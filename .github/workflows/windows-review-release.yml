@@ -54,15 +54,37 @@ jobs:
             -quit
 
           $zipPath = "${{ github.workspace }}\Builds\Windows_Review\Zip\Windows_Review_Latest.zip"
+          $logPath = "${{ github.workspace }}\Logs\windows_review_build.log"
+          $zipDir  = "${{ github.workspace }}\Builds\Windows_Review\Zip"
+          $playerDir = "${{ github.workspace }}\Builds\Windows_Review\Player"
 
           Write-Host "=== ZIP PATH ==="
           Write-Host $zipPath
           Write-Host "=== ZIP EXISTS? ==="
           Write-Host (Test-Path $zipPath)
 
+          Write-Host "=== ZIP DIR EXISTS? ==="
+          Write-Host (Test-Path $zipDir)
+          
+          if (Test-Path $zipDir) {
+            Write-Host "=== ZIP DIR CONTENTS ==="
+            Get-ChildItem $zipDir -Force | Format-List FullName, Length, LastWriteTime
+          }
+
+          Write-Host "=== PLAYER DIR EXISTS? ==="
+          Write-Host (Test-Path $playerDir)
+
+          if (Test-Path $playerDir) {
+            Write-Host "=== PLAYER DIR CONTENTS ==="
+            Get-ChildItem $playerDir -Force | Format-List FullName, Length, LastWriteTime
+          }
+
+          if (Test-Path $logPath) {
+            Write-Host "=== UNITY LOG TAIL ==="
+            Get-Content $logPath -Tail 200
+          }
+
           if (-not (Test-Path $zipPath)) {
-            Write-Host "=== BUILDS DIR ==="
-            Get-ChildItem "${{ github.workspace }}\Builds" -Recurse -Force | Select-Object FullName
             throw "zip が見つかりません: $zipPath"
           }
 

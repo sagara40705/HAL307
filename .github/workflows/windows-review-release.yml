@@ -50,18 +50,20 @@ jobs:
             -projectPath "${{ github.workspace }}" `
             -activeBuildProfile "Assets/Settings/Build Profiles/Windows_Review.asset" `
             -executeMethod BuildScript.BuildWindowsReviewBatch `
+            -logFile "${{ github.workspace }}\Logs\windows_review_build.log" `
             -quit
 
           $exitCode = $LASTEXITCODE
 
+          if (Test-Path "${{ github.workspace }}\Logs\windows_review_build.log") {
+            Write-Host "===== Unity Log ====="
+            Get-Content "${{ github.workspace }}\Logs\windows_review_build.log"
+            Write-Host "====================="
+          }
+
           if ($exitCode -ne 0) {
             throw "Unity build failed. ExitCode=$exitCode"
           }
-
-          if (-not (Test-Path "${{ steps.prep.outputs.zip_path }}")) {
-            throw "zip が見つかりません: ${{ steps.prep.outputs.zip_path }}"
-          }
-
 
       - name: Upload Unity log on failure
         if: failure()

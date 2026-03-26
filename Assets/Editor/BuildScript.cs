@@ -103,8 +103,12 @@ public static class BuildScript
             CreateZip(playerOutputDirectory, latestZipPath);
             CreateZip(playerOutputDirectory, archiveZipPath);
 
-            Debug.Log($"[Zip] Latest : {latestZipPath}");
-            Debug.Log($"[Zip] Archive: {archiveZipPath}");
+            Debug.Log($"[Path] ProjectRoot: {ProjectRoot}");
+            Debug.Log($"[Path] BuildRoot: {BuildRoot}");
+            Debug.Log($"[Path] PlayerOutputDirectory: {playerOutputDirectory}");
+            Debug.Log($"[Path] ZipOutputDirectory: {zipOutputDirectory}");
+            Debug.Log($"[Zip] Latest Absolute: {latestZipPath}");
+            Debug.Log($"[Zip] Archive Absolute: {archiveZipPath}");
         }
 
         AssetDatabase.Refresh();

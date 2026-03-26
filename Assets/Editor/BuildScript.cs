@@ -13,7 +13,9 @@ public static class BuildScript
 {
     private const string BuildProfilePath = "Assets/Settings/Build Profiles/Windows_Review.asset";
 
-    private const string BuildRoot = "Builds/Windows_Review";
+    static string ProjectRoot => Path.GetDirectoryName(Application.dataPath);
+    static string BuildRoot => Path.Combine(ProjectRoot, "Builds", "Windows_Review");
+
     private const string PlayerFolderName = "Player";
     private const string ZipFolderName = "Zip";
 

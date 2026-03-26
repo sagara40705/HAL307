@@ -53,13 +53,30 @@ jobs:
             -logFile "${{ github.workspace }}\Logs\windows_review_build.log" `
             -quit
 
-          if ($LASTEXITCODE -ne 0) {
-            throw "Unity build failed. ExitCode=$LASTEXITCODE"
+          $exitCode = $LASTEXITCODE
+
+          if (Test-Path "${{ github.workspace }}\Logs\windows_review_build.log") {
+            Write-Host "===== Unity Log Tail ====="
+            Get-Content "${{ github.workspace }}\Logs\windows_review_build.log" -Tail 200
+            Write-Host "=========================="
+          }
+
+          if ($exitCode -ne 0) {
+            throw "Unity build failed. ExitCode=$exitCode"
           }
 
           if (-not (Test-Path "${{ steps.prep.outputs.zip_path }}")) {
             throw "zip が見つかりません: ${{ steps.prep.outputs.zip_path }}"
           }
+
+
+      - name: Upload Unity log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-build-log
+          path: Logs/windows_review_build.log
+
 
       - name: Create GitHub Release
         id: create_release
@@ -121,3 +138,4 @@ jobs:
         run: |
           Write-Host "Release created:"
           Write-Host "${{ steps.create_release.outputs.html_url }}"
+

@@ -1,7 +1,9 @@
 name: Build Windows Review Release
 
+# 一時停止中:
+# self-hosted runner 上で Unity batch build の安定動作確認が取れるまで無効
 on:
-  workflow_dispatch:
+  # workflow_dispatch:
 
 permissions:
   contents: write

@@ -50,16 +50,9 @@ jobs:
             -projectPath "${{ github.workspace }}" `
             -activeBuildProfile "Assets/Settings/Build Profiles/Windows_Review.asset" `
             -executeMethod BuildScript.BuildWindowsReviewBatch `
-            -logFile "${{ github.workspace }}\Logs\windows_review_build.log" `
             -quit
 
           $exitCode = $LASTEXITCODE
-
-          if (Test-Path "${{ github.workspace }}\Logs\windows_review_build.log") {
-            Write-Host "===== Unity Log Tail ====="
-            Get-Content "${{ github.workspace }}\Logs\windows_review_build.log" -Tail 200
-            Write-Host "=========================="
-          }
 
           if ($exitCode -ne 0) {
             throw "Unity build failed. ExitCode=$exitCode"

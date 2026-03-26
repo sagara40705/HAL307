@@ -55,6 +55,20 @@ jobs:
 
           $exitCode = $LASTEXITCODE
 
+          Write-Host "=== EXIT CODE ==="
+          Write-Host $exitCode
+
+          Write-Host "=== LOGS DIR ==="
+          Get-ChildItem "${{ github.workspace }}\Logs" -Force | Format-Table Name, Length, LastWriteTime
+
+          Write-Host "=== WORKSPACE ROOT DIR ==="
+          Get-ChildItem "${{ github.workspace }}" -Force | Format-Table Name, LastWriteTime
+
+          $logPath = "${{ github.workspace }}\Logs\windows_review_build.log"
+
+          Write-Host "=== LOG PATH EXISTS? ==="
+          Write-Host (Test-Path $logPath)
+
           if (Test-Path "${{ github.workspace }}\Logs\windows_review_build.log") {
             Write-Host "===== Unity Log ====="
             Get-Content "${{ github.workspace }}\Logs\windows_review_build.log"

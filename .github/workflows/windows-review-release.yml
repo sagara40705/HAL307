@@ -1,0 +1,123 @@
+name: Build Windows Review Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: [self-hosted, windows, x64]
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare metadata
+        id: prep
+        run: |
+          $branchName = "${{ github.ref_name }}"
+          $safeBranch = $branchName -replace '[^0-9A-Za-z._-]', '-'
+          $shortSha = "${{ github.sha }}".Substring(0, 7)
+          $tagName = "windows-review-$safeBranch-r${{ github.run_number }}-a${{ github.run_attempt }}-$shortSha"
+          $releaseName = "Windows Review | $branchName | run ${{ github.run_number }}.${{ github.run_attempt }}"
+          $zipPath = "Builds/Windows_Review/Zip/Windows_Review_Latest.zip"
+
+          "branch_name=$branchName" >> $env:GITHUB_OUTPUT
+          "safe_branch=$safeBranch" >> $env:GITHUB_OUTPUT
+          "short_sha=$shortSha" >> $env:GITHUB_OUTPUT
+          "tag_name=$tagName" >> $env:GITHUB_OUTPUT
+          "release_name=$releaseName" >> $env:GITHUB_OUTPUT
+          "zip_path=$zipPath" >> $env:GITHUB_OUTPUT
+
+      - name: Validate UNITY_EXE_PATH
+        run: |
+          if (-not "${{ vars.UNITY_EXE_PATH }}") {
+            throw "Repository variable 'UNITY_EXE_PATH' が未設定です。例: C:\Program Files\Unity\Hub\Editor\6000.0.43f1\Editor\Unity.exe"
+          }
+
+      - name: Build and zip with Unity
+        run: |
+          New-Item -ItemType Directory -Force -Path "Logs" | Out-Null
+
+          & "${{ vars.UNITY_EXE_PATH }}" `
+            -batchmode `
+            -projectPath "${{ github.workspace }}" `
+            -activeBuildProfile "Assets/Settings/Build Profiles/Windows_Review.asset" `
+            -executeMethod BuildScript.BuildWindowsReviewBatch `
+            -logFile "${{ github.workspace }}\Logs\windows_review_build.log" `
+            -quit
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unity build failed. ExitCode=$LASTEXITCODE"
+          }
+
+          if (-not (Test-Path "${{ steps.prep.outputs.zip_path }}")) {
+            throw "zip が見つかりません: ${{ steps.prep.outputs.zip_path }}"
+          }
+
+      - name: Create GitHub Release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $headers = @{
+            Authorization        = "Bearer $env:GITHUB_TOKEN"
+            Accept               = "application/vnd.github+json"
+            "X-GitHub-Api-Version" = "2022-11-28"
+          }
+
+          $body = @{
+            tag_name         = "${{ steps.prep.outputs.tag_name }}"
+            target_commitish = "${{ github.sha }}"
+            name             = "${{ steps.prep.outputs.release_name }}"
+            body             = @"
+          Branch: ${{ steps.prep.outputs.branch_name }}
+          Commit: ${{ github.sha }}
+          Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          "@
+            draft            = $false
+            prerelease       = $true
+          } | ConvertTo-Json
+
+          $release = Invoke-RestMethod `
+            -Method Post `
+            -Uri "https://api.github.com/repos/${{ github.repository }}/releases" `
+            -Headers $headers `
+            -Body $body
+
+          $uploadUrl = $release.upload_url -replace '\{\?name,label\}$', ''
+
+          "upload_url=$uploadUrl" >> $env:GITHUB_OUTPUT
+          "html_url=$($release.html_url)" >> $env:GITHUB_OUTPUT
+
+      - name: Upload zip asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $zipPath = "${{ steps.prep.outputs.zip_path }}"
+          $assetName = Split-Path $zipPath -Leaf
+          $uploadUrl = "${{ steps.create_release.outputs.upload_url }}?name=$assetName"
+
+          $headers = @{
+            Authorization        = "Bearer $env:GITHUB_TOKEN"
+            Accept               = "application/vnd.github+json"
+            "X-GitHub-Api-Version" = "2022-11-28"
+            "Content-Type"       = "application/zip"
+          }
+
+          Invoke-RestMethod `
+            -Method Post `
+            -Uri $uploadUrl `
+            -Headers $headers `
+            -InFile $zipPath
+
+      - name: Show release URL
+        run: |
+          Write-Host "Release created:"
+          Write-Host "${{ steps.create_release.outputs.html_url }}"

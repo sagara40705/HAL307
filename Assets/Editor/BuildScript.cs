@@ -43,6 +43,8 @@ public static class BuildScript
     // CI / コマンドライン用
     public static void BuildWindowsReviewBatch()
     {
+        Debug.Log("=== BUILD METHOD STARTED ===");
+
         BuildWindowsReview(createZip: true, runAfterBuild: false);
     }
 

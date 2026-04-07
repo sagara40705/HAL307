@@ -19,7 +19,6 @@ public static class BuildScript
     private const string PlayerFolderName = "Player";
     private const string ZipFolderName = "Zip";
 
-    // exe名は好きに変えてOK
     private const string ExeName = "GameReview.exe";
 
     [MenuItem("Tools/Build/Windows Review/Build Only")]
@@ -149,7 +148,6 @@ public static class BuildScript
             File.Delete(zipPath);
         }
 
-        // includeBaseDirectory: true にすると zip を展開したときに Player フォルダごと入る
         ZipFile.CreateFromDirectory(
             sourceDirectory,
             zipPath,

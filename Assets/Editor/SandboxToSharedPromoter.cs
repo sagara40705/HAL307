@@ -682,7 +682,7 @@ $@"{{
     ""name"": ""{asmdefName}"",
     ""rootNamespace"": ""{rootNamespace}"",
     ""references"": [
-        ""GUID:{gameAsmdefGuid}""
+        ""GUID:{gameAsmdefGuid}"",
         ""Unity.InputSystem""
     ],
     ""includePlatforms"": [],

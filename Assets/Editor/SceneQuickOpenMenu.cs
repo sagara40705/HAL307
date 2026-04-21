@@ -11,7 +11,8 @@ public sealed class SceneQuickOpenWindow : EditorWindow
     private static readonly string[] SearchFolders =
     {
         "Assets/Game/Scenes",
-        "Assets/_Sandbox"
+        "Assets/_Sandbox",
+        "Assets/_Shared"
     };
 
     private Vector2 _scroll;

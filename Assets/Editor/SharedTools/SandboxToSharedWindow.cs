@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -13,13 +11,12 @@ public class SandboxToSharedWindow : EditorWindow
     private string _filter = string.Empty;
     private string _selectedSourcePath = string.Empty;
     private string _sharedFolderName = string.Empty;
-    private string _sharedRootNamespace = string.Empty;
 
     [MenuItem("Tools/Shared/Promote Sandbox To Shared...", false, 120)]
     public static void Open()
     {
         SandboxToSharedWindow window = GetWindow<SandboxToSharedWindow>("Sandbox → Shared");
-        window.minSize = new Vector2(560f, 430f);
+        window.minSize = new Vector2(560f, 360f);
         window.RefreshCandidates();
         window.TrySelectFromProjectWindow();
     }
@@ -27,6 +24,7 @@ public class SandboxToSharedWindow : EditorWindow
     private void OnEnable()
     {
         RefreshCandidates();
+        TrySelectFromProjectWindow();
     }
 
     private void OnGUI()
@@ -74,7 +72,7 @@ public class SandboxToSharedWindow : EditorWindow
 
         List<string> filtered = GetFilteredCandidates();
 
-        using (EditorGUILayout.ScrollViewScope scrollView = new EditorGUILayout.ScrollViewScope(_scroll, GUILayout.Height(190f)))
+        using (EditorGUILayout.ScrollViewScope scrollView = new EditorGUILayout.ScrollViewScope(_scroll, GUILayout.Height(180f)))
         {
             _scroll = scrollView.scrollPosition;
 
@@ -107,10 +105,12 @@ public class SandboxToSharedWindow : EditorWindow
         }
 
         _sharedFolderName = EditorGUILayout.TextField("Shared Folder Name", _sharedFolderName);
-        _sharedRootNamespace = EditorGUILayout.TextField("Shared Root Namespace", _sharedRootNamespace);
 
         EditorGUILayout.HelpBox(
-            "Shared 用 asmdef には Game と Unity.InputSystem を自動追加します。",
+            "この処理は Copy ではなく Move です。\n" +
+            "- _Sandbox から _Shared へ移動します\n" +
+            "- 上書きはしません\n" +
+            "- Script / namespace / asmdef はそのまま保持します",
             MessageType.None
         );
     }
@@ -127,30 +127,16 @@ public class SandboxToSharedWindow : EditorWindow
         {
             EditorGUILayout.HelpBox(
                 $"同名フォルダが既に存在します:\n{destinationPath}\n" +
-                "通常コピーは不可です。上書きする場合は Backup 付き Overwrite を使ってください。",
+                "上書きせず停止します。別名に変更してください。",
                 MessageType.Warning
             );
         }
 
-        using (new EditorGUI.DisabledScope(!hasSource || !hasSharedName))
+        using (new EditorGUI.DisabledScope(!hasSource || !hasSharedName || destinationExists))
         {
-            using (new EditorGUILayout.HorizontalScope())
+            if (GUILayout.Button("Move To _Shared", GUILayout.Height(32f)))
             {
-                using (new EditorGUI.DisabledScope(destinationExists))
-                {
-                    if (GUILayout.Button("Copy To _Shared", GUILayout.Height(32f)))
-                    {
-                        Promote(false);
-                    }
-                }
-
-                using (new EditorGUI.DisabledScope(!destinationExists))
-                {
-                    if (GUILayout.Button("Overwrite With Backup", GUILayout.Height(32f)))
-                    {
-                        Promote(true);
-                    }
-                }
+                Promote();
             }
         }
     }
@@ -158,19 +144,7 @@ public class SandboxToSharedWindow : EditorWindow
     private void RefreshCandidates()
     {
         _candidateFolders.Clear();
-
-        if (!AssetDatabase.IsValidFolder(SharedPromotionUtility.SandboxRoot))
-        {
-            return;
-        }
-
-        string[] directSubFolders = AssetDatabase.GetSubFolders(SharedPromotionUtility.SandboxRoot);
-        foreach (string path in directSubFolders)
-        {
-            _candidateFolders.Add(path);
-        }
-
-        _candidateFolders.Sort(StringComparer.OrdinalIgnoreCase);
+        _candidateFolders.AddRange(SharedPromotionUtility.GetDirectSubFolders(SharedPromotionUtility.SandboxRoot));
     }
 
     private List<string> GetFilteredCandidates()
@@ -180,9 +154,17 @@ public class SandboxToSharedWindow : EditorWindow
             return new List<string>(_candidateFolders);
         }
 
-        return _candidateFolders
-            .Where(x => x.IndexOf(_filter, StringComparison.OrdinalIgnoreCase) >= 0)
-            .ToList();
+        List<string> filtered = new List<string>();
+
+        foreach (string candidate in _candidateFolders)
+        {
+            if (candidate.IndexOf(_filter, System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                filtered.Add(candidate);
+            }
+        }
+
+        return filtered;
     }
 
     private void TrySelectFromProjectWindow()
@@ -192,28 +174,14 @@ public class SandboxToSharedWindow : EditorWindow
             return;
         }
 
-        string path = AssetDatabase.GetAssetPath(Selection.activeObject);
-        if (string.IsNullOrEmpty(path))
+        string selectedPath = AssetDatabase.GetAssetPath(Selection.activeObject);
+        if (string.IsNullOrEmpty(selectedPath))
         {
             return;
         }
 
-        string root = SharedPromotionUtility.SandboxRoot + "/";
-        if (!path.StartsWith(root, StringComparison.Ordinal))
-        {
-            return;
-        }
-
-        string relative = path.Substring(root.Length);
-        string[] parts = relative.Split('/');
-
-        if (parts.Length == 0 || string.IsNullOrWhiteSpace(parts[0]))
-        {
-            return;
-        }
-
-        string topLevelFolder = $"{SharedPromotionUtility.SandboxRoot}/{parts[0]}";
-        if (AssetDatabase.IsValidFolder(topLevelFolder))
+        string topLevelFolder = SharedPromotionUtility.GetTopLevelSandboxFolderFromPath(selectedPath);
+        if (!string.IsNullOrEmpty(topLevelFolder))
         {
             SelectSource(topLevelFolder);
         }
@@ -222,152 +190,81 @@ public class SandboxToSharedWindow : EditorWindow
     private void SelectSource(string path)
     {
         _selectedSourcePath = path;
-
-        string folderName = Path.GetFileName(path);
-        _sharedFolderName = SharedPromotionUtility.SanitizeName(folderName);
-        _sharedRootNamespace = $"Shared.{SharedPromotionUtility.SanitizeNamespacePart(folderName)}";
+        _sharedFolderName = SharedPromotionUtility.SanitizeName(Path.GetFileName(path));
     }
 
-    private void Promote(bool overwriteWithBackup)
+    private void Promote()
     {
         string sourcePath = _selectedSourcePath;
         string sharedFolderName = SharedPromotionUtility.SanitizeName(_sharedFolderName);
-        string sharedRootNamespace = SharedPromotionUtility.SanitizeNamespace(_sharedRootNamespace);
 
-        if (string.IsNullOrWhiteSpace(sourcePath) ||
-            string.IsNullOrWhiteSpace(sharedFolderName) ||
-            string.IsNullOrWhiteSpace(sharedRootNamespace))
+        if (string.IsNullOrWhiteSpace(sourcePath))
         {
-            EditorUtility.DisplayDialog("Error", "入力値が不正です。", "OK");
+            EditorUtility.DisplayDialog("Error", "移動元フォルダを選択してください。", "OK");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(sharedFolderName))
+        {
+            EditorUtility.DisplayDialog("Error", "Shared Folder Name が不正です。", "OK");
             return;
         }
 
         SharedPromotionUtility.EnsureFolder("Assets", "_Shared");
 
         string destinationPath = $"{SharedPromotionUtility.SharedRoot}/{sharedFolderName}";
-        bool destinationExists = AssetDatabase.IsValidFolder(destinationPath);
-
-        if (destinationExists && !overwriteWithBackup)
+        if (AssetDatabase.IsValidFolder(destinationPath))
         {
             EditorUtility.DisplayDialog(
                 "Error",
-                $"既に存在します:\n{destinationPath}\n\n" +
-                "上書きしたい場合は Overwrite With Backup を使ってください。",
+                $"同名フォルダが既に存在します:\n{destinationPath}\n\n別名を指定してください。",
                 "OK"
             );
             return;
         }
 
-        string gameAsmdefGuid = SharedPromotionUtility.FindAsmdefGuidByName("Game");
-        if (string.IsNullOrEmpty(gameAsmdefGuid))
+        bool confirmed = EditorUtility.DisplayDialog(
+            "Move To _Shared",
+            $"次のフォルダを _Shared へ移動します。\n\n" +
+            $"From:\n{sourcePath}\n\n" +
+            $"To:\n{destinationPath}\n\n" +
+            "この処理は Move です。_Sandbox 側からは消えます。",
+            "Move",
+            "Cancel"
+        );
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        string moveError = AssetDatabase.MoveAsset(sourcePath, destinationPath);
+        if (!string.IsNullOrEmpty(moveError))
         {
             EditorUtility.DisplayDialog(
                 "Error",
-                "Game.asmdef が見つかりませんでした。Assets/Game/Game.asmdef を確認してください。",
+                $"移動に失敗しました。\n{moveError}",
                 "OK"
             );
             return;
         }
 
-        string sourceAsmdefPath = SharedPromotionUtility.FindFirstAsmdefPath(sourcePath);
-        SharedPromotionUtility.AsmdefInfo sourceAsmdef = SharedPromotionUtility.ReadAsmdef(sourceAsmdefPath);
-        string sourceRootNamespace = sourceAsmdef != null ? sourceAsmdef.rootNamespace : string.Empty;
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
 
-        string backupPath = null;
-        bool backupCreated = false;
-
-        try
+        Object folderObj = SharedPromotionUtility.LoadFolderObject(destinationPath);
+        if (folderObj != null)
         {
-            if (destinationExists)
-            {
-                SharedPromotionUtility.EnsureFolder(SharedPromotionUtility.SharedRoot, "_Backup");
-
-                backupPath = SharedPromotionUtility.GenerateBackupPath(sharedFolderName);
-
-                bool confirmed = EditorUtility.DisplayDialog(
-                    "Overwrite With Backup",
-                    $"既存フォルダをバックアップしてから上書きします。\n\n" +
-                    $"対象:\n{destinationPath}\n\n" +
-                    $"バックアップ先:\n{backupPath}",
-                    "Overwrite",
-                    "Cancel"
-                );
-
-                if (!confirmed)
-                {
-                    return;
-                }
-
-                string moveError = AssetDatabase.MoveAsset(destinationPath, backupPath);
-                if (!string.IsNullOrEmpty(moveError))
-                {
-                    throw new Exception($"バックアップ作成に失敗しました。\n{moveError}");
-                }
-
-                backupCreated = true;
-            }
-
-            bool copied = AssetDatabase.CopyAsset(sourcePath, destinationPath);
-            if (!copied)
-            {
-                throw new Exception("フォルダコピーに失敗しました。");
-            }
-
-            SharedPromotionUtility.DeleteAsmdefsInFolder(destinationPath);
-
-            string sharedAsmdefName = $"{sharedFolderName}.Shared";
-            SharedPromotionUtility.CreateAsmdef(destinationPath, sharedAsmdefName, sharedRootNamespace, gameAsmdefGuid);
-
-            if (!string.IsNullOrWhiteSpace(sourceRootNamespace))
-            {
-                SharedPromotionUtility.ReplaceNamespaceInCSharpFiles(destinationPath, sourceRootNamespace, sharedRootNamespace);
-            }
-
-            SharedPromotionUtility.CreateOrOverwriteReadme(destinationPath, sourcePath, sharedFolderName, sharedRootNamespace);
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-
-            UnityEngine.Object folderObj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(destinationPath);
             Selection.activeObject = folderObj;
             EditorGUIUtility.PingObject(folderObj);
-
-            string message =
-                $"完了:\n{destinationPath}" +
-                (backupCreated ? $"\n\nBackup:\n{backupPath}" : string.Empty);
-
-            EditorUtility.DisplayDialog("Completed", message, "OK");
         }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
 
-            AssetDatabase.Refresh();
+        RefreshCandidates();
 
-            if (AssetDatabase.IsValidFolder(destinationPath))
-            {
-                AssetDatabase.DeleteAsset(destinationPath);
-                AssetDatabase.Refresh();
-            }
-
-            if (backupCreated && !string.IsNullOrEmpty(backupPath) && AssetDatabase.IsValidFolder(backupPath))
-            {
-                string restoreError = AssetDatabase.MoveAsset(backupPath, destinationPath);
-                if (!string.IsNullOrEmpty(restoreError))
-                {
-                    Debug.LogError($"バックアップからの復元に失敗しました: {restoreError}");
-                }
-            }
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-
-            EditorUtility.DisplayDialog(
-                "Error",
-                $"Shared へのコピーに失敗しました。\n{ex.Message}\n\n" +
-                "可能な限り元の状態へ復元を試みました。",
-                "OK"
-            );
-        }
+        EditorUtility.DisplayDialog(
+            "Completed",
+            $"移動完了:\n{destinationPath}",
+            "OK"
+        );
     }
 }

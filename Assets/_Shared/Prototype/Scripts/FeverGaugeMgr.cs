@@ -1,84 +1,139 @@
+using System;
 using UnityEngine;
 
 // フィーバーゲージ管理クラス
-// ゲージの追加、フィーバーモードの開始と終了、ゲージの状態管理を行う
-// フィーバーモード中のゲージは最大値で固定
 public class FeverGaugeMgr : MonoBehaviour
 {
-    [SerializeField] private int _kMaxGauge = 100;  // フィーバーゲージの最大値
-    [SerializeField] private int _kInitGauge = 0;   // フィーバーゲージの初期値
+    [Header("Gauge")]
+    [SerializeField] private int maxGauge = 100;    // ゲージの最大値
+    [SerializeField] private int initialGauge = 0;  // ゲージの初期値
 
-    [SerializeField] private float _kFeverModeDuration = 10f; // フィーバーモードの持続時間（秒）
+    [Header("Fever")]
+    [SerializeField] private float feverDuration = 10f; // フィーバーモードの持続時間（秒）
 
-    private int _currentGauge = 0;      // 現在のゲージ値
-    private bool _feverMode = false;    // フィーバーモード中かどうか
-    private float _feverModeTimer = 0f; // フィーバーモードの残り時間
+    private int currentGauge;   // 現在のゲージ値
+    private bool isFeverMode;   // フィーバーモード中かどうか
+    private float feverTimer;   // フィーバーモードの残り時間
 
-    private void Start()
+
+    // 外部参照プロパティ
+
+    // ゲージの最大値
+    public int MaxGauge => maxGauge;
+
+    // 現在のゲージ値
+    public int CurrentGauge => currentGauge;
+
+    // フィーバーモード中かどうか
+    public bool IsFeverMode => isFeverMode;
+
+    // フィーバーモードの持続時間
+    public float FeverDuration => feverDuration;
+
+    // フィーバーモードの残り時間
+    public float FeverRemainingTime => feverTimer;
+
+    // フィーバーモードの経過時間
+    public float FeverElapsedTime => isFeverMode ? feverDuration - feverTimer : 0f;
+
+    // ゲージの割合（0.0～1.0）
+    public float GaugeRate => maxGauge <= 0 ? 0f : (float)currentGauge / maxGauge;
+
+
+    // UI用のイベント
+    public event Action<int, int> OnGaugeChanged;   // (currentGauge, maxGauge)の形式でゲージの変化を通知
+    public event Action OnFeverStarted;             // フィーバーモード開始を通知
+    public event Action OnFeverEnded;               // フィーバーモード終了を通知
+
+    private void Awake()
     {
-        _currentGauge = _kInitGauge; // ゲージを初期値に設定
-        _feverMode = false;
-        _feverModeTimer = 0f;
+        Initialize();
     }
 
     private void Update()
     {
-        if (_feverMode)
+        if (!isFeverMode)
         {
-            _feverModeTimer -= Time.deltaTime;
-            if (_feverModeTimer <= 0f)
-            {
-                EndFeverMode();
-            }
+            return;
         }
+
+        feverTimer -= Time.deltaTime;
+        if (feverTimer <= 0f)
+        {
+            EndFeverMode();
+        }
+    }
+
+    private void Initialize()
+    {
+        maxGauge = Mathf.Max(1, maxGauge);
+        feverDuration = Mathf.Max(0.1f, feverDuration);
+
+        currentGauge = Mathf.Clamp(initialGauge, 0, maxGauge);
+        isFeverMode = false;
+        feverTimer = 0f;
+
+        OnGaugeChanged?.Invoke(currentGauge, maxGauge);
     }
 
     public void AddGauge(int amount)
     {
-        // フィーバーモード中はゲージを追加しない
-        if (_feverMode) { return; }
+        if (isFeverMode) { return; }
 
-        // ゲージを追加
-        _currentGauge += amount;
+        if (amount <= 0) { return; }
 
-        // ゲージが最大値を超えた場合はフィーバーモードを開始
-        if (_currentGauge >= _kMaxGauge)
+        currentGauge = Mathf.Clamp(currentGauge + amount, 0, maxGauge);
+        OnGaugeChanged?.Invoke(currentGauge, maxGauge);
+
+        if (currentGauge >= maxGauge)
         {
             StartFeverMode();
         }
     }
 
-    // 外部参照用関数
-    public int GetMaxGauge() { return _kMaxGauge; }     // ゲージの最大値を返す関数
-    public int GetCurrentGauge() { return _currentGauge; }  // 現在のゲージ値を返す関数
-    public bool IsFeverMode() { return _feverMode; }    // フィーバーモード中かどうかを返す関数
-    public float GetFeverModeDuration() { return _kFeverModeDuration; } // フィーバーモードの持続時間を返す関数
-    public float GetFeverModeTimer() { return _feverModeTimer; } // フィーバーモードの残り時間を返す関数
+    public void SetGauge(int amount)
+    {
+        if (isFeverMode) { return; }
 
+        currentGauge = Mathf.Clamp(amount, 0, maxGauge);
+        OnGaugeChanged?.Invoke(currentGauge, maxGauge);
 
-    // 内部処理関数
+        if (currentGauge >= maxGauge)
+        {
+            StartFeverMode();
+        }
+    }
+
     private void StartFeverMode()
     {
-        if (_feverMode) { return; }
+        if (isFeverMode) { return; }
 
-        Debug.Log("フィーバーモード開始！");
-        _feverMode = true;
-        _feverModeTimer = _kFeverModeDuration;
-        _currentGauge = _kMaxGauge;
+        isFeverMode = true;
+        feverTimer = feverDuration;
+        currentGauge = maxGauge;
+
+        OnGaugeChanged?.Invoke(currentGauge, maxGauge);
+        OnFeverStarted?.Invoke();
+
+        Debug.Log("フィーバーモード開始");
     }
 
     private bool EndFeverMode()
     {
-        if (!_feverMode) { return false; }
+        if (!isFeverMode) { return false; }
 
-        _feverMode = false;
-        _feverModeTimer = 0f;
-        _currentGauge = 0;
-        Debug.Log("フィーバーモード終了！");
+        isFeverMode = false;
+        feverTimer = 0f;
+        currentGauge = 0;
+
+        OnGaugeChanged?.Invoke(currentGauge, maxGauge);
+        OnFeverEnded?.Invoke();
+
+        Debug.Log("フィーバーモード終了");
         return true;
     }
 
-    // デバック用関数
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
     public void DebugStartFeverMode()
     {
         Debug.Log("Debug: フィーバーモード開始");
@@ -87,21 +142,14 @@ public class FeverGaugeMgr : MonoBehaviour
 
     public void DebugEndFeverMode()
     {
-        EndFeverMode();
-        Debug.Log("Debug: フィーバーモード終了");
-    }
-
-    public void SetGauge(int amount)
-    {
-        if (_feverMode) { return; }
-
-        _currentGauge = Mathf.Clamp(amount, 0, _kMaxGauge);
-        Debug.Log("Debug: ゲージを設定 " + _currentGauge);
-
-        if (_currentGauge >= _kMaxGauge)
+        if (EndFeverMode())
         {
-            StartFeverMode();
+            Debug.Log("Debug: フィーバーモード終了");
+        }
+        else
+        {
+            Debug.Log("Debug: フィーバーモード中ではありません");
         }
     }
-
+#endif
 }

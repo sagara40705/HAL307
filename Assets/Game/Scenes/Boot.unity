@@ -256,6 +256,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &909709785
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 909709787}
+  - component: {fileID: 909709786}
+  m_Layer: 0
+  m_Name: SoundManagerObj
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &909709786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909709785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 185c727ac1f2ea64aba5a5d400fb8e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::SoundManager
+  catalog: {fileID: 11400000, guid: f8bb033a9dfe6904e85cc003e1cda917, type: 2}
+  resourcesCatalogPath: Audio/SoundCatalog
+  audioMixer: {fileID: 0}
+  masterVolumeParameter: MasterVolume
+  bgmVolumeParameter: BgmVolume
+  seVolumeParameter: SeVolume
+  seSourcePoolSize: 8
+  saveVolumeSettings: 1
+--- !u!4 &909709787
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909709785}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 416.74408, y: -0, z: 1138.0222}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1300418828
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,3 +489,4 @@ SceneRoots:
   - {fileID: 1300418830}
   - {fileID: 903886854}
   - {fileID: 1567818133}
+  - {fileID: 909709787}

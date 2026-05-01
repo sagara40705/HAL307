@@ -45,10 +45,32 @@ public sealed class AppBootstrapper : MonoBehaviour
 
         // --- 追加例 --------------------------------------------------
 
+        // debug用のManager
         yield return BootManager(
             nameof(DebugConsoleManager),
             () => DebugConsoleManager.CreateFromBootIfNeeded());
-        if (HasFailed) yield break;
+        if (HasFailed)
+        {
+            yield break;
+        }
+
+        // SoundManager
+        yield return BootManager(
+            nameof(SoundManager),
+            () => SoundManager.CreateFromBootIfNeeded());
+        if (HasFailed)
+        {
+            yield break;
+        }
+
+        // SceneLoader
+        yield return BootManager(
+            nameof(SceneLoader),
+            () => SceneLoader.CreateFromBootIfNeeded());
+        if (HasFailed)
+        {
+            yield break;
+        }
 
         /*
         yield return BootSingleton(
@@ -67,7 +89,7 @@ public sealed class AppBootstrapper : MonoBehaviour
             () => OptionManager.CreateFromBootIfNeeded());
         if (HasFailed) yield break;
         */
-        
+
         // yield return BootManager(
         //     nameof(SaveManager),
         //     () => SaveManager.CreateFromBootIfNeeded());

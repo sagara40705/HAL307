@@ -78,7 +78,7 @@ public class VoiceOnnxRunner : MonoBehaviour
             return;
         }
 
-        float volume = GetMaxAbs(samples);
+        float volume = GetVolumeRMS(samples);
         if (volume < minVolumeThreshold)
         {
             return;
@@ -120,6 +120,15 @@ public class VoiceOnnxRunner : MonoBehaviour
         int predictedIndex = ArgMax(readable);
         string predictedLabel = labels[predictedIndex];
 
+
+        Debug.Log($"[MIC] vollume = {volume:F4}");
+
+        Debug.Log(
+    $"[AI] result={predictedLabel} / " +
+    $"muscle={muscleScore:F3}, none={noneScore:F3}, power={powerScore:F3}, yaa={yaaScore:F3}"
+);
+
+
         if (logPrediction)
         {
             Debug.Log($"推論結果: {predictedLabel} / volume={volume:F3}");
@@ -130,6 +139,7 @@ public class VoiceOnnxRunner : MonoBehaviour
             Debug.Log(BuildScoreLog(readable));
         }
 
+        // 誤爆防止フィルタ: muscle/power/yaa のスコアが none と十分に差がない場合は無視する
         if (useSafetyFilter)
         {
             if (predictedLabel == "muscle" && muscleScore - noneScore < muscleNoneMargin)
@@ -162,20 +172,16 @@ public class VoiceOnnxRunner : MonoBehaviour
         readable.Dispose();
     }
 
-    private float GetMaxAbs(float[] samples)
+    private float GetVolumeRMS(float[] samples)
     {
-        float maxAbs = 0f;
+        float sum = 0.0f;
 
         for (int i = 0; i < samples.Length; i++)
         {
-            float v = Mathf.Abs(samples[i]);
-            if (v > maxAbs)
-            {
-                maxAbs = v;
-            }
+            sum += samples[i] * samples[i];
         }
 
-        return maxAbs;
+        return Mathf.Sqrt(sum / samples.Length);    
     }
 
     private int ArgMax(Tensor<float> tensor)

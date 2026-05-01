@@ -7,68 +7,57 @@ public class VoiceCommandAction : MonoBehaviour
     [SerializeField] private GameObject yaaObject;
     [SerializeField] private GameObject muscleObject;
 
-    [Header("完全削除ではなく非表示にする")]
+    [Header("設定")]
     [SerializeField] private bool onlyHide = true;
-
-    [Header("ログを出す")]
     [SerializeField] private bool logCommand = true;
 
     public void ExecuteCommand(string command)
     {
-        if (logCommand)
-        {
-            Debug.Log("認識コマンド: " + command);
-        }
-
         if (string.IsNullOrEmpty(command))
         {
             return;
         }
 
+        if (logCommand)
+        {
+            Debug.Log("[Action] command = " + command);
+        }
+
         switch (command)
         {
             case "power":
-                HideOrDestroy(powerObject, "power");
+                HandleObject(powerObject, "power");
                 break;
 
             case "yaa":
-                HideOrDestroy(yaaObject, "yaa");
+                HandleObject(yaaObject, "yaa");
                 break;
 
             case "muscle":
-                HideOrDestroy(muscleObject, "muscle");
-                break;
-
-            case "none":
-                // 何もしない
+                HandleObject(muscleObject, "muscle");
                 break;
 
             default:
-                Debug.Log("未対応コマンド: " + command);
+                // none や不明は何もしない
                 break;
         }
     }
 
-    private void HideOrDestroy(GameObject target, string label)
+    private void HandleObject(GameObject obj, string label)
     {
-        if (target == null)
+        if (obj == null)
         {
-            Debug.LogWarning(label + " 用のオブジェクトが設定されていません");
+            Debug.LogWarning(label + " の対象オブジェクトが設定されていません");
             return;
         }
 
         if (onlyHide)
         {
-            if (target.activeSelf)
-            {
-                target.SetActive(false);
-                Debug.Log(label + " のオブジェクトを非表示にしました");
-            }
+            obj.SetActive(false);
         }
         else
         {
-            Destroy(target);
-            Debug.Log(label + " のオブジェクトを削除しました");
+            Destroy(obj);
         }
     }
 }

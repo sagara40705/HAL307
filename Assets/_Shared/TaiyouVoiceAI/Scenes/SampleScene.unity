@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 62380395}
   - component: {fileID: 62380394}
   - component: {fileID: 62380393}
-  - component: {fileID: 62380398}
+  - component: {fileID: 62380392}
   m_Layer: 0
   m_Name: VoiceAIManager
   m_TagString: Untagged
@@ -156,6 +156,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &62380392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62380389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 467bbb5e34a1f834fa51766e760bba8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::VoiceOnnxRunner
+  modelAsset: {fileID: 5022602860645237092, guid: a33416011209da1468935a76ae9cfecd, type: 3}
+  microphoneInput: {fileID: 62380394}
+  featureExtractor: {fileID: 62380396}
+  voiceCommandAction: {fileID: 62380393}
+  inferenceInterval: 0.1
+  minVolumeThreshold: 0.0005
+  logPrediction: 1
+  logScores: 1
+  useSafetyFilter: 1
+  muscleNoneMargin: 5
+  powerNoneMargin: 7
+  yaaNoneMargin: 3
 --- !u!114 &62380393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,15 +187,45 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62380389}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49a4019392ceada4693d38d8553e4659, type: 3}
+  m_Script: {fileID: 11500000, guid: e436a8f5e84b93c438658f58999e665e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::FeatureDebug
-  microphoneInput: {fileID: 62380396}
-  featureExtractor: {fileID: 62380394}
-  checkInterval: 1.5
+  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::VoiceCommandAction
+  powerObject: {fileID: 293995663}
+  yaaObject: {fileID: 1173539856}
+  muscleObject: {fileID: 1790491365}
+  onlyHide: 1
+  logCommand: 1
 --- !u!114 &62380394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62380389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842d3d58341e8c342a542e115b5f1054, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::MicrophoneInput
+  sampleRate: 16000
+  recordLengthSec: 1
+--- !u!114 &62380395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62380389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e04fe287266e5d54e9c691d49d7563f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::MicrophoneDebug
+  microphoneInput: {fileID: 62380394}
+  checkInterval: 1
+--- !u!114 &62380396
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -189,34 +243,6 @@ MonoBehaviour:
   melFilterCount: 40
   preEmphasis: 0.97
   normalizePerFeature: 1
---- !u!114 &62380395
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 62380389}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e04fe287266e5d54e9c691d49d7563f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::MicrophoneDebug
-  microphoneInput: {fileID: 0}
-  checkInterval: 1
---- !u!114 &62380396
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 62380389}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 842d3d58341e8c342a542e115b5f1054, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::MicrophoneInput
-  sampleRate: 16000
-  recordLengthSec: 1
 --- !u!114 &62380397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,38 +252,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 62380389}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e436a8f5e84b93c438658f58999e665e, type: 3}
+  m_Script: {fileID: 11500000, guid: 49a4019392ceada4693d38d8553e4659, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::VoiceCommandAction
-  powerObject: {fileID: 293995663}
-  yaaObject: {fileID: 1173539856}
-  muscleObject: {fileID: 1790491365}
-  onlyHide: 1
-  logCommand: 1
---- !u!114 &62380398
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 62380389}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 467bbb5e34a1f834fa51766e760bba8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::VoiceOnnxRunner
-  modelAsset: {fileID: 5022602860645237092, guid: a33416011209da1468935a76ae9cfecd, type: 3}
-  microphoneInput: {fileID: 62380396}
-  featureExtractor: {fileID: 62380394}
-  voiceCommandAction: {fileID: 62380397}
-  inferenceInterval: 0.2
-  minVolumeThreshold: 0.0001
-  logPrediction: 1
-  logScores: 1
-  useSafetyFilter: 1
-  muscleNoneMargin: 10
-  powerNoneMargin: 10
-  yaaNoneMargin: 10
+  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::FeatureDebug
+  microphoneInput: {fileID: 62380394}
+  featureExtractor: {fileID: 62380396}
+  checkInterval: 1.5
 --- !u!1 &293995663
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,17 @@
+{
+    "name": "Prototype.Sandbox",
+    "rootNamespace": "Prototype.Sandbox",
+    "references": [
+        "GUID:2525a5a692f1e3d4b8ac5b3ac61152dc",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

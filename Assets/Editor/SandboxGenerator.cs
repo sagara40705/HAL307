@@ -151,7 +151,8 @@ $@"{{
     ""name"": ""{personName}.Sandbox"",
     ""rootNamespace"": ""{personName}.Sandbox"",
     ""references"": [
-        ""GUID:{gameAsmdefGuid}""
+        ""GUID:{gameAsmdefGuid}"",
+        ""Unity.InputSystem""
     ],
     ""includePlatforms"": [],
     ""excludePlatforms"": [],

@@ -6,7 +6,7 @@ using System.Diagnostics;
 public class OpenWindows
 {
     private const string MenuPath = "Tools/ OpenWindows";
-    private const int Priority = 1;
+    private const int Priority = 50;
 
     [MenuItem(MenuPath + "/Show In Exploer", false, Priority)]
     private static void ShowInExploer()

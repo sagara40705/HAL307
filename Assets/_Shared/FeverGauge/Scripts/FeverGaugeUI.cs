@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 namespace FeverGauge.Sandbox
 {
+    // <summary>
+    // フィーバーゲージのUI管理クラス
+    // </summary>
     public class FeverGaugeUI : MonoBehaviour
     {
         [Header("Reference")]

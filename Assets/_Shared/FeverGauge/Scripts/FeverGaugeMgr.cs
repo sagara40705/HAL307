@@ -3,7 +3,9 @@ using UnityEngine;
 
 namespace FeverGauge.Sandbox
 {
-    // フィーバーゲージ管理クラス
+    // <summary>
+    // フィーバーゲージの管理クラス(ゲーム内のロジックを担当)
+    // </summary>
     public class FeverGaugeMgr : MonoBehaviour
     {
         [Header("Gauge")]

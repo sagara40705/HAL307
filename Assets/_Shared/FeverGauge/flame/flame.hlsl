@@ -1,6 +1,7 @@
 #ifndef FLAME_UI_INCLUDED
 #define FLAME_UI_INCLUDED
 
+
 // UI Image から渡されるスプライト
 sampler2D _MainTex;
 
@@ -8,7 +9,7 @@ sampler2D _MainTex;
 float4 _MainTex_ST;
 
 // 炎描画ロジック
-#include "Assets/_Sandbox/masato/flame/flame_fire.hlsl"
+#include "flame_fire.hlsl"
 
 // 頂点入力
 struct Attributes

@@ -51,6 +51,7 @@ Shader "Custom/flame"
     {
         Tags
         {
+            "RenderPipeline"="UniversalPipeline"
             "Queue"="Transparent"
             "RenderType"="Transparent"
             "IgnoreProjector"="True"
@@ -70,7 +71,7 @@ Shader "Custom/flame"
             #pragma fragment FlameFragment
 
             #include "UnityCG.cginc"
-            #include "Assets/_Sandbox/masato/flame/flame.hlsl"
+            #include "flame.hlsl"
 
             ENDHLSL
         }

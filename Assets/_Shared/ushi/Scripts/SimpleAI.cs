@@ -36,7 +36,7 @@ public class SimpleAI : MonoBehaviour
         };
         StartCoroutine(AIBehaviour());
     }
-
+ 
     void Push()
     {
 
@@ -87,12 +87,13 @@ public class SimpleAI : MonoBehaviour
             rend.material.color = colors[index];
             timer = 0f;
 
-            while (timer < stopTime)
+            if (Random.value<=0.6)
             {
                 Push(); // 毎フレーム確認
                 timer += Time.deltaTime * 1.2f;
                 yield return null;
             }
+
             yield return new WaitForSeconds(stopTime);
 
         }

@@ -154,7 +154,7 @@ MonoBehaviour:
   speed: 3
   moveTimeMin: 2
   moveTimeMax: 2
-  stopTimeMin: 1
+  stopTimeMin: 2
   stopTimeMax: 1
   moveColor: {r: 1, g: 1, b: 1, a: 1}
   stopColor: {r: 1, g: 0, b: 0, a: 1}

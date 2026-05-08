@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class SimpleAI : MonoBehaviour
 {
@@ -23,6 +24,7 @@ public class SimpleAI : MonoBehaviour
     private Renderer rend;
     private Color[] colors;
     private int index;
+    private bool isParry = false;
     void Start()
     {
 
@@ -32,7 +34,6 @@ public class SimpleAI : MonoBehaviour
             stopColor,
             PowerColor,
             MasssuruColor,
-            ParryColor,//ここはフェイク
         };
         StartCoroutine(AIBehaviour());
     }
@@ -42,22 +43,55 @@ public class SimpleAI : MonoBehaviour
 
         switch (index)
         {
+            case 0:
+
+                if (!isParry)
+                {
+                    rend.material.color = stopColor;
+                }
+
+                if (Keyboard.current.cKey.wasPressedThisFrame)
+                {
+                    Debug.Log("Push!");
+
+                    isParry = true;
+                    rend.material.color = ParryColor;
+                }
+
+                break;
+
             case 1:
-                rend.material.color = stopColor;
+
+                if (!isParry)
+                {
+                    rend.material.color = PowerColor;
+                }
+
+                if (Keyboard.current.dKey.wasPressedThisFrame)
+                {
+                    Debug.Log("Push!");
+                    isParry = true;
+                    rend.material.color = ParryColor;
+                }
+
                 break;
+
             case 2:
-                rend.material.color = PowerColor;
-                break;
-            case 3:
-                rend.material.color = MasssuruColor;
+
+                if (!isParry)
+                {
+                    rend.material.color = MasssuruColor;
+                }
+
+                if (Keyboard.current.fKey.wasPressedThisFrame)
+                {
+                    Debug.Log("Push!");
+                    isParry = true;
+                    rend.material.color = ParryColor;
+                }
+
                 break;
         }
-        //if (Keyboard.current.cKey.wasPressedThisFrame)
-        //{
-        //    Debug.Log("Push!");
-        //    止まる状態
-        //    rend.material.color = ParryColor;
-        //}
     }
 
     IEnumerator AIBehaviour()
@@ -87,12 +121,15 @@ public class SimpleAI : MonoBehaviour
             rend.material.color = colors[index];
             timer = 0f;
 
-            if (Random.value<=0.6)
+            //if (Random.value<=0.6)
+            //{
+            while (timer < stopTime)
             {
                 Push(); // 毎フレーム確認
                 timer += Time.deltaTime * 1.2f;
                 yield return null;
             }
+           // }
 
             yield return new WaitForSeconds(stopTime);
 

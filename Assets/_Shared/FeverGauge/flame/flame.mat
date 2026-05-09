@@ -37,17 +37,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _FillAmount: 0.709
+    - _FillAmount: 0.859
     - _FlameAngleOffset: -180
-    - _FlameSpeed: 0.5
+    - _FlameSpeed: 0
     - _FlameStrength: 1.078
     - _FlickerSpeed: 6
     - _FlickerStrength: 0.08
-    - _InnerRadius: 0.301
-    - _OuterRadius: 0.5
+    - _InnerRadius: 0.314
+    - _OuterRadius: 0.47
     - _Radius: 0.4
     - _Scale: 0.75
-    - _StartAngle: 0
+    - _StartAngle: 177
     - _TipGlow: 4
     - _TipLength: 0.265
     - _TipStrength: 1.65

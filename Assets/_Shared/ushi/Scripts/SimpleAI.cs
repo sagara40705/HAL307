@@ -21,9 +21,13 @@ public class SimpleAI : MonoBehaviour
 
     // ← ここで方向を決める（例：前方向）
     public Vector3 moveDirection = Vector3.forward;
+    //色を取得する箱
     private Renderer rend;
+    //色を取得するための配列
     private Color[] colors;
+    //現在のポーズの種類を保存する変数(色)
     private int index;
+    //ポーズ中パリィが発生したかどうか
     private bool isParry = false;
     void Start()
     {

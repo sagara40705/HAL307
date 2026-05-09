@@ -172,7 +172,7 @@ MonoBehaviour:
   microphoneInput: {fileID: 62380394}
   featureExtractor: {fileID: 62380396}
   voiceCommandAction: {fileID: 62380393}
-  inferenceInterval: 0.1
+  inferenceInterval: 0.7
   minVolumeThreshold: 0.0005
   logPrediction: 1
   logScores: 1
@@ -250,7 +250,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62380389}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 49a4019392ceada4693d38d8553e4659, type: 3}
   m_Name: 

@@ -96,15 +96,16 @@ namespace Enemy
             }
         }
 
-        public void RandomPose()
+        public PoseID RandomPose()
         {
             if (_data == null || _data.PoseSet.Poses.Count == 0)
             {
                 Debug.LogWarning($"Enemy {name} has no poses defined in its data.");
-                return;
+                return PoseID.None;
             }
             EnemyPoseData randomPoseData = _data.PoseSet.GetRandomPose();
             Pause(randomPoseData);
+            return randomPoseData.ID;
         }
 
         public void Pause(EnemyPoseData poseData)

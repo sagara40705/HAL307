@@ -7,36 +7,40 @@ namespace Pose
     public class PoseParryJudge : MonoBehaviour
     {
         // 敵のPoseID
-        [SerializeField] private PoseID enemyPoseID;
+        [SerializeField] private PoseID _enemyPoseID;
 
         // プレイヤーのPoseID
-        [SerializeField] private PoseID playerPoseID;
+        [SerializeField] private PoseID _playerPoseID;
 
         // パリイ発生時のアクション
         public event Action OnParrySuccess;
 
         public void StartEnemyPose(PoseID enemyPoseID)
         {
-            this.enemyPoseID = enemyPoseID;
+            _enemyPoseID = enemyPoseID;
         }
         public void StartPlayerPose(PoseID playerPoseID)
         {
-            this.playerPoseID = playerPoseID;
+            _playerPoseID = playerPoseID;
             CheckParry();
         }
         public void EndEnemyPose()
         {
-            this.enemyPoseID = PoseID.None;
+            _enemyPoseID = PoseID.None;
+            Debug.Log("PoseParryJudge Enemy pose ended.");
         }
         public void EndPlayerPose()
         {
-            this.playerPoseID = PoseID.None;
+            _playerPoseID = PoseID.None;
+            Debug.Log("PoseParryJudge Player pose ended.");
         }
 
         private void CheckParry()
         {
-            if (enemyPoseID == PoseID.None) { return; }
-            if (playerPoseID == PoseID.None) { return; }
+            Debug.Log($"PoseParryJudge CheckParry() Player pose: {_playerPoseID}");
+            Debug.Log($"PoseParryJudge CheckParry() Enemy pose: {_enemyPoseID}");
+            if (_enemyPoseID == PoseID.None) { return; }
+            if (_playerPoseID == PoseID.None) { return; }
 
             if (IsParrySuccessful())
             {
@@ -55,7 +59,7 @@ namespace Pose
         private bool IsParrySuccessful()
         {
             // 敵のPoseIDとプレイヤーのPoseIDが一致しているかを判定
-            return enemyPoseID != PoseID.None && playerPoseID != PoseID.None && enemyPoseID == playerPoseID;
+            return _enemyPoseID != PoseID.None && _playerPoseID != PoseID.None && _enemyPoseID == _playerPoseID;
         }
 
         // デバッグ用のメソッド

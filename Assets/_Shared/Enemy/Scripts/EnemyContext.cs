@@ -16,7 +16,7 @@ namespace Enemy
 
         public PoseParryJudge PoseParryJudge => _poseParryJudge;
 
-        void Start()
+        private void Awake()
         {
             // PoseParryJudgeシーンが存在するか確認
             Scene scene = SceneManager.GetSceneByName(_poseParryJudgeScene);

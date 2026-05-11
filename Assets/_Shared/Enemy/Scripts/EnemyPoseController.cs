@@ -40,8 +40,8 @@ namespace Enemy
                 {
                     _pausedEnemy = _enemyRegistry.GetRandomEnemy();
                     _isPaused = true;
-                    _pausedEnemy.RandomPose();
-                    Debug.Log($"Paused enemy: {_pausedEnemy?.name ?? "None"}");
+                    PoseID pose = _pausedEnemy.RandomPose();
+                    _poseParryJudge.StartEnemyPose(pose);
                 }
             }
         }
@@ -51,6 +51,7 @@ namespace Enemy
         {
             _pausedEnemy = null;
             _isPaused = false;
+            _poseParryJudge.EndEnemyPose();
         }
 
         // パリイ成功時の処理

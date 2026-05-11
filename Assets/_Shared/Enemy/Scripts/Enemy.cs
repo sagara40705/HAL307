@@ -16,7 +16,19 @@ namespace Enemy
         private bool _isPaused = false;
         private PoseID _currentPoseID;
         private float _poseTimer = 0f;
-        private EnemyPoseData　_currentPoseData;
+        private EnemyPoseData _currentPoseData;
+
+        //
+        Proto_EnemyChangeColor _colorChanger;
+
+        void Start()
+        {
+            _colorChanger = GetComponent<Proto_EnemyChangeColor>();
+            if (_colorChanger == null)
+            {
+                Debug.LogWarning($"Enemy {name} does not have a Proto_EnemyChangeColor component.");
+            }
+        }
 
         private void Update()
         {

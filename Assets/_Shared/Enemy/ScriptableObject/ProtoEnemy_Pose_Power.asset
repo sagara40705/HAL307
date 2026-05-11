@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Pose::Pose.EnemyPoseData
   _poseID: 1
   _duration: 3
+  _poseAction: {fileID: 11400000, guid: 10f97a772a599274e82e20856b238a4b, type: 2}

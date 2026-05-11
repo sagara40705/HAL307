@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b3a5ea9d7257b048bdc4f66c3fd4bd7, type: 3}
   m_Name: EnemyPoseAction_Muscle
   m_EditorClassIdentifier: Enemy::Enemy.EnemyPoseAction_Muscle
+  poseColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}

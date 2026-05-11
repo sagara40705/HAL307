@@ -57,5 +57,12 @@ namespace Pose
             // 敵のPoseIDとプレイヤーのPoseIDが一致しているかを判定
             return enemyPoseID != PoseID.None && playerPoseID != PoseID.None && enemyPoseID == playerPoseID;
         }
+
+        // デバッグ用のメソッド
+        public void DebugOnParry()
+        {
+            Debug.Log("Debug: Parry triggered.");
+            OnParrySuccess();
+        }
     }
 }

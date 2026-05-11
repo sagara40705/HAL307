@@ -14,6 +14,8 @@ namespace Enemy
         [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前
         [SerializeField] private PoseParryJudge _poseParryJudge;// PoseParryJudgeのプレハブ
 
+        public PoseParryJudge PoseParryJudge => _poseParryJudge;
+
         void Start()
         {
             // PoseParryJudgeシーンが存在するか確認

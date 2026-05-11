@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: ProtoEnemy_Pose_Yaa
   m_EditorClassIdentifier: Pose::Pose.EnemyPoseData
   _poseID: 0
-  _duration: 3
+  _duration: 5
   _poseAction: {fileID: 11400000, guid: ee69f0bea4c1e0349b663d64a26fc3cd, type: 2}

@@ -18,6 +18,10 @@ namespace Enemy
         private float _poseTimer = 0f;
         private EnemyPoseData _currentPoseData;
 
+        // パリイ関連
+        private bool _isParried = false;
+        private float _parryTimer = 0f;
+
         //
         Proto_EnemyChangeColor _colorChanger;
 
@@ -41,6 +45,17 @@ namespace Enemy
                 }
 
             }
+
+            if (_isParried)
+            {
+                _parryTimer -= Time.deltaTime;
+                if (_parryTimer <= 0f)
+                {
+                    _isParried = false;
+                    _colorChanger?.ResetColor();
+                    Debug.Log($"Enemy {name} parry state ended.");
+                }
+            }
         }
 
         // Enemyが生成されたときの初期化
@@ -63,7 +78,7 @@ namespace Enemy
             _isPaused = false;
             // ここにPose終了時の共通処理を記述する
             Debug.Log($"Enemy {name} unpaused.");
-            _currentPoseData.PoseAction.OnEnd(this);
+            if (_currentPoseData) { _currentPoseData.PoseAction.OnEnd(this); }
 
             _poseController.Unpause();
             _currentPoseID = PoseID.None;
@@ -101,6 +116,16 @@ namespace Enemy
 
             Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
             _currentPoseData.PoseAction.OnStart(this);
+        }
+
+        //　パリイされたときの処理
+        public void OnParrySuccess()
+        {
+            Debug.Log($"Enemy {name} was parried with pose {_currentPoseID}.");
+            OnUnpause();
+            _colorChanger?.SetColor(Color.blue);
+            _isParried = true;
+            _parryTimer = 3.0f;
         }
     }
 }

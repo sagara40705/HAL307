@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: ProtoEnemy_Pose_Muscle
   m_EditorClassIdentifier: Pose::Pose.EnemyPoseData
   _poseID: 2
-  _duration: 3
+  _duration: 5
   _poseAction: {fileID: 11400000, guid: 75d3df557b284b64db23e755d3fc867c, type: 2}

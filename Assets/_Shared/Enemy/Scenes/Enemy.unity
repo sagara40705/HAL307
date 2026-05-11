@@ -369,6 +369,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Enemy::Enemy.EnemyPoseController
   _enemyRegistry: {fileID: 904307783}
+  _enemyContext: {fileID: 770144274}
+  _poseParryJudge: {fileID: 0}
 --- !u!4 &535028704
 Transform:
   m_ObjectHideFlags: 0

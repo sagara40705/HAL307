@@ -20,10 +20,11 @@ namespace Enemy
         {
             if (_isPaused) { return; }
 
-            if (DebugShortcuts.Combo(Key.E, Key.P, Key.A) )
+            if (DebugShortcuts.Combo(Key.E, Key.P))
             {
                 _pausedEnemy = _enemyRegistry.GetRandomEnemy();
                 _isPaused = true;
+                _pausedEnemy.RandomPose();
                 Debug.Log($"Paused enemy: {_pausedEnemy?.name ?? "None"}");
             }
         }

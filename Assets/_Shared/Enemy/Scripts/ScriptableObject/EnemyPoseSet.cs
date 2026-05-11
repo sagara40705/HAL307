@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Pose;
 
-namespace Pose
+namespace Enemy
 {
     [CreateAssetMenu(fileName = "EnemyPoseSet", menuName = "Game/Enemy/Pose Set")]
     public class EnemyPoseSet : ScriptableObject

@@ -34,7 +34,7 @@ public static class GitFetchNotifier
 
     private static void OnPlayModeStateChanged(PlayModeStateChange state)
     {
-        if (!CheckOnPlayMode) return;
+        if (!CheckOnPlayMode) { return; }
 
         // Play開始直前に確認
         if (state == PlayModeStateChange.ExitingEditMode)

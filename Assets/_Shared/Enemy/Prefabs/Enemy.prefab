@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: -4488858887470348062}
   - component: {fileID: 2528562455302666114}
   - component: {fileID: 1177405807762486689}
+  - component: {fileID: -2164832423234523109}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -67,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -4125471728267972529, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+  - {fileID: 2100000, guid: cd536afb1c935ed4580f750dbd52a71a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -103,3 +104,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87f65769920a28847aed5ecd5c63c806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Enemy::Enemy.Enemy
+--- !u!114 &-2164832423234523109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1792186146121775386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45381ea5cceff5c45ba2286b8bc00527, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Enemy::Enemy.Proto_EnemyChangeColor
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}

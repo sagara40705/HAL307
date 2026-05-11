@@ -150,8 +150,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Enemy::Enemy.EnemyGenerator
   _enemyRegistry: {fileID: 904307783}
   _poseController: {fileID: 535028703}
-  _enemyPrefab: {fileID: 1177405807762486689, guid: 92848164047a27b4ba9e05f6aae06e9d, type: 3}
   _parent: {fileID: 904307782}
+  _spawnData: {fileID: 11400000, guid: 10a6a492d28b84840b91eff81192bb69, type: 2}
 --- !u!4 &232563141
 Transform:
   m_ObjectHideFlags: 0

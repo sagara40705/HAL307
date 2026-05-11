@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b73bdf1a03e367446992f2e5360767c7, type: 3}
-  m_Name: ProtoEnemy_PoseSet
-  m_EditorClassIdentifier: Pose::Pose.EnemyPoseSet
-  _poses:
-  - {fileID: 11400000, guid: 55e0f0dbd78f545479d2f732820753ab, type: 2}
+  m_Script: {fileID: 11500000, guid: fabfc6ef552d25346b52ebeab4c9b70e, type: 3}
+  m_Name: ProtoEnemy_Pose_Yaa
+  m_EditorClassIdentifier: Pose::Pose.EnemyPoseData
+  _poseID: 0
+  _duration: 3

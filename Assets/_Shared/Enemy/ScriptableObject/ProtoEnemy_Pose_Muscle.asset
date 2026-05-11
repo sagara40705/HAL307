@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fabfc6ef552d25346b52ebeab4c9b70e, type: 3}
-  m_Name: ProtoEnemy_Pose_A
+  m_Name: ProtoEnemy_Pose_Muscle
   m_EditorClassIdentifier: Pose::Pose.EnemyPoseData
-  _poseID: 0
-  _duration: 5
+  _poseID: 2
+  _duration: 3

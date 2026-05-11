@@ -148,8 +148,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d572d56b0babad348be1153e792ac860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Prototype.Sandbox::Prototype.Sandbox.ProttypeSceneCore
-  _sceneNames:
+  _scenes:
   - StageModel
+  - PoseParryJudge
+  - Enemy
+  - Player
 --- !u!4 &773442693
 Transform:
   m_ObjectHideFlags: 0

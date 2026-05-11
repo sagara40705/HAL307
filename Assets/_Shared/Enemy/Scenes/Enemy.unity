@@ -184,7 +184,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &504420565
 Light:
   m_ObjectHideFlags: 0
@@ -414,6 +414,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Enemy::Enemy.EnemyContext
   _enemyManager: {fileID: 529276126}
+  _poseParryJudgeScene: PoseParryJudge
+  _poseParryJudge: {fileID: 238323164532869387, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
 --- !u!4 &770144275
 Transform:
   m_ObjectHideFlags: 0
@@ -491,7 +493,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &1642159506
 AudioListener:
   m_ObjectHideFlags: 0

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Prototype.Sandbox
@@ -8,14 +10,22 @@ namespace Prototype.Sandbox
     public class ProttypeSceneCore : MonoBehaviour
     {
         // 統合するsceneのリスト
-        [SerializeField] private string[] _sceneNames;
+        [SerializeField] private List<string> _scenes;
 
         // scene開始時にすべてadditiveで読み込む
         void Start()
         {
-            foreach (var sceneName in _sceneNames)
+            foreach (var sceneName in _scenes)
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+                if (!string.IsNullOrEmpty(sceneName))
+                {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+                    Debug.Log($"Loaded scene: {sceneName}");
+                }
+                else
+                {
+                    Debug.LogWarning("Scene name is empty or null.");
+                }
             }
         }
     }

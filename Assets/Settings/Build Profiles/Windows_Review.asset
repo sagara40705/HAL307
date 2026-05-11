@@ -31,7 +31,11 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/_Shared/taichi/Scenes/StageModel.unity
   - m_enabled: 1
+    m_path: Assets/_Shared/Pose/Scenes/PoseParryJudge.unity
+  - m_enabled: 1
     m_path: Assets/_Shared/Enemy/Scenes/Enemy.unity
+  - m_enabled: 1
+    m_path: Assets/_Shared/Player/Scenes/Player.unity
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:

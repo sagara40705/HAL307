@@ -1,0 +1,19 @@
+{
+    "name": "AudienceRequest",
+    "rootNamespace": "AudienceRequest",
+    "references": [
+        "GUID:2525a5a692f1e3d4b8ac5b3ac61152dc",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:74752ff5b54ce8c4eb257740e25220b1",
+        "GUID:16ddcba8eb04a3843917b6536d7e1ff2"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

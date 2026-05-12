@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fabfc6ef552d25346b52ebeab4c9b70e, type: 3}
+  m_Name: ProtoEnemy_Pose_Yaa
+  m_EditorClassIdentifier: Pose::Pose.EnemyPoseData
+  _poseID: 0
+  _duration: 5
+  _poseAction: {fileID: 11400000, guid: ee69f0bea4c1e0349b663d64a26fc3cd, type: 2}

@@ -1,6 +1,7 @@
 using Unity.InferenceEngine;
 using UnityEngine;
 using System.Text;
+using UnityEngine.InputSystem;
 
 public class VoiceOnnxRunner : MonoBehaviour
 {
@@ -60,11 +61,15 @@ public class VoiceOnnxRunner : MonoBehaviour
     private void Update()
     {
         if (worker == null) return;
-
-        timer += Time.deltaTime;
-        if (timer >= inferenceInterval)
+     
+        // Vキーを押したら音声認識開始
+        if (DebugShortcuts.Pressed(Key.V))
         {
-            timer = 0f;
+            Debug.Log("[Voice] 音声認識開始");
+        }
+        if (DebugShortcuts.Held(Key.V))
+        {
+
             RunInference();
         }
     }

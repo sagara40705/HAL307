@@ -375,6 +375,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69f311c752f0401408d71626c8e7d9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Player::Player.PlayerContext
+  _poseController: {fileID: 1691506340}
   _poseParryJudgeScene: PoseParryJudge
   _poseParryJudge: {fileID: 238323164532869387, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
 --- !u!4 &1037201950

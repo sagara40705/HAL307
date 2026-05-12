@@ -17,7 +17,8 @@ namespace Enemy
         // ポーズ中のEnemy
         private Enemy _pausedEnemy;
 
-        //
+        // AI
+        private float _timer;
 
         void Start()
         {
@@ -25,6 +26,7 @@ namespace Enemy
             _poseParryJudge = _enemyContext.PoseParryJudge;
             if (_poseParryJudge == null) { return; }
             _poseParryJudge.OnParrySuccess += OnParrySuccess;
+            _timer = 0f;
         }
 
         // Update is called once per frame
@@ -39,10 +41,21 @@ namespace Enemy
             }
             else
             {
+                if (UpdatePoseTimer())
+                {
+                    _pausedEnemy = _enemyRegistry.GetRandomEnemy();
+                    _isPaused = true;
+                    _timer = 0f;
+                    PoseID pose = _pausedEnemy.RandomPose();
+                    if (_poseParryJudge == null) { return; }
+                    _poseParryJudge.StartEnemyPose(pose);
+                }
+
                 if (DebugShortcuts.Combo(Key.E, Key.P))
                 {
                     _pausedEnemy = _enemyRegistry.GetRandomEnemy();
                     _isPaused = true;
+                    _timer = 0f;
                     PoseID pose = _pausedEnemy.RandomPose();
                     if (_poseParryJudge == null) { return; }
                     _poseParryJudge.StartEnemyPose(pose);
@@ -69,6 +82,19 @@ namespace Enemy
                 Debug.Log($"Unpausing enemy: {_pausedEnemy.name}");
                 _pausedEnemy.OnParrySuccess();
             }
+        }
+
+        private bool UpdatePoseTimer()
+        {
+            if (_isPaused) { return false; }
+
+            _timer += Time.deltaTime;
+            if (_timer >= 5.0f)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

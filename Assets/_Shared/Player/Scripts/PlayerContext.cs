@@ -6,6 +6,9 @@ namespace Player
 {
     public class PlayerContext : MonoBehaviour
     {
+        // 内部
+        [SerializeField] private PlayerPoseContoroller _poseController;
+
         //　外部
         [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前
         [SerializeField] private PoseParryJudge _poseParryJudge;// PoseParryJudgeのプレハブ
@@ -42,5 +45,7 @@ namespace Player
             }
             return null;
         }
+
+        public PlayerPoseContoroller PlayerPose => _poseController;
     }
 }

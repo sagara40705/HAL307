@@ -124,7 +124,7 @@ namespace Enemy
         {
             Debug.Log($"Enemy {name} was parried with pose {_currentPoseID}.");
             OnUnpause();
-            _colorChanger?.SetColor(Color.blue);
+            _colorChanger?.SetColor(Color.black);
             _isParried = true;
             _parryTimer = 3.0f;
         }

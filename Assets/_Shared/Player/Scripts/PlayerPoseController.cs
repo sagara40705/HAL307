@@ -9,6 +9,12 @@ namespace Player
         [SerializeField] private PlayerContext _playerContext;
         [SerializeField] private PoseParryJudge _poseParryJudge;
 
+        [SerializeField] private Proto_PlayerColorChanger _colorChanger;
+        [SerializeField] private Color _yaaColor;
+        [SerializeField] private Color _powerColor;
+        [SerializeField] private Color _muscleColor;
+
+
         private bool _isPose = false;
         private float _poseTimer = 0f;
 
@@ -29,6 +35,7 @@ namespace Player
                     _isPose = false;
                     _poseTimer = 0f;
                     _poseParryJudge.EndPlayerPose();
+                    _colorChanger.ResetColor();
                     Debug.Log("Player pose ended.");
                 }
             }
@@ -54,6 +61,7 @@ namespace Player
             _isPose = true;
             _poseTimer = 3f; // ポーズ状態の持続時間を設定
             _poseParryJudge.StartPlayerPose(poseID);
+            ChangeColor(poseID);
             Debug.Log($"Player started pose: {poseID}");
         }
 
@@ -62,6 +70,25 @@ namespace Player
             if (!_isPose)
             {
                 OnPose(poseID);
+            }
+        }
+
+        private void ChangeColor(PoseID poseID)
+        {
+            switch (poseID)
+            {
+                case PoseID.Pose_Yaa:
+                    _colorChanger.SetColor(_yaaColor);
+                    break;
+                case PoseID.Pose_Power:
+                    _colorChanger.SetColor(_powerColor);
+                    break;
+                case PoseID.Pose_Muscle:
+                    _colorChanger.SetColor(_muscleColor);
+                    break;
+                default:
+                    _colorChanger.ResetColor();
+                    break;
             }
         }
     }

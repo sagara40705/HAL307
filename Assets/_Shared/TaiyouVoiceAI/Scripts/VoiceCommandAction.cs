@@ -1,15 +1,36 @@
 using UnityEngine;
+using TaiyouVoiceAI;
+using Player;
 
 public class VoiceCommandAction : MonoBehaviour
 {
-    [Header("‘ÎÛƒIƒuƒWƒFƒNƒg")]
+    [Header("å¯¾è±¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ")]
     [SerializeField] private GameObject powerObject;
     [SerializeField] private GameObject yaaObject;
     [SerializeField] private GameObject muscleObject;
 
-    [Header("İ’è")]
+    [Header("è¨­å®š")]
     [SerializeField] private bool onlyHide = true;
     [SerializeField] private bool logCommand = true;
+
+    [Header("Context")]
+    [SerializeField] private VoiceAiContext voiceAiContext;
+    private Player.PlayerPoseContoroller playerPoseController;
+
+    private void Start()
+    {
+        if (voiceAiContext == null)
+        {
+            Debug.LogWarning("VoiceAiContext ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“");
+            return;
+        }
+
+        playerPoseController = voiceAiContext.PlayerCnt.PlayerPose;
+        if (playerPoseController == null)
+        {
+            Debug.LogWarning("PlayerPoseContoroller ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“");
+        }
+    }
 
     public void ExecuteCommand(string command)
     {
@@ -27,18 +48,21 @@ public class VoiceCommandAction : MonoBehaviour
         {
             case "power":
                 HandleObject(powerObject, "power");
+                playerPoseController.TryOnPose(Pose.PoseID.Pose_Power);
                 break;
 
             case "yaa":
                 HandleObject(yaaObject, "yaa");
+                playerPoseController.TryOnPose(Pose.PoseID.Pose_Yaa);
                 break;
 
             case "muscle":
                 HandleObject(muscleObject, "muscle");
+                playerPoseController.TryOnPose(Pose.PoseID.Pose_Muscle);
                 break;
 
             default:
-                // none ‚â•s–¾‚Í‰½‚à‚µ‚È‚¢
+                // none ã‚„ä¸æ˜ã¯ä½•ã‚‚ã—ãªã„
                 break;
         }
     }
@@ -47,7 +71,7 @@ public class VoiceCommandAction : MonoBehaviour
     {
         if (obj == null)
         {
-            Debug.LogWarning(label + " ‚Ì‘ÎÛƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");
+            Debug.LogWarning(label + " ã®å¯¾è±¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“");
             return;
         }
 

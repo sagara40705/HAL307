@@ -56,5 +56,13 @@ namespace Player
             _poseParryJudge.StartPlayerPose(poseID);
             Debug.Log($"Player started pose: {poseID}");
         }
+
+        public void TryOnPose(PoseID poseID)
+        {
+            if (!_isPose)
+            {
+                OnPose(poseID);
+            }
+        }
     }
 }

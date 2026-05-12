@@ -11,7 +11,7 @@ namespace TaiyouVoiceAI
 
         public PlayerContext PlayerCnt => _playerContext;
 
-        private void Awake()
+        private void Start()
         {
             // Playerシーンが存在するか確認
             Scene scene = SceneManager.GetSceneByName(_playerScene);

@@ -1,6 +1,7 @@
 using UnityEngine;
 using TaiyouVoiceAI;
 using Player;
+using UnityEngine.InputSystem;
 
 public class VoiceCommandAction : MonoBehaviour
 {
@@ -15,20 +16,30 @@ public class VoiceCommandAction : MonoBehaviour
 
     [Header("Context")]
     [SerializeField] private VoiceAiContext voiceAiContext;
-    private Player.PlayerPoseContoroller playerPoseController;
+    private Player.PlayerPoseContoroller playerPoseController ;
 
     private void Start()
     {
-        if (voiceAiContext == null)
-        {
-            Debug.LogWarning("VoiceAiContext が設定されていません");
-            return;
-        }
+        playerPoseController = null;
+    }
 
-        playerPoseController = voiceAiContext.PlayerCnt.PlayerPose;
-        if (playerPoseController == null)
+    private void Update()
+    {
+        if (!playerPoseController)
         {
-            Debug.LogWarning("PlayerPoseContoroller が見つかりません");
+            playerPoseController = voiceAiContext.PlayerCnt.PlayerPose;
+            if (playerPoseController == null)
+            {
+                Debug.LogWarning("PlayerPoseContoroller が見つかりません");
+            }
+            Debug.Log("VoiceCommandAction PlayerPoseContoroller を取得しました");
+        }
+        else
+        {
+           if (DebugShortcuts.Combo(Key.P , Key.Space))
+           {
+                playerPoseController.TryOnPose(Pose.PoseID.Pose_Power);
+           }
         }
     }
 

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd399116116b9a84f979e040629d6185, type: 3}
   m_Name: ProtoEnemyData
   m_EditorClassIdentifier: Enemy::Enemy.EnemyData
-  enemyPrefab: {fileID: 1177405807762486689, guid: 92848164047a27b4ba9e05f6aae06e9d, type: 3}
+  enemyPrefab: {fileID: -7396777476198942863, guid: d6583124afaa36240b9a65c934d30fce, type: 3}
   maxHp: 100
   poseSet: {fileID: 11400000, guid: 07030030f9d6b3c47a7c94504574b210, type: 2}

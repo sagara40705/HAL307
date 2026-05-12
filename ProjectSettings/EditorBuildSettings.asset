@@ -14,6 +14,21 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game/Scenes/Sample.unity
     guid: f6d382427db3855429efbcd6bea38e84
+  - enabled: 1
+    path: Assets/_Shared/Prototype/Scenes/Prototype.unity
+    guid: 4c2bb757cdaf6374ab0b385f46626eea
+  - enabled: 1
+    path: Assets/_Shared/taichi/Scenes/StageModel.unity
+    guid: a5bc089ffa8513c4ab82f4281d3da7ef
+  - enabled: 1
+    path: Assets/_Shared/Pose/Scenes/PoseParryJudge.unity
+    guid: 6c163b692bdfdb346823524e46f54db3
+  - enabled: 1
+    path: Assets/_Shared/Player/Scenes/Player.unity
+    guid: 3440789bf60b50344929e1cf78bbc836
+  - enabled: 1
+    path: Assets/_Shared/Enemy/Scenes/Enemy.unity
+    guid: 041f4c9b4acfe5647abbf1ac3c9e6d80
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

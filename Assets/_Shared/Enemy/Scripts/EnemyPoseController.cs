@@ -17,10 +17,13 @@ namespace Enemy
         // ポーズ中のEnemy
         private Enemy _pausedEnemy;
 
+        //
+
         void Start()
         {
             // EnemyContextからPoseParryJudgeを取得
             _poseParryJudge = _enemyContext.PoseParryJudge;
+            if (_poseParryJudge == null) { return; }
             _poseParryJudge.OnParrySuccess += OnParrySuccess;
         }
 
@@ -41,6 +44,7 @@ namespace Enemy
                     _pausedEnemy = _enemyRegistry.GetRandomEnemy();
                     _isPaused = true;
                     PoseID pose = _pausedEnemy.RandomPose();
+                    if (_poseParryJudge == null) { return; }
                     _poseParryJudge.StartEnemyPose(pose);
                 }
             }
@@ -51,6 +55,7 @@ namespace Enemy
         {
             _pausedEnemy = null;
             _isPaused = false;
+            if (_poseParryJudge == null) { return; }
             _poseParryJudge.EndEnemyPose();
         }
 

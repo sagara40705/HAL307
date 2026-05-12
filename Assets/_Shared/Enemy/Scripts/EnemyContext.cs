@@ -14,10 +14,18 @@ namespace Enemy
         [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前
         [SerializeField] private PoseParryJudge _poseParryJudge;// PoseParryJudgeのプレハブ
 
+        [SerializeField] private bool _onlyEnemyScene;
+
         public PoseParryJudge PoseParryJudge => _poseParryJudge;
 
         private void Awake()
         {
+            if (_onlyEnemyScene)
+            {
+                Debug.Log("EnemyContext: _onlyEnemyScene is true, skipping PoseParryJudge retrieval.");
+                return;
+            }
+
             // PoseParryJudgeシーンが存在するか確認
             Scene scene = SceneManager.GetSceneByName(_poseParryJudgeScene);
             if (!scene.IsValid() || !scene.isLoaded)

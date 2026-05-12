@@ -3,7 +3,7 @@
     "rootNamespace": "FeverGauge.Sandbox",
     "references": [
         "GUID:2525a5a692f1e3d4b8ac5b3ac61152dc",
-        "Unity.InputSystem"
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

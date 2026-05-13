@@ -15,6 +15,12 @@ namespace Pose
         // パリイ発生時のアクション
         public event Action OnParrySuccess;
 
+        private void Start()
+        {
+            _enemyPoseID = PoseID.None;
+            _playerPoseID = PoseID.None;
+        }
+
         public void StartEnemyPose(PoseID enemyPoseID)
         {
             _enemyPoseID = enemyPoseID;

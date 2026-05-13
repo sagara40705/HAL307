@@ -9,6 +9,7 @@ namespace AudienceRequest
     public sealed class AudienceRequestEntry
     {
         public PoseID poseID;
+        public int count;
     }
 
     [CreateAssetMenu(fileName = "AudienceRequest", menuName = "Game/AudienceRequests")]

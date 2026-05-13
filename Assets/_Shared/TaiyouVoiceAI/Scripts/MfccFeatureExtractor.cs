@@ -1,4 +1,4 @@
-using System;
+
 using UnityEngine;
 
 public class MfccFeatureExtractor : MonoBehaviour
@@ -71,7 +71,7 @@ public class MfccFeatureExtractor : MonoBehaviour
 
             for (int m = 0; m < melFilterCount; m++)
             {
-                // log(0) ‰ñ”ð
+                // log(0) å›žé¿
                 melSpectrogram[m, frame] = Mathf.Log(melEnergies[m] + 1e-6f);
             }
         }
@@ -86,7 +86,7 @@ public class MfccFeatureExtractor : MonoBehaviour
         return ResizeToTargetWidth(mfcc, TargetWidth);
     }
 
-    // ŒÝŠ·—p
+    // äº’æ›ç”¨
     public float[,] ExtractDummyMfcc(float[] samples)
     {
         return ExtractMfcc(samples);

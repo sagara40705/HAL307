@@ -20,12 +20,13 @@ namespace Enemy
         // AI
         private float _timer;
 
-        void Start()
+        private void Start()
         {
             // EnemyContextからPoseParryJudgeを取得
-            _poseParryJudge = _enemyContext.PoseParryJudge;
-            if (_poseParryJudge == null) { return; }
-            _poseParryJudge.OnParrySuccess += OnParrySuccess;
+            _poseParryJudge = _enemyContext?.GetPoseContext()?.GetPoseParryJudge;
+            if (_poseParryJudge) { _poseParryJudge.OnParrySuccess += OnParrySuccess; }
+            Debug.Log("EnemyPoseController Start. _poseParryJudge = " + _poseParryJudge);
+
             _timer = 0f;
         }
 
@@ -36,7 +37,7 @@ namespace Enemy
             {
                 if (DebugShortcuts.Combo(Key.D, Key.P))
                 {
-                    _poseParryJudge.DebugOnParry();
+                    _poseParryJudge?.DebugOnParry();
                 }
             }
             else
@@ -48,7 +49,7 @@ namespace Enemy
                     _timer = 0f;
                     PoseID pose = _pausedEnemy.RandomPose();
                     if (_poseParryJudge == null) { return; }
-                    _poseParryJudge.StartEnemyPose(pose);
+                    _poseParryJudge?.StartEnemyPose(pose);
                 }
 
                 if (DebugShortcuts.Combo(Key.E, Key.P))
@@ -58,7 +59,7 @@ namespace Enemy
                     _timer = 0f;
                     PoseID pose = _pausedEnemy.RandomPose();
                     if (_poseParryJudge == null) { return; }
-                    _poseParryJudge.StartEnemyPose(pose);
+                    _poseParryJudge?.StartEnemyPose(pose);
                 }
             }
         }
@@ -69,19 +70,13 @@ namespace Enemy
             _pausedEnemy = null;
             _isPaused = false;
             if (_poseParryJudge == null) { return; }
-            _poseParryJudge.EndEnemyPose();
+            _poseParryJudge?.EndEnemyPose();
         }
 
         // パリイ成功時の処理
         public void OnParrySuccess()
         {
-            Debug.Log("Parry success received in EnemyPoseController.");
-
-            if (_pausedEnemy != null)
-            {
-                Debug.Log($"Unpausing enemy: {_pausedEnemy.name}");
-                _pausedEnemy.OnParrySuccess();
-            }
+            _pausedEnemy?.OnParrySuccess();
         }
 
         private bool UpdatePoseTimer()

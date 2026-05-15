@@ -16,30 +16,19 @@ public class VoiceCommandAction : MonoBehaviour
 
     [Header("Context")]
     [SerializeField] private VoiceAiContext voiceAiContext;
-    private Player.PlayerPoseContoroller playerPoseController ;
+    private Player.PlayerPoseContoroller playerPoseController;
 
     private void Start()
     {
-        playerPoseController = null;
+        playerPoseController = voiceAiContext?.GetPlayerContext()?.PlayerPose;
+        Debug.Log("VoiceCommandAction Start. playerPoseController = " + playerPoseController);
     }
 
     private void Update()
     {
-        if (!playerPoseController)
+        if (DebugShortcuts.Combo(Key.P, Key.Space))
         {
-            playerPoseController = voiceAiContext.PlayerCnt.PlayerPose;
-            if (playerPoseController == null)
-            {
-                Debug.LogWarning("PlayerPoseContoroller が見つかりません");
-            }
-            Debug.Log("VoiceCommandAction PlayerPoseContoroller を取得しました");
-        }
-        else
-        {
-           if (DebugShortcuts.Combo(Key.P , Key.Space))
-           {
-                playerPoseController.TryOnPose(Pose.PoseID.Pose_Power);
-           }
+            playerPoseController?.TryOnPose(Pose.PoseID.Pose_Power);
         }
     }
 
@@ -59,17 +48,17 @@ public class VoiceCommandAction : MonoBehaviour
         {
             case "power":
                 HandleObject(powerObject, "power");
-                playerPoseController.TryOnPose(Pose.PoseID.Pose_Power);
+                playerPoseController?.TryOnPose(Pose.PoseID.Pose_Power);
                 break;
 
             case "yaa":
                 HandleObject(yaaObject, "yaa");
-                playerPoseController.TryOnPose(Pose.PoseID.Pose_Yaa);
+                playerPoseController?.TryOnPose(Pose.PoseID.Pose_Yaa);
                 break;
 
             case "muscle":
                 HandleObject(muscleObject, "muscle");
-                playerPoseController.TryOnPose(Pose.PoseID.Pose_Muscle);
+                playerPoseController?.TryOnPose(Pose.PoseID.Pose_Muscle);
                 break;
 
             default:

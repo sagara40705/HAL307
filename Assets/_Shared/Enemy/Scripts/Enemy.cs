@@ -63,7 +63,7 @@ namespace Enemy
         {
             // EnemyRegistryを受け取って登録する
             _enemyRegistry = enemyRegistry;
-            _enemyRegistry.Register(this);
+            _enemyRegistry?.Register(this);
 
             // EnemyPoseControllerを受け取る
             _poseController = poseController;
@@ -80,7 +80,7 @@ namespace Enemy
             Debug.Log($"Enemy {name} unpaused.");
             if (_currentPoseData) { _currentPoseData.PoseAction.OnEnd(this); }
 
-            _poseController.Unpause();
+            _poseController?.Unpause();
             _currentPoseID = PoseID.None;
             _poseTimer = 0f;
             _currentPoseData = null;
@@ -90,10 +90,7 @@ namespace Enemy
         private void OnDestroy()
         {
             // EnemyRegistryから登録解除する
-            if (_enemyRegistry != null)
-            {
-                _enemyRegistry.Unregister(this);
-            }
+            _enemyRegistry?.Unregister(this);
         }
 
         public PoseID RandomPose()
@@ -116,7 +113,7 @@ namespace Enemy
             _currentPoseData = poseData;
 
             Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
-            _currentPoseData.PoseAction.OnStart(this);
+            _currentPoseData?.PoseAction?.OnStart(this);
         }
 
         //　パリイされたときの処理

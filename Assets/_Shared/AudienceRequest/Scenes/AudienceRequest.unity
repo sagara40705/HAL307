@@ -471,6 +471,7 @@ MonoBehaviour:
   _maxRequestCount: 30
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
+  _uiPool: {fileID: 1958838624}
   _requestInterval: 5
 --- !u!4 &848356011
 Transform:

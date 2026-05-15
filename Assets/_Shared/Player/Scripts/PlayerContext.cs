@@ -8,7 +8,7 @@ namespace Player
     {
         // 内部
         [SerializeField] private PlayerPoseContoroller _poseController;
-        public PlayerPoseContoroller PlayerPose => _poseController;
+        public PlayerPoseContoroller GetPlayerPoseContoroller => _poseController;
 
         // Pose
         [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前

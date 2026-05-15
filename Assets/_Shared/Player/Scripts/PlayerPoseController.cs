@@ -2,6 +2,7 @@ using Pose;
 using Context;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 namespace Player
 {
@@ -18,6 +19,9 @@ namespace Player
 
         private bool _isPose = false;
         private float _poseTimer = 0f;
+
+        // ポーズ時のイベント
+        public event Action<PoseID> OnPoseStart; /*あう*/
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         private void Start()

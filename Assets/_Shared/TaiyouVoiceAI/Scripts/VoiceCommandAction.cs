@@ -1,6 +1,5 @@
 using UnityEngine;
 using TaiyouVoiceAI;
-using Player;
 using UnityEngine.InputSystem;
 
 public class VoiceCommandAction : MonoBehaviour
@@ -20,7 +19,7 @@ public class VoiceCommandAction : MonoBehaviour
 
     private void Start()
     {
-        playerPoseController = voiceAiContext?.GetPlayerContext()?.PlayerPose;
+        playerPoseController = voiceAiContext?.GetPlayerContext()?.GetPlayerPoseContoroller;
         Debug.Log("VoiceCommandAction Start. playerPoseController = " + playerPoseController);
     }
 

@@ -1,51 +1,25 @@
 using UnityEngine;
 using Pose;
-using UnityEngine.SceneManagement;
+using Context;
 
 namespace Player
 {
-    public class PlayerContext : MonoBehaviour
+    public class PlayerContext : ContextBase
     {
         // 内部
         [SerializeField] private PlayerPoseContoroller _poseController;
+        public PlayerPoseContoroller GetPlayerPoseContoroller => _poseController;
 
-        //　外部
+        // Pose
         [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前
-        [SerializeField] private PoseParryJudge _poseParryJudge;// PoseParryJudgeのプレハブ
+        [SerializeField] private string _poseContextName; // PoseParryJudgeオブジェクトの名前
+        [SerializeField] private PoseContext _poseContext;// PoseContext
 
-        public PoseParryJudge PoseParryJudge => _poseParryJudge;
-        private void Awake()
+        public PoseContext GetPoseContext()
         {
-            // PoseParryJudgeシーンが存在するか確認
-            Scene scene = SceneManager.GetSceneByName(_poseParryJudgeScene);
-            if (!scene.IsValid() || !scene.isLoaded)
-            {
-                Debug.LogWarning($"Scene '{_poseParryJudgeScene}' が未ロードまたは無効です。");
-                return;
-            }
-
-            _poseParryJudge = FindInScene<PoseParryJudge>(scene);
-            if (_poseParryJudge == null)
-            {
-                Debug.LogWarning($"Scene '{_poseParryJudgeScene}' で PoseParryJudge が見つかりません。");
-                return;
-            }
-
-            Debug.Log($"取得成功: {_poseParryJudge.name}");
-
+            if (OnlyMyScene) { return null; }
+            if (_poseContext == null) { _poseContext = FindContext<PoseContext>(_poseParryJudgeScene, _poseContextName); }
+            return _poseContext;
         }
-
-        private static T FindInScene<T>(Scene scene) where T : Component
-        {
-            var roots = scene.GetRootGameObjects();
-            for (int i = 0; i < roots.Length; i++)
-            {
-                T found = roots[i].GetComponentInChildren<T>(true); // 非アクティブも探索
-                if (found != null) return found;
-            }
-            return null;
-        }
-
-        public PlayerPoseContoroller PlayerPose => _poseController;
     }
 }

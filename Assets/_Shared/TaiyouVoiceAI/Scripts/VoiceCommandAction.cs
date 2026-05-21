@@ -1,6 +1,6 @@
 using UnityEngine;
 using TaiyouVoiceAI;
-using Player;
+using UnityEngine.InputSystem;
 
 public class VoiceCommandAction : MonoBehaviour
 {
@@ -19,16 +19,15 @@ public class VoiceCommandAction : MonoBehaviour
 
     private void Start()
     {
-        if (voiceAiContext == null)
-        {
-            Debug.LogWarning("VoiceAiContext が設定されていません");
-            return;
-        }
+        playerPoseController = voiceAiContext?.GetPlayerContext()?.GetPlayerPoseContoroller;
+        Debug.Log("VoiceCommandAction Start. playerPoseController = " + playerPoseController);
+    }
 
-        playerPoseController = voiceAiContext.PlayerCnt.PlayerPose;
-        if (playerPoseController == null)
+    private void Update()
+    {
+        if (DebugShortcuts.Combo(Key.P, Key.Space))
         {
-            Debug.LogWarning("PlayerPoseContoroller が見つかりません");
+            playerPoseController?.TryOnPose(Pose.PoseID.Pose_Power);
         }
     }
 
@@ -48,17 +47,17 @@ public class VoiceCommandAction : MonoBehaviour
         {
             case "power":
                 HandleObject(powerObject, "power");
-                playerPoseController.TryOnPose(Pose.PoseID.Pose_Power);
+                playerPoseController?.TryOnPose(Pose.PoseID.Pose_Power);
                 break;
 
             case "yaa":
                 HandleObject(yaaObject, "yaa");
-                playerPoseController.TryOnPose(Pose.PoseID.Pose_Yaa);
+                playerPoseController?.TryOnPose(Pose.PoseID.Pose_Yaa);
                 break;
 
             case "muscle":
                 HandleObject(muscleObject, "muscle");
-                playerPoseController.TryOnPose(Pose.PoseID.Pose_Muscle);
+                playerPoseController?.TryOnPose(Pose.PoseID.Pose_Muscle);
                 break;
 
             default:

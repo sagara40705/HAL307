@@ -11,6 +11,7 @@ namespace Enemy
         void Start()
         {
             _enemyGenerator.GenerateFromData(0);
+            _enemyGenerator.GenerateFromData(1);
         }
 
         // Update is called once per frame

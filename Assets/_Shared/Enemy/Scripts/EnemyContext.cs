@@ -1,59 +1,27 @@
 using UnityEngine;
 using Pose;
-using UnityEngine.SceneManagement;
+using Context;
 
 namespace Enemy
 {
     // 外部との接点を管理するクラス
-    public class EnemyContext : MonoBehaviour
+    public class EnemyContext : ContextBase
     {
         //　内部
         [SerializeField] private EnemyManager _enemyManager;
 
-        //　外部
+        // Pose
         [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前
-        [SerializeField] private PoseParryJudge _poseParryJudge;// PoseParryJudgeのプレハブ
+        [SerializeField] private string _poseContextName; // PoseParryJudgeオブジェクトの名前
+        [SerializeField] private PoseContext _poseContext;// PoseContext
 
-        [SerializeField] private bool _onlyEnemyScene;
-
-        public PoseParryJudge PoseParryJudge => _poseParryJudge;
-
-        private void Awake()
+        public PoseContext GetPoseContext()
         {
-            if (_onlyEnemyScene)
-            {
-                Debug.Log("EnemyContext: _onlyEnemyScene is true, skipping PoseParryJudge retrieval.");
-                return;
-            }
-
-            // PoseParryJudgeシーンが存在するか確認
-            Scene scene = SceneManager.GetSceneByName(_poseParryJudgeScene);
-            if (!scene.IsValid() || !scene.isLoaded)
-            {
-                Debug.LogWarning($"Scene '{_poseParryJudgeScene}' が未ロードまたは無効です。");
-                return;
-            }
-
-            _poseParryJudge = FindInScene<PoseParryJudge>(scene);
-            if (_poseParryJudge == null)
-            {
-                Debug.LogWarning($"Scene '{_poseParryJudgeScene}' で PoseParryJudge が見つかりません。");
-                return;
-            }
-
-            Debug.Log($"取得成功: {_poseParryJudge.name}");
-
+            if (OnlyMyScene) { return null; }
+            if (_poseContext == null) { _poseContext = FindContext<PoseContext>(_poseParryJudgeScene, _poseContextName); }
+            return _poseContext;
         }
 
-        private static T FindInScene<T>(Scene scene) where T : Component
-        {
-            var roots = scene.GetRootGameObjects();
-            for (int i = 0; i < roots.Length; i++)
-            {
-                T found = roots[i].GetComponentInChildren<T>(true); // 非アクティブも探索
-                if (found != null) return found;
-            }
-            return null;
-        }
     }
+
 }

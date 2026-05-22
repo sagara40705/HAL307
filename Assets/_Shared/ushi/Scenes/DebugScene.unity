@@ -571,8 +571,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ba250384f006bf4296e4cd1cf769708, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ushiharu.Sandbox::ushiharu.Sandbox.SecondA
-  speed: 3
-  rend: {fileID: 0}
 --- !u!65 &1488375838
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -678,6 +676,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 353cb436b8b67b94b9d66def6d6633a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ushiharu.Sandbox::ushiharu.Sandbox.BaceAI
+  speed: 3
+  moveTimeMin: 2
+  moveTimeMax: 5
+  stopTimeMin: 1
+  stopTimeMax: 3
+  pos: {x: 1, y: 0, z: 0}
+  dir: {x: 1, y: 0, z: 0}
+  timer: 0
+  movetime: 5
 --- !u!1 &1941876884
 GameObject:
   m_ObjectHideFlags: 0

@@ -150,8 +150,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Enemy::Enemy.EnemyGenerator
   _enemyRegistry: {fileID: 904307783}
   _poseController: {fileID: 535028703}
-  _enemyPrefab: {fileID: 1177405807762486689, guid: 92848164047a27b4ba9e05f6aae06e9d, type: 3}
   _parent: {fileID: 904307782}
+  _spawnData: {fileID: 11400000, guid: 10a6a492d28b84840b91eff81192bb69, type: 2}
 --- !u!4 &232563141
 Transform:
   m_ObjectHideFlags: 0
@@ -369,6 +369,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Enemy::Enemy.EnemyPoseController
   _enemyRegistry: {fileID: 904307783}
+  _enemyContext: {fileID: 770144274}
+  _poseParryJudge: {fileID: 0}
 --- !u!4 &535028704
 Transform:
   m_ObjectHideFlags: 0
@@ -413,7 +415,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ae88dd986ce6a84cac81ecd706c0777, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Enemy::Enemy.EnemyContext
+  _onlyMyScene: 0
+  _initalize: 0
   _enemyManager: {fileID: 529276126}
+  _poseParryJudgeScene: PoseParryJudge
+  _poseContextName: PoseContext
+  _poseContext: {fileID: 0}
 --- !u!4 &770144275
 Transform:
   m_ObjectHideFlags: 0
@@ -473,6 +480,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cedb6ad316066e14485c0237e19dd274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Enemy::Enemy.EnemyRegistry
+--- !u!1 &1456485777
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1456485779}
+  - component: {fileID: 1456485778}
+  m_Layer: 0
+  m_Name: AdditiveSceneObjectDisabler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1456485778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1456485777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::AdditiveSceneObjectDisabler
+  _disableTargets:
+  - {fileID: 1642159505}
+  - {fileID: 504420564}
+--- !u!4 &1456485779
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1456485777}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1642159505
 GameObject:
   m_ObjectHideFlags: 0
@@ -560,7 +614,7 @@ Transform:
   m_GameObject: {fileID: 1642159505}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 1, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -621,3 +675,4 @@ SceneRoots:
   - {fileID: 904307782}
   - {fileID: 232563141}
   - {fileID: 535028704}
+  - {fileID: 1456485779}

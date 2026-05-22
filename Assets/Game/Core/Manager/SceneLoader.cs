@@ -109,6 +109,21 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
 
         yield return op;
 
+        if (mode == LoadSceneMode.Additive)
+        {
+            var loadedScene = UnitySceneManager.GetSceneByName(sceneName);
+            foreach (var root in loadedScene.GetRootGameObjects())
+            {
+                var disabler = root.GetComponentInChildren<AdditiveSceneObjectDisabler>(true);
+                if (disabler != null)
+                {
+                    disabler.DisableTargets();
+                    Debug.Log($"Disabled Target objects in {sceneName}");
+                    break; // 最初に見つけた1つだけ
+                }
+            }
+        }
+
         IsBusy = false;
     }
 
@@ -118,3 +133,6 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
         return scene.IsValid() && scene.isLoaded;
     }
 }
+
+
+

@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class VoiceCommandAction : MonoBehaviour
 {
-    [Header("‘ÎÛƒIƒuƒWƒFƒNƒg")]
+    [Header("å¯¾è±¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ")]
     [SerializeField] private GameObject powerObject;
     [SerializeField] private GameObject yaaObject;
     [SerializeField] private GameObject muscleObject;
 
-    [Header("İ’è")]
+    [Header("è¨­å®š")]
     [SerializeField] private bool onlyHide = true;
     [SerializeField] private bool logCommand = true;
 
@@ -20,7 +20,7 @@ public class VoiceCommandAction : MonoBehaviour
 
         if (logCommand)
         {
-            Debug.Log("[Action] command = " + command);
+            //Debug.Log("[Action] command = " + command);
         }
 
         switch (command)
@@ -38,7 +38,7 @@ public class VoiceCommandAction : MonoBehaviour
                 break;
 
             default:
-                // none ‚â•s–¾‚Í‰½‚à‚µ‚È‚¢
+                // none ã‚„ä¸æ˜ã¯ä½•ã‚‚ã—ãªã„
                 break;
         }
     }
@@ -47,7 +47,7 @@ public class VoiceCommandAction : MonoBehaviour
     {
         if (obj == null)
         {
-            Debug.LogWarning(label + " ‚Ì‘ÎÛƒIƒuƒWƒFƒNƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");
+            Debug.LogWarning(label + " ã®å¯¾è±¡ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“");
             return;
         }
 

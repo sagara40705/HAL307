@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Prototype.Sandbox::Prototype.Sandbox.ProttypeSceneCore
   _scenes:
   - StageModel
+  - RutimeDebugTest
   - PoseParryJudge
   - Enemy
   - Player

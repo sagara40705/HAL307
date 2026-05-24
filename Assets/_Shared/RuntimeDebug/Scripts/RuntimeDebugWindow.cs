@@ -36,6 +36,12 @@ namespace RuntimeDebug
             items.Add(new DebugVector3Item(name, getter, setter));
         }
 
+        public void CreateButton(string name, Action onClick)
+        {
+            items.Add(new DebugButtonItem(name, onClick));
+        }
+
+
         public void Draw()
         {
             if (!IsOpen)

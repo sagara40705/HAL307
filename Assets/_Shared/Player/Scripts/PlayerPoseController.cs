@@ -3,6 +3,7 @@ using Context;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
+using RuntimeDebug;
 
 namespace Player
 {
@@ -28,6 +29,12 @@ namespace Player
         {
             _poseParryJudge = _playerContext?.GetPoseContext()?.GetPoseParryJudge;
             Debug.Log("PlayerPoseController Start. _poseParryJudge = " + _poseParryJudge);
+
+            // デバッグ用のUIを作成
+            DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow("Player");
+            window.CreateButton("Pose Yaa", () => TryOnPose(PoseID.Pose_Yaa));
+            window.CreateButton("Pose Power", () => TryOnPose(PoseID.Pose_Power));
+            window.CreateButton("Pose Muscle", () => TryOnPose(PoseID.Pose_Muscle));
         }
 
         // Update is called once per frame

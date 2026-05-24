@@ -27,6 +27,8 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/Game/Scenes/Sample.unity
   - m_enabled: 1
+    m_path: Assets/_Shared/RuntimeDebug/Scenes/RuntimeDebugTest.unity
+  - m_enabled: 1
     m_path: Assets/_Shared/Prototype/Scenes/Prototype.unity
   - m_enabled: 1
     m_path: Assets/_Shared/taichi/Scenes/StageModel.unity

@@ -9,6 +9,7 @@ namespace RuntimeDebug
         Int,
         Float,
         Vector3,
+        Button,
     }
 
 
@@ -170,6 +171,25 @@ namespace RuntimeDebug
             return Mathf.Approximately(a.x, b.x)
                 && Mathf.Approximately(a.y, b.y)
                 && Mathf.Approximately(a.z, b.z);
+        }
+    }
+
+    
+    public sealed class DebugButtonItem : DebugItem
+    {
+        private readonly Action onClick;
+
+        public DebugButtonItem(string name, Action onClick) : base(name, DebugItemKind.Button)
+        {
+            this.onClick = onClick;
+        }
+
+        public override void Draw()
+        {
+            if (GUILayout.Button(Name))
+            {
+                onClick?.Invoke();
+            }
         }
     }
 }

@@ -38,6 +38,10 @@ MonoBehaviour:
     m_path: Assets/_Shared/Enemy/Scenes/Enemy.unity
   - m_enabled: 1
     m_path: Assets/_Shared/Player/Scenes/Player.unity
+  - m_enabled: 1
+    m_path: Assets/_Shared/TaiyouVoiceAI/Scenes/VoiceAi.unity
+  - m_enabled: 1
+    m_path: Assets/_Shared/AudienceRequest/Scenes/AudienceRequest.unity
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:

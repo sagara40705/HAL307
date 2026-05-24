@@ -17,11 +17,17 @@ namespace Enemy
         // ポーズ中のEnemy
         private Enemy _pausedEnemy;
 
-        void Start()
+        // AI
+        private float _timer;
+
+        private void Start()
         {
             // EnemyContextからPoseParryJudgeを取得
-            _poseParryJudge = _enemyContext.PoseParryJudge;
-            _poseParryJudge.OnParrySuccess += OnParrySuccess;
+            _poseParryJudge = _enemyContext?.GetPoseContext()?.GetPoseParryJudge;
+            if (_poseParryJudge) { _poseParryJudge.OnParrySuccess += OnParrySuccess; }
+            Debug.Log("EnemyPoseController Start. _poseParryJudge = " + _poseParryJudge);
+
+            _timer = 0f;
         }
 
         // Update is called once per frame
@@ -31,17 +37,29 @@ namespace Enemy
             {
                 if (DebugShortcuts.Combo(Key.D, Key.P))
                 {
-                    _poseParryJudge.DebugOnParry();
+                    _poseParryJudge?.DebugOnParry();
                 }
             }
             else
             {
+                if (UpdatePoseTimer())
+                {
+                    _pausedEnemy = _enemyRegistry.GetRandomEnemy();
+                    _isPaused = true;
+                    _timer = 0f;
+                    PoseID pose = _pausedEnemy.RandomPose();
+                    if (_poseParryJudge == null) { return; }
+                    _poseParryJudge?.StartEnemyPose(pose);
+                }
+
                 if (DebugShortcuts.Combo(Key.E, Key.P))
                 {
                     _pausedEnemy = _enemyRegistry.GetRandomEnemy();
                     _isPaused = true;
+                    _timer = 0f;
                     PoseID pose = _pausedEnemy.RandomPose();
-                    _poseParryJudge.StartEnemyPose(pose);
+                    if (_poseParryJudge == null) { return; }
+                    _poseParryJudge?.StartEnemyPose(pose);
                 }
             }
         }
@@ -51,19 +69,27 @@ namespace Enemy
         {
             _pausedEnemy = null;
             _isPaused = false;
-            _poseParryJudge.EndEnemyPose();
+            if (_poseParryJudge == null) { return; }
+            _poseParryJudge?.EndEnemyPose();
         }
 
         // パリイ成功時の処理
         public void OnParrySuccess()
         {
-            Debug.Log("Parry success received in EnemyPoseController.");
+            _pausedEnemy?.OnParrySuccess();
+        }
 
-            if (_pausedEnemy != null)
+        private bool UpdatePoseTimer()
+        {
+            if (_isPaused) { return false; }
+
+            _timer += Time.deltaTime;
+            if (_timer >= 5.0f)
             {
-                Debug.Log($"Unpausing enemy: {_pausedEnemy.name}");
-                _pausedEnemy.OnParrySuccess();
+                return true;
             }
+
+            return false;
         }
     }
 }

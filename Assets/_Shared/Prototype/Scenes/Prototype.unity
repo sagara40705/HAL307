@@ -153,6 +153,8 @@ MonoBehaviour:
   - PoseParryJudge
   - Enemy
   - Player
+  - VoiceAi
+  - AudienceRequest
 --- !u!4 &773442693
 Transform:
   m_ObjectHideFlags: 0

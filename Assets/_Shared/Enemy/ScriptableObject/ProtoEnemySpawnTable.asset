@@ -16,3 +16,6 @@ MonoBehaviour:
   - enemyData: {fileID: 11400000, guid: 4f219e1e1e2b712469f37319355d4199, type: 2}
     position: {x: 0, y: 5, z: 30}
     rotationEuler: {x: 0, y: 0, z: 0}
+  - enemyData: {fileID: 11400000, guid: 4f219e1e1e2b712469f37319355d4199, type: 2}
+    position: {x: -2, y: 5, z: 30}
+    rotationEuler: {x: 0, y: 0, z: 0}

@@ -10,6 +10,7 @@ namespace RuntimeDebug
         Float,
         Vector3,
         Button,
+        Message,
     }
 
 
@@ -174,7 +175,6 @@ namespace RuntimeDebug
         }
     }
 
-    
     public sealed class DebugButtonItem : DebugItem
     {
         private readonly Action onClick;
@@ -190,6 +190,25 @@ namespace RuntimeDebug
             {
                 onClick?.Invoke();
             }
+        }
+    }
+
+    public sealed class DebugMessageItem : DebugItem
+    {
+        private readonly Func<string> getter;
+
+        public DebugMessageItem(string name, Func<string> getter)
+            : base(name, DebugItemKind.Message)
+        {
+            this.getter = getter;
+        }
+
+        public override void Draw()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Name, GUILayout.Width(140));
+            GUILayout.Label(getter.Invoke());
+            GUILayout.EndHorizontal();
         }
     }
 }

@@ -150,10 +150,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Prototype.Sandbox::Prototype.Sandbox.ProttypeSceneCore
   _scenes:
   - StageModel
+  - RuntimeDebugTest
   - PoseParryJudge
   - Enemy
   - Player
   - VoiceAi
+  - InGameUI
   - AudienceRequest
 --- !u!4 &773442693
 Transform:

@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5247088940061243106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 659112704389125885}
+  - component: {fileID: 8620349508532635140}
+  m_Layer: 0
+  m_Name: Hukidasi
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &659112704389125885
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5247088940061243106}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -641.25, y: -282.125, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8620349508532635140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5247088940061243106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5477a206c4e4664b99e67136f238e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Kosuke.Sandbox::BillboardSpawner
+  billboardPrefabs:
+  - {fileID: 4044294870427922061, guid: 8f821ded632008042a4348166bc3509b, type: 3}
+  - {fileID: 2624760887686886189, guid: 5212447c0d9fdb644ae7cbe9366cb220, type: 3}
+  - {fileID: 6308965949122286310, guid: 837561d8d58fd68468f604d0c776871c, type: 3}
+  spawnInterval: 1.5
+  spawnRange: {x: 15, y: 4, z: 0}
+  maxBillboardCount: 50
+  spriteTable:
+  - originalSprite: {fileID: 21300000, guid: 3c4bb7e837c209541ba4371ce0d02bad, type: 3}
+    changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
+  - originalSprite: {fileID: 21300000, guid: cc1102c9ad1a5c747b8db0bf20d4fc39, type: 3}
+    changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
+  - originalSprite: {fileID: 21300000, guid: 60817e80f2e24954bba7089e8a1aaba9, type: 3}
+    changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}

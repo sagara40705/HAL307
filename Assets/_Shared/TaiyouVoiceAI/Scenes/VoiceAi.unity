@@ -223,12 +223,12 @@ MonoBehaviour:
   voiceCommandAction: {fileID: 62380393}
   inferenceInterval: 0.7
   minVolumeThreshold: 0.001
-  logPrediction: 0
-  logScores: 0
+  logPrediction: 1
+  logScores: 1
   useSafetyFilter: 1
-  muscleNoneMargin: 5
-  powerNoneMargin: 7
-  yaaNoneMargin: 3
+  muscleNoneMargin: 10
+  powerNoneMargin: 10
+  yaaNoneMargin: 10
 --- !u!114 &62380393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,9 +244,9 @@ MonoBehaviour:
   powerObject: {fileID: 293995663}
   yaaObject: {fileID: 1173539856}
   muscleObject: {fileID: 1790491365}
+  bigVoiceThreshold: 0.08
   onlyHide: 1
   logCommand: 1
-  voiceAiContext: {fileID: 58132891}
 --- !u!114 &62380394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,9 +288,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::MfccFeatureExtractor
   sampleRate: 16000
-  fftSize: 512
+  fftSize: 256
   hopLength: 256
-  melFilterCount: 40
+  melFilterCount: 24
   preEmphasis: 0.97
   normalizePerFeature: 1
 --- !u!114 &62380397

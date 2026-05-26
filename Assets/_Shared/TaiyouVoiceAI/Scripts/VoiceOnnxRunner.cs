@@ -65,7 +65,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         // Vキーを押したら音声認識開始
         if (DebugShortcuts.Pressed(Key.V))
         {
-            Debug.Log("[Voice] 音声認識開始");
+            //Debug.Log("[Voice] 音声認識開始");
         }
         if (DebugShortcuts.Held(Key.V))
         {
@@ -126,12 +126,12 @@ public class VoiceOnnxRunner : MonoBehaviour
         string predictedLabel = labels[predictedIndex];
 
 
-        Debug.Log($"[MIC] vollume = {volume:F4}");
+        //Debug.Log($"[MIC] vollume = {volume:F4}");
 
-        Debug.Log(
-    $"[AI] result={predictedLabel} / " +
-    $"muscle={muscleScore:F3}, none={noneScore:F3}, power={powerScore:F3}, yaa={yaaScore:F3}"
-);
+//        Debug.Log(
+//    $"[AI] result={predictedLabel} / " +
+//    $"muscle={muscleScore:F3}, none={noneScore:F3}, power={powerScore:F3}, yaa={yaaScore:F3}"
+//);
 
 
         if (logPrediction)
@@ -141,7 +141,7 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         if (logScores)
         {
-            Debug.Log(BuildScoreLog(readable));
+            //Debug.Log(BuildScoreLog(readable));
         }
 
         // 誤爆防止フィルタ: muscle/power/yaa のスコアが none と十分に差がない場合は無視する
@@ -149,21 +149,21 @@ public class VoiceOnnxRunner : MonoBehaviour
         {
             if (predictedLabel == "muscle" && muscleScore - noneScore < muscleNoneMargin)
             {
-                Debug.Log($"muscle を無視しました（none と僅差: diff={muscleScore - noneScore:F3}）");
+                //Debug.Log($"muscle を無視しました（none と僅差: diff={muscleScore - noneScore:F3}）");
                 readable.Dispose();
                 return;
             }
 
             if (predictedLabel == "power" && powerScore - noneScore < powerNoneMargin)
             {
-                Debug.Log($"power を無視しました（none と僅差: diff={powerScore - noneScore:F3}）");
+                //Debug.Log($"power を無視しました（none と僅差: diff={powerScore - noneScore:F3}）");
                 readable.Dispose();
                 return;
             }
 
             if (predictedLabel == "yaa" && yaaScore - noneScore < yaaNoneMargin)
             {
-                Debug.Log($"yaa を無視しました（none と僅差: diff={yaaScore - noneScore:F3}）");
+                //Debug.Log($"yaa を無視しました（none と僅差: diff={yaaScore - noneScore:F3}）");
                 readable.Dispose();
                 return;
             }

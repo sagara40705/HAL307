@@ -525,7 +525,8 @@ MonoBehaviour:
   _colorChanger: {fileID: 1387029096}
   _yaaColor: {r: 0, g: 0.41078663, b: 1, a: 0}
   _powerColor: {r: 1, g: 0, b: 0, a: 0}
-  _muscleColor: {r: 1, g: 0.5675658, b: 0, a: 0}
+  _muscleColor: {r: 0.9113277, g: 1, b: 0, a: 0}
+  _currentPoseName: None
 --- !u!4 &1691506341
 Transform:
   m_ObjectHideFlags: 0

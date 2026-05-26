@@ -22,6 +22,15 @@ namespace RuntimeDebug
             return window;
         }
 
+        public static void DestroyWindow(string name)
+        {
+            DebugWindow window = windows.Find(w => w.Name == name);
+            if (window != null)
+            {
+                windows.Remove(window);
+            }
+        }
+
         public static void Toggle()
         {
             IsVisible = !IsVisible;

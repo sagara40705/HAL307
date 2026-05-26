@@ -40,6 +40,11 @@ namespace Player
             window.CreateMessage("Current Pose", () => _currentPoseName);
         }
 
+        private void OnDestroy()
+        {
+            RuntimeDebug.DebugMenu.DestroyWindow("Player");
+        }
+
         // Update is called once per frame
         private void Update()
         {

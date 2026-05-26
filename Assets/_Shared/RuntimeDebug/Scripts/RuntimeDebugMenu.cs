@@ -45,7 +45,6 @@ namespace RuntimeDebug
             }
 
             GUILayout.BeginArea(new Rect(10, 10, 320, 900));
-            GUILayout.Label("Debug Test");
 
             foreach (DebugWindow window in windows)
             {

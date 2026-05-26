@@ -696,23 +696,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestUiPool
   _audienceRequestSystem: {fileID: 848356010}
-  _uiParent: {fileID: 619822163}
+  _uiParent: {fileID: 619822164}
   _uiPrefabs:
-  - {fileID: 6068844057625993518, guid: 696dbb75c18af1a4682970ab0edb8c59, type: 3}
-  - {fileID: 7078501392725544788, guid: 9ea70fccbb5a2604797108b7d6e515d1, type: 3}
-  - {fileID: 6894311207650932971, guid: 633e57682573a114b99fb51707608350, type: 3}
-  _spawnAreaMin: {x: 50, y: 50}
-  _spawnAreaMax: {x: 600, y: 300}
-  _minDistance: 80
-  _maxAttempts: 10
+  - {fileID: 4044294870427922061, guid: 8f821ded632008042a4348166bc3509b, type: 3}
+  - {fileID: 2624760887686886189, guid: 5212447c0d9fdb644ae7cbe9366cb220, type: 3}
+  - {fileID: 6308965949122286310, guid: 837561d8d58fd68468f604d0c776871c, type: 3}
+  _spawnAreaMin: {x: -1000, y: -200}
+  _spawnAreaMax: {x: 1000, y: 200}
+  _minDistance: 150
+  _maxAttempts: 150
   _clearScale: 1.5
   _clearDelay: 1
   _spriteTable:
-  - originalSprite: {fileID: 0}
+  - originalSprite: {fileID: 21300000, guid: 3c4bb7e837c209541ba4371ce0d02bad, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
-  - originalSprite: {fileID: 0}
+  - originalSprite: {fileID: 21300000, guid: cc1102c9ad1a5c747b8db0bf20d4fc39, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
-  - originalSprite: {fileID: 0}
+  - originalSprite: {fileID: 21300000, guid: 60817e80f2e24954bba7089e8a1aaba9, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
 --- !u!4 &1958838625
 Transform:

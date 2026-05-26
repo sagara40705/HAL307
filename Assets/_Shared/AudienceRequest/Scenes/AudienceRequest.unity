@@ -701,6 +701,19 @@ MonoBehaviour:
   - {fileID: 6068844057625993518, guid: 696dbb75c18af1a4682970ab0edb8c59, type: 3}
   - {fileID: 7078501392725544788, guid: 9ea70fccbb5a2604797108b7d6e515d1, type: 3}
   - {fileID: 6894311207650932971, guid: 633e57682573a114b99fb51707608350, type: 3}
+  _spawnAreaMin: {x: 50, y: 50}
+  _spawnAreaMax: {x: 600, y: 300}
+  _minDistance: 80
+  _maxAttempts: 10
+  _clearScale: 1.5
+  _clearDelay: 1
+  _spriteTable:
+  - originalSprite: {fileID: 0}
+    changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
+  - originalSprite: {fileID: 0}
+    changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
+  - originalSprite: {fileID: 0}
+    changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
 --- !u!4 &1958838625
 Transform:
   m_ObjectHideFlags: 0

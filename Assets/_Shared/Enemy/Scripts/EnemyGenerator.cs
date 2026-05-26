@@ -25,6 +25,11 @@ namespace Enemy
 
             EnemySpawnEntry entry = _spawnData.SpawnEntries[index];
             Enemy enemy = Instantiate(entry.EnemyData.EnemyPrefab, entry.Position, entry.Rotation, _parent);
+
+            // 名前を付ける
+            int enemyNumber = _enemyRegistry.Count + 1;
+            enemy.name = $"Enemy{enemyNumber}";
+
             Debug.Log($"Generated enemy from data: {enemy.name}");
 
             enemy.Initialize(_enemyRegistry, _poseController, entry.EnemyData);

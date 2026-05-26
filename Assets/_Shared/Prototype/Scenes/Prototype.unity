@@ -155,6 +155,7 @@ MonoBehaviour:
   - Enemy
   - Player
   - VoiceAi
+  - InGameUI
   - AudienceRequest
 --- !u!4 &773442693
 Transform:

@@ -40,7 +40,7 @@ public class VoiceCommandAction : MonoBehaviour
 
         if (logCommand)
         {
-            Debug.Log("[Action] command = " + command);
+            //Debug.Log("[Action] command = " + command);
         }
 
         switch (command)

@@ -26,7 +26,7 @@ public class MicrophoneDebug : MonoBehaviour
 
             {
 
-                Debug.LogWarning("MicrophoneInput ‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");
+               Debug.LogWarning("MicrophoneInput ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“");
 
                 return;
 
@@ -38,7 +38,7 @@ public class MicrophoneDebug : MonoBehaviour
 
             {
 
-                Debug.LogWarning("ƒTƒ“ƒvƒ‹‚ªæ‚ê‚Ä‚¢‚Ü‚¹‚ñ");
+                Debug.LogWarning("ã‚µãƒ³ãƒ—ãƒ«ãŒå–ã‚Œã¦ã„ã¾ã›ã‚“");
 
                 return;
 
@@ -62,7 +62,7 @@ public class MicrophoneDebug : MonoBehaviour
 
             }
 
-            Debug.Log("ƒ}ƒCƒN“ü—Í Å‘å‰¹—Ê: " + maxAbs);
+            Debug.Log("ãƒã‚¤ã‚¯å…¥åŠ› æœ€å¤§éŸ³é‡: " + maxAbs);
 
         }
 

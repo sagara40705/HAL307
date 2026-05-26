@@ -18,6 +18,8 @@ namespace Player
         [SerializeField] private Color _muscleColor;
 
 
+        [SerializeField] private string _currentPoseName = "None";  
+
         private bool _isPose = false;
         private float _poseTimer = 0f;
 
@@ -35,6 +37,12 @@ namespace Player
             window.CreateButton("Pose Yaa", () => TryOnPose(PoseID.Pose_Yaa));
             window.CreateButton("Pose Power", () => TryOnPose(PoseID.Pose_Power));
             window.CreateButton("Pose Muscle", () => TryOnPose(PoseID.Pose_Muscle));
+            window.CreateMessage("Current Pose", () => _currentPoseName);
+        }
+
+        private void OnDestroy()
+        {
+            RuntimeDebug.DebugMenu.DestroyWindow("Player");
         }
 
         // Update is called once per frame
@@ -79,6 +87,7 @@ namespace Player
             if (!_isPose)
             {
                 OnPose(poseID);
+                _currentPoseName = poseID.ToString();
             }
         }
 
@@ -107,6 +116,7 @@ namespace Player
             _poseTimer = 0f;
             _poseParryJudge?.EndPlayerPose();
             _colorChanger?.ResetColor();
+            _currentPoseName = "None";
             Debug.Log("Player pose ended.");
         }
     }

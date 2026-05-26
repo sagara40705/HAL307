@@ -41,6 +41,10 @@ namespace RuntimeDebug
             items.Add(new DebugButtonItem(name, onClick));
         }
 
+        public void CreateMessage(string name, Func<string> getter)
+        {
+            items.Add(new DebugMessageItem(name, getter));
+        }
 
         public void Draw()
         {

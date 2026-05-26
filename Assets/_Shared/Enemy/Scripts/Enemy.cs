@@ -1,5 +1,6 @@
 using UnityEngine;
 using Pose;
+using RuntimeDebug;
 
 namespace Enemy
 {
@@ -32,6 +33,13 @@ namespace Enemy
             {
                 Debug.LogWarning($"Enemy {name} does not have a Proto_EnemyChangeColor component.");
             }
+
+            // デバッグ用のUIを作成
+            DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(name);
+            window.CreateMessage("Current Pose", () => _currentPoseID.ToString());
+            window.CreateMessage("Pose Timer", () => _poseTimer.ToString("F2"));
+            window.CreateMessage("Parried", () => _isParried.ToString());
+            window.CreateMessage("Parry Timer", () => _parryTimer.ToString("F2"));
         }
 
         private void Update()
@@ -91,6 +99,7 @@ namespace Enemy
         {
             // EnemyRegistryから登録解除する
             _enemyRegistry?.Unregister(this);
+            RuntimeDebug.DebugMenu.DestroyWindow(name);
         }
 
         public PoseID RandomPose()

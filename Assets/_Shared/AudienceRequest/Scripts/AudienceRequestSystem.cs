@@ -54,7 +54,17 @@ namespace AudienceRequest
         public void ClearRequest(PoseID poseID)
         {
             int value = _audienceRequests.GetCount(poseID);
+            if (value <= 0) return;
 
+            // リクエストのカウントを減らす
+            _audienceRequests.ClearCount(poseID);
+
+            // 合計リクエスト数を減らす
+            _currentRequestCount -= value;
+            if(_currentRequestCount < 0)
+                _currentRequestCount = 0;
+
+            _uiPool.PlayClearEffectAndRelease(poseID);
         }
 
         // リクエスト発生関数

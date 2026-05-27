@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 524425865}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: EnemyAi2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -554,7 +554,7 @@ GameObject:
   - component: {fileID: 1488375842}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: EnemyAi
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -658,7 +658,7 @@ Transform:
   m_GameObject: {fileID: 1488375836}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.73, y: 0.35, z: 5.18}
+  m_LocalPosition: {x: 1.73, y: 0.35, z: 5.145}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -685,6 +685,7 @@ MonoBehaviour:
   dir: {x: 1, y: 0, z: 0}
   timer: 0
   movetime: 5
+  moveDirection: {x: 0, y: 0, z: 1}
 --- !u!1 &1941876884
 GameObject:
   m_ObjectHideFlags: 0

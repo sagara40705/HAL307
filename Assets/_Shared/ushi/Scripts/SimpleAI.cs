@@ -29,6 +29,9 @@ public class SimpleAI : MonoBehaviour
     private int index;
     //ポーズ中パリィが発生したかどうか
     private bool isParry = false;
+    private  float PlayerPoint;
+    private float EnemyPoint;
+
     void Start()
     {
 
@@ -52,14 +55,18 @@ public class SimpleAI : MonoBehaviour
                 if (!isParry)
                 {
                     rend.material.color = stopColor;
+                    //敵のポイント取得
+                    EnemyPoint += 1f;
                 }
-
+                ///ここにプレイヤーが何の声を出したかの条件文
                 if (Keyboard.current.cKey.wasPressedThisFrame)
                 {
                     Debug.Log("Push!");
 
                     isParry = true;
                     rend.material.color = ParryColor;
+                    //敵のポイント取得
+                    PlayerPoint += 1f;
                 }
 
                 break;
@@ -69,13 +76,16 @@ public class SimpleAI : MonoBehaviour
                 if (!isParry)
                 {
                     rend.material.color = PowerColor;
+                    //敵のポイント取得
+                    EnemyPoint += 1f;
                 }
-
+                ///ここにプレイヤーが何の声を出したかの条件文
                 if (Keyboard.current.dKey.wasPressedThisFrame)
                 {
                     Debug.Log("Push!");
                     isParry = true;
                     rend.material.color = ParryColor;
+                    PlayerPoint += 1f;
                 }
 
                 break;
@@ -85,13 +95,15 @@ public class SimpleAI : MonoBehaviour
                 if (!isParry)
                 {
                     rend.material.color = MasssuruColor;
+                    EnemyPoint += 1f;
                 }
-
+                ///ここにプレイヤーが何の声を出したかの条件文
                 if (Keyboard.current.fKey.wasPressedThisFrame)
                 {
                     Debug.Log("Push!");
                     isParry = true;
                     rend.material.color = ParryColor;
+                    PlayerPoint += 1f;
                 }
 
                 break;

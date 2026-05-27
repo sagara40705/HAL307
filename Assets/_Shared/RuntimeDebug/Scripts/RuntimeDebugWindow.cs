@@ -7,7 +7,7 @@ namespace RuntimeDebug
     public sealed class DebugWindow
     {
         public string Name { get; }
-        public bool IsOpen { get; set; } = true;
+        private bool isExpanded = false; // デフォルトで展開
 
         private readonly List<DebugItem> items = new();
 
@@ -48,15 +48,17 @@ namespace RuntimeDebug
 
         public void Draw()
         {
-            if (!IsOpen)
+            // タイトルバーをボタンに
+            if (GUILayout.Button(Name, GUILayout.Width(300)))
             {
-                return;
+                isExpanded = !isExpanded;
             }
 
-            GUILayout.BeginVertical(GUI.skin.window);
-            GUILayout.Label(Name);
+            if (!isExpanded) { return; }
 
-            foreach (DebugItem item in items)
+            GUILayout.BeginVertical(GUI.skin.window);
+
+            foreach (var item in items)
             {
                 item.Draw();
             }

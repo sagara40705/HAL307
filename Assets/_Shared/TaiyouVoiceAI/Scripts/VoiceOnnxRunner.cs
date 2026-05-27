@@ -21,9 +21,9 @@ public class VoiceOnnxRunner : MonoBehaviour
 
     [Header("誤爆防止")]
     [SerializeField] private bool useSafetyFilter = true;
-    [SerializeField] private float muscleNoneMargin = 10.0f;
+    [SerializeField] private float muscleNoneMargin = 3.0f;
     [SerializeField] private float powerNoneMargin = 10.0f;
-    [SerializeField] private float yaaNoneMargin = 10.0f;
+    [SerializeField] private float yaaNoneMargin = 5.0f;
 
     private Worker worker;
     private Model runtimeModel;
@@ -58,40 +58,173 @@ public class VoiceOnnxRunner : MonoBehaviour
         Debug.Log("ONNXモデル読み込み成功");
     }
 
+    private enum VoiceProcessState
+    {
+        Idle,
+        CheckVolume,
+        MakeFeature,
+        RunOnnx,
+        HandleResult
+    }
+
+    private VoiceProcessState state = VoiceProcessState.Idle;
+
+    private float[] cachedSamples;
+    private float cachedVolume;
+    private float[,] cachedMfcc;
+    private Tensor<float> cachedOutput;
+    private string cachedLabel;
+
     private void Update()
     {
+
         if (worker == null) return;
-     
-        // Vキーを押したら音声認識開始
+
+        // Vキーを押していない場合はなにもしない
+        if (Keyboard.current == null || !Keyboard.current.vKey.isPressed)
+        {
+            state = VoiceProcessState.Idle;
+            timer = 0f;
+            return;
+        }
+
+        // Vキー押している間だけ処理をする
         if (DebugShortcuts.Pressed(Key.V))
         {
-            //Debug.Log("[Voice] 音声認識開始");
+            timer += Time.deltaTime;
+
+            if (timer >= inferenceInterval)
+            {
+                timer = 0f;
+                state = VoiceProcessState.CheckVolume;
+            }
+
+            return;
         }
-        if (DebugShortcuts.Held(Key.V))
+
+        switch (state)
         {
 
-            RunInference();
+            case VoiceProcessState.Idle:
+                timer = 0f;
+                state = VoiceProcessState.CheckVolume;
+                break;
+
+            case VoiceProcessState.CheckVolume:
+                CheckVolumeStep();
+                break;
+
+            case VoiceProcessState.MakeFeature:
+                MakeFeatureStep();
+                break;
+
+            case VoiceProcessState.RunOnnx:
+                RunOnnxStep();
+                break;
+
+            case VoiceProcessState.HandleResult:
+                HandleResultStep();
+                break;
         }
     }
 
-    private void RunInference()
+    private void CheckVolumeStep()
     {
-        float[] samples = microphoneInput.GetLatestSamples();
-        if (samples == null || samples.Length == 0)
+        cachedSamples = microphoneInput.GetLatestSamples();
+
+        if (cachedSamples == null || cachedSamples.Length == 0)
         {
-            Debug.LogWarning("音声サンプルが取れていません");
+            state = VoiceProcessState.Idle;
             return;
         }
 
-        float volume = GetVolumeRMS(samples);
-        if (volume < minVolumeThreshold)
+        cachedVolume = GetMaxAbs(cachedSamples);
+
+        if (cachedVolume < minVolumeThreshold)
         {
+            state = VoiceProcessState.Idle;
             return;
         }
 
+        state = VoiceProcessState.MakeFeature;
+    }
+
+    private void MakeFeatureStep()
+    {
+        cachedMfcc = featureExtractor.ExtractDummyMfcc(cachedSamples);
+        state = VoiceProcessState.RunOnnx;
+    }
+
+    private void RunOnnxStep()
+    {
+        using Tensor<float> inputTensor =
+            new Tensor<float>(new TensorShape(1, 1, 20, 32));
+
+        for (int m = 0; m < 20; m++)
+        {
+            for (int t = 0; t < 32; t++)
+            {
+                inputTensor[0, 0, m, t] = cachedMfcc[m, t];
+            }
+        }
+
+        worker.Schedule(inputTensor);
+
+        Tensor<float> output = worker.PeekOutput() as Tensor<float>;
+        if (output == null)
+        {
+            state = VoiceProcessState.Idle;
+            return;
+        }
+
+        cachedOutput = output.ReadbackAndClone() as Tensor<float>;
+
+        if (cachedOutput == null)
+        {
+            state = VoiceProcessState.Idle;
+            return;
+        }
+
+        int predictedIndex = ArgMax(cachedOutput);
+        cachedLabel = labels[predictedIndex];
+
+        state = VoiceProcessState.HandleResult;
+    }
+
+    private void HandleResultStep()
+    {
+        if (logPrediction)
+        {
+            Debug.Log($"[AI] result={cachedLabel} / volume={cachedVolume:F4}");
+        }
+
+        if (logScores && cachedOutput != null)
+        {
+            Debug.Log(BuildScoreLog(cachedOutput));
+        }
+
+        if (voiceCommandAction != null)
+        {
+            voiceCommandAction.ExecuteCommand(cachedLabel, cachedVolume);
+        }
+
+        cachedOutput?.Dispose();
+        cachedOutput = null;
+
+        cachedSamples = null;
+        cachedMfcc = null;
+        cachedLabel = null;
+
+        state = VoiceProcessState.Idle;
+    }
+
+
+    private void RunInferenceWithSamples(float[] samples, float volume)
+    {
         float[,] mfcc = featureExtractor.ExtractDummyMfcc(samples);
 
-        using Tensor<float> inputTensor = new Tensor<float>(new TensorShape(1, 1, 20, 32));
+        using Tensor<float> inputTensor =
+            new Tensor<float>(new TensorShape(1, 1, 20, 32));
 
         for (int m = 0; m < 20; m++)
         {
@@ -104,89 +237,48 @@ public class VoiceOnnxRunner : MonoBehaviour
         worker.Schedule(inputTensor);
 
         Tensor<float> output = worker.PeekOutput() as Tensor<float>;
+
         if (output == null)
         {
-            Debug.LogWarning("推論結果が取得できませんでした");
             return;
         }
 
-        Tensor<float> readable = output.ReadbackAndClone() as Tensor<float>;
+        Tensor<float> readable =
+            output.ReadbackAndClone() as Tensor<float>;
+
         if (readable == null)
         {
-            Debug.LogWarning("推論結果の読み取りに失敗しました");
             return;
         }
-
-        float muscleScore = readable[0];
-        float noneScore = readable[1];
-        float powerScore = readable[2];
-        float yaaScore = readable[3];
 
         int predictedIndex = ArgMax(readable);
         string predictedLabel = labels[predictedIndex];
 
-
-        //Debug.Log($"[MIC] vollume = {volume:F4}");
-
-//        Debug.Log(
-//    $"[AI] result={predictedLabel} / " +
-//    $"muscle={muscleScore:F3}, none={noneScore:F3}, power={powerScore:F3}, yaa={yaaScore:F3}"
-//);
-
-
-        if (logPrediction)
-        {
-            Debug.Log($"推論結果: {predictedLabel} / volume={volume:F3}");
-        }
-
-        if (logScores)
-        {
-            //Debug.Log(BuildScoreLog(readable));
-        }
-
-        // 誤爆防止フィルタ: muscle/power/yaa のスコアが none と十分に差がない場合は無視する
-        if (useSafetyFilter)
-        {
-            if (predictedLabel == "muscle" && muscleScore - noneScore < muscleNoneMargin)
-            {
-                //Debug.Log($"muscle を無視しました（none と僅差: diff={muscleScore - noneScore:F3}）");
-                readable.Dispose();
-                return;
-            }
-
-            if (predictedLabel == "power" && powerScore - noneScore < powerNoneMargin)
-            {
-                //Debug.Log($"power を無視しました（none と僅差: diff={powerScore - noneScore:F3}）");
-                readable.Dispose();
-                return;
-            }
-
-            if (predictedLabel == "yaa" && yaaScore - noneScore < yaaNoneMargin)
-            {
-                //Debug.Log($"yaa を無視しました（none と僅差: diff={yaaScore - noneScore:F3}）");
-                readable.Dispose();
-                return;
-            }
-        }
+        Debug.Log("[AI] " + predictedLabel);
 
         if (voiceCommandAction != null)
         {
-            voiceCommandAction.ExecuteCommand(predictedLabel);
+            voiceCommandAction.ExecuteCommand(predictedLabel, volume);
         }
 
         readable.Dispose();
     }
 
-    private float GetVolumeRMS(float[] samples)
+    private float GetMaxAbs(float[] samples)
     {
-        float sum = 0.0f;
+        float maxAbs = 0f;
 
         for (int i = 0; i < samples.Length; i++)
         {
-            sum += samples[i] * samples[i];
+            float v = Mathf.Abs(samples[i]);
+
+            if (v > maxAbs)
+            {
+                maxAbs = v;
+            }
         }
 
-        return Mathf.Sqrt(sum / samples.Length);    
+        return maxAbs;
     }
 
     private int ArgMax(Tensor<float> tensor)
@@ -212,6 +304,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         sb.Append("scores: ");
 
         int count = Mathf.Min(labels.Length, tensor.shape.length);
+
         for (int i = 0; i < count; i++)
         {
             sb.Append(labels[i]);

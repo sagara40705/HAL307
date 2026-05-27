@@ -77,39 +77,36 @@ public class VoiceOnnxRunner : MonoBehaviour
 
     private void Update()
     {
-
         if (worker == null) return;
 
-        // Vキーを押していない場合はなにもしない
-        if (Keyboard.current == null || !Keyboard.current.vKey.isPressed)
+        // Vキー押している間だけ動作
+        if (!DebugShortcuts.Held(Key.V))
         {
             state = VoiceProcessState.Idle;
             timer = 0f;
             return;
         }
 
-        // Vキー押している間だけ処理をする
-        if (DebugShortcuts.Pressed(Key.V))
+        // Idle中のみタイマー進行
+        if (state == VoiceProcessState.Idle)
         {
             timer += Time.deltaTime;
 
             if (timer >= inferenceInterval)
             {
                 timer = 0f;
+
+                Debug.Log("[Voice] 推論開始");
+
                 state = VoiceProcessState.CheckVolume;
             }
 
             return;
         }
 
+        // 分割処理
         switch (state)
         {
-
-            case VoiceProcessState.Idle:
-                timer = 0f;
-                state = VoiceProcessState.CheckVolume;
-                break;
-
             case VoiceProcessState.CheckVolume:
                 CheckVolumeStep();
                 break;

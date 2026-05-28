@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -6,15 +7,15 @@ using UnityEngine.InputSystem;
 
 public class TitleSceneController : MonoBehaviour
 {
-    [Header("ƒƒjƒ…[‚Ì€–Ú")]
+    [Header("ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®é …ç›®")]
     public RectTransform menuItems;
 
-    [Header("‘I‘ğƒAƒCƒRƒ“")]
+    [Header("é¸æŠã‚¢ã‚¤ã‚³ãƒ³")]
     public RectTransform iconLeft;
     public RectTransform iconRight;
     public float iconOffsetX = 50f;
 
-    [Header("‘I‘ğ’†‚ÌF")]
+    [Header("é¸æŠä¸­ã®è‰²")]
     public Color selectedColor = Color.yellow;
     public Color normalColor = Color.white;
 
@@ -32,7 +33,7 @@ public class TitleSceneController : MonoBehaviour
         bool downPressed = false;
         bool submitPressed = false;
 
-        // ƒL[ƒ{[ƒh‚Ì”»’è
+        // ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®åˆ¤å®š
         if (Keyboard.current != null)
         {
             upPressed |= Keyboard.current.upArrowKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame;
@@ -40,15 +41,15 @@ public class TitleSceneController : MonoBehaviour
             submitPressed |= Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame;
         }
 
-        // ƒQ[ƒ€ƒpƒbƒh‚Ì”»’è
+        // ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã®åˆ¤å®š
         if (Gamepad.current != null)
         {
             upPressed |= Gamepad.current.dpad.up.wasPressedThisFrame || Gamepad.current.leftStick.up.wasPressedThisFrame;
             downPressed |= Gamepad.current.dpad.down.wasPressedThisFrame || Gamepad.current.leftStick.down.wasPressedThisFrame;
-            submitPressed |= Gamepad.current.buttonSouth.wasPressedThisFrame; // PS‚È‚ç~/ZAXbox‚È‚çAƒ{ƒ^ƒ“
+            submitPressed |= Gamepad.current.buttonSouth.wasPressedThisFrame; // PSãªã‚‰Ã—/ã€‡ã€Xboxãªã‚‰Aãƒœã‚¿ãƒ³
         }
 
-        // “ü—Íˆ—‚ÌÀs
+        // å…¥åŠ›å‡¦ç†ã®å®Ÿè¡Œ
         if (upPressed)
         {
             currentIndex = (currentIndex - 1 + menuItems.childCount) % menuItems.childCount;
@@ -107,8 +108,9 @@ public class TitleSceneController : MonoBehaviour
                 Application.Quit();
                 break;
             default:
-                Debug.LogWarning("–¢’è‹`‚Ìƒƒjƒ…[€–Ú‚ª‘I‘ğ‚³‚ê‚Ü‚µ‚½: " + selectedItem);
+                Debug.LogWarning("æœªå®šç¾©ã®ãƒ¡ãƒ‹ãƒ¥ãƒ¼é …ç›®ãŒé¸æŠã•ã‚Œã¾ã—ãŸ: " + selectedItem);
                 break;
         }
     }
+
 }

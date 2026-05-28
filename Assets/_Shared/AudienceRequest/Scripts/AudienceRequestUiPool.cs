@@ -19,6 +19,10 @@ namespace AudienceRequest
         [SerializeField] private Vector2 _spawnAreaMin = new Vector2(50f, 50f); // ランダム配置の最小座標
         [SerializeField] private Vector2 _spawnAreaMax = new Vector2(600f, 300f);// ランダム配置の最大座標
 
+        [Header("生成禁止エリア")]
+        [SerializeField] private List<RectTransform> _forbiddenAreas = new();
+        [SerializeField] private float _forbiddenPadding = 20f;
+
         [SerializeField] private float _minDistance = 80;
         [SerializeField] private int _maxAttempts = 10;
 
@@ -77,22 +81,22 @@ namespace AudienceRequest
 
         public GameObject Generate(PoseID pose)
         {
-            // プールからUIオブジェクトを取得
-            GameObject obj = _uiPools[(int)pose].Get();
+            if (!TryFindSpawnPosition(out Vector2 spawnPos))
+            {
+                return null;
+            }
 
-            // UIの親オブジェクトに設定
+            GameObject obj = _uiPools[(int)pose].Get();
             obj.transform.SetParent(_uiParent.transform, false);
             obj.transform.localScale = Vector3.one;
 
             RectTransform rect = obj.GetComponent<RectTransform>();
             if (rect != null)
             {
-                rect.anchoredPosition = FindSpawnPosition();
+                rect.anchoredPosition = spawnPos;
             }
 
-            // アクティブなUIオブジェクトのリストに追加
             _activeUis[(int)pose].Add(obj);
-
             return obj;
         }
 
@@ -151,41 +155,28 @@ namespace AudienceRequest
         }
 
 
-        private Vector2 FindSpawnPosition()
+        private bool TryFindSpawnPosition(out Vector2 pos)
         {
-            if (_uiParent == null)
-                return Vector2.zero;
-
-            Rect rect = _uiParent.rect;
-
-            // 端に寄りすぎないよう余白
-            float paddingX = 80f;
-            float paddingY = 60f;
-
-            float minX = rect.xMin + paddingX;
-            float maxX = rect.xMax - paddingX;
-            float minY = rect.yMin + paddingY;
-            float maxY = rect.yMax - paddingY;
-
             for (int i = 0; i < _maxAttempts; i++)
             {
                 Vector2 candidate = new Vector2(
-                    Random.Range(minX, maxX),
-                    Random.Range(minY, maxY)
+                    Random.Range(_spawnAreaMin.x, _spawnAreaMax.x),
+                    Random.Range(_spawnAreaMin.y, _spawnAreaMax.y)
                 );
 
-                if (!IsOverlapping(candidate))
-                {
-                    return candidate;
-                }
+                if (IsInsideForbiddenArea(candidate))
+                    continue;
+
+                if (IsOverlapping(candidate))
+                    continue;
+
+                pos = candidate;
+                return true;
             }
 
-            return new Vector2(
-                Random.Range(minX, maxX),
-                Random.Range(minY, maxY)
-            );
+            pos = Vector2.zero;
+            return false;
         }
-
 
         private bool IsOverlapping(Vector2 pos)
         {
@@ -206,7 +197,33 @@ namespace AudienceRequest
             }
             return false;
         }
+        private bool IsInsideForbiddenArea(Vector2 localPos)
+        {
+            foreach (var area in _forbiddenAreas)
+            {
+                if (area == null) continue;
+
+                Vector3[] corners = new Vector3[4];
+                area.GetWorldCorners(corners);
+
+                Vector2 min = _uiParent.InverseTransformPoint(corners[0]);
+                Vector2 max = _uiParent.InverseTransformPoint(corners[2]);
+
+                min -= Vector2.one * _forbiddenPadding;
+                max += Vector2.one * _forbiddenPadding;
+
+                if (localPos.x >= min.x && localPos.x <= max.x &&
+                    localPos.y >= min.y && localPos.y <= max.y)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
     }
+
 
 }
 

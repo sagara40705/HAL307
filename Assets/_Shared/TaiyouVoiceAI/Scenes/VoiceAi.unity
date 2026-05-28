@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 62380394}
   - component: {fileID: 62380393}
   - component: {fileID: 62380392}
+  - component: {fileID: 62380398}
   m_Layer: 0
   m_Name: VoiceAIManager
   m_TagString: Untagged
@@ -221,10 +222,10 @@ MonoBehaviour:
   microphoneInput: {fileID: 62380394}
   featureExtractor: {fileID: 62380396}
   voiceCommandAction: {fileID: 62380393}
-  inferenceInterval: 0.7
+  inferenceInterval: 0.4
   minVolumeThreshold: 0.001
   logPrediction: 1
-  logScores: 1
+  logScores: 0
   useSafetyFilter: 1
   muscleNoneMargin: 10
   powerNoneMargin: 10
@@ -308,6 +309,19 @@ MonoBehaviour:
   microphoneInput: {fileID: 62380394}
   featureExtractor: {fileID: 62380396}
   checkInterval: 1.5
+--- !u!114 &62380398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62380389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6453f4ca88bb50a4181422c0dae7df8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TaiyouVoiceAI::VoiceTextRecognizer
+  voiceCommandAction: {fileID: 62380393}
 --- !u!1 &293995663
 GameObject:
   m_ObjectHideFlags: 0

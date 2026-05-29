@@ -13,7 +13,7 @@ public class TitleSceneController : MonoBehaviour
     [Header("選択アイコン")]
     public RectTransform iconLeft;
     public RectTransform iconRight;
-    public float iconOffsetX = 50f;
+    public float iconOffsetX = 80f;
 
     [Header("選択中の色")]
     public Color selectedColor = Color.yellow;

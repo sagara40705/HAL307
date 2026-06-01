@@ -151,13 +151,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f7b2eec61fde0d458b9dc9927e5a371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TransitionManager
-  dumbbellCanvasRoot: {fileID: 0}
-  dumbbellPrefab: {fileID: 0}
+  dumbbellCanvasRoot: {fileID: 2186267}
+  dumbbellPrefab: {fileID: 7602200858801397624, guid: f4031ac5d8aa6fa438bce205d615385f, type: 3}
   spawnCount: 80
   spawnInterval: 0.02
   spawnSize: 0
   backgroundPanel: {fileID: 0}
-  spawnPoint: {fileID: 0}
+  spawnPoint: {fileID: 306931734}
   spawnWidth: 400
 --- !u!114 &2186264
 MonoBehaviour:
@@ -813,9 +813,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1990511552}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a666b66bdb0d3344f86b8a4ffa1ee628, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f6ae27e303a1cd49b28ca533c766540, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneController
+  titleSceneName: TitleScene
+  gameSceneName: GameScene
 --- !u!4 &1990511554
 Transform:
   m_ObjectHideFlags: 0

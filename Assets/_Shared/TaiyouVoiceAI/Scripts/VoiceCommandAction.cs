@@ -1,4 +1,8 @@
+using Player;
 using UnityEngine;
+using Context;
+using Pose;
+using TaiyouVoiceAI;
 
 public class VoiceCommandAction : MonoBehaviour
 {
@@ -16,6 +20,18 @@ public class VoiceCommandAction : MonoBehaviour
 
     [Header("再表示設定")]
     [SerializeField] private float hideTime = 5f;
+
+    [SerializeField] private VoiceAiContext _voiceAiContext;
+    [SerializeField] private PlayerPoseContoroller _playerPoseController;
+
+    private void Start()
+    {
+        _playerPoseController = _voiceAiContext.GetPlayerContext().GetPlayerPoseContoroller;
+        if (_playerPoseController == null)
+        {
+            Debug.LogError("PlayerPoseControllerが見つかりません");
+        }
+    }
 
     public void ExecuteCommand(string command, float volume)
     {
@@ -41,15 +57,30 @@ public class VoiceCommandAction : MonoBehaviour
         {
             case "power":
                 HideOrDestroy(powerObject, "power");
+                _playerPoseController?.TryOnPose(PoseID.Pose_Power);
+              
                 break;
 
             case "yaa":
                 HideOrDestroy(yaaObject, "yaa");
+                _playerPoseController?.TryOnPose(PoseID.Pose_Yaa);
+
                 break;
 
             case "muscle":
                 HideOrDestroy(muscleObject, "muscle");
+                _playerPoseController?.TryOnPose(PoseID.Pose_Muscle);
+
                 break;
+        }
+
+        if (_playerPoseController != null)
+        {
+            Debug.Log("/////////音声でポーズが開始されました//////////");
+        }
+        else
+        {
+            Debug.LogWarning("/////////PlayerPoseControllerが見つからないため、ポーズを開始できません//////////");
         }
     }
 

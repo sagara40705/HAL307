@@ -1,6 +1,21 @@
 using System;
 using UnityEngine;
 
+
+/// マイクから取得した音声データをMFCC特徴量へ変換するクラス
+///
+/// 処理の流れ
+/// 1. PreEmphasis（高周波強調）
+/// 2. Hamming Window適用
+/// 3. FFT(スペクトル解析)
+/// 4. Mel Filter Bank適用
+/// 5. Log変換
+/// 6. DCT変換
+/// 7. MFCC生成
+/// 8. 正規化
+/// 9. 20×32サイズへ変換
+///
+/// 生成したMFCCはONNXモデルの入力として使用する。
 public class MfccFeatureExtractor : MonoBehaviour
 {
     public const int MfccCount = 20;
@@ -35,6 +50,7 @@ public class MfccFeatureExtractor : MonoBehaviour
         initialized = true;
     }
 
+    /// MFCC特徴量を生成する
     public float[,] ExtractMfcc(float[] samples)
     {
         Initialize();

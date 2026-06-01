@@ -26,10 +26,11 @@ public class VoiceCommandAction : MonoBehaviour
 
     private void Start()
     {
-        _playerPoseController = _voiceAiContext.GetPlayerContext().GetPlayerPoseContoroller;
+        _playerPoseController = _voiceAiContext.GetPlayerContext().GetPlayerPoseController();
+
         if (_playerPoseController == null)
-        {
-            Debug.LogError("PlayerPoseControllerが見つかりません");
+            {
+                Debug.LogError("PlayerPoseControllerが見つかりませんでした。");
         }
     }
 

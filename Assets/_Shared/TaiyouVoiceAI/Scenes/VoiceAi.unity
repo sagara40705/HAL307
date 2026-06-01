@@ -246,6 +246,9 @@ MonoBehaviour:
   minVoiceVolume: 0.08
   onlyHide: 1
   logCommand: 1
+  hideTime: 5
+  _voiceAiContext: {fileID: 58132891}
+  _playerPoseController: {fileID: 0}
 --- !u!114 &62380394
 MonoBehaviour:
   m_ObjectHideFlags: 0

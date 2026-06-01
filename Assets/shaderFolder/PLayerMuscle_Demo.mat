@@ -25,25 +25,25 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: e55269526d09dd240924955964f2c5eb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 1271c934859c12a40bdfe946cb34bd7a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NumTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 02f04eef9c53ab04bb3ec037fa6c989c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AmbientStrength: 0.1
+    - _AmbientStrength: 0.507
     - _Darkness: 0.35
     - _Digit0: 0
     - _Digit1: 0
     - _Digit2: 0
-    - _NormalStrength: 1
+    - _NormalStrength: 0
     - _ShowNumber: 1
     - _SpecPower: 48
     - _SpecStrength: 1.2

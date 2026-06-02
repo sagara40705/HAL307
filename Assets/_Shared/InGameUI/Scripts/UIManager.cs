@@ -2,27 +2,27 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
-    //== ƒVƒ“ƒOƒ‹ƒgƒ“ƒpƒ^[ƒ“‚ÌÀ‘• ==//
-    // ƒVƒ“ƒOƒ‹ƒgƒ“‚ÌƒCƒ“ƒXƒ^ƒ“ƒX
+    //== ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ãƒ‘ã‚¿ãƒ¼ãƒ³ã®å®Ÿè£… ==//
+    // ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
     public static UIManager Instance;
 
-    //== UI—v‘f‚ÌQÆ ==//
-    [Header("‰æ–Êƒpƒlƒ‹")]
-    public GameObject gamePanel;   // ƒQ[ƒ€UI
-    public GameObject resultPanel; // ƒŠƒUƒ‹ƒgUI
+    //== UIè¦ç´ ã®å‚ç…§ ==//
+    [Header("ç”»é¢ãƒ‘ãƒãƒ«")]
+    public GameObject gamePanel;   // ã‚²ãƒ¼ãƒ UI
+    public GameObject resultPanel; // ãƒªã‚¶ãƒ«ãƒˆUI
 
 
-    //ŠeUI—v‘f‚ÌQÆ‚ğ’Ç‰Á
-    //[Header("ƒ^ƒCƒgƒ‹UI")]
+    //å„UIè¦ç´ ã®å‚ç…§ã‚’è¿½åŠ 
+    //[Header("ã‚¿ã‚¤ãƒˆãƒ«UI")]
 
-    [Header("ƒQ[ƒ€UI")]
-    public BillboardSpawner spawner; // ‚«o‚µ
-    public GaugeController  gauge;   // ƒQ[ƒW
+    [Header("ã‚²ãƒ¼ãƒ UI")]
+    //public BillboardSpawner spawner; // å¹ãå‡ºã—
+    public GaugeController  gauge;   // ã‚²ãƒ¼ã‚¸
 
-    //[Header("ƒŠƒUƒ‹ƒgUI")]
+    //[Header("ãƒªã‚¶ãƒ«ãƒˆUI")]
 
 
-    // ƒVƒ“ƒOƒ‹ƒgƒ“‚Ì‰Šú‰»
+    // ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã®åˆæœŸåŒ–
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -35,17 +35,17 @@ public class UIManager : MonoBehaviour
         ShowGameScreen();
     }
 
-    //== ‰æ–ÊØ‚è‘Ö‚¦‚Ìƒƒ\ƒbƒh ==//
+    //== ç”»é¢åˆ‡ã‚Šæ›¿ãˆã®ãƒ¡ã‚½ãƒƒãƒ‰ ==//
 
     public void ShowGameScreen()
     {
         gamePanel.SetActive(true);
         resultPanel.SetActive(false);
 
-        if (spawner != null)
-        {
-            spawner.StartSpawning();
-        }
+        //    if (spawner != null)
+        //    {
+        //        spawner.StartSpawning();
+        //    }
     }
 
     public void ShowResultScreen()
@@ -53,10 +53,10 @@ public class UIManager : MonoBehaviour
         gamePanel.SetActive(false);
         resultPanel.SetActive(true);
 
-        if (spawner != null)
-        {
-            spawner.StopSpawning();
-        }
+        //if (spawner != null)
+        //{
+        //    spawner.StopSpawning();
+        //}
     }
 
     public void ReportHeartChanged(int count)

@@ -79,6 +79,7 @@ namespace Player
             _poseTimer = 3f; // ポーズ状態の持続時間を設定
             _poseParryJudge?.StartPlayerPose(poseID);
             ChangeColor(poseID);
+            OnPoseStart?.Invoke(poseID); 
             Debug.Log($"Player started pose: {poseID}");
         }
 

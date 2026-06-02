@@ -1,21 +1,21 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Cysharp.Threading.Tasks;//UniTask‚ğg—p‚·‚é‚½‚ß
+using Cysharp.Threading.Tasks;//UniTaskã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚
 
 public class SceneController : MonoBehaviour
 {
     public static SceneController Instance;
 
-    [Header("ƒV[ƒ“–¼")]
+    [Header("ã‚·ãƒ¼ãƒ³å")]
     public string titleSceneName = "TitleScene";
     public string gameSceneName = "GameScene";
 
-    //Œ»İg‚í‚ê‚Ä‚éƒV[ƒ“
+    //ç¾åœ¨ä½¿ã‚ã‚Œã¦ã‚‹ã‚·ãƒ¼ãƒ³
     private string currentSceneName = "";
 
     private void Awake()
     {
-        //ƒVƒ“ƒOƒ‹ƒgƒ“‚ÌÀ‘•
+        //ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³ã®å®Ÿè£…
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
@@ -24,7 +24,7 @@ public class SceneController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
-        //Å‰‚Íƒ^ƒCƒgƒ‹ƒV[ƒ“‚ğ“Ç‚İ‚Ş
+        //æœ€åˆã¯ã‚¿ã‚¤ãƒˆãƒ«ã‚·ãƒ¼ãƒ³ã‚’èª­ã¿è¾¼ã‚€
         TransitionManager.Instance.StartDumbbellTransition(titleSceneName).Forget();
     }
 
@@ -32,22 +32,21 @@ public class SceneController : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(currentSceneName))
         {
-            //Œ»İ‚ÌƒV[ƒ“‚ª‚ ‚éê‡‚ÍƒAƒ“ƒ[ƒh‚·‚é
+            //ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒã‚ã‚‹å ´åˆã¯ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
             await SceneManager.UnloadSceneAsync(currentSceneName);
         }
 
-        //Ÿ‚ÌƒV[ƒ“‚ğ“Ç‚İ‚Ş
+        //æ¬¡ã®ã‚·ãƒ¼ãƒ³ã‚’èª­ã¿è¾¼ã‚€
         await SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);
 
-        //Œ»İ‚ÌƒV[ƒ“–¼‚ğXV
+        //ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³åã‚’æ›´æ–°
         currentSceneName = nextSceneName;
 
-        //‰ÁZƒ[ƒh‚³‚ê‚½ƒV[ƒ“‚ğƒAƒNƒeƒBƒu‚ÈƒV[ƒ“‚Éİ’è‚·‚é
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(nextSceneName))
-;    
+        //åŠ ç®—ãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸã‚·ãƒ¼ãƒ³ã‚’ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªã‚·ãƒ¼ãƒ³ã«è¨­å®šã™ã‚‹
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(nextSceneName)); 
     }
 
-    //ŠO•”‚©‚çŠÈ’P‚ÉŒÄ‚×‚é‚æ‚¤‚É‚·‚é
+    //å¤–éƒ¨ã‹ã‚‰ç°¡å˜ã«å‘¼ã¹ã‚‹ã‚ˆã†ã«ã™ã‚‹
     public void GoToGame()
     {
         ChangeScene(gameSceneName).Forget();

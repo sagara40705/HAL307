@@ -37,7 +37,7 @@ namespace Enemy
         public void Clear()
         {
             _enemies.Clear();
-            Debug.Log("Cleared all enemies from registry.");
+            //Debug.Log("Cleared all enemies from registry.");
         }
 
         // ランダムにEnemyを1体取得する

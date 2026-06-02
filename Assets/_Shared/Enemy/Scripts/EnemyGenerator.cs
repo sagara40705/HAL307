@@ -30,7 +30,7 @@ namespace Enemy
             int enemyNumber = _enemyRegistry.Count + 1;
             enemy.name = $"Enemy{enemyNumber}";
 
-            Debug.Log($"Generated enemy from data: {enemy.name}");
+           // Debug.Log($"Generated enemy from data: {enemy.name}");
 
             enemy.Initialize(_enemyRegistry, _poseController, entry.EnemyData);
         }

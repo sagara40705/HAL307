@@ -26,7 +26,7 @@ public class VoiceCommandAction : MonoBehaviour
 
     private void Start()
     {
-        _playerPoseController = _voiceAiContext.GetPlayerContext().GetPlayerPoseContoroller();
+        _playerPoseController = _voiceAiContext.GetPlayerContext().GetPlayerPoseContoroller;
 
         if (_playerPoseController == null)
             {

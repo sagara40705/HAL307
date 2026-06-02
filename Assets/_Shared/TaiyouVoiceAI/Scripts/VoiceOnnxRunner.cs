@@ -200,11 +200,27 @@ public class VoiceOnnxRunner : MonoBehaviour
             Debug.Log(BuildScoreLog(cachedOutput));
         }
 
+        // none の場合は何もしない
+        if (cachedLabel == "none")
+        {
+            cachedOutput?.Dispose();
+            cachedOutput = null;
+
+            cachedSamples = null;
+            cachedMfcc = null;
+            cachedLabel = null;
+
+            state = VoiceProcessState.Idle;
+            return;
+        }
+
+        // 認識結果を実行
         if (voiceCommandAction != null)
         {
             voiceCommandAction.ExecuteCommand(cachedLabel, cachedVolume);
         }
 
+        // 後始末
         cachedOutput?.Dispose();
         cachedOutput = null;
 
@@ -212,6 +228,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         cachedMfcc = null;
         cachedLabel = null;
 
+        // 次の推論を受け付ける
         state = VoiceProcessState.Idle;
     }
 

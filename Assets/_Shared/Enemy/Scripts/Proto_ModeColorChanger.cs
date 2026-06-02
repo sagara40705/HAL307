@@ -29,7 +29,7 @@ namespace Enemy
 
             material.color = color;
 
-            Debug.Log("色を変更しました: " + color);
+            //Debug.Log("色を変更しました: " + color);
         }
 
         public void ResetColor()

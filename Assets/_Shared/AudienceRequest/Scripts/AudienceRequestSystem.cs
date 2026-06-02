@@ -16,6 +16,7 @@ namespace AudienceRequest
         [SerializeField] private AudienceRequests _audienceRequests; // リクエストのデータベース
         [SerializeField] private AudienceRequestUiPool _uiPool; // UIプールの参照
 
+
         [SerializeField] private float _requestInterval = 5f;
         private float _requestTimer = 0f;
 

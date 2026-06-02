@@ -143,7 +143,6 @@ namespace AudienceRequest
             _activeUis[(int)pose].Clear();
         }
 
-
         private IEnumerator ReleaseAfterDelay(GameObject obj, PoseID pose, float delay)
         {
             yield return new WaitForSeconds(delay);

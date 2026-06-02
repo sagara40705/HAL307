@@ -29,8 +29,8 @@ public class VoiceCommandAction : MonoBehaviour
         _playerPoseController = _voiceAiContext.GetPlayerContext().GetPlayerPoseContoroller;
 
         if (_playerPoseController == null)
-            {
-                Debug.LogError("PlayerPoseControllerが見つかりませんでした。");
+        {
+            Debug.LogError("PlayerPoseControllerが見つかりませんでした。");
         }
     }
 

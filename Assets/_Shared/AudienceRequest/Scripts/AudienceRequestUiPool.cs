@@ -61,6 +61,7 @@ namespace AudienceRequest
                      obj => obj.SetActive(true),
                      obj =>
                      {
+                         ResetUiVisual(obj);
                          obj.SetActive(false);
                          obj.transform.SetParent(_uiParent.transform, false);
                          obj.transform.localScale = Vector3.one;
@@ -222,6 +223,25 @@ namespace AudienceRequest
             return false;
         }
 
+        private void ResetUiVisual(GameObject obj)
+        {
+            if (obj == null) return;
+
+            Image img = obj.GetComponent<Image>();
+            if (img != null && img.sprite != null)
+            {
+                foreach (var pair in _spriteTable)
+                {
+                    if (img.sprite == pair.changeSprite)
+                    {
+                        img.sprite = pair.originalSprite;
+                        break;
+                    }
+                }
+            }
+
+            obj.transform.localScale = Vector3.one;
+        }
     }
 
 

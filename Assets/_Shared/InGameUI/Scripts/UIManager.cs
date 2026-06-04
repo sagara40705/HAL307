@@ -42,10 +42,6 @@ public class UIManager : MonoBehaviour
         gamePanel.SetActive(true);
         resultPanel.SetActive(false);
 
-        //    if (spawner != null)
-        //    {
-        //        spawner.StartSpawning();
-        //    }
     }
 
     public void ShowResultScreen()
@@ -53,10 +49,6 @@ public class UIManager : MonoBehaviour
         gamePanel.SetActive(false);
         resultPanel.SetActive(true);
 
-        //if (spawner != null)
-        //{
-        //    spawner.StopSpawning();
-        //}
     }
 
     public void ReportHeartChanged(int count)
@@ -69,11 +61,4 @@ public class UIManager : MonoBehaviour
     {
         gauge.ResetGauge();
     }
-
-    public void ReturnToTitle()
-    {
-        SceneController.Instance.GoToTitle();
-    }
-
-
 }

@@ -288,8 +288,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6.1112, y: -67.76042}
-  m_SizeDelta: {x: 600.7715, y: 267.2025}
+  m_AnchoredPosition: {x: -4.7436, y: -32.502182}
+  m_SizeDelta: {x: 552.3204, y: 196.6861}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &558537223
 GameObject:
@@ -507,11 +507,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baaa62f64f6a6fc48919752b66c0356e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestSystem
-  _maxRequestCount: 30
+  _maxRequestCount: 50
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
   _uiPool: {fileID: 1958838624}
-  _requestInterval: 5
+  _requestInterval: 1
 --- !u!4 &848356011
 Transform:
   m_ObjectHideFlags: 0

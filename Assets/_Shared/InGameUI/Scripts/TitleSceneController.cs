@@ -95,22 +95,23 @@ public class TitleSceneController : MonoBehaviour
         }
     }
 
-    void ExecuteSelection()
+    async UniTaskVoid ExecuteSelection()
     {
         var selectedItem = menuItems.GetChild(currentIndex).name;
 
         switch (selectedItem)
         {
             case "Start":
-                TransitionManager.Instance.StartDumbbellTransition(SceneController.Instance.gameSceneName).Forget();
+                await TransitionManager.PlayDumbbellFadeOut();
                 break;
+
             case "Exit":
                 Application.Quit();
                 break;
+
             default:
                 Debug.LogWarning("未定義のメニュー項目が選択されました: " + selectedItem);
                 break;
         }
     }
-
 }

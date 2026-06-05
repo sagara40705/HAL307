@@ -549,7 +549,7 @@ MonoBehaviour:
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
   _uiPool: {fileID: 1958838624}
-  _requestInterval: 1
+  _requestInterval: 2
 --- !u!4 &848356011
 Transform:
   m_ObjectHideFlags: 0

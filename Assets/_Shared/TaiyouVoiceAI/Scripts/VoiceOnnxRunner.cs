@@ -79,13 +79,31 @@ public class VoiceOnnxRunner : MonoBehaviour
     {
         if (worker == null) return;
 
-        // Vキー押している間だけ動作
-        if (!DebugShortcuts.Held(Key.V))
+
+        if (state == VoiceProcessState.Idle)
         {
-            state = VoiceProcessState.Idle;
-            timer = 0f;
+            timer += Time.deltaTime;
+
+            if (timer >= inferenceInterval)
+            {
+                timer = 0f;
+
+                Debug.Log("[Voice] 推論開始");
+
+                state = VoiceProcessState.CheckVolume;
+            }
+
             return;
         }
+
+
+        //// Vキー押している間だけ動作
+        //if (!DebugShortcuts.Held(Key.V))
+        //{
+        //    state = VoiceProcessState.Idle;
+        //    timer = 0f;
+        //    return;
+        //}
 
         // Idle中のみタイマー進行
         if (state == VoiceProcessState.Idle)

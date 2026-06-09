@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd399116116b9a84f979e040629d6185, type: 3}
-  m_Name: ProtoEnemyData
-  m_EditorClassIdentifier: Enemy::Enemy.EnemyData
-  enemyPrefab: {fileID: -7396777476198942863, guid: d6583124afaa36240b9a65c934d30fce, type: 3}
-  maxHp: 100
-  poseSet: {fileID: 11400000, guid: 07030030f9d6b3c47a7c94504574b210, type: 2}
+version https://git-lfs.github.com/spec/v1
+oid sha256:58cd0fcb234f684ee6918ea6cc91156574cc2f2d2a948c15e61edc96d39e3fa1
+size 612

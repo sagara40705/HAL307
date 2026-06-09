@@ -1,8 +1,9 @@
-using UnityEngine;
-using System.Collections.Generic;
-using UnityEngine.Pool;
-using Pose;
 using System.Collections;
+using System.Collections.Generic;
+using Codice.CM.Common;
+using Pose;
+using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace AudienceRequest
@@ -32,6 +33,7 @@ namespace AudienceRequest
         [System.Serializable]
         public class SpritePair
         {
+            public PoseID poseID;
             public Sprite originalSprite;
             public Sprite changeSprite;
         }
@@ -96,6 +98,17 @@ namespace AudienceRequest
             {
                 rect.anchoredPosition = spawnPos;
             }
+
+            Image img = obj.GetComponent<Image>();
+            if (img != null)
+            {
+                SpritePair spriteSetting = _spriteTable.Find(pair => pair.poseID == pose); 
+                if (spriteSetting != null)
+                {
+                    img.sprite = spriteSetting.originalSprite;
+                }
+            }
+
 
             _activeUis[(int)pose].Add(obj);
             return obj;

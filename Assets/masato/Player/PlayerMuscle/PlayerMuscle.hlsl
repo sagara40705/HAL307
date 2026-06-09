@@ -60,6 +60,16 @@ float _ShowNumber;
     // 数字のスケール
     float4 _DigitScale;
 
+    //汗用の変数
+float _DropSize;
+float _DropEdgeSoftness;
+float _HighlightStrength;
+float _DropStrength;
+float _DropDensity;
+float _DropExistThreshold;
+float _DropFlowSpeed;
+float _ObjectFlowScale;
+
 CBUFFER_END
 
 

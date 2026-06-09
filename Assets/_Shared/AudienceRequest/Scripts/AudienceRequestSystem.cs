@@ -29,6 +29,7 @@ namespace AudienceRequest
         {
             _requestTimer = 0f;
             _currentRequestCount = 0;
+            _audienceRequests.ClearAll();
         }
 
         // 毎フレーム更新
@@ -53,7 +54,7 @@ namespace AudienceRequest
         }
 
         // リクエストをクリアする関数
-        public void ClearRequest(PoseID poseID)
+        public void ClearRequest(PoseID poseID, bool isPlayer)
         {
             int value = _audienceRequests.GetCount(poseID);
             if (value <= 0) return;
@@ -66,7 +67,7 @@ namespace AudienceRequest
             if(_currentRequestCount < 0)
                 _currentRequestCount = 0;
 
-            _uiPool.PlayClearEffectAndRelease(poseID);
+            _uiPool.PlayClearEffectAndRelease(poseID,isPlayer);
         }
 
         // リクエスト発生関数

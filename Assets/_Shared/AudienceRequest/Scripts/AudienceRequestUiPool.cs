@@ -36,16 +36,20 @@ namespace AudienceRequest
             public PoseID poseID;
             public Sprite originalSprite;
             public Sprite changeSprite;
+            public Sprite enemyChangeSprite;
         }
 
         [Header("スプライト変換テーブル")]
         [SerializeField] private List<SpritePair> _spriteTable = new();
+        private readonly Dictionary<PoseID, SpritePair> _spriteTableByPose = new();
 
         private List<ObjectPool<GameObject>> _uiPools = new(); // UIオブジェクトプールのリスト
         private List<List<GameObject>> _activeUis = new(); // アクティブなUIオブジェクトのリスト
 
         private void Awake()
         {
+            BuildSpriteLookup();
+
             int capacity = _audienceRequestSystem.MaxRequestCount; // キャパはリクエストの最大合計
 
             int count = _uiPrefabs.Count;
@@ -63,7 +67,7 @@ namespace AudienceRequest
                      obj => obj.SetActive(true),
                      obj =>
                      {
-                         ResetUiVisual(obj);
+                         ResetUiVisual(obj, (PoseID)idx);
                          obj.SetActive(false);
                          obj.transform.SetParent(_uiParent.transform, false);
                          obj.transform.localScale = Vector3.one;
@@ -84,6 +88,12 @@ namespace AudienceRequest
 
         public GameObject Generate(PoseID pose)
         {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return null;
+            }
+
             if (!TryFindSpawnPosition(out Vector2 spawnPos))
             {
                 return null;
@@ -102,8 +112,7 @@ namespace AudienceRequest
             Image img = obj.GetComponent<Image>();
             if (img != null)
             {
-                SpritePair spriteSetting = _spriteTable.Find(pair => pair.poseID == pose); 
-                if (spriteSetting != null)
+                if (TryGetSpritePair(pose, out SpritePair spriteSetting))
                 {
                     img.sprite = spriteSetting.originalSprite;
                 }
@@ -116,26 +125,26 @@ namespace AudienceRequest
 
 
         // 指定ポーズのUIを演出付きで消す
-        public void PlayClearEffectAndRelease(PoseID pose)
+        public void PlayClearEffectAndRelease(PoseID pose, bool isPlayer)
         {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return;
+            }
+
             List<GameObject> targetList = new List<GameObject>(_activeUis[(int)pose]);
             _activeUis[(int)pose].Clear();
+            TryGetSpritePair(pose, out SpritePair spriteSetting);
 
             foreach (var obj in targetList)
             {
                 if (obj == null) continue;
 
                 Image img = obj.GetComponent<Image>();
-                if (img != null && img.sprite != null)
+                if (img != null && spriteSetting != null)
                 {
-                    foreach (var pair in _spriteTable)
-                    {
-                        if (img.sprite == pair.originalSprite)
-                        {
-                            img.sprite = pair.changeSprite;
-                            break;
-                        }
-                    }
+                    img.sprite = isPlayer ? spriteSetting.changeSprite : spriteSetting.enemyChangeSprite;
                 }
 
                 obj.transform.localScale = Vector3.one * _clearScale;
@@ -147,6 +156,12 @@ namespace AudienceRequest
 
         public void ClearUiPool(PoseID pose)
         {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return;
+            }
+
             // アクティブなUIオブジェクトをすべてプールに返す
             foreach (var o in _activeUis[(int)pose])
             {
@@ -161,7 +176,7 @@ namespace AudienceRequest
         {
             yield return new WaitForSeconds(delay);
 
-            if (obj != null)
+            if (obj != null && IsValidPose(pose))
             {
                 _uiPools[(int)pose].Release(obj);
             }
@@ -235,24 +250,70 @@ namespace AudienceRequest
             return false;
         }
 
-        private void ResetUiVisual(GameObject obj)
+        private void ResetUiVisual(GameObject obj, PoseID pose)
         {
             if (obj == null) return;
 
             Image img = obj.GetComponent<Image>();
-            if (img != null && img.sprite != null)
+            if (img != null && TryGetSpritePair(pose, out SpritePair spriteSetting))
             {
-                foreach (var pair in _spriteTable)
-                {
-                    if (img.sprite == pair.changeSprite)
-                    {
-                        img.sprite = pair.originalSprite;
-                        break;
-                    }
-                }
+                img.sprite = spriteSetting.originalSprite;
             }
 
             obj.transform.localScale = Vector3.one;
+        }
+
+        private void BuildSpriteLookup()
+        {
+            _spriteTableByPose.Clear();
+
+            foreach (var pair in _spriteTable)
+            {
+                if (pair == null)
+                {
+                    continue;
+                }
+
+                if (!IsValidPose(pair.poseID))
+                {
+                    Debug.LogError($"Audience request sprite table contains invalid pose: {pair.poseID}");
+                    continue;
+                }
+
+                if (_spriteTableByPose.ContainsKey(pair.poseID))
+                {
+                    Debug.LogError($"Audience request sprite table contains duplicate pose: {pair.poseID}");
+                    continue;
+                }
+
+                _spriteTableByPose.Add(pair.poseID, pair);
+            }
+
+            for (int i = 0; i < (int)PoseID.Pose_Count; i++)
+            {
+                PoseID pose = (PoseID)i;
+                if (!_spriteTableByPose.ContainsKey(pose))
+                {
+                    Debug.LogError($"Audience request sprite table is missing pose: {pose}");
+                }
+            }
+        }
+
+        private bool TryGetSpritePair(PoseID pose, out SpritePair spritePair)
+        {
+            if (_spriteTableByPose.TryGetValue(pose, out spritePair))
+            {
+                return true;
+            }
+
+            Debug.LogError($"Audience request sprite table does not contain pose: {pose}");
+            return false;
+        }
+
+        private static bool IsValidPose(PoseID pose)
+        {
+            int poseIndex = (int)pose;
+            return poseIndex >= 0 && poseIndex < (int)PoseID.Pose_Count;
         }
     }
 

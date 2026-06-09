@@ -60,10 +60,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8645590146962141853, guid: adb72099e7a082c498eab3efa4caca44, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 5080115402618434437, guid: adb72099e7a082c498eab3efa4caca44, type: 3}
     - target: {fileID: -1233576720272439965, guid: adb72099e7a082c498eab3efa4caca44, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 02058e7b838af4741a97f35c87be31ed, type: 2}
+      objectReference: {fileID: 2100000, guid: 92d5541f3256b9b42a432381e9ac5682, type: 2}
     - target: {fileID: 919132149155446097, guid: adb72099e7a082c498eab3efa4caca44, type: 3}
       propertyPath: m_Name
       value: ProtoEnemyModel

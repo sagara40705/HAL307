@@ -69,7 +69,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _PosTex:
-        m_Texture: {fileID: 2800000, guid: f8fe8ddc9ce3ad94086074bbb5f3c794, type: 2}
+        m_Texture: {fileID: 2800000, guid: ff138d1047263de46b93decf13fe1e4f, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:

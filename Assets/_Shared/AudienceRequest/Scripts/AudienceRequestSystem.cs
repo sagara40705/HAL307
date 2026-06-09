@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Pose;
 using UnityEngine;
 
@@ -72,25 +73,45 @@ namespace AudienceRequest
         private void GenerateRequest()
         {
             if (FullRequest()) { return; }
+            // 生成できるリクエストの数を計算
+            int canSpawnCount = Mathf.Min(3, _maxRequestCount - _currentRequestCount);
+            if (canSpawnCount <= 0) { return; }
 
             // ランダムにリクエストを生成
-            AudienceRequestEntry requestEntry = _audienceRequests.GetRandomRequest();
-            if (requestEntry == null) { return; }
+            List<AudienceRequestEntry> availableRequests = new List<AudienceRequestEntry>(_audienceRequests.Requests);
+            if (availableRequests.Count == 0) { return; }
 
-            // 生成されたリクエストのカウントを増やす
-            PoseID poseID = requestEntry.poseID;
-            _audienceRequests.AddCount(poseID);
+            // 生成するリクエストの数だけループ
+            for (int i = 0; i < canSpawnCount; i++)
+            {
+                // 生成できるリクエストがなくなったらループを抜ける
+                if (availableRequests.Count == 0) { break; }
 
-            // 合計リクエスト数をカウント
-            _currentRequestCount++;
+                // ランダムにリクエストを選ぶ
+                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
+                AudienceRequestEntry requestEntry = availableRequests[randomIndex];
+                availableRequests.RemoveAt(randomIndex);
 
-            // UIプールから対応するUIを生成
-            GameObject ui = _uiPool.Generate(poseID);
+                // もしリクエストがnullならスキップ
+                if (requestEntry == null) { continue; }
 
+                // 
+                PoseID poseID = requestEntry.poseID;
 
-            // リクエスト生成イベントを発火
-            OnRequestReceived?.Invoke(poseID);
-            Debug.Log("New request received! Current request count: " + _currentRequestCount);
+                // 先にUI生成を試す
+                GameObject ui = _uiPool.Generate(poseID);
+                if (ui == null)
+                {
+                    continue;
+                }
+
+                // UI生成に成功した時だけカウントを増やす
+                _audienceRequests.AddCount(poseID);
+                _currentRequestCount++;
+
+                OnRequestReceived?.Invoke(poseID);
+                Debug.Log("New request received! Current request count: " + _currentRequestCount);
+            }
         }
 
         // リクエストが満杯かどうかをチェックする関数

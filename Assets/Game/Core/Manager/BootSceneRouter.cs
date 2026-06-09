@@ -6,8 +6,8 @@ public sealed class BootSceneRouter : MonoBehaviour
 {
     [SerializeField] private AppBootstrapper appBootstrapper;
 
-    [Header("Build時の遷移先。フルパス")]
-    [SerializeField] private string defaultFirstScenePath = "Assets/Scenes/Title.unity";
+    [Header("Build時の遷移先。Scene名")]
+    [SerializeField] private string defaultFirstSceneName = "Prototype";
 
 #if UNITY_EDITOR
     private const string TargetSceneKey = "PlayFromBoot.TargetScenePath";
@@ -29,17 +29,17 @@ public sealed class BootSceneRouter : MonoBehaviour
             yield break;
         }
 
-        string nextScenePath = GetNextScenePath();
-        if (string.IsNullOrEmpty(nextScenePath))
+        string nextSceneName = GetNextSceneName();
+        if (string.IsNullOrEmpty(nextSceneName))
         {
-            Debug.LogError("[BootSceneRouter] Next scene path is empty.");
+            Debug.LogError("[BootSceneRouter] Next scene name is empty.");
             yield break;
         }
 
-        yield return SceneManager.LoadSceneAsync(nextScenePath, LoadSceneMode.Single);
+        yield return SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Single);
     }
 
-    private string GetNextScenePath()
+    private string GetNextSceneName()
     {
 #if UNITY_EDITOR
         string editorTarget = UnityEditor.SessionState.GetString(TargetSceneKey, string.Empty);
@@ -50,6 +50,6 @@ public sealed class BootSceneRouter : MonoBehaviour
             return editorTarget;
         }
 #endif
-        return defaultFirstScenePath;
+        return defaultFirstSceneName;
     }
 }

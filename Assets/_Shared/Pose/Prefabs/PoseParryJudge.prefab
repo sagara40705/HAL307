@@ -43,6 +43,6 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cee62329fb37199498318f7e35ad3be0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Pose::Pose.PoseParryJudge
+  m_EditorClassIdentifier: Assembly-CSharp::Pose.PoseParryJudge
   enemyPoseID: -1
   playerPoseID: -1

@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f9399e4e09df8c4c8d7bea6db07eb58, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: masato.Sandbox::PlanarReflectionRenderer
+  m_EditorClassIdentifier: Assembly-CSharp::PlanarReflectionRenderer
   textureSize: 1024
   reflectionMask:
     serializedVersion: 2
@@ -417,7 +417,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69f311c752f0401408d71626c8e7d9ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Player::Player.PlayerContext
+  m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerContext
   _onlyMyScene: 0
   _initalize: 0
   _poseController: {fileID: 1691506340}
@@ -467,7 +467,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::AdditiveSceneObjectDisabler
+  m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets:
   - {fileID: 1023944906}
   - {fileID: 1403822706}
@@ -496,7 +496,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7c10e7d38cc7574b9b18e567586891b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Player::Player.Proto_PlayerColorChanger
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Proto_PlayerColorChanger
 --- !u!1 &1403822706
 GameObject:
   m_ObjectHideFlags: 0
@@ -652,7 +652,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1f35e1586190c0428cc1dcc04a9fafe, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Player::Player.PlayerPoseContoroller
+  m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerPoseContoroller
   _playerContext: {fileID: 1037201949}
   _poseParryJudge: {fileID: 0}
   _colorChanger: {fileID: 1387029096}

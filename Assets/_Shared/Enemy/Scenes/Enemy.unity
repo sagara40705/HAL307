@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e2fec992207e514fbfd0c8762de70ba, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Enemy::Enemy.EnemyGenerator
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyGenerator
   _enemyRegistry: {fileID: 904307783}
   _poseController: {fileID: 535028703}
   _enemyContext: {fileID: 770144274}
@@ -323,7 +323,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4fd4cbaddcc01eb4aa30b7c3f14a2a9d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Enemy::Enemy.EnemyManager
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyManager
   _enemyGenerator: {fileID: 232563140}
 --- !u!4 &529276127
 Transform:
@@ -368,7 +368,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9c8a10430bbdd140a62d1b607cdb702, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Enemy::Enemy.EnemyPoseController
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyPoseController
   _enemyRegistry: {fileID: 904307783}
   _enemyContext: {fileID: 770144274}
   _poseParryJudge: {fileID: 0}
@@ -415,7 +415,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ae88dd986ce6a84cac81ecd706c0777, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Enemy::Enemy.EnemyContext
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyContext
   _onlyMyScene: 0
   _initalize: 0
   _enemyManager: {fileID: 529276126}
@@ -480,7 +480,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cedb6ad316066e14485c0237e19dd274, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Enemy::Enemy.EnemyRegistry
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyRegistry
 --- !u!1 &1456485777
 GameObject:
   m_ObjectHideFlags: 0
@@ -509,7 +509,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::AdditiveSceneObjectDisabler
+  m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets:
   - {fileID: 1642159505}
   - {fileID: 504420564}

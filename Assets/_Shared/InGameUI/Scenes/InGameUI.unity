@@ -1010,7 +1010,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1d13034137f6f03479dd9e382934a5c5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GaugeControll
+  m_EditorClassIdentifier: Assembly-CSharp::GaugeController
   gaugeImage: {fileID: 0}
   maxPoints: 10
 --- !u!1 &799775647
@@ -1553,7 +1553,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::AdditiveSceneObjectDisabler
+  m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets:
   - {fileID: 799775647}
   - {fileID: 410087039}

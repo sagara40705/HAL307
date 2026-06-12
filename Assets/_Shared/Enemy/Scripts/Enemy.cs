@@ -13,12 +13,14 @@ namespace Enemy
         // 管理クラスの参照
         private EnemyRegistry _enemyRegistry;
         private EnemyPoseController _poseController;
+        private PoseParryJudge _poseParryJudge;
 
         //Enemyの状態
         private bool _isPaused = false;
         private PoseID _currentPoseID;
         private float _poseTimer = 0f;
         private EnemyPoseData _currentPoseData;
+        private bool _isPoseCommitted = false;
 
         // パリイ関連
         private bool _isParried = false;
@@ -70,7 +72,7 @@ namespace Enemy
         }
 
         // Enemyが生成されたときの初期化
-        public void Initialize(EnemyRegistry enemyRegistry, EnemyPoseController poseController, EnemyData data)
+        public void Initialize(EnemyRegistry enemyRegistry, EnemyPoseController poseController, EnemyData data, PoseParryJudge poseParryJudge)
         {
             // EnemyRegistryを受け取って登録する
             _enemyRegistry = enemyRegistry;
@@ -81,6 +83,8 @@ namespace Enemy
 
             // EnemyDataを受け取る
             _data = data;
+
+            _poseParryJudge = poseParryJudge;
         }
 
         // Pose終了時の共通処理
@@ -94,6 +98,7 @@ namespace Enemy
             _currentPoseID = PoseID.None;
             _poseTimer = 0f;
             _currentPoseData = null;
+            _isPoseCommitted = false;
         }
 
         // Enemyが破壊されたときのクリーンアップ
@@ -121,10 +126,22 @@ namespace Enemy
             _isPaused = true;
             _poseTimer = poseData.Duration;
             _currentPoseData = poseData;
+            _isPoseCommitted = false;
 
             //Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
             _currentPoseData?.PoseAction?.OnStart(this);
 
+            CommitCurrentPose();
+        }
+
+        public void CommitCurrentPose()
+        {
+            if (!_isPaused) { return; }
+            if (_currentPoseData == null) { return; }
+            if (_isPoseCommitted) { return; }
+
+            _isPoseCommitted = true;
+            _poseParryJudge?.StartEnemyPose(_currentPoseID);
             OnPoseStart?.Invoke(_currentPoseID);
         }
 

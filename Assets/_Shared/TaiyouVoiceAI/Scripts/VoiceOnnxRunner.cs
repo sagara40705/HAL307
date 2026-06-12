@@ -77,39 +77,54 @@ public class VoiceOnnxRunner : MonoBehaviour
 
     private void Update()
     {
-
         if (worker == null) return;
 
-        // Vキーを押していない場合はなにもしない
-        if (Keyboard.current == null || !Keyboard.current.vKey.isPressed)
-        {
-            state = VoiceProcessState.Idle;
-            timer = 0f;
-            return;
-        }
 
-        // Vキー押している間だけ処理をする
-        if (DebugShortcuts.Pressed(Key.V))
+        if (state == VoiceProcessState.Idle)
         {
             timer += Time.deltaTime;
 
             if (timer >= inferenceInterval)
             {
                 timer = 0f;
+
+                Debug.Log("[Voice] 推論開始");
+
                 state = VoiceProcessState.CheckVolume;
             }
 
             return;
         }
 
+
+        //// Vキー押している間だけ動作
+        //if (!DebugShortcuts.Held(Key.V))
+        //{
+        //    state = VoiceProcessState.Idle;
+        //    timer = 0f;
+        //    return;
+        //}
+
+        // Idle中のみタイマー進行
+        if (state == VoiceProcessState.Idle)
+        {
+            timer += Time.deltaTime;
+
+            if (timer >= inferenceInterval)
+            {
+                timer = 0f;
+
+                Debug.Log("[Voice] 推論開始");
+
+                state = VoiceProcessState.CheckVolume;
+            }
+
+            return;
+        }
+
+        // 分割処理
         switch (state)
         {
-
-            case VoiceProcessState.Idle:
-                timer = 0f;
-                state = VoiceProcessState.CheckVolume;
-                break;
-
             case VoiceProcessState.CheckVolume:
                 CheckVolumeStep();
                 break;
@@ -203,11 +218,27 @@ public class VoiceOnnxRunner : MonoBehaviour
             Debug.Log(BuildScoreLog(cachedOutput));
         }
 
+        // none の場合は何もしない
+        if (cachedLabel == "none")
+        {
+            cachedOutput?.Dispose();
+            cachedOutput = null;
+
+            cachedSamples = null;
+            cachedMfcc = null;
+            cachedLabel = null;
+
+            state = VoiceProcessState.Idle;
+            return;
+        }
+
+        // 認識結果を実行
         if (voiceCommandAction != null)
         {
             voiceCommandAction.ExecuteCommand(cachedLabel, cachedVolume);
         }
 
+        // 後始末
         cachedOutput?.Dispose();
         cachedOutput = null;
 
@@ -215,6 +246,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         cachedMfcc = null;
         cachedLabel = null;
 
+        // 次の推論を受け付ける
         state = VoiceProcessState.Idle;
     }
 

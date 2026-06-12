@@ -1,15 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2702703bcee920d48aa950975b4c3b2d, type: 3}
-  m_Name: EnemyPoseAction_Yaa
-  m_EditorClassIdentifier: Enemy::Enemy.EnemyPoseAction_Yaa
-  poseColor: {r: 0, g: 0.4117647, b: 1, a: 1}
+version https://git-lfs.github.com/spec/v1
+oid sha256:09855080c25e731cb5a506d5281c4873a527ae6cc95750499c952a6060f08f4c
+size 486

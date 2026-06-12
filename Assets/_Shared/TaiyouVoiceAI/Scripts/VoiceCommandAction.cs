@@ -1,4 +1,8 @@
+using Player;
 using UnityEngine;
+using Context;
+using Pose;
+using TaiyouVoiceAI;
 
 public class VoiceCommandAction : MonoBehaviour
 {
@@ -8,11 +12,27 @@ public class VoiceCommandAction : MonoBehaviour
     [SerializeField] private GameObject muscleObject;
 
     [Header("音量設定")]
-    [SerializeField] private float bigVoiceThreshold = 0.05f;
+    [SerializeField] private float minVoiceVolume = 0.05f;
 
     [Header("設定")]
     [SerializeField] private bool onlyHide = true;
     [SerializeField] private bool logCommand = true;
+
+    [Header("再表示設定")]
+    [SerializeField] private float hideTime = 5f;
+
+    [SerializeField] private VoiceAiContext _voiceAiContext;
+    [SerializeField] private PlayerPoseContoroller _playerPoseController;
+
+    private void Start()
+    {
+        _playerPoseController = _voiceAiContext.GetPlayerContext().GetPlayerPoseContoroller;
+
+        if (_playerPoseController == null)
+        {
+            Debug.LogError("PlayerPoseControllerが見つかりませんでした。");
+        }
+    }
 
     public void ExecuteCommand(string command, float volume)
     {
@@ -23,17 +43,14 @@ public class VoiceCommandAction : MonoBehaviour
 
         if (logCommand)
         {
-            Debug.Log("[Action] command = " + command + " / volume = " + volume);
+            Debug.Log("[Action] command = " + command +
+                      " / volume = " + volume);
         }
 
-        float db = VolumeToDb(volume);
-
-        Debug.Log("dB = " + db);
-
-        // -20dB未満は無視
-        if (db < -20f)
+        // 音量が小さい場合は無視
+        if (volume < minVoiceVolume)
         {
-            Debug.Log("声が小さいので無視");
+            Debug.Log("声が小さいので無視 volume=" + volume);
             return;
         }
 
@@ -41,15 +58,30 @@ public class VoiceCommandAction : MonoBehaviour
         {
             case "power":
                 HideOrDestroy(powerObject, "power");
+                _playerPoseController?.TryOnPose(PoseID.Pose_Power);
+              
                 break;
 
             case "yaa":
                 HideOrDestroy(yaaObject, "yaa");
+                _playerPoseController?.TryOnPose(PoseID.Pose_Yaa);
+
                 break;
 
             case "muscle":
                 HideOrDestroy(muscleObject, "muscle");
+                _playerPoseController?.TryOnPose(PoseID.Pose_Muscle);
+
                 break;
+        }
+
+        if (_playerPoseController != null)
+        {
+            Debug.Log("/////////音声でポーズが開始されました//////////");
+        }
+        else
+        {
+            Debug.LogWarning("/////////PlayerPoseControllerが見つからないため、ポーズを開始できません//////////");
         }
     }
 
@@ -63,8 +95,7 @@ public class VoiceCommandAction : MonoBehaviour
 
         if (onlyHide)
         {
-            obj.SetActive(false);
-            Debug.Log(label + " → 非表示");
+            StartCoroutine(HideTemporarily(obj, label));
         }
         else
         {
@@ -73,8 +104,19 @@ public class VoiceCommandAction : MonoBehaviour
         }
     }
 
-    private float VolumeToDb(float volume)
+    private System.Collections.IEnumerator HideTemporarily(GameObject obj, string label)
     {
-        return 20f * Mathf.Log10(Mathf.Max(volume, 0.000001f));
+        obj.SetActive(false);
+
+        Debug.Log(label + " → 非表示");
+
+        yield return new WaitForSeconds(hideTime);
+
+        if (obj != null)
+        {
+            obj.SetActive(true);
+
+            Debug.Log(label + " → 再表示");
+        }
     }
 }

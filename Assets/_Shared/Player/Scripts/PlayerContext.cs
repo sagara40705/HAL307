@@ -14,6 +14,7 @@ namespace Player
         [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前
         [SerializeField] private string _poseContextName; // PoseParryJudgeオブジェクトの名前
         [SerializeField] private PoseContext _poseContext;// PoseContext
+        public readonly PlayerPoseContoroller GetPlayerPoseController;
 
         public PoseContext GetPoseContext()
         {

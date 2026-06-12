@@ -1,15 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78adec85d59fa754e9ff4d0e8f2e0ba9, type: 3}
-  m_Name: EnemyPoseAction_Power
-  m_EditorClassIdentifier: Enemy::Enemy.EnemyPoseAction_Power
-  poseColor: {r: 1, g: 0, b: 0, a: 1}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3c583a7edb5c3415fa32632816710e72701c1fc7d6e45c2464bdab60ae624e25
+size 482

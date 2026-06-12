@@ -1,8 +1,9 @@
-using UnityEngine;
-using System.Collections.Generic;
-using UnityEngine.Pool;
-using Pose;
 using System.Collections;
+using System.Collections.Generic;
+using Codice.CM.Common;
+using Pose;
+using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UI;
 
 namespace AudienceRequest
@@ -19,6 +20,10 @@ namespace AudienceRequest
         [SerializeField] private Vector2 _spawnAreaMin = new Vector2(50f, 50f); // ランダム配置の最小座標
         [SerializeField] private Vector2 _spawnAreaMax = new Vector2(600f, 300f);// ランダム配置の最大座標
 
+        [Header("生成禁止エリア")]
+        [SerializeField] private List<RectTransform> _forbiddenAreas = new();
+        [SerializeField] private float _forbiddenPadding = 20f;
+
         [SerializeField] private float _minDistance = 80;
         [SerializeField] private int _maxAttempts = 10;
 
@@ -28,18 +33,23 @@ namespace AudienceRequest
         [System.Serializable]
         public class SpritePair
         {
+            public PoseID poseID;
             public Sprite originalSprite;
             public Sprite changeSprite;
+            public Sprite enemyChangeSprite;
         }
 
         [Header("スプライト変換テーブル")]
         [SerializeField] private List<SpritePair> _spriteTable = new();
+        private readonly Dictionary<PoseID, SpritePair> _spriteTableByPose = new();
 
         private List<ObjectPool<GameObject>> _uiPools = new(); // UIオブジェクトプールのリスト
         private List<List<GameObject>> _activeUis = new(); // アクティブなUIオブジェクトのリスト
 
         private void Awake()
         {
+            BuildSpriteLookup();
+
             int capacity = _audienceRequestSystem.MaxRequestCount; // キャパはリクエストの最大合計
 
             int count = _uiPrefabs.Count;
@@ -57,6 +67,7 @@ namespace AudienceRequest
                      obj => obj.SetActive(true),
                      obj =>
                      {
+                         ResetUiVisual(obj, (PoseID)idx);
                          obj.SetActive(false);
                          obj.transform.SetParent(_uiParent.transform, false);
                          obj.transform.localScale = Vector3.one;
@@ -77,47 +88,63 @@ namespace AudienceRequest
 
         public GameObject Generate(PoseID pose)
         {
-            // プールからUIオブジェクトを取得
-            GameObject obj = _uiPools[(int)pose].Get();
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return null;
+            }
 
-            // UIの親オブジェクトに設定
+            if (!TryFindSpawnPosition(out Vector2 spawnPos))
+            {
+                return null;
+            }
+
+            GameObject obj = _uiPools[(int)pose].Get();
             obj.transform.SetParent(_uiParent.transform, false);
             obj.transform.localScale = Vector3.one;
 
             RectTransform rect = obj.GetComponent<RectTransform>();
             if (rect != null)
             {
-                rect.anchoredPosition = FindSpawnPosition();
+                rect.anchoredPosition = spawnPos;
             }
 
-            // アクティブなUIオブジェクトのリストに追加
-            _activeUis[(int)pose].Add(obj);
+            Image img = obj.GetComponent<Image>();
+            if (img != null)
+            {
+                if (TryGetSpritePair(pose, out SpritePair spriteSetting))
+                {
+                    img.sprite = spriteSetting.originalSprite;
+                }
+            }
 
+
+            _activeUis[(int)pose].Add(obj);
             return obj;
         }
 
 
         // 指定ポーズのUIを演出付きで消す
-        public void PlayClearEffectAndRelease(PoseID pose)
+        public void PlayClearEffectAndRelease(PoseID pose, bool isPlayer)
         {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return;
+            }
+
             List<GameObject> targetList = new List<GameObject>(_activeUis[(int)pose]);
             _activeUis[(int)pose].Clear();
+            TryGetSpritePair(pose, out SpritePair spriteSetting);
 
             foreach (var obj in targetList)
             {
                 if (obj == null) continue;
 
                 Image img = obj.GetComponent<Image>();
-                if (img != null && img.sprite != null)
+                if (img != null && spriteSetting != null)
                 {
-                    foreach (var pair in _spriteTable)
-                    {
-                        if (img.sprite == pair.originalSprite)
-                        {
-                            img.sprite = pair.changeSprite;
-                            break;
-                        }
-                    }
+                    img.sprite = isPlayer ? spriteSetting.changeSprite : spriteSetting.enemyChangeSprite;
                 }
 
                 obj.transform.localScale = Vector3.one * _clearScale;
@@ -129,6 +156,12 @@ namespace AudienceRequest
 
         public void ClearUiPool(PoseID pose)
         {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return;
+            }
+
             // アクティブなUIオブジェクトをすべてプールに返す
             foreach (var o in _activeUis[(int)pose])
             {
@@ -139,53 +172,39 @@ namespace AudienceRequest
             _activeUis[(int)pose].Clear();
         }
 
-
         private IEnumerator ReleaseAfterDelay(GameObject obj, PoseID pose, float delay)
         {
             yield return new WaitForSeconds(delay);
 
-            if (obj != null)
+            if (obj != null && IsValidPose(pose))
             {
                 _uiPools[(int)pose].Release(obj);
             }
         }
 
 
-        private Vector2 FindSpawnPosition()
+        private bool TryFindSpawnPosition(out Vector2 pos)
         {
-            if (_uiParent == null)
-                return Vector2.zero;
-
-            Rect rect = _uiParent.rect;
-
-            // 端に寄りすぎないよう余白
-            float paddingX = 80f;
-            float paddingY = 60f;
-
-            float minX = rect.xMin + paddingX;
-            float maxX = rect.xMax - paddingX;
-            float minY = rect.yMin + paddingY;
-            float maxY = rect.yMax - paddingY;
-
             for (int i = 0; i < _maxAttempts; i++)
             {
                 Vector2 candidate = new Vector2(
-                    Random.Range(minX, maxX),
-                    Random.Range(minY, maxY)
+                    Random.Range(_spawnAreaMin.x, _spawnAreaMax.x),
+                    Random.Range(_spawnAreaMin.y, _spawnAreaMax.y)
                 );
 
-                if (!IsOverlapping(candidate))
-                {
-                    return candidate;
-                }
+                if (IsInsideForbiddenArea(candidate))
+                    continue;
+
+                if (IsOverlapping(candidate))
+                    continue;
+
+                pos = candidate;
+                return true;
             }
 
-            return new Vector2(
-                Random.Range(minX, maxX),
-                Random.Range(minY, maxY)
-            );
+            pos = Vector2.zero;
+            return false;
         }
-
 
         private bool IsOverlapping(Vector2 pos)
         {
@@ -206,7 +225,98 @@ namespace AudienceRequest
             }
             return false;
         }
+        private bool IsInsideForbiddenArea(Vector2 localPos)
+        {
+            foreach (var area in _forbiddenAreas)
+            {
+                if (area == null) continue;
+
+                Vector3[] corners = new Vector3[4];
+                area.GetWorldCorners(corners);
+
+                Vector2 min = _uiParent.InverseTransformPoint(corners[0]);
+                Vector2 max = _uiParent.InverseTransformPoint(corners[2]);
+
+                min -= Vector2.one * _forbiddenPadding;
+                max += Vector2.one * _forbiddenPadding;
+
+                if (localPos.x >= min.x && localPos.x <= max.x &&
+                    localPos.y >= min.y && localPos.y <= max.y)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void ResetUiVisual(GameObject obj, PoseID pose)
+        {
+            if (obj == null) return;
+
+            Image img = obj.GetComponent<Image>();
+            if (img != null && TryGetSpritePair(pose, out SpritePair spriteSetting))
+            {
+                img.sprite = spriteSetting.originalSprite;
+            }
+
+            obj.transform.localScale = Vector3.one;
+        }
+
+        private void BuildSpriteLookup()
+        {
+            _spriteTableByPose.Clear();
+
+            foreach (var pair in _spriteTable)
+            {
+                if (pair == null)
+                {
+                    continue;
+                }
+
+                if (!IsValidPose(pair.poseID))
+                {
+                    Debug.LogError($"Audience request sprite table contains invalid pose: {pair.poseID}");
+                    continue;
+                }
+
+                if (_spriteTableByPose.ContainsKey(pair.poseID))
+                {
+                    Debug.LogError($"Audience request sprite table contains duplicate pose: {pair.poseID}");
+                    continue;
+                }
+
+                _spriteTableByPose.Add(pair.poseID, pair);
+            }
+
+            for (int i = 0; i < (int)PoseID.Pose_Count; i++)
+            {
+                PoseID pose = (PoseID)i;
+                if (!_spriteTableByPose.ContainsKey(pose))
+                {
+                    Debug.LogError($"Audience request sprite table is missing pose: {pose}");
+                }
+            }
+        }
+
+        private bool TryGetSpritePair(PoseID pose, out SpritePair spritePair)
+        {
+            if (_spriteTableByPose.TryGetValue(pose, out spritePair))
+            {
+                return true;
+            }
+
+            Debug.LogError($"Audience request sprite table does not contain pose: {pose}");
+            return false;
+        }
+
+        private static bool IsValidPose(PoseID pose)
+        {
+            int poseIndex = (int)pose;
+            return poseIndex >= 0 && poseIndex < (int)PoseID.Pose_Count;
+        }
     }
+
 
 }
 

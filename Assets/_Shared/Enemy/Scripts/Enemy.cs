@@ -19,6 +19,7 @@ namespace Enemy
         private bool _isPaused = false;
         private PoseID _currentPoseID;
         private float _poseTimer = 0f;
+        private float _poseElapsedTime = 0f;
         private EnemyPoseData _currentPoseData;
         private bool _isPoseCommitted = false;
 
@@ -52,7 +53,19 @@ namespace Enemy
         {
             if (_isPaused)
             {
-                _poseTimer -= Time.deltaTime;
+                float deltaTime = Time.deltaTime;
+
+                _poseElapsedTime += deltaTime;
+                _currentPoseData?.PoseAction?.OnUpdate(this, deltaTime);
+
+                if (!_isPoseCommitted && _currentPoseData != null && _poseElapsedTime >= _currentPoseData.CommitDelay)
+                {
+                    _currentPoseID = _currentPoseData.CommittedPoseID;
+                    CommitCurrentPose();
+                    _currentPoseData.PoseAction?.OnCommitPose(this);
+                }
+
+                _poseTimer -= deltaTime;
                 if (_poseTimer <= 0f)
                 {
                     OnUnpause();
@@ -92,11 +105,12 @@ namespace Enemy
         {
             _isPaused = false;
             // ここにPose終了時の共通処理を記述する
-            if (_currentPoseData) { _currentPoseData.PoseAction.OnEnd(this); }
+            if (_currentPoseData) { _currentPoseData.PoseAction?.OnEnd(this); }
 
             _poseController?.Unpause();
             _currentPoseID = PoseID.None;
             _poseTimer = 0f;
+            _poseElapsedTime = 0f;
             _currentPoseData = null;
             _isPoseCommitted = false;
         }
@@ -122,16 +136,15 @@ namespace Enemy
 
         public void Pause(EnemyPoseData poseData)
         {
-            _currentPoseID = poseData.ID;
+            _currentPoseID = poseData.PreCommitPoseID;
             _isPaused = true;
             _poseTimer = poseData.Duration;
+            _poseElapsedTime = 0f;
             _currentPoseData = poseData;
             _isPoseCommitted = false;
 
             //Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
             _currentPoseData?.PoseAction?.OnStart(this);
-
-            CommitCurrentPose();
         }
 
         public void CommitCurrentPose()

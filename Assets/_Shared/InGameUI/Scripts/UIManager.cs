@@ -40,14 +40,11 @@ public class UIManager : MonoBehaviour
     public void ShowGameScreen()
     {
         gamePanel.SetActive(true);
-       
-
     }
 
     public void ShowResultScreen()
     {
         gamePanel.SetActive(false);
-      
     }
 
     public void ReportHeartChanged(int count)

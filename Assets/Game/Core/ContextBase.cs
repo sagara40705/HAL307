@@ -1,38 +1,50 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Context
 {
+    [DefaultExecutionOrder(-1000)]
     public abstract class ContextBase : MonoBehaviour
     {
         [SerializeField] private bool _onlyMyScene;
         [SerializeField] private bool _initalize;
+        [SerializeField] private string _contextName;
+
+        public string ContextName => string.IsNullOrWhiteSpace(_contextName) ? gameObject.name : _contextName;
         protected bool OnlyMyScene => _onlyMyScene;
 
         protected virtual void Awake()
         {
-            if (_onlyMyScene) { _initalize = true; }
-            else { _initalize = false; }
-        }
+            _initalize = _onlyMyScene;
 
-        protected static T FindContext<T>(string sceneName, string objectName) where T : ContextBase
-        {
-            Scene scene = SceneManager.GetSceneByName(sceneName);
-            if (!scene.IsValid() || !scene.isLoaded) { Debug.LogWarning($"Scene'{sceneName}'が未ロードまたは無効"); return null; }
-
-            var roots = scene.GetRootGameObjects();
-            foreach (var root in roots)
+            global::ContextManager manager = global::ContextManager.Instance;
+            if (manager == null)
             {
-                if (root.name != objectName) { continue; }
-
-                T context = root.GetComponent<T>();
-                if (context != null) { return context; }
+                Debug.LogWarning($"[{GetType().Name}] ContextManager is not initialized. ContextName='{ContextName}'");
+                return;
             }
 
-            Debug.LogWarning(string.Format("Scene '{0}' にオブジェクト '{1}' が見つかりませんでした。", sceneName, objectName));
-            return null;
+            manager.Register(this);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            global::ContextManager manager = global::ContextManager.Instance;
+            if (manager != null)
+            {
+                manager.Unregister(this);
+            }
+        }
+
+        protected static T FindContext<T>(string contextName) where T : ContextBase
+        {
+            global::ContextManager manager = global::ContextManager.Instance;
+            if (manager == null)
+            {
+                Debug.LogWarning($"[ContextBase] ContextManager is not initialized. ContextName='{contextName}', Type={typeof(T).Name}");
+                return null;
+            }
+
+            return manager.Get<T>(contextName);
         }
     }
 }
-
-

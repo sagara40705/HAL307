@@ -110,7 +110,7 @@ public class SandboxToSharedWindow : EditorWindow
             "この処理は Copy ではなく Move です。\n" +
             "- _Sandbox から _Shared へ移動します\n" +
             "- 上書きはしません\n" +
-            "- Script / namespace / asmdef はそのまま保持します",
+            "- Script / namespace はそのまま保持します",
             MessageType.None
         );
     }

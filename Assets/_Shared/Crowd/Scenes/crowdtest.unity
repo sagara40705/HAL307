@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -272,7 +272,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -327,7 +327,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -382,7 +382,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -437,7 +437,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -629,7 +629,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -684,7 +684,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -739,7 +739,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -779,7 +779,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -834,7 +834,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -889,7 +889,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -959,7 +959,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1014,7 +1014,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1196,7 +1196,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1251,7 +1251,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1348,7 +1348,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1403,7 +1403,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1473,7 +1473,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1528,7 +1528,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1583,7 +1583,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1638,7 +1638,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1693,7 +1693,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1748,7 +1748,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1803,7 +1803,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1858,7 +1858,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 9b0088ec8adca0245a49c0b3af2368dc, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1913,7 +1913,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -1953,7 +1953,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -2008,7 +2008,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}
@@ -2078,7 +2078,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::CrowdSpawner
   mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
   material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
   modelScale: {x: 3, y: 3, z: 3}

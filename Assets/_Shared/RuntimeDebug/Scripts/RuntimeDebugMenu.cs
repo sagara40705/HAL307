@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,12 @@ namespace RuntimeDebug
     {
         private static readonly List<DebugWindow> windows = new();
 
+        public static IReadOnlyList<DebugWindow> Windows => windows;
+
         public static bool IsVisible { get; private set; }
+
+        public static event Action VisibilityChanged;
+        public static event Action Changed;
 
         public static DebugWindow CreateWindow(string name)
         {
@@ -19,6 +25,7 @@ namespace RuntimeDebug
 
             DebugWindow window = new(name);
             windows.Add(window);
+            NotifyChanged();
             return window;
         }
 
@@ -28,36 +35,50 @@ namespace RuntimeDebug
             if (window != null)
             {
                 windows.Remove(window);
+                NotifyChanged();
             }
         }
 
         public static void Toggle()
         {
-            IsVisible = !IsVisible;
+            SetVisible(!IsVisible);
             Debug.Log($"DebugMenu Toggle : {IsVisible}");
         }
 
-        public static void Draw()
+        public static void SetVisible(bool visible)
         {
-            if (!IsVisible)
+            if (IsVisible == visible)
             {
                 return;
             }
 
-            GUILayout.BeginArea(new Rect(10, 10, 320, 900));
+            IsVisible = visible;
+            VisibilityChanged?.Invoke();
+        }
 
+        public static void DrawContents()
+        {
             foreach (DebugWindow window in windows)
             {
                 window.Draw();
                 GUILayout.Space(8);
             }
+        }
 
-            GUILayout.EndArea();
+        public static void Draw()
+        {
+            // RuntimeDebug is displayed in the Unity Editor window.
         }
 
         public static void Clear()
         {
             windows.Clear();
+            NotifyChanged();
+        }
+
+        internal static void NotifyChanged()
+        {
+            Changed?.Invoke();
         }
     }
 }

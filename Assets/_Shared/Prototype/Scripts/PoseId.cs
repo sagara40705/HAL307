@@ -1,8 +1,11 @@
 
-public enum PoseId
+namespace Prototype.Sandbox
 {
-    Pose_A,
-    Pose_B,
-    Pose_C,
-    None,
+    public enum PoseId
+    {
+        Pose_A,
+        Pose_B,
+        Pose_C,
+        None,
+    }
 }

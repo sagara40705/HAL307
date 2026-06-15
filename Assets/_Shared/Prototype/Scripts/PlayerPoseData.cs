@@ -1,8 +1,11 @@
 using System;
 using UnityEngine;
 
-class PlayerPoseData
+namespace Prototype.Sandbox
 {
-    public float duration;
-    public Action action;
+    class PlayerPoseData
+    {
+        public float duration;
+        public Action action;
+    }
 }

@@ -418,8 +418,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyContext
   _onlyMyScene: 0
   _initalize: 0
+  _contextName: 
   _enemyManager: {fileID: 529276126}
-  _poseParryJudgeScene: PoseParryJudge
   _poseContextName: PoseContext
   _poseContext: {fileID: 0}
 --- !u!4 &770144275

@@ -8,7 +8,8 @@ namespace Enemy
         [Header("Visual")]
         [SerializeField] private Color _preCommitColor = Color.white;
         [SerializeField] private Color _committedColor = Color.white;
-        [SerializeField, Min(0.01f)] private float _preCommitBlinkInterval = 0.2f;
+        [SerializeField, Min(0.01f)] private float _preCommitBlinkInterval = 0.5f;
+        [SerializeField, Min(0.01f)] private float _parryGraceBlinkInterval = 0.1f;
 
         [Header("Animation")]
         [SerializeField] private string _preCommitAnimatorTriggerName;
@@ -34,11 +35,19 @@ namespace Enemy
         public void OnUpdate(Enemy enemy, float deltaTime)
         {
             if (enemy == null) { return; }
-            if (_isCommitted) { return; }
 
-            float blinkInterval = Mathf.Max(0.01f, _preCommitBlinkInterval);
-            bool usePoseColor = Mathf.FloorToInt(Time.time / blinkInterval) % 2 == 0;
-            ApplyColor(enemy, usePoseColor ? _preCommitColor : Color.white);
+            switch (enemy.PoseState)
+            {
+                case EnemyPoseState.PreCommit:
+                    ApplyBlink(enemy, _preCommitColor, _preCommitBlinkInterval);
+                    break;
+                case EnemyPoseState.ParryGrace:
+                    ApplyBlink(enemy, _committedColor, _parryGraceBlinkInterval);
+                    break;
+                case EnemyPoseState.Completed:
+                    ApplyColor(enemy, _committedColor);
+                    break;
+            }
         }
 
         public void OnCommitPose(Enemy enemy)
@@ -75,6 +84,13 @@ namespace Enemy
             {
                 visual.SetColor(color);
             }
+        }
+
+        private static void ApplyBlink(Enemy enemy, Color color, float blinkInterval)
+        {
+            float interval = Mathf.Max(0.01f, blinkInterval);
+            bool usePoseColor = Mathf.FloorToInt(enemy.PoseStateElapsedTime / interval) % 2 == 0;
+            ApplyColor(enemy, usePoseColor ? color : Color.white);
         }
 
         private static void ApplyAnimatorTrigger(Enemy enemy, string animatorTriggerName)

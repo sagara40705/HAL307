@@ -5,6 +5,14 @@ using UnityEngine;
 
 namespace Enemy
 {
+    public enum EnemyPoseState
+    {
+        None,
+        PreCommit,
+        ParryGrace,
+        Completed
+    }
+
     public class Enemy : MonoBehaviour
     {
         //　EnemyData
@@ -20,8 +28,12 @@ namespace Enemy
         private PoseID _currentPoseID;
         private float _poseTimer = 0f;
         private float _poseElapsedTime = 0f;
+        private float _poseStateElapsedTime = 0f;
+        private float _parryGraceTimer = 0f;
         private EnemyPoseData _currentPoseData;
+        private EnemyPoseState _poseState = EnemyPoseState.None;
         private bool _isPoseCommitted = false;
+        private bool _hasEnemyRequestNotified = false;
 
         // パリイ関連
         private bool _isParried = false;
@@ -32,6 +44,9 @@ namespace Enemy
 
         // Pose開始イベント
         public event Action<PoseID> OnPoseStart;
+
+        public EnemyPoseState PoseState => _poseState;
+        public float PoseStateElapsedTime => _poseStateElapsedTime;
 
         void Start()
         {
@@ -44,7 +59,9 @@ namespace Enemy
             // デバッグ用のUIを作成
             DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(name);
             window.CreateMessage("Current Pose", () => _currentPoseID.ToString());
+            window.CreateMessage("Pose State", () => _poseState.ToString());
             window.CreateMessage("Pose Timer", () => _poseTimer.ToString("F2"));
+            window.CreateMessage("Parry Grace", () => _parryGraceTimer.ToString("F2"));
             window.CreateMessage("Parried", () => _isParried.ToString());
             window.CreateMessage("Parry Timer", () => _parryTimer.ToString("F2"));
         }
@@ -56,6 +73,7 @@ namespace Enemy
                 float deltaTime = Time.deltaTime;
 
                 _poseElapsedTime += deltaTime;
+                _poseStateElapsedTime += deltaTime;
                 _currentPoseData?.PoseAction?.OnUpdate(this, deltaTime);
 
                 if (!_isPoseCommitted && _currentPoseData != null && _poseElapsedTime >= _currentPoseData.CommitDelay)
@@ -63,6 +81,15 @@ namespace Enemy
                     _currentPoseID = _currentPoseData.CommittedPoseID;
                     CommitCurrentPose();
                     _currentPoseData.PoseAction?.OnCommitPose(this);
+                }
+
+                if (_isPoseCommitted && !_hasEnemyRequestNotified)
+                {
+                    _parryGraceTimer -= deltaTime;
+                    if (_parryGraceTimer <= 0f)
+                    {
+                        CompleteParryGrace();
+                    }
                 }
 
                 _poseTimer -= deltaTime;
@@ -111,8 +138,12 @@ namespace Enemy
             _currentPoseID = PoseID.None;
             _poseTimer = 0f;
             _poseElapsedTime = 0f;
+            _poseStateElapsedTime = 0f;
+            _parryGraceTimer = 0f;
             _currentPoseData = null;
+            SetPoseState(EnemyPoseState.None);
             _isPoseCommitted = false;
+            _hasEnemyRequestNotified = false;
         }
 
         // Enemyが破壊されたときのクリーンアップ
@@ -140,8 +171,12 @@ namespace Enemy
             _isPaused = true;
             _poseTimer = poseData.Duration;
             _poseElapsedTime = 0f;
+            _poseStateElapsedTime = 0f;
+            _parryGraceTimer = 0f;
             _currentPoseData = poseData;
+            SetPoseState(EnemyPoseState.PreCommit);
             _isPoseCommitted = false;
+            _hasEnemyRequestNotified = false;
 
             //Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
             _currentPoseData?.PoseAction?.OnStart(this);
@@ -154,8 +189,30 @@ namespace Enemy
             if (_isPoseCommitted) { return; }
 
             _isPoseCommitted = true;
+            SetPoseState(EnemyPoseState.ParryGrace);
+            _parryGraceTimer = _currentPoseData.ParryGraceDuration;
             _poseParryJudge?.StartEnemyPose(_currentPoseID);
+        }
+
+        private void CompleteParryGrace()
+        {
+            if (!_isPaused) { return; }
+            if (!_isPoseCommitted) { return; }
+            if (_hasEnemyRequestNotified) { return; }
+
+            _hasEnemyRequestNotified = true;
+            SetPoseState(EnemyPoseState.Completed);
+            _currentPoseData?.PoseAction?.OnUpdate(this, 0f);
+            _poseParryJudge?.EndEnemyPose();
             OnPoseStart?.Invoke(_currentPoseID);
+        }
+
+        private void SetPoseState(EnemyPoseState poseState)
+        {
+            if (_poseState == poseState) { return; }
+
+            _poseState = poseState;
+            _poseStateElapsedTime = 0f;
         }
 
         //　パリイされたときの処理

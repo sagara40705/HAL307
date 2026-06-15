@@ -14,6 +14,7 @@ namespace Enemy
         [Header("Timing")]
         [SerializeField, FormerlySerializedAs("_duration"), Min(0.01f)] private float _duration = 1.0f;
         [SerializeField, Min(0f)] private float _commitDelay = 0f;
+        [SerializeField, Min(0f)] private float _parryGraceDuration = 1.0f;
 
         [Header("Action")]
         [SerializeField] private EnemyPoseAction _poseAction;
@@ -23,6 +24,7 @@ namespace Enemy
         public PoseID CommittedPoseID => _committedPoseID == PoseID.None ? _preCommitPoseID : _committedPoseID;
         public float Duration => _duration;
         public float CommitDelay => Mathf.Min(_commitDelay, _duration);
+        public float ParryGraceDuration => Mathf.Min(_parryGraceDuration, Mathf.Max(0f, _duration - CommitDelay));
         public EnemyPoseAction PoseAction => _poseAction;
     }
 }

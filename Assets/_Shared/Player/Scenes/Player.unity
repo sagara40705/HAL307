@@ -686,7 +686,7 @@ PrefabInstance:
     - target: {fileID: 488489204602220556, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 574720c5b7aa1d244877bd8fb1b5e4ea, type: 2}
+      objectReference: {fileID: 2100000, guid: 186cd03b7604ee6429259df1f165db09, type: 2}
     - target: {fileID: 7270897789143926846, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_Name
       value: Proto_Player

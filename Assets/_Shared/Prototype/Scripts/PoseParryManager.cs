@@ -1,5 +1,8 @@
 using UnityEngine;
 
+namespace Prototype.Sandbox
+{
+
 // パリイ判定マネージャークラス
 public class PoseParryManager : MonoBehaviour
 {
@@ -21,4 +24,5 @@ public class PoseParryManager : MonoBehaviour
         return playerPoseId == currentEnemyPoseId;
     }
 
+}
 }

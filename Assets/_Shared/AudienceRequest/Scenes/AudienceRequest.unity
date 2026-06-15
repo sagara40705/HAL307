@@ -354,7 +354,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a62f9485f57ce7a4f8d4dbc5638cef6a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestJudge
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestJudge
   _context: {fileID: 1743887621}
   _requestSystem: {fileID: 848356010}
 --- !u!4 &558537225
@@ -544,7 +544,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baaa62f64f6a6fc48919752b66c0356e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestSystem
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestSystem
   _maxRequestCount: 50
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
@@ -630,7 +630,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::AdditiveSceneObjectDisabler
+  m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets:
   - {fileID: 185333792}
   - {fileID: 1986899497}
@@ -861,7 +861,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 39392d7662a0a074ab3923d2a1e465f6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestContext
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestContext
   _onlyMyScene: 0
   _initalize: 0
   _playerSceneName: Player
@@ -948,7 +948,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c80339c08336d9347a341ec890095ad1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestUiPool
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestUiPool
   _audienceRequestSystem: {fileID: 848356010}
   _uiParent: {fileID: 619822164}
   _uiPrefabs:

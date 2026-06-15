@@ -259,7 +259,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f60dd0a71d33b254f87e9e2a3e83aa77, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Kosuke.Sandbox::FadeButton
+  m_EditorClassIdentifier: Assembly-CSharp::FadeButton
 --- !u!1 &8717428
 GameObject:
   m_ObjectHideFlags: 0
@@ -879,7 +879,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2186268}
-        m_TargetAssemblyTypeName: FadeButton, Kosuke.Sandbox
+        m_TargetAssemblyTypeName: FadeButton, Assembly-CSharp
         m_MethodName: OnClickFade
         m_Mode: 1
         m_Arguments:

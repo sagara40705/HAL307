@@ -8,6 +8,7 @@ namespace Enemy
         [Header("Visual")]
         [SerializeField] private Color _preCommitColor = Color.white;
         [SerializeField] private Color _committedColor = Color.white;
+        [SerializeField, Min(0.01f)] private float _preCommitBlinkInterval = 0.2f;
 
         [Header("Animation")]
         [SerializeField] private string _preCommitAnimatorTriggerName;
@@ -32,6 +33,12 @@ namespace Enemy
 
         public void OnUpdate(Enemy enemy, float deltaTime)
         {
+            if (enemy == null) { return; }
+            if (_isCommitted) { return; }
+
+            float blinkInterval = Mathf.Max(0.01f, _preCommitBlinkInterval);
+            bool usePoseColor = Mathf.FloorToInt(Time.time / blinkInterval) % 2 == 0;
+            ApplyColor(enemy, usePoseColor ? _preCommitColor : Color.white);
         }
 
         public void OnCommitPose(Enemy enemy)
@@ -57,12 +64,21 @@ namespace Enemy
 
         private static void ApplyVisual(Enemy enemy, Color color, string animatorTriggerName)
         {
+            ApplyColor(enemy, color);
+            ApplyAnimatorTrigger(enemy, animatorTriggerName);
+        }
+
+        private static void ApplyColor(Enemy enemy, Color color)
+        {
             Proto_EnemyChangeColor visual = enemy.GetComponent<Proto_EnemyChangeColor>();
             if (visual != null)
             {
                 visual.SetColor(color);
             }
+        }
 
+        private static void ApplyAnimatorTrigger(Enemy enemy, string animatorTriggerName)
+        {
             if (!string.IsNullOrEmpty(animatorTriggerName))
             {
                 Animator animator = enemy.GetComponentInChildren<Animator>();

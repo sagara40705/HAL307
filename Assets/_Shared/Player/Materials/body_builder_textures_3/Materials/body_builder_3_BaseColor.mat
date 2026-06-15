@@ -27,7 +27,6 @@ Material:
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _HIGHLIGHTSTRENGTH_ON
-  - _SHOWNUMBER_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -123,7 +122,7 @@ Material:
     - _Darkness: 0.551
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _Digit0: 0
+    - _Digit0: 5.87
     - _Digit1: 0
     - _Digit2: 0
     - _DropDensity: 18
@@ -147,7 +146,7 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _ShadowStrength: 0.25
-    - _ShowNumber: 1
+    - _ShowNumber: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecPower: 41.7
@@ -164,7 +163,7 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DigitArea: {r: 0.3, g: 0.3, b: 0.2, a: 0.2}
-    - _DigitColor: {r: 1, g: 0, b: 0, a: 1}
+    - _DigitColor: {r: 1, g: 0.073584795, b: 0.7697678, a: 1}
     - _DigitScale: {r: 1, g: 1, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}

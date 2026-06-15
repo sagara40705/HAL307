@@ -11,6 +11,9 @@ namespace Enemy
         // EnemyPoseController
         [SerializeField] private EnemyPoseController _poseController;
 
+        // EnemyContext
+        [SerializeField] private EnemyContext _enemyContext;
+
         // Enemyを生成する場所(親)
         [SerializeField] private Transform _parent;
 
@@ -33,6 +36,11 @@ namespace Enemy
            // Debug.Log($"Generated enemy from data: {enemy.name}");
 
             enemy.Initialize(_enemyRegistry, _poseController, entry.EnemyData);
+
+            if (_enemyContext != null)
+            {
+                enemy.OnPoseStart += _enemyContext.NotifyEnemyPoseStart;
+            }
         }
     }
 }

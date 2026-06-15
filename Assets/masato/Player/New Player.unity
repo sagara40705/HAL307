@@ -294,6 +294,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1233576720272439965, guid: 64248097d4e211748bd75e3ead2c5885, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c8a5ef5e9e814314fb9a34f5d2a7983f, type: 2}
     - target: {fileID: 919132149155446097, guid: 64248097d4e211748bd75e3ead2c5885, type: 3}
       propertyPath: m_Name
       value: body_builder_1_3

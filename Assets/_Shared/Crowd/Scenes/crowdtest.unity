@@ -1,0 +1,2129 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!29 &1
+OcclusionCullingSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_OcclusionBakeSettings:
+    smallestOccluder: 5
+    smallestHole: 0.25
+    backfaceThreshold: 100
+  m_SceneGUID: 00000000000000000000000000000000
+  m_OcclusionCullingData: {fileID: 0}
+--- !u!104 &2
+RenderSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 10
+  m_Fog: 0
+  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_FogMode: 3
+  m_FogDensity: 0.01
+  m_LinearFogStart: 0
+  m_LinearFogEnd: 300
+  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
+  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientIntensity: 1
+  m_AmbientMode: 0
+  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_HaloStrength: 0.5
+  m_FlareStrength: 1
+  m_FlareFadeSpeed: 3
+  m_HaloTexture: {fileID: 0}
+  m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
+  m_DefaultReflectionMode: 0
+  m_DefaultReflectionResolution: 128
+  m_ReflectionBounces: 1
+  m_ReflectionIntensity: 1
+  m_CustomReflection: {fileID: 0}
+  m_Sun: {fileID: 0}
+  m_UseRadianceAmbientProbe: 0
+--- !u!157 &3
+LightmapSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
+  m_GISettings:
+    serializedVersion: 2
+    m_BounceScale: 1
+    m_IndirectOutputScale: 1
+    m_AlbedoBoost: 1
+    m_EnvironmentLightingMode: 0
+    m_EnableBakedLightmaps: 1
+    m_EnableRealtimeLightmaps: 0
+  m_LightmapEditorSettings:
+    serializedVersion: 12
+    m_Resolution: 2
+    m_BakeResolution: 40
+    m_AtlasSize: 1024
+    m_AO: 0
+    m_AOMaxDistance: 1
+    m_CompAOExponent: 1
+    m_CompAOExponentDirect: 0
+    m_ExtractAmbientOcclusion: 0
+    m_Padding: 2
+    m_LightmapParameters: {fileID: 0}
+    m_LightmapsBakeMode: 1
+    m_TextureCompression: 1
+    m_ReflectionCompression: 2
+    m_MixedBakeMode: 2
+    m_BakeBackend: 2
+    m_PVRSampling: 1
+    m_PVRDirectSampleCount: 32
+    m_PVRSampleCount: 512
+    m_PVRBounces: 2
+    m_PVREnvironmentSampleCount: 256
+    m_PVREnvironmentReferencePointCount: 2048
+    m_PVRFilteringMode: 1
+    m_PVRDenoiserTypeDirect: 1
+    m_PVRDenoiserTypeIndirect: 1
+    m_PVRDenoiserTypeAO: 1
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
+    m_PVREnvironmentMIS: 1
+    m_PVRCulling: 1
+    m_PVRFilteringGaussRadiusDirect: 1
+    m_PVRFilteringGaussRadiusIndirect: 1
+    m_PVRFilteringGaussRadiusAO: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
+  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
+  m_LightingSettings: {fileID: 0}
+--- !u!196 &4
+NavMeshSettings:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_BuildSettings:
+    serializedVersion: 3
+    agentTypeID: 0
+    agentRadius: 0.5
+    agentHeight: 2
+    agentSlope: 45
+    agentClimb: 0.4
+    ledgeDropHeight: 0
+    maxJumpAcrossDistance: 0
+    minRegionArea: 2
+    manualCellSize: 0
+    cellSize: 0.16666667
+    manualTileSize: 0
+    tileSize: 256
+    buildHeightMesh: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
+    debug:
+      m_Flags: 0
+  m_NavMeshData: {fileID: 0}
+--- !u!1 &130120856
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 130120858}
+  - component: {fileID: 130120857}
+  m_Layer: 0
+  m_Name: GameObject (4)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &130120857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130120856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 7
+  cols: 5
+  spacing: 2
+  rowHeight: 0
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!4 &130120858
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130120856}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 82.2, y: -1.1, z: 70.85}
+  m_LocalScale: {x: 26.16095, y: 0.12419658, z: 14.992946}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!1 &153684304
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 153684305}
+  - component: {fileID: 153684306}
+  m_Layer: 0
+  m_Name: GameObject (9)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &153684305
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153684304}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.77531517, z: -0, w: -0.63157463}
+  m_LocalPosition: {x: 119.24952, y: 0.29, z: 53.617058}
+  m_LocalScale: {x: 26.160961, y: 0.12419658, z: 14.99295}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 148.796, z: 0}
+--- !u!114 &153684306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153684304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &154605862
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 154605863}
+  - component: {fileID: 154605864}
+  m_Layer: 0
+  m_Name: GameObject (8)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &154605863
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154605862}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.77200174, z: -0, w: 0.6356204}
+  m_LocalPosition: {x: -3.1053982, y: 10.59, z: 57.48938}
+  m_LocalScale: {x: 26.16095, y: 0.12419658, z: 14.992946}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 101.068, z: 0}
+--- !u!114 &154605864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154605862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &171394041
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 171394042}
+  - component: {fileID: 171394043}
+  m_Layer: 0
+  m_Name: GameObject (8)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &171394042
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171394041}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.44412836, z: -0, w: -0.8959632}
+  m_LocalPosition: {x: 111.18703, y: 0.29, z: -26.723362}
+  m_LocalScale: {x: 26.160954, y: 0.12419658, z: 14.992949}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 115.447, z: 0}
+--- !u!114 &171394043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171394041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &363837140
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 363837141}
+  - component: {fileID: 363837142}
+  m_Layer: 0
+  m_Name: GameObject (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &363837141
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363837140}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -5.6553993, y: 10.59, z: 28.82938}
+  m_LocalScale: {x: 26.16096, y: 0.12419658, z: 14.9929495}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &363837142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363837140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &368334937
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 368334938}
+  - component: {fileID: 368334939}
+  m_Layer: 0
+  m_Name: GameObject (8)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &368334938
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368334937}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.92393434, z: -0, w: -0.38255107}
+  m_LocalPosition: {x: 104.73807, y: 0.29, z: 80.57178}
+  m_LocalScale: {x: 26.160954, y: 0.12419658, z: 14.992949}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 115.447, z: 0}
+--- !u!114 &368334939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368334937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &376511005
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 376511008}
+  - component: {fileID: 376511007}
+  - component: {fileID: 376511006}
+  - component: {fileID: 376511009}
+  m_Layer: 0
+  m_Name: Main Camera
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!81 &376511006
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376511005}
+  m_Enabled: 1
+--- !u!20 &376511007
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376511005}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!4 &376511008
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376511005}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.97166735, z: -0.2363526, w: 0}
+  m_LocalPosition: {x: 50, y: 12.9, z: 41.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 27.343, y: 180, z: 0}
+--- !u!114 &376511009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376511005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
+--- !u!1 &396314311
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 396314312}
+  - component: {fileID: 396314313}
+  m_Layer: 0
+  m_Name: GameObject (9)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &396314312
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396314311}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.82337683, z: -0, w: -0.567495}
+  m_LocalPosition: {x: 127.38591, y: 10.59, z: 60.57035}
+  m_LocalScale: {x: 26.160954, y: 0.12419658, z: 14.992947}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 148.796, z: 0}
+--- !u!114 &396314313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396314311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &562620539
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 562620540}
+  - component: {fileID: 562620541}
+  m_Layer: 0
+  m_Name: GameObject (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &562620540
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562620539}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.995129, z: -0, w: -0.098581746}
+  m_LocalPosition: {x: 76.76749, y: 0.29, z: 95.13393}
+  m_LocalScale: {x: 26.160973, y: 0.12419658, z: 14.992957}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 81.778, z: 0}
+--- !u!114 &562620541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562620539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &836643942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 836643943}
+  - component: {fileID: 836643944}
+  m_Layer: 0
+  m_Name: GameObject (9)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &836643943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836643942}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.44691217, z: -0, w: 0.8945778}
+  m_LocalPosition: {x: 6.0315304, y: 10.59, z: -28.181044}
+  m_LocalScale: {x: 26.16096, y: 0.12419658, z: 14.99295}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 143.304, z: 0}
+--- !u!114 &836643944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836643942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &879344117
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 879344119}
+  - component: {fileID: 879344118}
+  m_Layer: 0
+  m_Name: GameObject (8)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &879344118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 879344117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!4 &879344119
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 879344117}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.77200174, z: -0, w: 0.6356205}
+  m_LocalPosition: {x: 5.549988, y: 0.28999984, z: 56.430008}
+  m_LocalScale: {x: 26.160952, y: 0.12419658, z: 14.992948}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 101.068, z: 0}
+--- !u!1 &918438064
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 918438067}
+  - component: {fileID: 918438066}
+  m_Layer: 0
+  m_Name: GameObject (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &918438066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918438064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 13
+  cols: 37
+  spacing: 2
+  rowHeight: 0
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!4 &918438067
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918438064}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 27.47, y: -1.1, z: 27.51}
+  m_LocalScale: {x: 26.16095, y: 0.12419658, z: 14.992946}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &932030222
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 932030224}
+  - component: {fileID: 932030223}
+  m_Layer: 0
+  m_Name: GameObject (5)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &932030223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932030222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 2
+  cols: 30
+  spacing: 2
+  rowHeight: 0
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!4 &932030224
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932030222}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 22.81, y: -1.24, z: 27.77}
+  m_LocalScale: {x: 26.16095, y: 0.12419658, z: 14.992946}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &959556868
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 959556869}
+  - component: {fileID: 959556870}
+  m_Layer: 0
+  m_Name: GameObject (10)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &959556869
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959556868}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.7212675, z: -0, w: -0.69265664}
+  m_LocalPosition: {x: 119.94559, y: 0.29, z: 28.30709}
+  m_LocalScale: {x: 26.160967, y: 0.12419658, z: 14.992953}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 158.145, z: 0}
+--- !u!114 &959556870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959556868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 7
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &972294282
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 972294283}
+  - component: {fileID: 972294284}
+  m_Layer: 0
+  m_Name: GameObject (10)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &972294283
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 972294282}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.99775755, z: -0, w: 0.06693259}
+  m_LocalPosition: {x: 50.79999, y: 0.28999984, z: 94.30001}
+  m_LocalScale: {x: 26.16096, y: 0.12419658, z: 14.99295}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 172.324, z: 0}
+--- !u!114 &972294284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 972294282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 7
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1066145271
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1066145274}
+  - component: {fileID: 1066145273}
+  - component: {fileID: 1066145272}
+  m_Layer: 0
+  m_Name: Directional Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1066145272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1066145271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!108 &1066145273
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1066145271}
+  m_Enabled: 1
+  serializedVersion: 12
+  m_Type: 1
+  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Intensity: 1
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 2
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!4 &1066145274
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1066145271}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1181407537
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1181407538}
+  - component: {fileID: 1181407539}
+  m_Layer: 0
+  m_Name: GameObject (10)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1181407538
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1181407537}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.65679437, z: -0, w: 0.7540698}
+  m_LocalPosition: {x: -3.1715984, y: 10.59, z: -0.41501617}
+  m_LocalScale: {x: 26.160957, y: 0.12419658, z: 14.992949}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 172.324, z: 0}
+--- !u!114 &1181407539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1181407537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 7
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1238020453
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1238020454}
+  - component: {fileID: 1238020455}
+  m_Layer: 0
+  m_Name: GameObject (9)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1238020454
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238020453}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.94916254, z: -0, w: 0.3147865}
+  m_LocalPosition: {x: 14.344601, y: 10.59, z: 86.25938}
+  m_LocalScale: {x: 26.16096, y: 0.12419658, z: 14.9929495}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 143.304, z: 0}
+--- !u!114 &1238020455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238020453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1001 &1328827697
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 61.08759
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.8
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.180374
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+      propertyPath: m_Name
+      value: SM_FullStage
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b627c07907b63674dbd1edb9fdd18478, type: 3}
+--- !u!1 &1351093216
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1351093218}
+  - component: {fileID: 1351093217}
+  m_Layer: 0
+  m_Name: GameObject (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1351093217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351093216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 7
+  cols: 5
+  spacing: 2
+  rowHeight: 0
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!4 &1351093218
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351093216}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 39.5, y: -1.1, z: 70.92}
+  m_LocalScale: {x: 26.16095, y: 0.12419658, z: 14.992946}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &1354711182
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1354711185}
+  - component: {fileID: 1354711184}
+  m_Layer: 0
+  m_Name: GameObject (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1354711184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1354711182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 13
+  cols: 37
+  spacing: 2
+  rowHeight: 0
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!4 &1354711185
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1354711182}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 94.2, y: -1.1, z: 27.71}
+  m_LocalScale: {x: 26.16095, y: 0.12419658, z: 14.992946}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!1 &1398553970
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1398553971}
+  - component: {fileID: 1398553972}
+  m_Layer: 0
+  m_Name: GameObject (9)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1398553971
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398553970}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.94916254, z: -0, w: 0.3147865}
+  m_LocalPosition: {x: 22.999985, y: 0.28999984, z: 85.20001}
+  m_LocalScale: {x: 26.16096, y: 0.12419658, z: 14.9929495}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 143.304, z: 0}
+--- !u!114 &1398553972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398553970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1413988534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1413988535}
+  - component: {fileID: 1413988536}
+  m_Layer: 0
+  m_Name: GameObject (10)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1413988535
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1413988534}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.67919683, z: -0, w: 0.7339563}
+  m_LocalPosition: {x: 4.6084423, y: 0.29, z: 3.382164}
+  m_LocalScale: {x: 26.160961, y: 0.12419658, z: 14.992951}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 172.324, z: 0}
+--- !u!114 &1413988536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1413988534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 7
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1501120554
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1501120555}
+  - component: {fileID: 1501120556}
+  m_Layer: 0
+  m_Name: GameObject (10)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1501120555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501120554}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.99775755, z: -0, w: 0.0669326}
+  m_LocalPosition: {x: 42.1446, y: 10.59, z: 95.35938}
+  m_LocalScale: {x: 26.16096, y: 0.12419658, z: 14.9929495}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 172.324, z: 0}
+--- !u!114 &1501120556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501120554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 7
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1535703357
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1535703358}
+  - component: {fileID: 1535703359}
+  m_Layer: 0
+  m_Name: GameObject (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1535703358
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1535703357}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.6845709, z: -0, w: -0.72894627}
+  m_LocalPosition: {x: 121.8605, y: 0.29, z: 2.9496403}
+  m_LocalScale: {x: 26.160961, y: 0.12419658, z: 14.992951}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 81.778, z: 0}
+--- !u!114 &1535703359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1535703357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1552227219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1552227220}
+  - component: {fileID: 1552227221}
+  m_Layer: 0
+  m_Name: GameObject (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1552227220
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552227219}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.6845709, z: -0, w: -0.72894627}
+  m_LocalPosition: {x: 127.46968, y: 10.59, z: 1.3050003}
+  m_LocalScale: {x: 26.160961, y: 0.12419658, z: 14.992951}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 81.778, z: 0}
+--- !u!114 &1552227221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552227219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1665563895
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1665563896}
+  - component: {fileID: 1665563897}
+  m_Layer: 0
+  m_Name: GameObject (9)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1665563896
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665563895}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.4736396, z: -0, w: 0.8807188}
+  m_LocalPosition: {x: 12.123941, y: 0.29, z: -24.887386}
+  m_LocalScale: {x: 26.16096, y: 0.12419658, z: 14.9929495}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 143.304, z: 0}
+--- !u!114 &1665563897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665563895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1672650276
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1672650277}
+  - component: {fileID: 1672650278}
+  m_Layer: 0
+  m_Name: GameObject (8)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1672650277
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672650276}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.95158833, z: -0, w: -0.30737543}
+  m_LocalPosition: {x: 107.848694, y: 10.59, z: 86.555565}
+  m_LocalScale: {x: 26.16095, y: 0.12419658, z: 14.992947}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 115.447, z: 0}
+--- !u!114 &1672650278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672650276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1682084715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1682084716}
+  - component: {fileID: 1682084717}
+  m_Layer: 0
+  m_Name: GameObject (8)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1682084716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1682084715}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.44412836, z: -0, w: -0.8959632}
+  m_LocalPosition: {x: 115.526024, y: 10.59, z: -31.606514}
+  m_LocalScale: {x: 26.160954, y: 0.12419658, z: 14.992949}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 115.447, z: 0}
+--- !u!114 &1682084717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1682084715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 9b0088ec8adca0245a49c0b3af2368dc, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1731614849
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1731614850}
+  - component: {fileID: 1731614851}
+  m_Layer: 0
+  m_Name: GameObject (10)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1731614850
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1731614849}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.74225503, z: -0, w: -0.6701175}
+  m_LocalPosition: {x: 126.89479, y: 10.59, z: 31.179893}
+  m_LocalScale: {x: 26.160954, y: 0.12419658, z: 14.992947}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 163.797, z: 0}
+--- !u!114 &1731614851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1731614849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 7
+  cols: 11
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1 &1751778153
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1751778155}
+  - component: {fileID: 1751778154}
+  m_Layer: 0
+  m_Name: GameObject (6)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1751778154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751778153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 2
+  cols: 30
+  spacing: 2
+  rowHeight: 0
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!4 &1751778155
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751778153}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.71021813, z: -0, w: -0.7039817}
+  m_LocalPosition: {x: 99.1, y: -1.19, z: 27.8}
+  m_LocalScale: {x: 26.16095, y: 0.12419658, z: 14.992946}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 269.495, z: 0}
+--- !u!1 &2066930612
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2066930614}
+  - component: {fileID: 2066930613}
+  m_Layer: 0
+  m_Name: GameObject (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2066930613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066930612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!4 &2066930614
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066930612}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 2.999977, y: 0.28999984, z: 27.770004}
+  m_LocalScale: {x: 26.160957, y: 0.12419658, z: 14.9929495}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &2114565885
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2114565886}
+  - component: {fileID: 2114565887}
+  m_Layer: 0
+  m_Name: GameObject (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2114565886
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114565885}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.99982667, z: -0, w: -0.018618882}
+  m_LocalPosition: {x: 75.896194, y: 10.59, z: 93.66505}
+  m_LocalScale: {x: 26.160957, y: 0.12419658, z: 14.9929495}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 81.778, z: 0}
+--- !u!114 &2114565887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114565885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1c5da0fc53166478cf2797c005f0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Crowd.Sandbox::CrowdSpawner
+  mesh: {fileID: -3702037217650275473, guid: 42350ce93e0aa5e45bbc479cba17bc06, type: 3}
+  material: {fileID: 2100000, guid: 47402058b7e28674bb2332c9741c919a, type: 2}
+  modelScale: {x: 3, y: 3, z: 3}
+  rows: 8
+  cols: 12
+  spacing: 2
+  rowHeight: 0.5
+  chunkRows: 4
+  chunkCols: 4
+  animationIndex: 1
+  showChunkBounds: 1
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 376511008}
+  - {fileID: 1066145274}
+  - {fileID: 918438067}
+  - {fileID: 1351093218}
+  - {fileID: 932030224}
+  - {fileID: 1751778155}
+  - {fileID: 130120858}
+  - {fileID: 2066930614}
+  - {fileID: 879344119}
+  - {fileID: 1398553971}
+  - {fileID: 972294283}
+  - {fileID: 1354711185}
+  - {fileID: 363837141}
+  - {fileID: 154605863}
+  - {fileID: 1238020454}
+  - {fileID: 1501120555}
+  - {fileID: 1665563896}
+  - {fileID: 1413988535}
+  - {fileID: 836643943}
+  - {fileID: 1181407538}
+  - {fileID: 562620540}
+  - {fileID: 368334938}
+  - {fileID: 153684305}
+  - {fileID: 959556869}
+  - {fileID: 2114565886}
+  - {fileID: 1672650277}
+  - {fileID: 396314312}
+  - {fileID: 1731614850}
+  - {fileID: 1535703358}
+  - {fileID: 171394042}
+  - {fileID: 1552227220}
+  - {fileID: 1682084716}
+  - {fileID: 1328827697}

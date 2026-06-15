@@ -1,6 +1,7 @@
-using UnityEngine;
-using Pose;
+using System;
 using Context;
+using Pose;
+using UnityEngine;
 
 namespace Enemy
 {
@@ -9,6 +10,12 @@ namespace Enemy
     {
         //　内部
         [SerializeField] private EnemyManager _enemyManager;
+
+        public event Action<PoseID> OnEnemyPoseStart;
+        public void NotifyEnemyPoseStart(PoseID poseID)
+        {
+            OnEnemyPoseStart?.Invoke(poseID);
+        }
 
         // Pose
         [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前

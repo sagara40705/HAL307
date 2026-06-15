@@ -1,6 +1,7 @@
-using UnityEngine;
+using System;
 using Pose;
 using RuntimeDebug;
+using UnityEngine;
 
 namespace Enemy
 {
@@ -25,6 +26,9 @@ namespace Enemy
 
         //
         Proto_EnemyChangeColor _colorChanger;
+
+        // Pose開始イベント
+        public event Action<PoseID> OnPoseStart;
 
         void Start()
         {
@@ -120,6 +124,8 @@ namespace Enemy
 
             //Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
             _currentPoseData?.PoseAction?.OnStart(this);
+
+            OnPoseStart?.Invoke(_currentPoseID);
         }
 
         //　パリイされたときの処理

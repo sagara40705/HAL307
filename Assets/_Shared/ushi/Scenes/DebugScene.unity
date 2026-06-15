@@ -685,7 +685,7 @@ MonoBehaviour:
   dir: {x: 1, y: 0, z: 0}
   timer: 0
   movetime: 5
-  moveDirection: {x: 0, y: 0, z: 1}
+  moveDirection: {x: 1, y: 0, z: 0}
 --- !u!1 &1941876884
 GameObject:
   m_ObjectHideFlags: 0

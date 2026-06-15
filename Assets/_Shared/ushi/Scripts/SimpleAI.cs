@@ -18,6 +18,7 @@ public class SimpleAI : MonoBehaviour
     public Color MasssuruColor = Color.black;
 
     public Color ParryColor = Color.blue;  // パリィ状態のとき
+    Color fakePose;
 
     // ← ここで方向を決める（例：前方向）
     public Vector3 moveDirection = Vector3.forward;
@@ -41,6 +42,7 @@ public class SimpleAI : MonoBehaviour
             stopColor,
             PowerColor,
             MasssuruColor,
+            fakePose,
         };
         StartCoroutine(AIBehaviour());
     }
@@ -96,6 +98,32 @@ public class SimpleAI : MonoBehaviour
                 {
                     rend.material.color = MasssuruColor;
                     EnemyPoint += 1f;
+                }
+                ///ここにプレイヤーが何の声を出したかの条件文
+                if (Keyboard.current.fKey.wasPressedThisFrame)
+                {
+                    Debug.Log("Push!");
+                    isParry = true;
+                    rend.material.color = ParryColor;
+                    PlayerPoint += 1f;
+                }
+
+                break;
+            case 3:
+                if (!isParry)
+                {
+                    int time;
+                    time = 10;
+
+                    rend.material.color = MasssuruColor;
+                 for (int i = 0; i < time; i++)
+                    {
+                        if (i == time)
+                        {
+                            rend.material.color = PowerColor;
+                            EnemyPoint += 1f;
+                        }
+                    }
                 }
                 ///ここにプレイヤーが何の声を出したかの条件文
                 if (Keyboard.current.fKey.wasPressedThisFrame)

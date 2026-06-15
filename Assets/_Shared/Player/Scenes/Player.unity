@@ -138,7 +138,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &263768339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -420,8 +420,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerContext
   _onlyMyScene: 0
   _initalize: 0
+  _contextName: 
   _poseController: {fileID: 1691506340}
-  _poseParryJudgeScene: PoseParryJudge
   _poseContextName: PoseContext
   _poseContext: {fileID: 0}
 --- !u!4 &1037201950
@@ -693,7 +693,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8047012967296307844, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8047012967296307844, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_LocalPosition.y

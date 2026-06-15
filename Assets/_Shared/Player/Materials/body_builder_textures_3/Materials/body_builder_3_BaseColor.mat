@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: body_builder_3_BaseColor
-  m_Shader: {fileID: 4800000, guid: 6e75dcc082ee9b74c9b30605002bf537, type: 3}
+  m_Shader: {fileID: 4800000, guid: 5effd6e7bdc906f43b18f08aea484d60, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []

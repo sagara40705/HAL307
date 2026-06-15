@@ -76,7 +76,6 @@ public static class SandboxGenerator
         CreateSubFolder(basePath, "UI");
         CreateSubFolder(basePath, "Editor");
 
-        CreateAsmdef(basePath, personName);
         CreateReadme(basePath, personName);
 
         AssetDatabase.Refresh();
@@ -107,65 +106,6 @@ public static class SandboxGenerator
         {
             AssetDatabase.CreateFolder(parent, folderName);
         }
-    }
-
-    private static string FindAsmdefGuidByName(string asmdefName)
-    {
-        string[] guids = AssetDatabase.FindAssets($"{asmdefName} t:asmdef");
-
-        foreach (string guid in guids)
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            string fileName = Path.GetFileNameWithoutExtension(path);
-
-            if (fileName == asmdefName)
-            {
-                return guid;
-            }
-        }
-
-        return null;
-    }
-
-    private static void CreateAsmdef(string basePath, string personName)
-    {
-        string asmdefPath = $"{basePath}/{personName}.Sandbox.asmdef";
-        if (File.Exists(asmdefPath))
-        {
-            return;
-        }
-
-        string gameAsmdefGuid = FindAsmdefGuidByName("Game");
-        if (string.IsNullOrEmpty(gameAsmdefGuid))
-        {
-            EditorUtility.DisplayDialog(
-                "Error",
-                "Game.asmdef が見つかりませんでした。相良に連絡ください",
-                "OK"
-            );
-            return;
-        }
-
-        string json =
-$@"{{
-    ""name"": ""{personName}.Sandbox"",
-    ""rootNamespace"": ""{personName}.Sandbox"",
-    ""references"": [
-        ""GUID:{gameAsmdefGuid}"",
-        ""Unity.InputSystem""
-    ],
-    ""includePlatforms"": [],
-    ""excludePlatforms"": [],
-    ""allowUnsafeCode"": false,
-    ""overrideReferences"": false,
-    ""precompiledReferences"": [],
-    ""autoReferenced"": false,
-    ""defineConstraints"": [],
-    ""versionDefines"": [],
-    ""noEngineReferences"": false
-}}";
-
-        File.WriteAllText(asmdefPath, json);
     }
 
     private static void CreateReadme(string basePath, string personName)

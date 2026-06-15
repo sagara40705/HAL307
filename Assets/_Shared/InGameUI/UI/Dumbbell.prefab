@@ -87,7 +87,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02a2b8a357d2fab4998d4bcac0d1cbfc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Kosuke.Sandbox::UIDumbbellFall
+  m_EditorClassIdentifier: Assembly-CSharp::UIDumbbellFall
   fallSpeed: 800
   halfWidth: 40
   halfHeight: 20

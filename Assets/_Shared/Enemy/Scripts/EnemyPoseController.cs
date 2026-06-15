@@ -45,21 +45,19 @@ namespace Enemy
                 if (UpdatePoseTimer())
                 {
                     _pausedEnemy = _enemyRegistry.GetRandomEnemy();
+                    if (_pausedEnemy == null) { return; }
                     _isPaused = true;
                     _timer = 0f;
-                    PoseID pose = _pausedEnemy.RandomPose();
-                    if (_poseParryJudge == null) { return; }
-                    _poseParryJudge?.StartEnemyPose(pose);
+                    _pausedEnemy.RandomPose();
                 }
 
                 if (DebugShortcuts.Combo(Key.E, Key.P))
                 {
                     _pausedEnemy = _enemyRegistry.GetRandomEnemy();
+                    if (_pausedEnemy == null) { return; }
                     _isPaused = true;
                     _timer = 0f;
-                    PoseID pose = _pausedEnemy.RandomPose();
-                    if (_poseParryJudge == null) { return; }
-                    _poseParryJudge?.StartEnemyPose(pose);
+                    _pausedEnemy.RandomPose();
                 }
             }
         }

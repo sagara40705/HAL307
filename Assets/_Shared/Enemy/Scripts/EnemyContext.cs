@@ -5,30 +5,39 @@ using UnityEngine;
 
 namespace Enemy
 {
-    // 外部との接点を管理するクラス
     public class EnemyContext : ContextBase
     {
-        //　内部
         [SerializeField] private EnemyManager _enemyManager;
 
         public event Action<PoseID> OnEnemyPoseStart;
+
+        [SerializeField] private string _poseContextName;
+        [SerializeField] private PoseContext _poseContext;
+
+        private void Start()
+        {
+            ResolveExternalContexts();
+        }
+
         public void NotifyEnemyPoseStart(PoseID poseID)
         {
             OnEnemyPoseStart?.Invoke(poseID);
         }
 
-        // Pose
-        [SerializeField] private string _poseParryJudgeScene;   // PoseParryJudgeシーンの名前
-        [SerializeField] private string _poseContextName; // PoseParryJudgeオブジェクトの名前
-        [SerializeField] private PoseContext _poseContext;// PoseContext
-
         public PoseContext GetPoseContext()
         {
-            if (OnlyMyScene) { return null; }
-            if (_poseContext == null) { _poseContext = FindContext<PoseContext>(_poseParryJudgeScene, _poseContextName); }
+            ResolveExternalContexts();
             return _poseContext;
         }
 
-    }
+        private void ResolveExternalContexts()
+        {
+            if (OnlyMyScene || _poseContext != null)
+            {
+                return;
+            }
 
+            _poseContext = FindContext<PoseContext>(_poseContextName);
+        }
+    }
 }

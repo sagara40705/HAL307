@@ -183,11 +183,43 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5950800466205042707, guid: 733fc6897033cb04eaf205a551092b1b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3e6235c90f5f80f479a9d7ba417a1c28, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6755942265043517324, guid: 733fc6897033cb04eaf205a551092b1b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 164257468}
   m_SourcePrefab: {fileID: 100100000, guid: 733fc6897033cb04eaf205a551092b1b, type: 3}
+--- !u!1 &164257467 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6755942265043517324, guid: 733fc6897033cb04eaf205a551092b1b, type: 3}
+  m_PrefabInstance: {fileID: 164257466}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &164257468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 164257467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f9399e4e09df8c4c8d7bea6db07eb58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: masato.Sandbox::PlanarReflectionRenderer
+  textureSize: 1024
+  reflectionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  clipPlaneOffset: -4.61
+  planeOffset: 0.07
+  reflectionTextureProperty: _ReflectionTex
+  reflectionVpProperty: _ReflectionVP
 --- !u!1 &240446713
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,14 +255,14 @@ MonoBehaviour:
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
   m_Cameras: []
-  m_RendererIndex: -1
+  m_RendererIndex: 0
   m_VolumeLayerMask:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
-  m_Antialiasing: 0
+  m_Antialiasing: 1
   m_AntialiasingQuality: 2
   m_StopNaN: 0
   m_Dithering: 0
@@ -437,7 +469,7 @@ Transform:
   m_GameObject: {fileID: 1506163265}
   serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 30, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

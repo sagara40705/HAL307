@@ -1,3 +1,4 @@
+using Pose;
 using UnityEngine;
 
 namespace Enemy
@@ -35,7 +36,8 @@ namespace Enemy
 
            // Debug.Log($"Generated enemy from data: {enemy.name}");
 
-            enemy.Initialize(_enemyRegistry, _poseController, entry.EnemyData);
+            PoseParryJudge poseParryJudge = _enemyContext?.GetPoseContext()?.GetPoseParryJudge;
+            enemy.Initialize(_enemyRegistry, _poseController, entry.EnemyData, poseParryJudge);
 
             if (_enemyContext != null)
             {

@@ -449,7 +449,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9ab2df9b76a76d49926e05be3507461, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: masato.Sandbox::masato.Sandbox.NumMove
+  m_EditorClassIdentifier: Assembly-CSharp::masato.Sandbox.NumMove
   targetRenderer: {fileID: 417117352}
   number: 0
 --- !u!1 &538554695

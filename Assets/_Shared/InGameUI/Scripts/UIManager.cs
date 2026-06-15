@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
@@ -16,8 +17,12 @@ public class UIManager : MonoBehaviour
     //[Header("タイトルUI")]
 
     [Header("ゲームUI")]
-    //public BillboardSpawner spawner; // 吹き出し
     public GaugeController  gauge;   // ゲージ
+
+    [Header("スコアUI")]
+    public TextMeshProUGUI playerScoreText;
+    public TextMeshProUGUI enemy1ScoreText;
+    public TextMeshProUGUI enemy2ScoreText;
 
     //[Header("リザルトUI")]
 
@@ -33,10 +38,38 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         ShowGameScreen();
+
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.OnScoreChanged += UpdateScoreUI;
+        }
+
+        UpdateScoreUI(); // 初期表示
+    }
+    private void OnDestroy()
+    {
+        // オブジェクトが破棄されるときはイベントを解除する（メモリリーク防止）
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.OnScoreChanged -= UpdateScoreUI;
+        }
+    }
+
+    private void UpdateScoreUI()
+    {
+        if (ScoreManager.Instance == null) return;
+
+        if (playerScoreText != null)
+            playerScoreText.text = ScoreManager.Instance.PlayerScore.ToString();
+
+        if (enemy1ScoreText != null)
+            enemy1ScoreText.text = ScoreManager.Instance.Enemy1Score.ToString();
+
+        if (enemy2ScoreText != null)
+            enemy2ScoreText.text = ScoreManager.Instance.Enemy2Score.ToString();
     }
 
     //== 画面切り替えのメソッド ==//
-
     public void ShowGameScreen()
     {
         gamePanel.SetActive(true);

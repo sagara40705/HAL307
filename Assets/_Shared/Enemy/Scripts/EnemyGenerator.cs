@@ -41,7 +41,7 @@ namespace Enemy
 
             if (_enemyContext != null)
             {
-                enemy.OnPoseStart += _enemyContext.NotifyEnemyPoseStart;
+                enemy.OnPoseStart += (poseID) => _enemyContext.NotifyEnemyPoseStart(enemy, poseID);
             }
         }
     }

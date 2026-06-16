@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6014c5b4ac886c499cb4cd6f3cff807, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI::TaiyouVoiceAI.VoiceAiContext
+  m_EditorClassIdentifier: Assembly-CSharp::TaiyouVoiceAI.VoiceAiContext
   _onlyMyScene: 0
   _initalize: 0
   _playerSceneName: Player
@@ -215,7 +215,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 467bbb5e34a1f834fa51766e760bba8d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::VoiceOnnxRunner
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceOnnxRunner
   modelAsset: {fileID: 5022602860645237092, guid: a33416011209da1468935a76ae9cfecd, type: 3}
   microphoneInput: {fileID: 62380394}
   featureExtractor: {fileID: 62380396}
@@ -239,7 +239,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e436a8f5e84b93c438658f58999e665e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::VoiceCommandAction
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceCommandAction
   powerObject: {fileID: 293995663}
   yaaObject: {fileID: 1173539856}
   muscleObject: {fileID: 1790491365}
@@ -260,7 +260,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 842d3d58341e8c342a542e115b5f1054, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::MicrophoneInput
+  m_EditorClassIdentifier: Assembly-CSharp::MicrophoneInput
   sampleRate: 16000
   recordLengthSec: 1
 --- !u!114 &62380396
@@ -274,7 +274,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ec4d52cfd12fe034fa4fa2ac6e33fb14, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI.Sandbox::MfccFeatureExtractor
+  m_EditorClassIdentifier: Assembly-CSharp::MfccFeatureExtractor
   sampleRate: 16000
   fftSize: 256
   hopLength: 256
@@ -292,7 +292,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6453f4ca88bb50a4181422c0dae7df8e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TaiyouVoiceAI::VoiceTextRecognizer
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceTextRecognizer
   voiceCommandAction: {fileID: 62380393}
 --- !u!1 &293995663
 GameObject:
@@ -689,7 +689,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::AdditiveSceneObjectDisabler
+  m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets:
   - {fileID: 330585543}
   - {fileID: 410087039}

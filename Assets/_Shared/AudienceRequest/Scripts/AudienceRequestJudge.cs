@@ -1,51 +1,68 @@
-using UnityEngine;
+using Enemy;
 using Player;
+using UnityEngine;
 
 namespace AudienceRequest
 {
     public class AudienceRequestJudge : MonoBehaviour
     {
-        //
         [SerializeField] private AudienceRequestContext _context;
         [SerializeField] private AudienceRequestSystem _requestSystem;
 
-        // Player
         private PlayerPoseContoroller _playerPoseController;
+        private EnemyContext _enemyContext;
 
         private void Start()
         {
-            // PlayerPoseControllerの取得
             _playerPoseController = _context.GetPlayerContext()?.GetPlayerPoseContoroller;
-            Debug.Log("AudienceRequestJudge Start. playerPoseController = " + _playerPoseController);
-
-            // PlayerPoseControllerのイベントにリクエスト判定関数を登録
-            if (_playerPoseController == null) { return; }
-            _playerPoseController.OnPoseStart += JudgeRequest;
-        }
-
-        // リクエスト判定関数
-        // ポーズ時に対応したリクエストをクリアし、個数分のポイントを加算する
-        public void JudgeRequest(Pose.PoseID poseID)
-        {
-            if (_playerPoseController == null)
+            if (_playerPoseController != null)
             {
-                Debug.LogWarning("PlayerPoseContoroller is not assigned in AudienceRequestJudge.");
-                return;
+                // 専用メソッドを登録
+                _playerPoseController.OnPoseStart += OnPlayerPoseStart;
             }
 
-            // 対応したリクエストの個数を取得
+            _enemyContext = _context.GetEnemyContext();
+            if (_enemyContext != null)
+            {
+                // 専用メソッドを登録
+                _enemyContext.OnEnemyPoseStart += OnEnemyPoseStart;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            // イベントから登録解除
+            if (_playerPoseController != null)
+            {
+                _playerPoseController.OnPoseStart -= OnPlayerPoseStart;
+            }
+            if (_enemyContext != null)
+            {
+                _enemyContext.OnEnemyPoseStart -= OnEnemyPoseStart;
+            }
+        }
+
+        // プレイヤーからのイベント受付
+        private void OnPlayerPoseStart(Pose.PoseID poseID)
+        {
+            JudgeRequest(poseID, true);
+        }
+
+        // 敵からのイベント受付
+       private void OnEnemyPoseStart(Enemy.Enemy enemy, Pose.PoseID poseID)
+       {
+            JudgeRequest(poseID, false, enemy);
+        }
+
+        // 共通判定ロジック
+        public void JudgeRequest(Pose.PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
+        {
+            // ここでリクエストの判定を行う
             int requestCount = _requestSystem.GetRequestCount(poseID);
             if (requestCount > 0)
             {
-                _requestSystem.ClearRequest(poseID);
-                Debug.Log("Cleared " + requestCount + " requests for pose: " + poseID);
-                // ポイント加算の処理をここに追加
-            }
-            else
-            {
-                Debug.Log("No requests to clear for pose: " + poseID);
+                _requestSystem.ClearRequest(poseID, isPlayer, enemy);
             }
         }
-
     }
 }

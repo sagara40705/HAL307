@@ -239,7 +239,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 003c1616f6caf6c47bb671868724b736, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::AppBootstrapper
+  m_EditorClassIdentifier: Assembly-CSharp::AppBootstrapper
   initializeTimeoutSeconds: 10
 --- !u!4 &903886854
 Transform:
@@ -284,7 +284,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 185c727ac1f2ea64aba5a5d400fb8e03, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::SoundManager
+  m_EditorClassIdentifier: Assembly-CSharp::SoundManager
   catalog: {fileID: 11400000, guid: f8bb033a9dfe6904e85cc003e1cda917, type: 2}
   resourcesCatalogPath: Audio/SoundCatalog
   audioMixer: {fileID: 0}
@@ -463,7 +463,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9159ba39a14281046ac1272d48af9bb0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::BootSceneRouter
+  m_EditorClassIdentifier: Assembly-CSharp::BootSceneRouter
   appBootstrapper: {fileID: 903886853}
   defaultFirstScenePath: Assets/Game/Scenes/Title.unity
 --- !u!4 &1567818133

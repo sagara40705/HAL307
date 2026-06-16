@@ -103,7 +103,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 87f65769920a28847aed5ecd5c63c806, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Enemy::Enemy.Enemy
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.Enemy
 --- !u!114 &-2164832423234523109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,5 +115,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45381ea5cceff5c45ba2286b8bc00527, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Enemy::Enemy.Proto_EnemyChangeColor
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.Proto_EnemyChangeColor
   defaultColor: {r: 1, g: 1, b: 1, a: 1}

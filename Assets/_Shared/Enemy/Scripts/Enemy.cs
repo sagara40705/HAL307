@@ -25,7 +25,7 @@ namespace Enemy
 
         //Enemyの状態
         private bool _isPaused = false;
-        private PoseID _currentPoseID;
+        private PoseID _currentPoseID = PoseID.None;
         private float _poseTimer = 0f;
         private float _poseElapsedTime = 0f;
         private float _poseStateElapsedTime = 0f;

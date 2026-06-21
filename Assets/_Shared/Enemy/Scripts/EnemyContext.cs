@@ -9,7 +9,7 @@ namespace Enemy
     {
         [SerializeField] private EnemyManager _enemyManager;
 
-        public event Action<PoseID> OnEnemyPoseStart;
+        public event Action<Enemy, PoseID> OnEnemyPoseStart;
 
         [SerializeField] private string _poseContextName;
         [SerializeField] private PoseContext _poseContext;
@@ -19,9 +19,9 @@ namespace Enemy
             ResolveExternalContexts();
         }
 
-        public void NotifyEnemyPoseStart(PoseID poseID)
+        public void NotifyEnemyPoseStart(Enemy enemy, PoseID poseID)
         {
-            OnEnemyPoseStart?.Invoke(poseID);
+            OnEnemyPoseStart?.Invoke(enemy, poseID);
         }
 
         public PoseContext GetPoseContext()

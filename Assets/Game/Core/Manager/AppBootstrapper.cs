@@ -46,13 +46,13 @@ public sealed class AppBootstrapper : MonoBehaviour
         // --- 追加例 --------------------------------------------------
 
         // debug用のManager
-        yield return BootManager(
-            nameof(DebugConsoleManager),
-            () => DebugConsoleManager.CreateFromBootIfNeeded());
-        if (HasFailed)
-        {
-            yield break;
-        }
+        //yield return BootManager(
+        //    nameof(DebugConsoleManager),
+        //    () => DebugConsoleManager.CreateFromBootIfNeeded());
+        //if (HasFailed)
+        //{
+        //    yield break;
+        //}
 
         // ContextManager
         yield return BootManager(

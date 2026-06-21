@@ -57,35 +57,39 @@ namespace AudienceRequest
         }
 
         // リクエストをクリアする関数
-        public void ClearRequest(PoseID poseID, bool isPlayer)
+        public void ClearRequest(PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
         {
             int value = _audienceRequests.GetCount(poseID);
             if (value <= 0) return;
 
-            // リクエストのカウントを減らす
             _audienceRequests.ClearCount(poseID);
 
-            // 合計リクエスト数を減らす
             _currentRequestCount -= value;
-            if(_currentRequestCount < 0)
+            if (_currentRequestCount < 0)
                 _currentRequestCount = 0;
 
-
-            // プレイヤー成功時にゲージ増加
             if (isPlayer)
             {
                 float fill = _flameMaterial.GetFloat("_FillAmount");
-
                 fill += _fillIncrease;
+                _flameMaterial.SetFloat("_FillAmount", Mathf.Clamp01(fill));
 
-                _flameMaterial.SetFloat(
-                    "_FillAmount",
-                    Mathf.Clamp01(fill)
-                );
+                //
+                if (ScoreManager.Instance != null)
+                {
+                    ScoreManager.Instance.AddPlayerScore(value);
+                }
+            }
+            else
+            {
+                //
+                if (ScoreManager.Instance != null && enemy != null)
+                {
+                    ScoreManager.Instance.AddEnemyScore(value, enemy.name);
+                }
             }
 
-
-            _uiPool.PlayClearEffectAndRelease(poseID,isPlayer);
+            _uiPool.PlayClearEffectAndRelease(poseID, isPlayer);
         }
 
         // リクエスト発生関数

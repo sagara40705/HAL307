@@ -49,19 +49,19 @@ namespace AudienceRequest
         }
 
         // 敵からのイベント受付
-        private void OnEnemyPoseStart(Pose.PoseID poseID)
-        {
-            JudgeRequest(poseID, false);
+       private void OnEnemyPoseStart(Enemy.Enemy enemy, Pose.PoseID poseID)
+       {
+            JudgeRequest(poseID, false, enemy);
         }
 
         // 共通判定ロジック
-        public void JudgeRequest(Pose.PoseID poseID, bool isPlayer)
+        public void JudgeRequest(Pose.PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
         {
             // ここでリクエストの判定を行う
             int requestCount = _requestSystem.GetRequestCount(poseID);
             if (requestCount > 0)
             {
-                _requestSystem.ClearRequest(poseID, isPlayer);
+                _requestSystem.ClearRequest(poseID, isPlayer, enemy);
             }
         }
     }

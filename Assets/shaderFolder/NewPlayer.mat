@@ -50,8 +50,8 @@ Material:
     - _DropEdgeSoftness: 0.02
     - _DropExistThreshold: 0.55
     - _DropFlowSpeed: 0.2
-    - _DropSize: 0.08
-    - _DropStrength: 0.2
+    - _DropSize: 0.01
+    - _DropStrength: 0.632
     - _HighlightStrength: 0
     - _NormalStrength: 1.86
     - _ObjectFlowScale: 0.3
@@ -59,7 +59,7 @@ Material:
     - _ShowNumber: 0
     - _SpecPower: 48
     - _SpecStrength: 1.2
-    - _UseDropTexture: 0
+    - _UseDropTexture: 0.207
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _DigitArea: {r: 0.3, g: 0.3, b: 0.2, a: 0.2}

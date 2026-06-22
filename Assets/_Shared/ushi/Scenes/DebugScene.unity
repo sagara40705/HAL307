@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a7eabd0f21ad6524f80013d6f7ad00e0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ushi.Sandbox::SimpleAI
+  m_EditorClassIdentifier: Assembly-CSharp::SimpleAI
   speed: 3
   moveTimeMin: 2
   moveTimeMax: 2
@@ -360,7 +360,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eda12477385b08345afd2a70ae12044d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ushi.Sandbox::CameraAI
+  m_EditorClassIdentifier: Assembly-CSharp::CameraAI
   speed: 3
   moveTimeMin: 2
   moveTimeMax: 2
@@ -570,7 +570,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ba250384f006bf4296e4cd1cf769708, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ushiharu.Sandbox::ushiharu.Sandbox.SecondA
+  m_EditorClassIdentifier: Assembly-CSharp::ushiharu.Sandbox.SecondA
 --- !u!65 &1488375838
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -675,7 +675,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 353cb436b8b67b94b9d66def6d6633a7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ushiharu.Sandbox::ushiharu.Sandbox.BaceAI
+  m_EditorClassIdentifier: Assembly-CSharp::ushiharu.Sandbox.BaceAI
   speed: 3
   moveTimeMin: 2
   moveTimeMax: 5

@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d572d56b0babad348be1153e792ac860, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Prototype.Sandbox::Prototype.Sandbox.ProttypeSceneCore
+  m_EditorClassIdentifier: Assembly-CSharp::Prototype.Sandbox.ProttypeSceneCore
   _scenes:
   - StageModel
   - RuntimeDebugTest

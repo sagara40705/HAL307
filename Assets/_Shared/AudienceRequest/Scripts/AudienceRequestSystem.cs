@@ -17,6 +17,9 @@ namespace AudienceRequest
         [SerializeField] private AudienceRequests _audienceRequests; // リクエストのデータベース
         [SerializeField] private AudienceRequestUiPool _uiPool; // UIプールの参照
 
+        // リクエストのUIを表示するためのマテリアルと、リクエストが増えるごとにUIがどれだけ満たされるかの割合
+        [SerializeField] private Material _flameMaterial;
+        [SerializeField] private float _fillIncrease = 0.05f;
 
         [SerializeField] private float _requestInterval = 5f;
         private float _requestTimer = 0f;
@@ -29,6 +32,7 @@ namespace AudienceRequest
         {
             _requestTimer = 0f;
             _currentRequestCount = 0;
+            _audienceRequests.ClearAll();
         }
 
         // 毎フレーム更新
@@ -53,20 +57,39 @@ namespace AudienceRequest
         }
 
         // リクエストをクリアする関数
-        public void ClearRequest(PoseID poseID)
+        public void ClearRequest(PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
         {
             int value = _audienceRequests.GetCount(poseID);
             if (value <= 0) return;
 
-            // リクエストのカウントを減らす
             _audienceRequests.ClearCount(poseID);
 
-            // 合計リクエスト数を減らす
             _currentRequestCount -= value;
-            if(_currentRequestCount < 0)
+            if (_currentRequestCount < 0)
                 _currentRequestCount = 0;
 
-            _uiPool.PlayClearEffectAndRelease(poseID);
+            if (isPlayer)
+            {
+                float fill = _flameMaterial.GetFloat("_FillAmount");
+                fill += _fillIncrease;
+                _flameMaterial.SetFloat("_FillAmount", Mathf.Clamp01(fill));
+
+                //
+                if (ScoreManager.Instance != null)
+                {
+                    ScoreManager.Instance.AddPlayerScore(value);
+                }
+            }
+            else
+            {
+                //
+                if (ScoreManager.Instance != null && enemy != null)
+                {
+                    ScoreManager.Instance.AddEnemyScore(value, enemy.name);
+                }
+            }
+
+            _uiPool.PlayClearEffectAndRelease(poseID, isPlayer);
         }
 
         // リクエスト発生関数

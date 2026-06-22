@@ -151,8 +151,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 216.92381, y: -20.038}
-  m_SizeDelta: {x: 108.9858, y: 221.62}
+  m_AnchoredPosition: {x: 215, y: -1.9578}
+  m_SizeDelta: {x: 110, y: 258.2064}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &185333792
 GameObject:
@@ -323,8 +323,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -225.63454, y: -20.038}
-  m_SizeDelta: {x: 110.5386, y: 221.62}
+  m_AnchoredPosition: {x: -0, y: -1.958}
+  m_SizeDelta: {x: 110, y: 258.21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &558537223
 GameObject:
@@ -354,7 +354,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a62f9485f57ce7a4f8d4dbc5638cef6a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestJudge
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestJudge
   _context: {fileID: 1743887621}
   _requestSystem: {fileID: 848356010}
 --- !u!4 &558537225
@@ -462,12 +462,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -544,11 +544,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baaa62f64f6a6fc48919752b66c0356e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestSystem
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestSystem
   _maxRequestCount: 50
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
   _uiPool: {fileID: 1958838624}
+  _flameMaterial: {fileID: 2100000, guid: 20381abbc77054941abb9cd752d95570, type: 2}
+  _fillIncrease: 0.05
   _requestInterval: 2
 --- !u!4 &848356011
 Transform:
@@ -597,8 +599,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00096035004, y: -20.038}
-  m_SizeDelta: {x: 99.998, y: 221.62}
+  m_AnchoredPosition: {x: -215, y: -1.9578}
+  m_SizeDelta: {x: 110, y: 258.21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1117888645
 GameObject:
@@ -628,7 +630,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::AdditiveSceneObjectDisabler
+  m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets:
   - {fileID: 185333792}
   - {fileID: 1986899497}
@@ -657,7 +659,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1344696318}
   m_Layer: 5
-  m_Name: NoSpawn_LeftBottom
+  m_Name: NoSpawn_Score
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -679,8 +681,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -874, y: 416}
-  m_SizeDelta: {x: 154.7942, y: 225.7935}
+  m_AnchoredPosition: {x: 2.9593, y: -198.26952}
+  m_SizeDelta: {x: 641.1616, y: 81.501}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1489226372
 GameObject:
@@ -793,8 +795,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 879, y: -400}
-  m_SizeDelta: {x: 143.81, y: 279.1733}
+  m_AnchoredPosition: {x: 480, y: -138}
+  m_SizeDelta: {x: 125.81, y: 202.0416}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1740324150
 GameObject:
@@ -826,10 +828,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 619822164}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 875, y: 445}
-  m_SizeDelta: {x: 143.8129, y: 128.5766}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 430, y: 76.0002}
+  m_SizeDelta: {x: 125.81, y: 124.5762}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1743887620
 GameObject:
@@ -859,14 +861,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 39392d7662a0a074ab3923d2a1e465f6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestContext
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestContext
   _onlyMyScene: 0
   _initalize: 0
-  _playerSceneName: Player
-  _playerConextName: PlayerContext
+  _contextName: 
+  _playerContextName: PlayerContext
   _playerContext: {fileID: 0}
-  _enemySceneName: Enemy
-  _enemyConextName: EnemyContext
+  _enemyContextName: EnemyContext
   _enemyContext: {fileID: 0}
 --- !u!4 &1743887622
 Transform:
@@ -893,7 +894,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1817538063}
   m_Layer: 5
-  m_Name: NoSpawn_LeftTop
+  m_Name: NoSpawn_LeftBottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -913,10 +914,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 619822164}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -879, y: -465}
-  m_SizeDelta: {x: 179.9253, y: 140.18}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -416.60233, y: -116}
+  m_SizeDelta: {x: 146.7206, y: 140.18}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1958838623
 GameObject:
@@ -946,7 +947,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c80339c08336d9347a341ec890095ad1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: AudienceRequest::AudienceRequest.AudienceRequestUiPool
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestUiPool
   _audienceRequestSystem: {fileID: 848356010}
   _uiParent: {fileID: 619822164}
   _uiPrefabs:
@@ -969,12 +970,18 @@ MonoBehaviour:
   _clearScale: 1.5
   _clearDelay: 1
   _spriteTable:
-  - originalSprite: {fileID: 21300000, guid: 3c4bb7e837c209541ba4371ce0d02bad, type: 3}
+  - poseID: 2
+    originalSprite: {fileID: 21300000, guid: 3c4bb7e837c209541ba4371ce0d02bad, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
-  - originalSprite: {fileID: 21300000, guid: cc1102c9ad1a5c747b8db0bf20d4fc39, type: 3}
+    enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
+  - poseID: 1
+    originalSprite: {fileID: 21300000, guid: cc1102c9ad1a5c747b8db0bf20d4fc39, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
-  - originalSprite: {fileID: 21300000, guid: 60817e80f2e24954bba7089e8a1aaba9, type: 3}
+    enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
+  - poseID: 0
+    originalSprite: {fileID: 21300000, guid: 60817e80f2e24954bba7089e8a1aaba9, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
+    enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
 --- !u!4 &1958838625
 Transform:
   m_ObjectHideFlags: 0

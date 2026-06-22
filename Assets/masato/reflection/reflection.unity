@@ -730,7 +730,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f9399e4e09df8c4c8d7bea6db07eb58, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: masato.Sandbox::PlanarReflectionRenderer
+  m_EditorClassIdentifier: Assembly-CSharp::PlanarReflectionRenderer
   textureSize: 1024
   reflectionMask:
     serializedVersion: 2

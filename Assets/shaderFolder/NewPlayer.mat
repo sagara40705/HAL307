@@ -49,12 +49,18 @@ Material:
     - _DropDensity: 30
     - _DropEdgeSoftness: 0.02
     - _DropExistThreshold: 0.55
+<<<<<<< HEAD
     - _DropFlowSpeed: 0.2
     - _DropSize: 0.01
     - _DropStrength: 0.632
+=======
+    - _DropFlowSpeed: 1
+    - _DropSize: 0.099
+    - _DropStrength: 0.7
+>>>>>>> 2424c47c24f5dd1b80247cbeece74f8e0f814b0b
     - _HighlightStrength: 0
     - _NormalStrength: 1.86
-    - _ObjectFlowScale: 0.3
+    - _ObjectFlowScale: 0.43
     - _ShadowStrength: 1
     - _ShowNumber: 0
     - _SpecPower: 48

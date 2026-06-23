@@ -33,7 +33,7 @@ public class ScoreManager : MonoBehaviour
     // プレイヤースコア加算
     public void AddPlayerScore(int score)
     {
-        PlayerScore += score;
+        PlayerScore += score * AddScore;
         OnScoreChanged?.Invoke(); // UI等に通知
     }
 

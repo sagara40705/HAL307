@@ -2093,7 +2093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f4e11af4591a464fbeba8ca3c870833, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
-  AddScore: 10
+  AddScore: 100
 --- !u!224 &1376770249
 RectTransform:
   m_ObjectHideFlags: 0

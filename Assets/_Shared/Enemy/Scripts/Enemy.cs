@@ -48,6 +48,9 @@ namespace Enemy
         public EnemyPoseState PoseState => _poseState;
         public float PoseStateElapsedTime => _poseStateElapsedTime;
 
+        private Animator animator;
+        public Animator GetAnimator => animator;
+
         void Start()
         {
             _colorChanger = GetComponent<Proto_EnemyChangeColor>();
@@ -64,6 +67,12 @@ namespace Enemy
             window.CreateMessage("Parry Grace", () => _parryGraceTimer.ToString("F2"));
             window.CreateMessage("Parried", () => _isParried.ToString());
             window.CreateMessage("Parry Timer", () => _parryTimer.ToString("F2"));
+
+            animator = GetComponentInChildren<Animator>();
+            if (animator == null)
+            {
+                Debug.LogWarning("enemy animator null");
+            }
         }
 
         private void Update()

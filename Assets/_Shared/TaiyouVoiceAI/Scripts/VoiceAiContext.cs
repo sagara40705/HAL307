@@ -1,20 +1,34 @@
-using UnityEngine;
-using Player;
 using Context;
+using Player;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TaiyouVoiceAI
 {
     public class VoiceAiContext : ContextBase
     {
-        // Player
-        [SerializeField] private string _playerSceneName;
-        [SerializeField] private string _playerConextName;
+        [SerializeField, FormerlySerializedAs("_playerConextName")] private string _playerContextName;
         [SerializeField] private PlayerContext _playerContext;
+
+        private void Start()
+        {
+            ResolveExternalContexts();
+        }
+
         public PlayerContext GetPlayerContext()
         {
-            if (OnlyMyScene) { return null; }
-            _playerContext = FindContext<PlayerContext>(_playerSceneName, _playerConextName);
+            ResolveExternalContexts();
             return _playerContext;
+        }
+
+        private void ResolveExternalContexts()
+        {
+            if (OnlyMyScene || _playerContext != null)
+            {
+                return;
+            }
+
+            _playerContext = FindContext<PlayerContext>(_playerContextName);
         }
     }
 }

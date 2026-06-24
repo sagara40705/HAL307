@@ -1,3 +1,4 @@
+using Pose;
 using UnityEngine;
 
 namespace Enemy
@@ -10,6 +11,9 @@ namespace Enemy
 
         // EnemyPoseController
         [SerializeField] private EnemyPoseController _poseController;
+
+        // EnemyContext
+        [SerializeField] private EnemyContext _enemyContext;
 
         // Enemyを生成する場所(親)
         [SerializeField] private Transform _parent;
@@ -24,15 +28,23 @@ namespace Enemy
             if (index < 0 || index >= _spawnData.SpawnEntries.Count) { return; }
 
             EnemySpawnEntry entry = _spawnData.SpawnEntries[index];
-            Enemy enemy = Instantiate(entry.EnemyData.EnemyPrefab, entry.Position, entry.Rotation, _parent);
+            GameObject instance = Instantiate(entry.EnemyData.EnemyPrefab, entry.Position, entry.Rotation, _parent);
+
+            Enemy enemy = instance.GetComponent<Enemy>();
 
             // 名前を付ける
-            int enemyNumber = _enemyRegistry.Count + 1;
+            int enemyNumber  = _enemyRegistry.Count + 1;
             enemy.name = $"Enemy{enemyNumber}";
 
            // Debug.Log($"Generated enemy from data: {enemy.name}");
 
-            enemy.Initialize(_enemyRegistry, _poseController, entry.EnemyData);
+            PoseParryJudge poseParryJudge = _enemyContext?.GetPoseContext()?.GetPoseParryJudge;
+            enemy.Initialize(_enemyRegistry, _poseController, entry.EnemyData, poseParryJudge);
+
+            if (_enemyContext != null)
+            {
+                enemy.OnPoseStart += (poseID) => _enemyContext.NotifyEnemyPoseStart(enemy, poseID);
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Enemy
     public class EnemyData : ScriptableObject
     {
         [Header("Prefab")]
-        [SerializeField] private Enemy enemyPrefab;
+        [SerializeField] private GameObject enemyPrefab;
 
         [Header("Status")]
         [SerializeField] private int maxHp = 100;
@@ -15,7 +15,7 @@ namespace Enemy
         [Header("Pose")]
         [SerializeField] private EnemyPoseSet poseSet;
 
-        public Enemy EnemyPrefab => enemyPrefab;
+        public GameObject EnemyPrefab => enemyPrefab;
         public int MaxHp => maxHp;
         public EnemyPoseSet PoseSet => poseSet;
     }

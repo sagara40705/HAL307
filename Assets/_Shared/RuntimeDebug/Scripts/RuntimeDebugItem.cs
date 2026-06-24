@@ -66,10 +66,10 @@ namespace RuntimeDebug
         {
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label(Name, GUILayout.Width(140));
+            GUILayout.Label(Name, GUILayout.MinWidth(120));
 
             int current = getter.Invoke();
-            string text = GUILayout.TextField(current.ToString(), GUILayout.Width(100));
+            string text = GUILayout.TextField(current.ToString(), GUILayout.MinWidth(80));
 
             if (int.TryParse(text, out int next) && next != current)
             {
@@ -95,10 +95,10 @@ namespace RuntimeDebug
         {
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label(Name, GUILayout.Width(140));
+            GUILayout.Label(Name, GUILayout.MinWidth(120));
 
             float current = getter.Invoke();
-            string text = GUILayout.TextField(current.ToString("0.###"), GUILayout.Width(100));
+            string text = GUILayout.TextField(current.ToString("0.###"), GUILayout.MinWidth(80));
 
             if (float.TryParse(text, out float next) && !Mathf.Approximately(next, current))
             {
@@ -140,13 +140,13 @@ namespace RuntimeDebug
             GUILayout.BeginHorizontal();
 
             GUILayout.Label("X", GUILayout.Width(20));
-            string nextXText = GUILayout.TextField(xText, GUILayout.Width(70));
+            string nextXText = GUILayout.TextField(xText, GUILayout.MinWidth(50));
 
             GUILayout.Label("Y", GUILayout.Width(20));
-            string nextYText = GUILayout.TextField(yText, GUILayout.Width(70));
+            string nextYText = GUILayout.TextField(yText, GUILayout.MinWidth(50));
 
             GUILayout.Label("Z", GUILayout.Width(20));
-            string nextZText = GUILayout.TextField(zText, GUILayout.Width(70));
+            string nextZText = GUILayout.TextField(zText, GUILayout.MinWidth(50));
 
             GUILayout.EndHorizontal();
 
@@ -206,7 +206,7 @@ namespace RuntimeDebug
         public override void Draw()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(Name, GUILayout.Width(140));
+            GUILayout.Label(Name, GUILayout.MinWidth(120));
             GUILayout.Label(getter.Invoke());
             GUILayout.EndHorizontal();
         }

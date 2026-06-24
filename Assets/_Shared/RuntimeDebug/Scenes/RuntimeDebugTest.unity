@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game::AdditiveSceneObjectDisabler
+  m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets:
   - {fileID: 1521477942}
   - {fileID: 435366922}
@@ -450,7 +450,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 057efe8d590c8294080cd472c932610e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RuntimeDebug::RuntimeDebug.DebugMenuRunner
+  m_EditorClassIdentifier: Assembly-CSharp::RuntimeDebug.DebugMenuRunner
 --- !u!4 &1680528067
 Transform:
   m_ObjectHideFlags: 0
@@ -496,7 +496,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19db96f84f1070642a66a6c2e8e74ace, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: RuntimeDebug::PlayerDebugSample
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDebugSample
   sampleBool: 0
   sampleInt: 0
   sampleFloat: 0

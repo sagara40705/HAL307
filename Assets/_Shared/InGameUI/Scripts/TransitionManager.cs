@@ -1,27 +1,30 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Pool;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 using System.Threading;
 
 public class TransitionManager : MonoBehaviour
 {
     public static TransitionManager Instance;
 
-    [Header("ƒ_ƒ“ƒxƒ‹—‰ºİ’è")]
-    [SerializeField] private Transform dumbbellCanvasRoot;
-    public GameObject dumbbellPrefab;
-    public int spawnCount = 80;
-    public float spawnInterval = 0.02f;
-    public int spawnSize;
-    public UnityEngine.UI.Image backgroundPanel;
+    [Header("ãƒ•ã‚§ãƒ¼ãƒ‰è¨­å®š")]
+    [SerializeField] private Image backgroundPanel;
 
-    [Tooltip("Canvas“à‚Ìã‚Ì•û‚É’u‚¢‚½‹óƒIƒuƒWƒFƒNƒg‚ğƒZƒbƒg")]
-    public Transform spawnPoint;
-    public float spawnWidth = 400f; // UI‚ÌƒsƒNƒZƒ‹•‚É‡‚í‚¹‚Ä’²®
+    [Header("ãƒ€ãƒ³ãƒ™ãƒ«è½ä¸‹è¨­å®š")]
+    [SerializeField] private Transform dumbbellCanvasRoot;
+    [SerializeField] private GameObject dumbbellPrefab;
+    [SerializeField] private int spawnCount = 80;
+    [SerializeField] private float spawnInterval = 0.02f;
+    [SerializeField] private float spawnSize = 1f;
+    [SerializeField] private Transform spawnPoint;
+    [SerializeField] private float spawnWidth = 400f;
 
     private ObjectPool<GameObject> dumbbellPool;
+    private readonly List<GameObject> activeDumbbells = new List<GameObject>();
+
+    private bool isFading = false;
 
     private void Awake()
     {
@@ -29,7 +32,15 @@ public class TransitionManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
             InitPool();
+
+            if (backgroundPanel != null)
+            {
+                Color color = backgroundPanel.color;
+                backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
+                backgroundPanel.gameObject.SetActive(false);
+            }
         }
         else
         {
@@ -39,110 +50,156 @@ public class TransitionManager : MonoBehaviour
 
     private void InitPool()
     {
+        if (dumbbellPrefab == null) return;
+
         dumbbellPool = new ObjectPool<GameObject>(
-            createFunc: () => {
-                // Manager‚Ìq‚Æ‚µ‚Ä¶¬
-                GameObject obj = Instantiate(dumbbellPrefab, this.transform);
+            createFunc: () =>
+            {
+                GameObject obj = Instantiate(dumbbellPrefab);
                 obj.SetActive(false);
                 return obj;
             },
-            actionOnGet: (obj) => obj.SetActive(true),
-            actionOnRelease: (obj) => obj.SetActive(false),
-            actionOnDestroy: (obj) => Destroy(obj),
+            actionOnGet: obj => obj.SetActive(true),
+            actionOnRelease: obj => obj.SetActive(false),
+            actionOnDestroy: obj => Destroy(obj),
             defaultCapacity: spawnCount
         );
     }
 
-    private void OnEnable()
+    /// <summary>
+    /// ã©ã“ã‹ã‚‰ã§ã‚‚å‘¼ã¹ã‚‹ãƒ€ãƒ³ãƒ™ãƒ«ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
+    /// ãƒ€ãƒ³ãƒ™ãƒ«ãŒé™ã£ã¦ç”»é¢ãŒåŸ‹ã¾ã£ãŸçŠ¶æ…‹ã§çµ‚äº†ã™ã‚‹
+    /// await TransitionManager.PlayDumbbellFadeOut();
+    /// </summary>
+    public static async UniTask PlayDumbbellFadeOut()
     {
-        // ƒV[ƒ“‚ª“Ç‚İ‚Ü‚ê‚½‚Æ‚«‚ÉÀs‚³‚ê‚éƒCƒxƒ“ƒg‚ğ“o˜^
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        if (Instance == null)
+        {
+            Debug.LogWarning("TransitionManager.Instance ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“");
+            return;
+        }
+
+        await Instance.PlayDumbbellFadeOutInternal();
     }
 
-    private void OnDisable()
+    /// <summary>
+    /// ã©ã“ã‹ã‚‰ã§ã‚‚å‘¼ã¹ã‚‹é€šå¸¸ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
+    /// ç”»é¢ã‚’é–‹ãã¤ã¤ã€æ®‹ã£ã¦ã„ã‚‹ãƒ€ãƒ³ãƒ™ãƒ«ã‚’å›åã™ã‚‹
+    /// await TransitionManager.FadeIn();
+    /// </summary>
+    public static async UniTask FadeIn(float duration = 0.5f)
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (Instance == null)
+        {
+            Debug.LogWarning("TransitionManager.Instance ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“");
+            return;
+        }
+
+        await Instance.FadeInInternal(duration);
     }
 
-    // V‚µ‚¢ƒV[ƒ“‚ª“Ç‚İ‚Ü‚ê‚½uŠÔ‚ÉŒÄ‚Î‚ê‚é
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private async UniTask PlayDumbbellFadeOutInternal()
     {
-        //// ¡‚ ‚éƒƒCƒ“ƒJƒƒ‰‚ğ’T‚·
-        //Camera mainCam = Camera.main;
+        if (isFading) return;
+        if (backgroundPanel == null || dumbbellCanvasRoot == null || dumbbellPrefab == null || spawnPoint == null)
+        {
+            Debug.LogWarning("TransitionManager ã®å‚ç…§è¨­å®šãŒä¸è¶³ã—ã¦ã„ã¾ã™");
+            return;
+        }
 
-        //// ƒV[ƒ““à‚Ì‚·‚×‚Ä‚ÌCanvas‚ğ’T‚·
-        //Canvas[] canvases = Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
-       
-        //foreach (var c in canvases)
-        //{
-        //    // ƒ_ƒ“ƒxƒ‹—pCanvas‚ÍƒXƒLƒbƒv
-        //    if (c.gameObject == this.gameObject) continue;
-           
-        //    // ƒ^ƒCƒgƒ‹‰æ–Ê‚È‚Ç‚ÌCanvas‚ğ‹­§“I‚ÉƒJƒƒ‰ƒ‚[ƒh‚É‘‚«Š·‚¦‚é
-        //    c.renderMode = RenderMode.ScreenSpaceCamera;
-        //    c.worldCamera = mainCam;
-
-        //    c.planeDistance = 100; // ƒV[ƒ“‘JˆÚ‚ÌUI‚æ‚è‰“‚­‚É”z’u
-        //    c.sortingOrder = 0;   //
-        //}
-    }
-
-
-
-    public async UniTask StartDumbbellTransition(string nextSceneName)
-    {
+        isFading = true;
         CancellationToken token = this.GetCancellationTokenOnDestroy();
-        List<GameObject> spawnedDumbbells = new List<GameObject>();
+
+        ClearDumbbellsImmediate();
 
         backgroundPanel.gameObject.SetActive(true);
+        backgroundPanel.transform.SetAsFirstSibling();
 
         Color baseColor = backgroundPanel.color;
         backgroundPanel.color = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
-        backgroundPanel.transform.SetAsFirstSibling();
 
-        backgroundPanel.transform.SetAsFirstSibling(); // •”wŒi‚Íˆê”Ô‰œ
-        // ƒ_ƒ“ƒxƒ‹¶¬
+        RectTransform spawnRt = spawnPoint as RectTransform;
+
         for (int i = 0; i < spawnCount; i++)
         {
-
-
-            // ¶¬
             GameObject d = dumbbellPool.Get();
             d.transform.SetParent(dumbbellCanvasRoot, false);
             d.transform.SetAsLastSibling();
-            spawnedDumbbells.Add(d);
 
-            float a = Mathf.Clamp01(backgroundPanel.color.a + 0.01f);
-            backgroundPanel.color = new Color(
-                baseColor.r, baseColor.g, baseColor.b, a);
+            RectTransform dRt = d.GetComponent<RectTransform>();
 
-            // À•W‚Ìİ’è
-            Vector3 basePos = spawnPoint.localPosition;
             float randomX = Random.Range(-spawnWidth, spawnWidth);
 
-          
-            d.transform.localPosition = new Vector3(basePos.x + randomX, basePos.y, 0f);
-            d.transform.localScale = Vector3.one * spawnSize;
-            d.transform.localRotation = Quaternion.Euler(0, 0, Random.Range(0, 360));
+            dRt.anchoredPosition = new Vector2(
+                spawnRt.anchoredPosition.x + randomX,
+                spawnRt.anchoredPosition.y
+            );
 
+            dRt.localScale = Vector3.one * spawnSize;
+            dRt.localRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
+
+            var fall = d.GetComponent<UIDumbbellFall>();
+            if (fall != null)
+            {
+                fall.ResetFall(-500f, 500f, -250f);
+            }
+
+            activeDumbbells.Add(d);
+
+            float alpha = Mathf.Clamp01((float)(i + 1) / spawnCount);
+            backgroundPanel.color = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
 
             await UniTask.Delay((int)(spawnInterval * 1000), cancellationToken: token);
         }
 
-        //‰æ–Ê‚ª–„‚Ü‚é‚Ü‚Å‘Ò‹@
-        await UniTask.Delay(2000, cancellationToken: token);
+        backgroundPanel.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+        isFading = false;
+    }
 
-        //ƒV[ƒ“‘JˆÚ
-        if (SceneController.Instance != null)
+
+    private async UniTask FadeInInternal(float duration)
+    {
+        if (isFading) return;
+        if (backgroundPanel == null) return;
+
+        isFading = true;
+
+        backgroundPanel.gameObject.SetActive(true);
+        backgroundPanel.transform.SetAsFirstSibling();
+
+        Color color = backgroundPanel.color;
+        backgroundPanel.color = new Color(color.r, color.g, color.b, 1f);
+
+        // å¿…è¦ãªã‚‰ã“ã“ã§å…ˆã«ãƒ€ãƒ³ãƒ™ãƒ«ã‚’æ¶ˆã™
+        ClearDumbbellsImmediate();
+
+        float time = 0f;
+        while (time < duration)
         {
-            await SceneController.Instance.ChangeScene(nextSceneName);
+            time += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, time / duration);
+            backgroundPanel.color = new Color(color.r, color.g, color.b, alpha);
+            await UniTask.Yield();
         }
 
-        //‘JˆÚŒã‚Ì‰ñû
-        await UniTask.Delay(100, cancellationToken: token);
-        foreach (var d in spawnedDumbbells)
+        backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
+        backgroundPanel.gameObject.SetActive(false);
+
+        isFading = false;
+    }
+
+    private void ClearDumbbellsImmediate()
+    {
+        if (dumbbellPool == null) return;
+
+        for (int i = 0; i < activeDumbbells.Count; i++)
         {
-            dumbbellPool.Release(d);
+            if (activeDumbbells[i] != null)
+            {
+                dumbbellPool.Release(activeDumbbells[i]);
+            }
         }
+
+        activeDumbbells.Clear();
     }
 }

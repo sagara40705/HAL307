@@ -30,6 +30,7 @@ namespace Enemy
 
             _isCommitted = false;
             ApplyVisual(enemy, _preCommitColor, _preCommitAnimatorTriggerName);
+            ApplyAnimatorTrigger(enemy, _preCommitAnimatorTriggerName);
         }
 
         public void OnUpdate(Enemy enemy, float deltaTime)
@@ -56,6 +57,7 @@ namespace Enemy
 
             _isCommitted = true;
             ApplyVisual(enemy, _committedColor, _committedAnimatorTriggerName);
+            ApplyAnimatorTrigger(enemy, _committedAnimatorTriggerName);
         }
 
         public void OnEnd(Enemy enemy)
@@ -69,12 +71,13 @@ namespace Enemy
             {
                 visual.ResetColor();
             }
+
+            ApplyAnimatorTrigger(enemy, "Idle");
         }
 
         private static void ApplyVisual(Enemy enemy, Color color, string animatorTriggerName)
         {
             ApplyColor(enemy, color);
-            ApplyAnimatorTrigger(enemy, animatorTriggerName);
         }
 
         private static void ApplyColor(Enemy enemy, Color color)
@@ -97,8 +100,11 @@ namespace Enemy
         {
             if (!string.IsNullOrEmpty(animatorTriggerName))
             {
-                Animator animator = enemy.GetComponentInChildren<Animator>();
+                Animator animator = enemy?.GetAnimator;
                 animator?.SetTrigger(animatorTriggerName);
+                Debug.Log("-----------------");
+                Debug.Log(animatorTriggerName);
+                Debug.Log("-----------------");
             }
         }
     }

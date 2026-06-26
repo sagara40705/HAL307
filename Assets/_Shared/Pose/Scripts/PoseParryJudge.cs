@@ -37,7 +37,6 @@ namespace Pose
         {
             _enemyPoseID = PoseID.None;
             Debug.Log("PoseParryJudge Enemy pose ended.");
-            _confettiEffect.Play();
         }
         public void EndPlayerPose()
         {

@@ -18,7 +18,6 @@ public class SimpleAI : MonoBehaviour
     public Color MasssuruColor = Color.black;
 
     public Color ParryColor = Color.blue;  // パリィ状態のとき
-    Color fakePose;
 
     // ← ここで方向を決める（例：前方向）
     public Vector3 moveDirection = Vector3.forward;
@@ -30,9 +29,15 @@ public class SimpleAI : MonoBehaviour
     private int index;
     //ポーズ中パリィが発生したかどうか
     private bool isParry = false;
-    private  float PlayerPoint;
-    private float EnemyPoint;
+    [SerializeField] public Light spotLightPrefab;
 
+    public Vector3 spawnPosition = new Vector3(0, 3, 16);
+    [SerializeField] public float spotAngleSpeed = 30.0f;
+    [SerializeField] public float rotateStep = 30.0f;
+    private Light currentSpotLight;
+
+    [SerializeField] private float spotStep = 5.0f;
+    public GameObject lightObj;
     void Start()
     {
 
@@ -42,7 +47,6 @@ public class SimpleAI : MonoBehaviour
             stopColor,
             PowerColor,
             MasssuruColor,
-            fakePose,
         };
         StartCoroutine(AIBehaviour());
     }
@@ -57,18 +61,14 @@ public class SimpleAI : MonoBehaviour
                 if (!isParry)
                 {
                     rend.material.color = stopColor;
-                    //敵のポイント取得
-                    EnemyPoint += 1f;
                 }
-                ///ここにプレイヤーが何の声を出したかの条件文
+
                 if (Keyboard.current.cKey.wasPressedThisFrame)
                 {
                     Debug.Log("Push!");
 
                     isParry = true;
                     rend.material.color = ParryColor;
-                    //敵のポイント取得
-                    PlayerPoint += 1f;
                 }
 
                 break;
@@ -78,16 +78,13 @@ public class SimpleAI : MonoBehaviour
                 if (!isParry)
                 {
                     rend.material.color = PowerColor;
-                    //敵のポイント取得
-                    EnemyPoint += 1f;
                 }
-                ///ここにプレイヤーが何の声を出したかの条件文
+
                 if (Keyboard.current.dKey.wasPressedThisFrame)
                 {
                     Debug.Log("Push!");
                     isParry = true;
                     rend.material.color = ParryColor;
-                    PlayerPoint += 1f;
                 }
 
                 break;
@@ -97,41 +94,13 @@ public class SimpleAI : MonoBehaviour
                 if (!isParry)
                 {
                     rend.material.color = MasssuruColor;
-                    EnemyPoint += 1f;
                 }
-                ///ここにプレイヤーが何の声を出したかの条件文
+
                 if (Keyboard.current.fKey.wasPressedThisFrame)
                 {
                     Debug.Log("Push!");
                     isParry = true;
                     rend.material.color = ParryColor;
-                    PlayerPoint += 1f;
-                }
-
-                break;
-            case 3:
-                if (!isParry)
-                {
-                    int time;
-                    time = 10;
-
-                    rend.material.color = MasssuruColor;
-                 for (int i = 0; i < time; i++)
-                    {
-                        if (i == time)
-                        {
-                            rend.material.color = PowerColor;
-                            EnemyPoint += 1f;
-                        }
-                    }
-                }
-                ///ここにプレイヤーが何の声を出したかの条件文
-                if (Keyboard.current.fKey.wasPressedThisFrame)
-                {
-                    Debug.Log("Push!");
-                    isParry = true;
-                    rend.material.color = ParryColor;
-                    PlayerPoint += 1f;
                 }
 
                 break;
@@ -155,6 +124,8 @@ public class SimpleAI : MonoBehaviour
 
             while (timer < moveTime)
             {
+                // 動き始めたらライト削除
+                LightDelete();
                 transform.position += dir * speed * Time.deltaTime;
                 timer += Time.deltaTime;
                 yield return null;
@@ -165,18 +136,49 @@ public class SimpleAI : MonoBehaviour
             rend.material.color = colors[index];
             timer = 0f;
 
-            //if (Random.value<=0.6)
-            //{
             while (timer < stopTime)
             {
+                //止まる前にLightを呼び出し
+                //CreateSpotLight();
                 Push(); // 毎フレーム確認
                 timer += Time.deltaTime * 1.2f;
                 yield return null;
             }
-           // }
-
+            CreateSpotLight();
             yield return new WaitForSeconds(stopTime);
 
         }
+    }
+    void CreateSpotLight()
+    {
+        // 新しくスポットライト用のGameObjectを作成する
+        lightObj = new GameObject("CurrentSpotLight");
+
+        // スポットライトを出す位置と向きを設定する
+        lightObj.transform.position = transform.position + new Vector3(0, 2, 0); ;
+        lightObj.transform.rotation = Quaternion.Euler(90, 0, 0);
+
+        // 作成したGameObjectにLightコンポーネントを追加する
+        currentSpotLight = lightObj.AddComponent<Light>();
+
+        // ライトの種類と明るさ、届く距離を設定する
+        currentSpotLight.type = LightType.Spot;
+        currentSpotLight.intensity = 10f;
+        currentSpotLight.range = 20f;
+
+        // スポットライトが影を落とすように設定する
+        currentSpotLight.shadows = LightShadows.Soft;
+        currentSpotLight.shadowStrength = 1.0f;
+        currentSpotLight.shadowBias = 0.05f;
+        currentSpotLight.shadowNormalBias = 0.4f;
+
+        // スポットライトの外側と内側の角度を設定する
+        currentSpotLight.spotAngle = 60f;
+        currentSpotLight.innerSpotAngle = 30f;
+    }
+    void LightDelete()
+    {
+        Destroy(lightObj);
+      //Destroy(spotLightPrefab);
     }
 }

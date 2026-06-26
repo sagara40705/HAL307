@@ -195,6 +195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pose.PoseContext
   _onlyMyScene: 0
   _initalize: 0
+  _contextName: 
   _poseParryJudge: {fileID: 1730729274838647557}
 --- !u!4 &1048310000
 Transform:
@@ -211,6 +212,96 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1449106450
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840328908970887248, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5383033275146616517, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5383033275146616517, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5383033275146616517, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: InitialModule.size3D
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7218770507335903999, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_Name
+      value: Confetti
+      objectReference: {fileID: 0}
+    - target: {fileID: 7218770507335903999, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+--- !u!198 &1449106451 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 5383033275146616517, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
+  m_PrefabInstance: {fileID: 1449106450}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1730729274838647556
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -227,6 +318,10 @@ PrefabInstance:
       propertyPath: _playerPoseID
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 238323164532869387, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
+      propertyPath: _confettiEffect
+      value: 
+      objectReference: {fileID: 1449106451}
     - target: {fileID: 480854162081172770, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.83935
@@ -294,3 +389,4 @@ SceneRoots:
   - {fileID: 1730729274838647556}
   - {fileID: 1048310000}
   - {fileID: 255158063}
+  - {fileID: 1449106450}

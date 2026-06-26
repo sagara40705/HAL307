@@ -954,8 +954,8 @@ MonoBehaviour:
   - {fileID: 4044294870427922061, guid: 8f821ded632008042a4348166bc3509b, type: 3}
   - {fileID: 2624760887686886189, guid: 5212447c0d9fdb644ae7cbe9366cb220, type: 3}
   - {fileID: 6308965949122286310, guid: 837561d8d58fd68468f604d0c776871c, type: 3}
-  _spawnAreaMin: {x: -500, y: -200}
-  _spawnAreaMax: {x: 500, y: 200}
+  _spawnAreaMin: {x: -640, y: -320}
+  _spawnAreaMax: {x: 640, y: 320}
   _forbiddenAreas:
   - {fileID: 1817538063}
   - {fileID: 1344696318}

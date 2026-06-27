@@ -56,7 +56,7 @@ namespace Pose
                 Debug.Log("Parry Successful!");
                 // パリイ成功時の処理
                 OnParrySuccess();
-                _confettiEffect.Play();
+                _confettiEffect.Play(); // 紙吹雪再生
             }
             else
             {

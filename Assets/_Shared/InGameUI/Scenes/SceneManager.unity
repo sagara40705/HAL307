@@ -155,11 +155,11 @@ MonoBehaviour:
   backgroundPanel: {fileID: 965085437}
   dumbbellCanvasRoot: {fileID: 2186267}
   dumbbellPrefab: {fileID: 538094209684891605, guid: f044afaf720143a4e89dd5210938c0d8, type: 3}
-  spawnCount: 200
-  spawnInterval: 0.02
+  spawnCount: 250
+  spawnInterval: 0.005
   spawnSize: 1
   spawnPoint: {fileID: 306931734}
-  spawnWidth: 400
+  spawnWidth: 1000
 --- !u!114 &2186264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,7 +372,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -668, y: 0}
+  m_AnchoredPosition: {x: -746, y: 0}
   m_SizeDelta: {x: 86.9417, y: 564.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &162502608
@@ -454,7 +454,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 349}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 1280, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &340469167
 GameObject:
@@ -1098,7 +1098,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0.61}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17, y: -432}
+  m_AnchoredPosition: {x: 17, y: -544}
   m_SizeDelta: {x: 1398.846, y: 301.6968}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &1603577511
@@ -1180,7 +1180,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 676, y: 0}
+  m_AnchoredPosition: {x: 719, y: 0}
   m_SizeDelta: {x: 86.9417, y: 564.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &2147191051

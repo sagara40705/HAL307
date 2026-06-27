@@ -416,7 +416,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ae88dd986ce6a84cac81ecd706c0777, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyContext
-  _onlyMyScene: 1
+  _onlyMyScene: 0
   _initalize: 0
   _contextName: 
   _enemyManager: {fileID: 529276126}

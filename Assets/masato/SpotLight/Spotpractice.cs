@@ -10,7 +10,8 @@ namespace masato.Sandbox
         [SerializeField] public Light spotLightPrefab;
 
         public Vector3 spawnPosition = new Vector3(0, 3, 16);
-       [SerializeField] public float spotAngleSpeed = 30.0f;
+
+        [SerializeField] public float spotAngleSpeed = 30.0f;
         [SerializeField] public float rotateStep = 30.0f;
         private Light currentSpotLight;
 
@@ -19,6 +20,7 @@ namespace masato.Sandbox
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
+            
         }
 
         // Update is called once per frame
@@ -28,6 +30,7 @@ namespace masato.Sandbox
             // Enterで生成
             //-----------------------------------
             if (Keyboard.current.enterKey.wasPressedThisFrame)
+              
             {
                 CreateSpotLight();
             }

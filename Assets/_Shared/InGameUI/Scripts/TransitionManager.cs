@@ -15,11 +15,11 @@ public class TransitionManager : MonoBehaviour
     [Header("ダンベル落下設定")]
     [SerializeField] private Transform dumbbellCanvasRoot;
     [SerializeField] private GameObject dumbbellPrefab;
-    [SerializeField] private int spawnCount = 80;
-    [SerializeField] private float spawnInterval = 0.02f;
+    [SerializeField] private int spawnCount = 250;
+    [SerializeField] private float spawnInterval = 0.005f;
     [SerializeField] private float spawnSize = 1f;
     [SerializeField] private Transform spawnPoint;
-    [SerializeField] private float spawnWidth = 400f;
+    [SerializeField] private float spawnWidth = 1200f;
 
     private ObjectPool<GameObject> dumbbellPool;
     private readonly List<GameObject> activeDumbbells = new List<GameObject>();
@@ -83,7 +83,7 @@ public class TransitionManager : MonoBehaviour
     }
 
     /// <summary>
-    /// どこからでも呼べる通常フェードイン
+    /// どこからでも呼べるフェードイン
     /// 画面を開きつつ、残っているダンベルを回収する
     /// await TransitionManager.FadeIn();
     /// </summary>
@@ -128,11 +128,16 @@ public class TransitionManager : MonoBehaviour
 
             RectTransform dRt = d.GetComponent<RectTransform>();
 
-            float randomX = Random.Range(-spawnWidth, spawnWidth);
+           
+            float randomXRatio = Random.Range(-0.1f, 1.1f);
+            dRt.anchorMin = new Vector2(randomXRatio, 0.5f);
+            dRt.anchorMax = new Vector2(randomXRatio, 0.5f);
+
+            float randomY = Random.Range(-300f, 300f); // 縦方向のばらつき
 
             dRt.anchoredPosition = new Vector2(
-                spawnRt.anchoredPosition.x + randomX,
-                spawnRt.anchoredPosition.y
+                0f,
+                spawnRt.anchoredPosition.y + randomY
             );
 
             dRt.localScale = Vector3.one * spawnSize;
@@ -141,7 +146,7 @@ public class TransitionManager : MonoBehaviour
             var fall = d.GetComponent<UIDumbbellFall>();
             if (fall != null)
             {
-                fall.ResetFall(-500f, 500f, -250f);
+                fall.ResetFall(-10f, 10f, -250f);
             }
 
             activeDumbbells.Add(d);
@@ -170,7 +175,7 @@ public class TransitionManager : MonoBehaviour
         Color color = backgroundPanel.color;
         backgroundPanel.color = new Color(color.r, color.g, color.b, 1f);
 
-        // 必要ならここで先にダンベルを消す
+        // ここで先にダンベルを消す
         ClearDumbbellsImmediate();
 
         float time = 0f;

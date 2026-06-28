@@ -954,8 +954,8 @@ MonoBehaviour:
   - {fileID: 4044294870427922061, guid: 8f821ded632008042a4348166bc3509b, type: 3}
   - {fileID: 2624760887686886189, guid: 5212447c0d9fdb644ae7cbe9366cb220, type: 3}
   - {fileID: 6308965949122286310, guid: 837561d8d58fd68468f604d0c776871c, type: 3}
-  _spawnAreaMin: {x: -500, y: -200}
-  _spawnAreaMax: {x: 500, y: 200}
+  _spawnAreaMin: {x: -640, y: -320}
+  _spawnAreaMax: {x: 640, y: 320}
   _forbiddenAreas:
   - {fileID: 1817538063}
   - {fileID: 1344696318}
@@ -971,15 +971,15 @@ MonoBehaviour:
   _clearDelay: 1
   _spriteTable:
   - poseID: 2
-    originalSprite: {fileID: 21300000, guid: 3c4bb7e837c209541ba4371ce0d02bad, type: 3}
+    originalSprite: {fileID: 21300000, guid: 3f4a2c1059842df44970ee191d35e6a8, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
     enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
   - poseID: 1
-    originalSprite: {fileID: 21300000, guid: cc1102c9ad1a5c747b8db0bf20d4fc39, type: 3}
+    originalSprite: {fileID: 21300000, guid: 01eaf42a0821aee47abc45e736d10ceb, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
     enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
   - poseID: 0
-    originalSprite: {fileID: 21300000, guid: 60817e80f2e24954bba7089e8a1aaba9, type: 3}
+    originalSprite: {fileID: 21300000, guid: 29a551116f49b0043b51787e5eec818d, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
     enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
 --- !u!4 &1958838625

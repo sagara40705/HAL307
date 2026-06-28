@@ -146,7 +146,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets: []
 --- !u!4 &255158063
@@ -159,6 +159,50 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &971358549
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 971358551}
+  - component: {fileID: 971358550}
+  m_Layer: 0
+  m_Name: PoseStateTracker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &971358550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 971358549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fac74e27e5a673f4fb820079c336b55a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PoseStateTracker
+--- !u!4 &971358551
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 971358549}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.92526, y: 0, z: 47.75975}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -195,7 +239,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pose.PoseContext
   _onlyMyScene: 0
   _initalize: 0
+  _contextName:
   _poseParryJudge: {fileID: 1730729274838647557}
+  _stateTracker: {fileID: 971358550}
 --- !u!4 &1048310000
 Transform:
   m_ObjectHideFlags: 0
@@ -227,6 +273,10 @@ PrefabInstance:
       propertyPath: _playerPoseID
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 238323164532869387, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
+      propertyPath: _stateTracker
+      value:
+      objectReference: {fileID: 971358550}
     - target: {fileID: 480854162081172770, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.83935
@@ -294,3 +344,4 @@ SceneRoots:
   - {fileID: 1730729274838647556}
   - {fileID: 1048310000}
   - {fileID: 255158063}
+  - {fileID: 971358551}

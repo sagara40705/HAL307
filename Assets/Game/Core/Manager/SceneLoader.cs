@@ -9,6 +9,45 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
 
     public string ActiveSceneName => UnitySceneManager.GetActiveScene().name;
 
+    public static bool Load(string sceneName)
+    {
+        return StartLoad(sceneName, LoadSceneMode.Single);
+    }
+
+    public static bool LoadAdditive(string sceneName)
+    {
+        return StartLoad(sceneName, LoadSceneMode.Additive);
+    }
+
+    public static bool Unload(string sceneName)
+    {
+        if (!TryGetReadyInstance("Unload", sceneName, out SceneLoader sceneLoader))
+        {
+            return false;
+        }
+
+        sceneLoader.StartCoroutine(sceneLoader.UnloadAsync(sceneName));
+        return true;
+    }
+
+    private static bool StartLoad(string sceneName, LoadSceneMode mode)
+    {
+        SceneLoader sceneLoader = Instance;
+        if (sceneLoader == null)
+        {
+            return LoadWithoutSceneLoader(sceneName, mode);
+        }
+
+        if (!sceneLoader.IsInitialized)
+        {
+            Debug.LogError($"[SceneLoader] Load failed. Reason=Not initialized. Scene='{sceneName}', Mode={mode}");
+            return false;
+        }
+
+        sceneLoader.StartCoroutine(sceneLoader.LoadCoroutine(sceneName, mode));
+        return true;
+    }
+
     protected override IEnumerator OnInitialize()
     {
         IsBusy = false;
@@ -17,38 +56,44 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
 
     public IEnumerator LoadAsync(string sceneName)
     {
-        yield return LoadInternalAsync(sceneName, LoadSceneMode.Single);
+        yield return LoadCoroutine(sceneName, LoadSceneMode.Single);
     }
 
     public IEnumerator LoadAdditiveAsync(string sceneName)
     {
-        yield return LoadInternalAsync(sceneName, LoadSceneMode.Additive);
+        yield return LoadCoroutine(sceneName, LoadSceneMode.Additive);
     }
 
     public IEnumerator UnloadAsync(string sceneName)
     {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogError("[SceneLoader] Unload failed. Reason=Scene name is empty.");
+            yield break;
+        }
+
         if (!IsInitialized)
         {
-            Debug.LogError("[SceneLoader] Not initialized.");
+            Debug.LogError($"[SceneLoader] Unload failed. Reason=Not initialized. Scene='{sceneName}'");
             yield break;
         }
 
         if (IsBusy)
         {
-            Debug.LogWarning("[SceneLoader] Busy.");
+            Debug.LogWarning($"[SceneLoader] Unload skipped. Reason=Loader is busy. Scene='{sceneName}', ActiveScene='{ActiveSceneName}'");
             yield break;
         }
 
         if (!IsSceneLoaded(sceneName))
         {
-            Debug.LogWarning($"[SceneLoader] Scene is not loaded: {sceneName}");
+            Debug.LogWarning($"[SceneLoader] Unload skipped. Reason=Scene is not loaded. Scene='{sceneName}', LoadedScenes=[{GetLoadedSceneNames()}]");
             yield break;
         }
 
         var activeScene = UnitySceneManager.GetActiveScene();
         if (activeScene.name == sceneName && UnitySceneManager.sceneCount <= 1)
         {
-            Debug.LogWarning($"[SceneLoader] Cannot unload the last active scene: {sceneName}");
+            Debug.LogWarning($"[SceneLoader] Unload skipped. Reason=Cannot unload the last active scene. Scene='{sceneName}'");
             yield break;
         }
 
@@ -58,42 +103,55 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
         if (op == null)
         {
             IsBusy = false;
-            Debug.LogError($"[SceneLoader] Failed to start unload: {sceneName}");
+            Debug.LogError($"[SceneLoader] Unload failed. Reason=UnloadSceneAsync returned null. Scene='{sceneName}', LoadedScenes=[{GetLoadedSceneNames()}]");
             yield break;
         }
 
         yield return op;
 
+        if (IsSceneLoaded(sceneName))
+        {
+            Debug.LogError($"[SceneLoader] Unload failed. Reason=Scene is still loaded after async operation. Scene='{sceneName}', LoadedScenes=[{GetLoadedSceneNames()}]");
+        }
+
         IsBusy = false;
     }
 
-    private IEnumerator LoadInternalAsync(string sceneName, LoadSceneMode mode)
+    private IEnumerator LoadCoroutine(string sceneName, LoadSceneMode mode)
     {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogError($"[SceneLoader] Load failed. Reason=Scene name is empty. Mode={mode}");
+            yield break;
+        }
+
         if (!IsInitialized)
         {
-            Debug.LogError("[SceneLoader] Not initialized.");
+            Debug.LogError($"[SceneLoader] Load failed. Reason=Not initialized. Scene='{sceneName}', Mode={mode}");
             yield break;
         }
 
         if (IsBusy)
         {
-            Debug.LogWarning("[SceneLoader] Busy.");
+            Debug.LogWarning($"[SceneLoader] Load skipped. Reason=Loader is busy. Scene='{sceneName}', Mode={mode}, ActiveScene='{ActiveSceneName}'");
             yield break;
         }
 
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {
-            Debug.LogError($"[SceneLoader] Scene cannot be loaded: {sceneName}");
+            Debug.LogError($"[SceneLoader] Load failed. Reason=Scene cannot be loaded by Application.CanStreamedLevelBeLoaded. Scene='{sceneName}', Mode={mode}. Check Build Settings scene list and scene name.");
             yield break;
         }
 
         if (mode == LoadSceneMode.Single && ActiveSceneName == sceneName)
         {
+            Debug.LogWarning($"[SceneLoader] Load skipped. Reason=Scene is already active. Scene='{sceneName}', Mode={mode}");
             yield break;
         }
 
         if (mode == LoadSceneMode.Additive && IsSceneLoaded(sceneName))
         {
+            Debug.LogWarning($"[SceneLoader] Load skipped. Reason=Scene is already loaded. Scene='{sceneName}', Mode={mode}, LoadedScenes=[{GetLoadedSceneNames()}]");
             yield break;
         }
 
@@ -103,11 +161,18 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
         if (op == null)
         {
             IsBusy = false;
-            Debug.LogError($"[SceneLoader] Failed to start load: {sceneName}");
+            Debug.LogError($"[SceneLoader] Load failed. Reason=LoadSceneAsync returned null. Scene='{sceneName}', Mode={mode}");
             yield break;
         }
 
         yield return op;
+
+        if (!IsSceneLoaded(sceneName))
+        {
+            Debug.LogError($"[SceneLoader] Load failed. Reason=Scene is not loaded after async operation. Scene='{sceneName}', Mode={mode}, LoadedScenes=[{GetLoadedSceneNames()}]");
+            IsBusy = false;
+            yield break;
+        }
 
         if (mode == LoadSceneMode.Additive)
         {
@@ -131,6 +196,80 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
     {
         Scene scene = UnitySceneManager.GetSceneByName(sceneName);
         return scene.IsValid() && scene.isLoaded;
+    }
+
+    private string GetLoadedSceneNames()
+    {
+        if (UnitySceneManager.sceneCount <= 0)
+        {
+            return string.Empty;
+        }
+
+        string[] sceneNames = new string[UnitySceneManager.sceneCount];
+        for (int i = 0; i < UnitySceneManager.sceneCount; i++)
+        {
+            sceneNames[i] = UnitySceneManager.GetSceneAt(i).name;
+        }
+
+        return string.Join(", ", sceneNames);
+    }
+
+    private static bool TryGetReadyInstance(string actionName, string sceneName, out SceneLoader sceneLoader)
+    {
+        sceneLoader = Instance;
+        if (sceneLoader == null)
+        {
+            Debug.LogError($"[SceneLoader] {actionName} failed. Reason=SceneLoader instance is not available. Scene='{sceneName}'");
+            return false;
+        }
+
+        if (!sceneLoader.IsInitialized)
+        {
+            Debug.LogError($"[SceneLoader] {actionName} failed. Reason=SceneLoader is not initialized. Scene='{sceneName}'");
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool LoadWithoutSceneLoader(string sceneName, LoadSceneMode mode)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogError($"[SceneLoader] Load failed. Reason=Scene name is empty. Mode={mode}");
+            return false;
+        }
+
+        if (!Application.CanStreamedLevelBeLoaded(sceneName))
+        {
+            Debug.LogError($"[SceneLoader] Load failed. Reason=Scene cannot be loaded by Application.CanStreamedLevelBeLoaded. Scene='{sceneName}', Mode={mode}. Check Build Settings scene list and scene name.");
+            return false;
+        }
+
+        Scene activeScene = UnitySceneManager.GetActiveScene();
+        if (mode == LoadSceneMode.Single && activeScene.name == sceneName)
+        {
+            Debug.LogWarning($"[SceneLoader] Load skipped. Reason=Scene is already active. Scene='{sceneName}', Mode={mode}");
+            return false;
+        }
+
+        Scene scene = UnitySceneManager.GetSceneByName(sceneName);
+        if (mode == LoadSceneMode.Additive && scene.IsValid() && scene.isLoaded)
+        {
+            Debug.LogWarning($"[SceneLoader] Load skipped. Reason=Scene is already loaded. Scene='{sceneName}', Mode={mode}");
+            return false;
+        }
+
+        Debug.LogWarning($"[SceneLoader] SceneLoader instance is not available. Falling back to Unity SceneManager. Scene='{sceneName}', Mode={mode}");
+
+        AsyncOperation op = UnitySceneManager.LoadSceneAsync(sceneName, mode);
+        if (op == null)
+        {
+            Debug.LogError($"[SceneLoader] Load failed. Reason=LoadSceneAsync returned null. Scene='{sceneName}', Mode={mode}");
+            return false;
+        }
+
+        return true;
     }
 }
 

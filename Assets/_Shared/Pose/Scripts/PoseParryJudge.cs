@@ -12,6 +12,9 @@ namespace Pose
         // プレイヤーのPoseID
         [SerializeField] private PoseID _playerPoseID;
 
+        // ポーズ中かどうかを管理するクラス
+        [SerializeField] private PoseStateTracker _stateTracker;
+
         // パリイ発生時のアクション
         public event Action OnParrySuccess;
 
@@ -19,24 +22,49 @@ namespace Pose
         {
             _enemyPoseID = PoseID.None;
             _playerPoseID = PoseID.None;
+
+            if (_stateTracker == null)
+            {
+                _stateTracker = FindFirstObjectByType<PoseStateTracker>();
+            }
         }
 
         public void StartEnemyPose(PoseID enemyPoseID)
         {
+            if (_enemyPoseID == PoseID.None && enemyPoseID != PoseID.None)
+            {
+                _stateTracker?.BeginPose();
+            }
+
             _enemyPoseID = enemyPoseID;
         }
         public void StartPlayerPose(PoseID playerPoseID)
         {
+            if (_playerPoseID == PoseID.None && playerPoseID != PoseID.None)
+            {
+                _stateTracker?.BeginPose();
+            }
+
             _playerPoseID = playerPoseID;
             CheckParry();
         }
         public void EndEnemyPose()
         {
+            if (_enemyPoseID != PoseID.None)
+            {
+                _stateTracker?.EndPose();
+            }
+
             _enemyPoseID = PoseID.None;
             Debug.Log("PoseParryJudge Enemy pose ended.");
         }
         public void EndPlayerPose()
         {
+            if (_playerPoseID != PoseID.None)
+            {
+                _stateTracker?.EndPose();
+            }
+
             _playerPoseID = PoseID.None;
             Debug.Log("PoseParryJudge Player pose ended.");
         }
@@ -52,7 +80,7 @@ namespace Pose
             {
                 Debug.Log("Parry Successful!");
                 // パリイ成功時の処理
-                OnParrySuccess();
+                OnParrySuccess?.Invoke();
             }
             else
             {
@@ -72,7 +100,7 @@ namespace Pose
         public void DebugOnParry()
         {
             Debug.Log("Debug: Parry triggered.");
-            OnParrySuccess();
+            OnParrySuccess?.Invoke();
         }
     }
 }

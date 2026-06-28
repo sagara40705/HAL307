@@ -427,7 +427,7 @@ MonoBehaviour:
   _poseContextName: PoseContext
   _poseContext: {fileID: 0}
   _autoRegisterTimeout: 5
-  _moveSpeed: 3
+  _moveSpeed: 1
 --- !u!4 &394115202
 Transform:
   m_ObjectHideFlags: 0

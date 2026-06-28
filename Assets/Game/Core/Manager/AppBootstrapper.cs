@@ -63,6 +63,15 @@ public sealed class AppBootstrapper : MonoBehaviour
             yield break;
         }
 
+        // RuntimeDebugManager
+        yield return BootManager(
+            nameof(RuntimeDebugManager),
+            () => RuntimeDebugManager.CreateFromBootIfNeeded());
+        if (HasFailed)
+        {
+            yield break;
+        }
+
         // SoundManager
         yield return BootManager(
             nameof(SoundManager),

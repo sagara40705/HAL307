@@ -57,7 +57,10 @@ namespace Enemy
 
             _isCommitted = true;
             ApplyVisual(enemy, _committedColor, _committedAnimatorTriggerName);
-            ApplyAnimatorTrigger(enemy, _committedAnimatorTriggerName);
+            if (_preCommitAnimatorTriggerName != _committedAnimatorTriggerName)
+            {
+                ApplyAnimatorTrigger(enemy, _committedAnimatorTriggerName);
+            }
         }
 
         public void OnEnd(Enemy enemy)

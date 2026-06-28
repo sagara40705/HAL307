@@ -273,10 +273,6 @@ PrefabInstance:
       propertyPath: _playerPoseID
       value: -1
       objectReference: {fileID: 0}
-    - target: {fileID: 238323164532869387, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
-      propertyPath: _stateTracker
-      value:
-      objectReference: {fileID: 971358550}
     - target: {fileID: 480854162081172770, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.83935

@@ -424,6 +424,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ForwardProgressMover
   _stageEndJudgeTransform: {fileID: 1170876506}
   _cameraTransform: {fileID: 240446716}
+  _poseContextName: PoseContext
+  _poseContext: {fileID: 0}
   _autoRegisterTimeout: 5
   _moveSpeed: 3
 --- !u!4 &394115202

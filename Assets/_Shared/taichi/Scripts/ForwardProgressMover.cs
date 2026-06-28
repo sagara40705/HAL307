@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Pose;
 using UnityEngine;
 
 public class ForwardProgressMover : MonoBehaviour
@@ -7,6 +8,10 @@ public class ForwardProgressMover : MonoBehaviour
     // Stage終了判定用のオブジェクト
     [SerializeField] private Transform _stageEndJudgeTransform;
     [SerializeField] private Transform _cameraTransform;
+
+    // Pose状態を取得するContext
+    [SerializeField] private string _poseContextName = "PoseContext";
+    [SerializeField] private PoseContext _poseContext;
 
     // 自動登録の待ち時間
     [SerializeField, Min(0f)] private float _autoRegisterTimeout = 5f;
@@ -16,6 +21,8 @@ public class ForwardProgressMover : MonoBehaviour
     // 前進させる対象
     private readonly List<Transform> _moveTargets = new();
     private StageEndJudge _stageEndJudge;
+    private PoseStateTracker _poseStateTracker;
+    private bool _poseStateTrackerWarningLogged;
     private bool _canMove;
     private bool _isStopped;
 
@@ -30,6 +37,9 @@ public class ForwardProgressMover : MonoBehaviour
 
         //　ステージ終了判定
         SetupStageEndJudge();
+
+        //　Pose状態
+        SetupPoseStateTracker(true);
 
         //　プレイヤーと敵
         StartCoroutine(RegisterPlayerAndEnemiesCoroutine());
@@ -49,6 +59,11 @@ public class ForwardProgressMover : MonoBehaviour
     void Update()
     {
         if (!_canMove || _isStopped)
+        {
+            return;
+        }
+
+        if (IsAnyPosing())
         {
             return;
         }
@@ -173,6 +188,45 @@ public class ForwardProgressMover : MonoBehaviour
         }
 
         _stageEndJudge.OnStageEnd += StopMove;
+    }
+
+    private void SetupPoseStateTracker(bool logWarning)
+    {
+        if (_poseStateTracker != null)
+        {
+            return;
+        }
+
+        if (_poseContext == null)
+        {
+            if (logWarning)
+            {
+                ContextManager contextManager = ContextManager.Instance;
+                if (contextManager != null && !string.IsNullOrWhiteSpace(_poseContextName))
+                {
+                    _poseContext = contextManager.Get<PoseContext>(_poseContextName);
+                }
+            }
+            else
+            {
+                _poseContext = Object.FindFirstObjectByType<PoseContext>();
+            }
+        }
+
+        _poseStateTracker = _poseContext?.GetPoseStateTracker;
+        if (_poseStateTracker != null || !logWarning || _poseStateTrackerWarningLogged)
+        {
+            return;
+        }
+
+        _poseStateTrackerWarningLogged = true;
+        Debug.LogWarning("[ForwardProgressMover] PoseStateTracker was not found.");
+    }
+
+    private bool IsAnyPosing()
+    {
+        SetupPoseStateTracker(false);
+        return _poseStateTracker != null && _poseStateTracker.IsAnyPosing;
     }
 
     private void StartMove()

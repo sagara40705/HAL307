@@ -46,4 +46,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pose.PoseParryJudge
   _enemyPoseID: -1
   _playerPoseID: -1
-  _stateTracker: {fileID: 0}

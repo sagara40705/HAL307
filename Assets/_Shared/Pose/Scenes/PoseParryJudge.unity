@@ -282,7 +282,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5383033275146616517, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
       propertyPath: simulationSpeed
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5383033275146616517, guid: ae68d10927e56994b9617ac60b827a9c, type: 3}
       propertyPath: InitialModule.size3D

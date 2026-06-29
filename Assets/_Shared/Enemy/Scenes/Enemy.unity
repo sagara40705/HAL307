@@ -372,6 +372,9 @@ MonoBehaviour:
   _enemyRegistry: {fileID: 904307783}
   _enemyContext: {fileID: 770144274}
   _poseParryJudge: {fileID: 0}
+  _audienceRequestContextName: AudienceRequestContext
+  _audienceRequestContext: {fileID: 0}
+  _feverGaugeController: {fileID: 0}
 --- !u!4 &535028704
 Transform:
   m_ObjectHideFlags: 0

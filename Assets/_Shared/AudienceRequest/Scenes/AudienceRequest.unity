@@ -549,8 +549,7 @@ MonoBehaviour:
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
   _uiPool: {fileID: 1958838624}
-  _flameMaterial: {fileID: 2100000, guid: 20381abbc77054941abb9cd752d95570, type: 2}
-  _fillIncrease: 0.05
+  _feverGaugeController: {fileID: 135792469}
   _requestInterval: 2
 --- !u!4 &848356011
 Transform:
@@ -869,6 +868,7 @@ MonoBehaviour:
   _playerContext: {fileID: 0}
   _enemyContextName: EnemyContext
   _enemyContext: {fileID: 0}
+  _feverGaugeController: {fileID: 135792469}
 --- !u!4 &1743887622
 Transform:
   m_ObjectHideFlags: 0
@@ -1124,6 +1124,55 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &135792468
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 135792470}
+  - component: {fileID: 135792469}
+  m_Layer: 0
+  m_Name: FeverGaugeController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &135792469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135792468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be3b0a418c324ed78e9a9940d2a42093, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.FeverGaugeController
+  _flameMaterial: {fileID: 2100000, guid: 20381abbc77054941abb9cd752d95570, type: 2}
+  _fillAmountProperty: _FillAmount
+  _fillIncrease: 0.05
+  _feverDuration: 10
+  _resetFillOnFeverEnd: 1
+--- !u!4 &135792470
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135792468}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1134,6 +1183,7 @@ SceneRoots:
   - {fileID: 1743887622}
   - {fileID: 558537225}
   - {fileID: 848356011}
+  - {fileID: 135792470}
   - {fileID: 1958838625}
   - {fileID: 674721743}
   - {fileID: 1489226375}

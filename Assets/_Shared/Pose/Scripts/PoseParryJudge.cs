@@ -52,7 +52,7 @@ namespace Pose
             {
                 Debug.Log("Parry Successful!");
                 // パリイ成功時の処理
-                OnParrySuccess();
+                OnParrySuccess?.Invoke();
             }
             else
             {
@@ -72,7 +72,7 @@ namespace Pose
         public void DebugOnParry()
         {
             Debug.Log("Debug: Parry triggered.");
-            OnParrySuccess();
+            OnParrySuccess?.Invoke();
         }
     }
 }

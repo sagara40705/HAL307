@@ -7,6 +7,11 @@ namespace RuntimeDebug
     {
         private void Update()
         {
+            if (global::RuntimeDebugManager.HasInstance)
+            {
+                return;
+            }
+
             if (DebugShortcuts.Combo(Key.D, Key.M))
             {
                 DebugMenu.Toggle();
@@ -15,6 +20,11 @@ namespace RuntimeDebug
 
         private void OnGUI()
         {
+            if (global::RuntimeDebugManager.HasInstance)
+            {
+                return;
+            }
+
             //float scale = 1.5f;
             //Matrix4x4 oldMatrix = GUI.matrix;
 

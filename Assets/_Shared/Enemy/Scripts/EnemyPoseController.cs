@@ -1,4 +1,5 @@
 using Pose;
+using AudienceRequest;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +11,9 @@ namespace Enemy
         [SerializeField] private EnemyRegistry _enemyRegistry;
         [SerializeField] private EnemyContext _enemyContext;
         [SerializeField] private PoseParryJudge _poseParryJudge;
+        [SerializeField] private string _audienceRequestContextName = "AudienceRequestContext";
+        [SerializeField] private AudienceRequestContext _audienceRequestContext;
+        [SerializeField] private FeverGaugeController _feverGaugeController;
 
         // ポーズ中かどうか
         private bool _isPaused = false;
@@ -19,6 +23,9 @@ namespace Enemy
 
         // AI
         private float _timer;
+        private float _nextFeverContextResolveTime;
+
+        private const float FeverContextResolveInterval = 0.5f;
 
         private void Start()
         {
@@ -42,6 +49,12 @@ namespace Enemy
             }
             else
             {
+                if (IsFeverActive())
+                {
+                    _timer = 0f;
+                    return;
+                }
+
                 if (UpdatePoseTimer())
                 {
                     _pausedEnemy = _enemyRegistry.GetRandomEnemy();
@@ -88,6 +101,43 @@ namespace Enemy
             }
 
             return false;
+        }
+
+        private bool IsFeverActive()
+        {
+            SetupFeverGaugeController();
+            return _feverGaugeController != null && _feverGaugeController.IsFever;
+        }
+
+        private void SetupFeverGaugeController()
+        {
+            if (_feverGaugeController != null)
+            {
+                return;
+            }
+
+            if (_audienceRequestContext == null)
+            {
+                if (Time.time < _nextFeverContextResolveTime)
+                {
+                    return;
+                }
+
+                _nextFeverContextResolveTime = Time.time + FeverContextResolveInterval;
+
+                ContextManager contextManager = ContextManager.Instance;
+                if (contextManager != null && !string.IsNullOrWhiteSpace(_audienceRequestContextName))
+                {
+                    _audienceRequestContext = contextManager.Get<AudienceRequestContext>(_audienceRequestContextName);
+                }
+
+                if (_audienceRequestContext == null)
+                {
+                    _audienceRequestContext = FindFirstObjectByType<AudienceRequestContext>();
+                }
+            }
+
+            _feverGaugeController = _audienceRequestContext?.GetFeverGaugeController();
         }
     }
 }

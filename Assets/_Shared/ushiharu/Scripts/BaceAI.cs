@@ -15,23 +15,9 @@ namespace ushiharu.Sandbox
         int[] Poose = new int [5];
         int randomPoose;
         public Vector3 moveDirection= Vector3.forward;
-        private Vector3 lastPosition;
-        public Light targetLight;
-        public GameObject lightObj;
-       [SerializeField] public Light spotLightPrefab;
-
-        public Vector3 spawnPosition = new Vector3(0, 3, 16);
-        [SerializeField] public float spotAngleSpeed = 30.0f;
-        [SerializeField] public float rotateStep = 30.0f;
-        private Light currentSpotLight;
-
-        [SerializeField] private float spotStep = 5.0f;
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            lastPosition = transform.position;
-            // 最初は消す
-            targetLight.enabled = false;
             StartCoroutine(AIBehaviour());
             rend = GetComponent<Renderer>();
         }
@@ -40,38 +26,71 @@ namespace ushiharu.Sandbox
 
         }
 
-        //コルーチンとは
-        //yield return を使った処理を停止するプログラムである
-        //この場合は指定した時間処理を止める事によって
-        //ポーズ、パリィの時間として使っている
+        // Update is called once per frame
         IEnumerator AIBehaviour()
         {
             while (true)
             {
                 // 正規化（念のため）
                dir = moveDirection.normalized;
+
+                //float moveTime = Random.Range(moveTimeMax, moveTimeMin);
+                //float move = 0f;
+
                 randomPoose = Random.Range(0, Poose.Length);
+                //while (move>=moveTime)
+                //{
+                //  }
+                // timer = 0f;
                 timer = 0f;
                 float stoptime = Random.Range(stopTimeMin, stopTimeMax);
                 float stop = 0f;
                 if (Random.value <= 0.6)
                 {
-                    //動き出す時間
                     while (timer <= movetime)
                     {
-                        // 動き始めたらライト削除
-                        LightDelete();
                         transform.position += dir * speed * Time.deltaTime;
                         Debug.Log("P!");
                         AiState();
                         timer += Time.deltaTime * 1.5f;
                         yield return null;
                     }
+                    ////transform.position += dir * speed * Time.deltaTime;
+                    //if (Random.value <= 0.6)
+                    //{
+                    //    while (timer <= movetime)
+                    //    {
+
+                    //        Debug.Log("P!");
+                    //        AiState();
+                    //        timer += Time.deltaTime * 1.5f;
+                    //        yield return null;
+                    //    }
+                    //}
+                    // base.ChangeColor(Color.red);
+                   // yield return null;
                 }
-               //止まる前にLightを呼び出し
-                CreateSpotLight();
-                //止まる時間をコルーチンで返している
-                yield return new WaitForSeconds(stoptime);
+                //else
+                //{
+                //    Debug.Log("P!");
+                //    yield return null;
+                //}
+
+
+
+
+                //float stopTime = Random.Range(stopTimeMin, stopTimeMax);
+                //float stop = 0;
+
+                //while (stop <=stopTime)
+                //{
+                //    stop += Time.deltaTime;
+                //    yield return null;
+                //}
+
+
+
+               yield return new WaitForSeconds(stoptime);
             }
         }
 
@@ -97,38 +116,6 @@ namespace ushiharu.Sandbox
                     break;
             }
         }
-        void CreateSpotLight()
-        {
-            // 新しくスポットライト用のGameObjectを作成する
-            lightObj = new GameObject("CurrentSpotLight");
-
-            // スポットライトを出す位置と向きを設定する
-            lightObj.transform.position = transform.position + new Vector3(0, 2, 0); ;
-            lightObj.transform.rotation = Quaternion.Euler(90, 0, 0);
-
-            // 作成したGameObjectにLightコンポーネントを追加する
-            currentSpotLight = lightObj.AddComponent<Light>();
-
-            // ライトの種類と明るさ、届く距離を設定する
-            currentSpotLight.type = LightType.Spot;
-            currentSpotLight.intensity = 10f;
-            currentSpotLight.range = 20f;
-
-            // スポットライトが影を落とすように設定する
-            currentSpotLight.shadows = LightShadows.Soft;
-            currentSpotLight.shadowStrength = 1.0f;
-            currentSpotLight.shadowBias = 0.05f;
-            currentSpotLight.shadowNormalBias = 0.4f;
-
-            // スポットライトの外側と内側の角度を設定する
-            currentSpotLight.spotAngle = 60f;
-            currentSpotLight.innerSpotAngle = 30f;
-        }
-        void LightDelete()
-        {
-            Destroy(lightObj);
-        }
 
     }
-
 }

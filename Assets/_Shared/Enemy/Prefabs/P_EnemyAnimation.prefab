@@ -104,6 +104,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87f65769920a28847aed5ecd5c63c806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Enemy::Enemy.Enemy
+  _poseContextName: PoseContext
+  _poseStateTracker: {fileID: 0}
+  _stopLight: {fileID: 0}
 --- !u!114 &5141107174043854698
 MonoBehaviour:
   m_ObjectHideFlags: 0

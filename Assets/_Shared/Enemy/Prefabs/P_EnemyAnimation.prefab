@@ -9,6 +9,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.56
       objectReference: {fileID: 0}
@@ -54,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 61e7d5ea8490d79409f1ab5839916a06, type: 2}
     - target: {fileID: 919132149155446097, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
       propertyPath: m_Name
-      value: AM_front_double_biceps (1)
+      value: P_EnemyAnimation
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
       propertyPath: m_Controller
@@ -71,9 +83,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1395358549951321518}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8637342027072991743}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5141107174043854698}
@@ -95,18 +104,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87f65769920a28847aed5ecd5c63c806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Enemy::Enemy.Enemy
---- !u!114 &8637342027072991743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1333020132457753605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c63cb1a767ce4e4ebe285e892b7dd7e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Animation.Sandbox::AnimationTest
 --- !u!114 &5141107174043854698
 MonoBehaviour:
   m_ObjectHideFlags: 0

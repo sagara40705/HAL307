@@ -73,6 +73,7 @@ namespace Enemy
             if (visual != null)
             {
                 visual.ResetColor();
+                ApplyAnimatorTrigger(enemy, "Idle");
             }
 
             ApplyAnimatorTrigger(enemy, "Idle");

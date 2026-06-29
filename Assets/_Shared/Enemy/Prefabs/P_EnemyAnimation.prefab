@@ -77,6 +77,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5141107174043854698}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7421178673451829021}
   m_SourcePrefab: {fileID: 100100000, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
 --- !u!1 &1333020132457753605 stripped
 GameObject:
@@ -120,3 +123,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.Proto_EnemyChangeColor
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &7421178673451829021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1333020132457753605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a7ac23488804c23a95ff782242d5ff0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyParryLightController
+  _enemy: {fileID: 1395358549951321518}
+  _offset: {x: 0, y: 2, z: 0}
+  _rotationEuler: {x: 90, y: 0, z: 0}
+  _followEnemy: 1
+  _intensity: 10
+  _range: 20
+  _spotAngle: 60
+  _innerSpotAngle: 30
+  _shadows: 2
+  _shadowStrength: 1
+  _shadowBias: 0.05
+  _shadowNormalBias: 0.4

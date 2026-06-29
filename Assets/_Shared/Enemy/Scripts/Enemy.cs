@@ -27,6 +27,9 @@ namespace Enemy
         [SerializeField] private string _poseContextName = "PoseContext";
         [SerializeField] private PoseStateTracker _poseStateTracker;
 
+        // Pose状態でON/OFFするLight
+        [SerializeField] private StopLight _stopLight;
+
         //Enemyの状態
         private bool _isPaused = false;
         private PoseID _currentPoseID = PoseID.None;
@@ -59,6 +62,7 @@ namespace Enemy
         void Start()
         {
             SetupPoseStateTracker();
+            SetupStopLight();
 
             _colorChanger = GetComponent<Proto_EnemyChangeColor>();
             if (_colorChanger == null)
@@ -150,6 +154,7 @@ namespace Enemy
             // ここにPose終了時の共通処理を記述する
             if (_currentPoseData) { _currentPoseData.PoseAction?.OnEnd(this); }
             EndPoseTrack();
+            _stopLight?.SetLight(false);
 
             _poseController?.Unpause();
             _currentPoseID = PoseID.None;
@@ -166,6 +171,7 @@ namespace Enemy
         // Enemyが破壊されたときのクリーンアップ
         private void OnDestroy()
         {
+            _stopLight?.SetLight(false);
             EndPoseTrack();
 
             // EnemyRegistryから登録解除する
@@ -197,6 +203,7 @@ namespace Enemy
             _isPoseCommitted = false;
             _hasEnemyRequestNotified = false;
             BeginPoseTrack();
+            _stopLight?.SetLight(true);
 
             //Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
             _currentPoseData?.PoseAction?.OnStart(this);
@@ -255,6 +262,18 @@ namespace Enemy
             }
 
             _poseStateTracker = poseContext?.GetPoseStateTracker;
+        }
+
+        private void SetupStopLight()
+        {
+            if (_stopLight != null)
+            {
+                _stopLight.SetLight(false);
+                return;
+            }
+
+            _stopLight = GetComponentInChildren<StopLight>(true);
+            _stopLight?.SetLight(false);
         }
 
         private void BeginPoseTrack()

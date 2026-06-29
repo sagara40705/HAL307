@@ -11,5 +11,10 @@ public class FadeButton : MonoBehaviour
     private async UniTask FadeAsync()
     {
         await TransitionManager.PlayDumbbellFadeOut();
+
+        await UniTask.Delay(2000);
+
+        await TransitionManager.FadeIn();
+
     }
 }

@@ -14,6 +14,8 @@ namespace AudienceRequest
         [SerializeField, FormerlySerializedAs("_enemyConextName")] private string _enemyContextName;
         [SerializeField] private EnemyContext _enemyContext;
 
+        [SerializeField] private FeverGaugeController _feverGaugeController;
+
         private void Start()
         {
             ResolveExternalContexts();
@@ -29,6 +31,16 @@ namespace AudienceRequest
         {
             ResolveExternalContexts();
             return _enemyContext;
+        }
+
+        public FeverGaugeController GetFeverGaugeController()
+        {
+            if (_feverGaugeController == null)
+            {
+                _feverGaugeController = FindFirstObjectByType<FeverGaugeController>();
+            }
+
+            return _feverGaugeController;
         }
 
         private void ResolveExternalContexts()

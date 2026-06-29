@@ -19,6 +19,9 @@ public class TitleSceneController : MonoBehaviour
     public Color selectedColor = Color.yellow;
     public Color normalColor = Color.white;
 
+    [Header("Scene")]
+    [SerializeField] private string nextSceneName = "Prototype";
+
     private int currentIndex = 0;
 
     void Start()
@@ -103,6 +106,7 @@ public class TitleSceneController : MonoBehaviour
         {
             case "Start":
                 await TransitionManager.PlayDumbbellFadeOut();
+                SceneLoader.Load(nextSceneName);
                 break;
 
             case "Exit":

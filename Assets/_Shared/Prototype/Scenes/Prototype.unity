@@ -150,7 +150,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Prototype.Sandbox.ProttypeSceneCore
   _scenes:
   - StageModel
-  - RuntimeDebugTest
   - PoseParryJudge
   - Enemy
   - Player

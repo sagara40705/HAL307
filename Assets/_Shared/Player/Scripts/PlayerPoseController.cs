@@ -11,6 +11,7 @@ namespace Player
     {
         [SerializeField] private PlayerContext _playerContext;
         [SerializeField] private PoseParryJudge _poseParryJudge;
+        [SerializeField] private PoseStateTracker _poseStateTracker;
 
         [SerializeField] private Proto_PlayerColorChanger _colorChanger;
         [SerializeField] private Color _yaaColor;
@@ -29,7 +30,9 @@ namespace Player
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         private void Start()
         {
-            _poseParryJudge = _playerContext?.GetPoseContext()?.GetPoseParryJudge;
+            PoseContext poseContext = _playerContext?.GetPoseContext();
+            _poseParryJudge = poseContext?.GetPoseParryJudge;
+            _poseStateTracker = poseContext?.GetPoseStateTracker;
             Debug.Log("PlayerPoseController Start. _poseParryJudge = " + _poseParryJudge);
 
             // デバッグ用のUIを作成
@@ -42,6 +45,11 @@ namespace Player
 
         private void OnDestroy()
         {
+            if (_isPose)
+            {
+                _poseStateTracker?.EndPose();
+            }
+
             RuntimeDebug.DebugMenu.DestroyWindow("Player");
         }
 
@@ -77,6 +85,7 @@ namespace Player
         {
             _isPose = true;
             _poseTimer = 3f; // ポーズ状態の持続時間を設定
+            _poseStateTracker?.BeginPose();
             _poseParryJudge?.StartPlayerPose(poseID);
             ChangeColor(poseID);
             OnPoseStart?.Invoke(poseID); 
@@ -115,6 +124,7 @@ namespace Player
         {
             _isPose = false;
             _poseTimer = 0f;
+            _poseStateTracker?.EndPose();
             _poseParryJudge?.EndPlayerPose();
             _colorChanger?.ResetColor();
             _currentPoseName = "None";

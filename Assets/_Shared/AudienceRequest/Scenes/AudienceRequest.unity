@@ -1018,6 +1018,7 @@ MonoBehaviour:
   _maxAttempts: 150
   _clearScale: 1.5
   _clearDelay: 1
+  _explosionPrefab: {fileID: 600055896250882990, guid: 92ccf096cc0f2914fbb703c7101ad5ae, type: 3}
   _spriteTable:
   - poseID: 2
     originalSprite: {fileID: 21300000, guid: 3f4a2c1059842df44970ee191d35e6a8, type: 3}

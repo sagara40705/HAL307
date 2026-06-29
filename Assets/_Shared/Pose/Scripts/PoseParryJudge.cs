@@ -12,9 +12,6 @@ namespace Pose
         // プレイヤーのPoseID
         [SerializeField] private PoseID _playerPoseID;
 
-        // 紙吹雪のエフェクト
-        [SerializeField] private ParticleSystem _confettiEffect;
-
         // パリイ発生時のアクション
         public event Action OnParrySuccess;
 
@@ -55,8 +52,7 @@ namespace Pose
             {
                 Debug.Log("Parry Successful!");
                 // パリイ成功時の処理
-                OnParrySuccess();
-                _confettiEffect.Play(); // 紙吹雪再生
+                OnParrySuccess?.Invoke();
             }
             else
             {
@@ -76,7 +72,7 @@ namespace Pose
         public void DebugOnParry()
         {
             Debug.Log("Debug: Parry triggered.");
-            OnParrySuccess();
+            OnParrySuccess?.Invoke();
         }
     }
 }

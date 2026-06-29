@@ -23,6 +23,11 @@ namespace Enemy
         private EnemyPoseController _poseController;
         private PoseParryJudge _poseParryJudge;
 
+        // Pose状態を取得するContext
+        [SerializeField] private string _poseContextName = "PoseContext";
+        [SerializeField] private PoseStateTracker _poseStateTracker;
+
+
         //Enemyの状態
         private bool _isPaused = false;
         private PoseID _currentPoseID = PoseID.None;
@@ -34,6 +39,7 @@ namespace Enemy
         private EnemyPoseState _poseState = EnemyPoseState.None;
         private bool _isPoseCommitted = false;
         private bool _hasEnemyRequestNotified = false;
+        private bool _isPoseTracked = false;
 
         // パリイ関連
         private bool _isParried = false;
@@ -53,6 +59,8 @@ namespace Enemy
 
         void Start()
         {
+            SetupPoseStateTracker();
+
             _colorChanger = GetComponent<Proto_EnemyChangeColor>();
             if (_colorChanger == null)
             {
@@ -142,6 +150,7 @@ namespace Enemy
             _isPaused = false;
             // ここにPose終了時の共通処理を記述する
             if (_currentPoseData) { _currentPoseData.PoseAction?.OnEnd(this); }
+            EndPoseTrack();
 
             _poseController?.Unpause();
             _currentPoseID = PoseID.None;
@@ -158,6 +167,8 @@ namespace Enemy
         // Enemyが破壊されたときのクリーンアップ
         private void OnDestroy()
         {
+            EndPoseTrack();
+
             // EnemyRegistryから登録解除する
             _enemyRegistry?.Unregister(this);
             RuntimeDebug.DebugMenu.DestroyWindow(name);
@@ -186,6 +197,7 @@ namespace Enemy
             SetPoseState(EnemyPoseState.PreCommit);
             _isPoseCommitted = false;
             _hasEnemyRequestNotified = false;
+            BeginPoseTrack();
 
             //Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
             _currentPoseData?.PoseAction?.OnStart(this);
@@ -222,6 +234,57 @@ namespace Enemy
 
             _poseState = poseState;
             _poseStateElapsedTime = 0f;
+        }
+
+        private void SetupPoseStateTracker()
+        {
+            if (_poseStateTracker != null)
+            {
+                return;
+            }
+
+            PoseContext poseContext = null;
+            ContextManager contextManager = ContextManager.Instance;
+            if (contextManager != null && !string.IsNullOrWhiteSpace(_poseContextName))
+            {
+                poseContext = contextManager.Get<PoseContext>(_poseContextName);
+            }
+
+            if (poseContext == null)
+            {
+                poseContext = FindFirstObjectByType<PoseContext>();
+            }
+
+            _poseStateTracker = poseContext?.GetPoseStateTracker;
+        }
+
+
+        private void BeginPoseTrack()
+        {
+            if (_isPoseTracked)
+            {
+                return;
+            }
+
+            SetupPoseStateTracker();
+            if (_poseStateTracker == null)
+            {
+                return;
+            }
+
+            _poseStateTracker.BeginPose();
+            _isPoseTracked = true;
+        }
+
+        private void EndPoseTrack()
+        {
+            if (!_isPoseTracked)
+            {
+                return;
+            }
+
+            _poseStateTracker?.EndPose();
+            _isPoseTracked = false;
         }
 
         //　パリイされたときの処理

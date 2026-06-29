@@ -17,9 +17,8 @@ namespace AudienceRequest
         [SerializeField] private AudienceRequests _audienceRequests; // リクエストのデータベース
         [SerializeField] private AudienceRequestUiPool _uiPool; // UIプールの参照
 
-        // リクエストのUIを表示するためのマテリアルと、リクエストが増えるごとにUIがどれだけ満たされるかの割合
-        [SerializeField] private Material _flameMaterial;
-        [SerializeField] private float _fillIncrease = 0.05f;
+        // フィーバーゲージ
+        [SerializeField] private FeverGaugeController _feverGaugeController;
 
         [SerializeField] private float _requestInterval = 5f;
         private float _requestTimer = 0f;
@@ -33,6 +32,11 @@ namespace AudienceRequest
             _requestTimer = 0f;
             _currentRequestCount = 0;
             _audienceRequests.ClearAll();
+
+            if (_feverGaugeController == null)
+            {
+                _feverGaugeController = FindFirstObjectByType<FeverGaugeController>();
+            }
         }
 
         // 毎フレーム更新
@@ -70,9 +74,7 @@ namespace AudienceRequest
 
             if (isPlayer)
             {
-                float fill = _flameMaterial.GetFloat("_FillAmount");
-                fill += _fillIncrease;
-                _flameMaterial.SetFloat("_FillAmount", Mathf.Clamp01(fill));
+                _feverGaugeController?.AddFill();
 
                 //
                 if (ScoreManager.Instance != null)

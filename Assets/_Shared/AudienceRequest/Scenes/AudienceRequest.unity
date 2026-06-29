@@ -868,6 +868,7 @@ MonoBehaviour:
   _playerContext: {fileID: 0}
   _enemyContextName: EnemyContext
   _enemyContext: {fileID: 0}
+  _feverGaugeController: {fileID: 135792469}
 --- !u!4 &1743887622
 Transform:
   m_ObjectHideFlags: 0

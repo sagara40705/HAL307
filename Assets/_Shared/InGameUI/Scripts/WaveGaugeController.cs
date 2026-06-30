@@ -9,6 +9,10 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private float maxValue = 1.0f;
     [SerializeField] private float minValue = 0.0f;
 
+    [SerializeField] private Image warningImage;
+    [SerializeField] private float warningThreshold = 0.2f; //20%
+    [SerializeField] private float blinkSpeed = 5f;
+
     private float currentValue;
 
     void Start()
@@ -50,6 +54,23 @@ public class WaveGaugeController : MonoBehaviour
 
             // シェーダーに新しい値をセット
             waveMaterial.SetFloat(propertyName, currentValue);
+        }
+
+        // 残量が少なくなったら点滅
+        if (warningImage != null)
+        {
+            if (currentValue <= warningThreshold)
+            {
+                Color color = warningImage.color;
+                color.a = Mathf.PingPong(Time.time * blinkSpeed, 1f);
+                warningImage.color = color;
+            }
+            else
+            {
+                Color color = warningImage.color;
+                color.a = 0f;
+                warningImage.color = color;
+            }
         }
     }
 }

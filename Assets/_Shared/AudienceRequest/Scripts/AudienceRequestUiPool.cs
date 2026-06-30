@@ -165,7 +165,7 @@ namespace AudienceRequest
                     img.sprite = isPlayer ? spriteSetting.changeSprite : spriteSetting.enemyChangeSprite;
                 }
 
-                obj.transform.localScale = Vector3.one * _clearScale;
+                obj.transform.localScale = Vector3.one;
                 StartCoroutine(ReleaseAfterDelay(obj, pose, _clearDelay));
             }
         }

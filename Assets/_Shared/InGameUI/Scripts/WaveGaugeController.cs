@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 public class WaveGaugeController : MonoBehaviour
 {
@@ -9,11 +10,14 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private float maxValue = 1.0f;
     [SerializeField] private float minValue = 0.0f;
 
-    [SerializeField] private Image warningImage;
-    [SerializeField] private float warningThreshold = 0.2f; //20%
-    [SerializeField] private float blinkSpeed = 5f;
+    [Header("警告UI")]
+    [SerializeField] private GameObject warningUI;
+    [SerializeField] private float warningThreshold = 0.2f;
 
     private float currentValue;
+
+    // WaveGaugeが0になった時に何度も演出が出ないようにするフラグ
+    private bool isTransitionStarted = false;
 
     void Start()
     {
@@ -31,13 +35,19 @@ public class WaveGaugeController : MonoBehaviour
         // マテリアルが存在するかチェック
         if (waveMaterial != null)
         {
-            //満タンの値をセットしてスタートする
+            // 満タンの値をセットしてスタートする
             currentValue = maxValue;
             waveMaterial.SetFloat(propertyName, currentValue);
         }
         else
         {
             Debug.LogError("WaveMaterialが見つかりません。");
+        }
+
+        // 最初は警告UIを非表示
+        if (warningUI != null)
+        {
+            warningUI.SetActive(false);
         }
     }
 
@@ -54,23 +64,24 @@ public class WaveGaugeController : MonoBehaviour
 
             // シェーダーに新しい値をセット
             waveMaterial.SetFloat(propertyName, currentValue);
-        }
 
-        // 残量が少なくなったら点滅
-        if (warningImage != null)
-        {
-            if (currentValue <= warningThreshold)
+            // ゲージが少なくなったら警告UIを表示
+            if (warningUI != null)
             {
-                Color color = warningImage.color;
-                color.a = Mathf.PingPong(Time.time * blinkSpeed, 1f);
-                warningImage.color = color;
+                warningUI.SetActive(currentValue <= warningThreshold);
             }
-            else
+
+            // WaveGaugeが0になったらシーン遷移演出を開始
+            if (!isTransitionStarted && currentValue <= minValue)
             {
-                Color color = warningImage.color;
-                color.a = 0f;
-                warningImage.color = color;
+                isTransitionStarted = true;
+                PlayGaugeEmptyTransition().Forget();
             }
         }
+    }
+
+    private async UniTaskVoid PlayGaugeEmptyTransition()
+    {
+        await TransitionManager.PlayDumbbellFadeOut();
     }
 }

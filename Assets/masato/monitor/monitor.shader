@@ -5,8 +5,11 @@ Shader "Custom/PlayerMuscle"
         // ベーステクスチャ
         [MainTexture] _BaseMap("Base Map", 2D) = "white" {}
 
-        // 環境光の強さ
-        _AmbientStrength("Ambient Strength", Range(0.0, 1.0)) = 0.10
+        // 画面の明るさ
+        _MonitorBrightness("MonitorBrightness", Range(0.0, 1.0)) = 0.10
+
+        // 発光の強さ
+        _EmissionStrength("EmissionStrength",Range(0.0,1.0)) = 0.10
 
         //モニターのぼかし
         _MonitorBlur("MonitorBlur", Range(0.0, 4.0)) = 0.2
@@ -16,6 +19,12 @@ Shader "Custom/PlayerMuscle"
 
         //モニターの発光具合
         _Monitorlight("Monitorlight",Range(0.0,4.0)) = 0.8
+
+             
+        _Saturation           // 色の鮮やかさ
+        _LedCount             // LEDの細かさ
+        _LedDotSize           // LED粒の大きさ
+
 
     }
 

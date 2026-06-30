@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
+//using FeverCutIn;
 
 
 public class GaugeController : MonoBehaviour
@@ -12,10 +14,12 @@ public class GaugeController : MonoBehaviour
     [SerializeField] private GameObject fireAnimObject;
     [SerializeField] private float maxDuration = 3.0f;
 
+    [SerializeField] private Image CutInImage;
 
     private readonly string fillAmountProperty = "_FillAmount";
     private bool isMaxActive = false;
     private float maxTimer = 0f;
+    
 
     // ゲージを増やす
     public void AddPoints(int amount)
@@ -59,6 +63,11 @@ public class GaugeController : MonoBehaviour
         {
             fireAnimObject.SetActive(false);
         }
+
+        if (CutInImage != null)
+        { 
+            CutInImage.gameObject.SetActive(false);
+        }
     }
 
     // Update is called once per frame
@@ -80,6 +89,7 @@ public class GaugeController : MonoBehaviour
     // マックス演出を開始するメソッド
     private void StartMaxGauge()
     {
+        StartCoroutine(PlayFeverCutIn());
         isMaxActive = true;
         maxTimer = 0f; // タイマーをリセット
         currentPoints = maxPoints;
@@ -122,4 +132,10 @@ public class GaugeController : MonoBehaviour
         }
     }
 
+    public IEnumerator PlayFeverCutIn()
+    {
+        CutInImage.gameObject.SetActive(true);
+        yield return new WaitForSeconds(3.0f);
+        CutInImage.gameObject.SetActive(false);
+    }
 }

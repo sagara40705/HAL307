@@ -146,7 +146,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b045f69580c10e947819d1e1d36d83ff, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AdditiveSceneObjectDisabler
   _disableTargets: []
 --- !u!4 &255158063
@@ -191,7 +191,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fac74e27e5a673f4fb820079c336b55a, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PoseStateTracker
 --- !u!4 &971358551
 Transform:
@@ -239,7 +239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pose.PoseContext
   _onlyMyScene: 0
   _initalize: 0
-  _contextName:
+  _contextName: 
   _poseParryJudge: {fileID: 1730729274838647557}
   _stateTracker: {fileID: 971358550}
 --- !u!4 &1048310000
@@ -333,6 +333,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cee62329fb37199498318f7e35ad3be0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pose.PoseParryJudge
+--- !u!1001 &8527707340016600753
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6165821040988135773, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: m_Name
+      value: Confetti
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 295bc384ceead7343b948180c278b080, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -341,3 +398,4 @@ SceneRoots:
   - {fileID: 1048310000}
   - {fileID: 255158063}
   - {fileID: 971358551}
+  - {fileID: 8527707340016600753}

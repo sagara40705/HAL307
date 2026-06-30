@@ -155,11 +155,20 @@ MonoBehaviour:
   backgroundPanel: {fileID: 965085437}
   dumbbellCanvasRoot: {fileID: 2186267}
   dumbbellPrefab: {fileID: 538094209684891605, guid: f044afaf720143a4e89dd5210938c0d8, type: 3}
-  spawnCount: 250
+  nextSceneName: GameScene
+  cellWidth: 130
+  cellHeight: 80
+  extraRows: 3
   spawnInterval: 0.005
-  spawnSize: 1
-  spawnPoint: {fileID: 306931734}
-  spawnWidth: 1000
+  startYOffset: 250
+  fallSpeedMin: 1600
+  fallSpeedMax: 2400
+  rotateSpeedMin: 240
+  rotateSpeedMax: 720
+  randomXOffset: 25
+  randomYOffset: 15
+  scaleMin: 1.15
+  scaleMax: 1.45
 --- !u!114 &2186264
 MonoBehaviour:
   m_ObjectHideFlags: 0

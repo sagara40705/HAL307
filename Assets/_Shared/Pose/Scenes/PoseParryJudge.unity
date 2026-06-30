@@ -273,6 +273,10 @@ PrefabInstance:
       propertyPath: _playerPoseID
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 238323164532869387, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
+      propertyPath: _confettiEffect
+      value: 
+      objectReference: {fileID: 8527707340016600754}
     - target: {fileID: 480854162081172770, guid: 1eeb5a8cf7090d74dbb0760a7b595e38, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.83935
@@ -347,11 +351,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 1321182306238603131, guid: 295bc384ceead7343b948180c278b080, type: 3}
       propertyPath: m_LocalRotation.w
@@ -385,11 +389,24 @@ PrefabInstance:
       propertyPath: m_Name
       value: Confetti
       objectReference: {fileID: 0}
+    - target: {fileID: 6953936997547257183, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6953936997547257183, guid: 295bc384ceead7343b948180c278b080, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 295bc384ceead7343b948180c278b080, type: 3}
+--- !u!198 &8527707340016600754 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 6953936997547257183, guid: 295bc384ceead7343b948180c278b080, type: 3}
+  m_PrefabInstance: {fileID: 8527707340016600753}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

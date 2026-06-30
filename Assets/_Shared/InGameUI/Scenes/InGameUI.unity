@@ -172,12 +172,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveGaugeController
   waveMaterial: {fileID: 2100000, guid: 343ab00e3639d9246b71ddd9a09ead13, type: 2}
-  decreaseSpeed: 0.05
+  decreaseSpeed: 0.01
   propertyName: _BaseLine
   maxValue: 0.7
   minValue: 0
   warningUI: {fileID: 811645271}
   warningThreshold: 0.05
+  hideOnWaveEffectUis:
+  - {fileID: 1718496973}
 --- !u!224 &68549861 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4762224450925470405, guid: 037d35f4770bcba43b0cbed74e127e45, type: 3}
@@ -1865,7 +1867,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6fe49ef49621ba40b861d5ac2a99ee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FeverCutIn.Cutin
-  CutInImage: {fileID: 918885606}
 --- !u!114 &918885606
 MonoBehaviour:
   m_ObjectHideFlags: 0

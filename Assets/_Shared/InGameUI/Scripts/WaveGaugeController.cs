@@ -14,6 +14,9 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private GameObject warningUI;
     [SerializeField] private float warningThreshold = 0.2f;
 
+    [Header("Wave演出時に非表示にするUI")]
+    [SerializeField] private GameObject[] hideOnWaveEffectUis;
+
     private float currentValue;
 
     // WaveGaugeが0になった時に何度も演出が出ないようにするフラグ
@@ -21,21 +24,17 @@ public class WaveGaugeController : MonoBehaviour
 
     void Start()
     {
-        // インスペクターでマテリアルが設定されていない場合、アタッチされているImageから取得を試みる
         if (waveMaterial == null)
         {
             Image image = GetComponent<Image>();
             if (image != null)
             {
-                // 実行時にマテリアルのインスタンスを作成して操作する
                 waveMaterial = image.material;
             }
         }
 
-        // マテリアルが存在するかチェック
         if (waveMaterial != null)
         {
-            // 満タンの値をセットしてスタートする
             currentValue = maxValue;
             waveMaterial.SetFloat(propertyName, currentValue);
         }
@@ -44,7 +43,6 @@ public class WaveGaugeController : MonoBehaviour
             Debug.LogError("WaveMaterialが見つかりません。");
         }
 
-        // 最初は警告UIを非表示
         if (warningUI != null)
         {
             warningUI.SetActive(false);
@@ -53,16 +51,11 @@ public class WaveGaugeController : MonoBehaviour
 
     void Update()
     {
-        // マテリアルがあり、値が最小値より大きい場合のみ減少させる
         if (waveMaterial != null && currentValue > minValue)
         {
-            // 時間経過に合わせて値を減らす
             currentValue -= decreaseSpeed * Time.deltaTime;
-
-            // 値が最小値を下回らないように制限
             currentValue = Mathf.Max(minValue, currentValue);
 
-            // シェーダーに新しい値をセット
             waveMaterial.SetFloat(propertyName, currentValue);
 
             // ゲージが少なくなったら警告UIを表示
@@ -75,7 +68,22 @@ public class WaveGaugeController : MonoBehaviour
             if (!isTransitionStarted && currentValue <= minValue)
             {
                 isTransitionStarted = true;
+
+                // ここで他のUIを非表示
+                HideOtherUis();
+
                 PlayGaugeEmptyTransition().Forget();
+            }
+        }
+    }
+
+    private void HideOtherUis()
+    {
+        foreach (GameObject ui in hideOnWaveEffectUis)
+        {
+            if (ui != null)
+            {
+                ui.SetActive(false);
             }
         }
     }

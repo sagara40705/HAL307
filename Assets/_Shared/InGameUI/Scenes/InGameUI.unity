@@ -177,7 +177,7 @@ MonoBehaviour:
   maxValue: 0.7
   minValue: 0
   warningImage: {fileID: 811645273}
-  warningThreshold: 0.2
+  warningThreshold: 0.1
   blinkSpeed: 2
 --- !u!224 &68549861 stripped
 RectTransform:

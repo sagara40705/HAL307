@@ -85,6 +85,8 @@ namespace Enemy
 
         private static void ApplyColor(Enemy enemy, Color color)
         {
+            return;
+
             Proto_EnemyChangeColor visual = enemy.GetComponent<Proto_EnemyChangeColor>();
             if (visual != null)
             {

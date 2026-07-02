@@ -1,62 +1,72 @@
-Shader "Custom/PlayerMuscle"
+Shader "Custom/LiveMonitor"
 {
     Properties
     {
-        // ベーステクスチャ
-        [MainTexture] _BaseMap("Base Map", 2D) = "white" {}
+        // モニターに表示する映像テクスチャ
+        // Render Texture をここに入れる
+        [MainTexture] _BaseMap("Monitor Texture", 2D) = "white" {}
 
-        // 画面の明るさ
-        _MonitorBrightness("MonitorBrightness", Range(0.0, 1.0)) = 0.10
+        // モニター全体の明るさ
+        // 数値を上げるほどライブ会場のLED画面のように明るくなる
+        _Monitorlight("Monitor Brightness", Range(0.0, 5.0)) = 1.8
 
-        // 発光の強さ
-        _EmissionStrength("EmissionStrength",Range(0.0,1.0)) = 0.10
+        // 色の鮮やかさ
+        // 1.0 が元の色、1.0より大きいと派手になる
+        _Saturation("Saturation", Range(0.0, 2.0)) = 1.2
 
-        //モニターのぼかし
-        _MonitorBlur("MonitorBlur", Range(0.0, 4.0)) = 0.2
+        // LEDの細かさ
+        // 数値が大きいほどLEDの粒が細かくなる
+        _LedCount("LED Count", Range(20.0, 400.0)) = 160.0
 
-        //枠の削り範囲 
-        _MonitorCutting("MonitorCutting", Range(0.0, 4.0)) = 0.5
+        // LEDの粒の大きさ
+        // 小さいほど粒の隙間が目立つ
+        _LedDotSize("LED Dot Size", Range(0.1, 0.9)) = 0.45
 
-        //モニターの発光具合
-        _Monitorlight("Monitorlight",Range(0.0,4.0)) = 0.8
-
-             
-        _Saturation           // 色の鮮やかさ
-        _LedCount             // LEDの細かさ
-        _LedDotSize           // LED粒の大きさ
-
-
+        // 暗い部分の底上げ
+        // 0だと黒が強く、上げると全体が少し明るくなる
+        _AmbientStrength("Ambient Strength", Range(0.0, 1.0)) = 0.05
     }
 
     SubShader
     {
         Tags
         {
+            // URP用のShaderとして使う指定
             "RenderPipeline" = "UniversalPipeline"
+
+            // 不透明なオブジェクトとして描画する
             "RenderType" = "Opaque"
+
+            // 通常の3Dオブジェクトと同じタイミングで描画する
             "Queue" = "Geometry"
         }
 
         Pass
         {
-            Name "PlayerMuscleForward"
+            // このPassの名前
+            // Unity上で直接見ることは少ないが、整理用に付けている
+            Name "LiveMonitorForward"
+
+            // URPの通常描画パスとして使う指定
             Tags { "LightMode" = "UniversalForward" }
 
             HLSLPROGRAM
 
-            // 頂点シェーダ関数
+            // 頂点シェーダーに vert 関数を使う
+            // 頂点の位置やUVを処理する
             #pragma vertex vert
 
-            // ピクセルシェーダ関数
+            // ピクセルシェーダーに frag 関数を使う
+            // 実際の色を決める
             #pragma fragment frag
 
-            // メインライトと影の対応
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            // URPの基本関数を使うための読み込み
+            // TransformObjectToHClip などが使えるようになる
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            // HLSL本体を読み込む
-            #include "PlayerMuscle.hlsl"
+            // モニター表現の本体
+            // vert / frag / LED表現などは monitor.hlsl に書く
+            #include "monitor.hlsl"
 
             ENDHLSL
         }

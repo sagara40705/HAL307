@@ -80,7 +80,7 @@ Material:
     - _Cull: 2
     - _DstBlend: 10
     - _DstBlendAlpha: 10
-    - _FresnelPower: 4.29
+    - _FresnelPower: 161.21
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1

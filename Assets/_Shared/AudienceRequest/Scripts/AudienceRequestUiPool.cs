@@ -29,7 +29,10 @@ namespace AudienceRequest
         [SerializeField] private float _clearScale = 1.5f;
         [SerializeField] private float _clearDelay = 1.0f;
 
+        [SerializeField] private GameObject _explosionPrefab;
+
         [System.Serializable]
+
         public class SpritePair
         {
             public PoseID poseID;
@@ -140,13 +143,29 @@ namespace AudienceRequest
             {
                 if (obj == null) continue;
 
+
+                if (_explosionPrefab != null)
+                {
+                    GameObject effect = Instantiate(_explosionPrefab, _uiParent);
+
+                    RectTransform effectRect = effect.GetComponent<RectTransform>();
+                    RectTransform targetRect = obj.GetComponent<RectTransform>();
+
+                    if (effectRect != null && targetRect != null)
+                    {
+                        effectRect.anchoredPosition = targetRect.anchoredPosition;
+                        effectRect.localScale = Vector3.one;
+                    }
+                }
+
+
                 Image img = obj.GetComponent<Image>();
                 if (img != null && spriteSetting != null)
                 {
                     img.sprite = isPlayer ? spriteSetting.changeSprite : spriteSetting.enemyChangeSprite;
                 }
 
-                obj.transform.localScale = Vector3.one * _clearScale;
+                obj.transform.localScale = Vector3.one;
                 StartCoroutine(ReleaseAfterDelay(obj, pose, _clearDelay));
             }
         }

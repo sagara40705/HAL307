@@ -159,6 +159,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!4 &130120858
 Transform:
   m_ObjectHideFlags: 0
@@ -229,6 +232,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &154605862
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,6 +290,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &171394041
 GameObject:
   m_ObjectHideFlags: 0
@@ -339,6 +348,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &363837140
 GameObject:
   m_ObjectHideFlags: 0
@@ -394,6 +406,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &368334937
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,6 +464,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &376511005
 GameObject:
   m_ObjectHideFlags: 0
@@ -535,13 +553,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 376511005}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.97166735, z: -0.2363526, w: 0}
+  m_LocalRotation: {x: -0.10472059, y: 0.88435125, z: -0.11936088, w: -0.4389868}
   m_LocalPosition: {x: 50, y: 12.9, z: 41.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 27.343, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 17.641, y: 232.047, z: -4.841}
 --- !u!114 &376511009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -641,6 +659,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &562620539
 GameObject:
   m_ObjectHideFlags: 0
@@ -696,6 +717,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &836643942
 GameObject:
   m_ObjectHideFlags: 0
@@ -751,6 +775,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &879344117
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,6 +818,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!4 &879344119
 Transform:
   m_ObjectHideFlags: 0
@@ -846,6 +876,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!4 &918438067
 Transform:
   m_ObjectHideFlags: 0
@@ -901,6 +934,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!4 &932030224
 Transform:
   m_ObjectHideFlags: 0
@@ -971,6 +1007,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &972294282
 GameObject:
   m_ObjectHideFlags: 0
@@ -1026,6 +1065,146 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
+--- !u!1 &1058486201
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1058486205}
+  - component: {fileID: 1058486204}
+  - component: {fileID: 1058486203}
+  - component: {fileID: 1058486202}
+  m_Layer: 0
+  m_Name: Main Camera (1)
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1058486202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1058486201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
+--- !u!81 &1058486203
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1058486201}
+  m_Enabled: 1
+--- !u!20 &1058486204
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1058486201}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 1
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!4 &1058486205
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1058486201}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.97166735, z: -0.2363526, w: 0}
+  m_LocalPosition: {x: 50, y: 12.9, z: 41.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 27.343, y: 180, z: 0}
 --- !u!1 &1066145271
 GameObject:
   m_ObjectHideFlags: 0
@@ -1208,6 +1387,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1238020453
 GameObject:
   m_ObjectHideFlags: 0
@@ -1263,6 +1445,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1001 &1328827697
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1360,6 +1545,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!4 &1351093218
 Transform:
   m_ObjectHideFlags: 0
@@ -1415,6 +1603,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!4 &1354711185
 Transform:
   m_ObjectHideFlags: 0
@@ -1485,6 +1676,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1413988534
 GameObject:
   m_ObjectHideFlags: 0
@@ -1540,6 +1734,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1501120554
 GameObject:
   m_ObjectHideFlags: 0
@@ -1595,6 +1792,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1535703357
 GameObject:
   m_ObjectHideFlags: 0
@@ -1650,6 +1850,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1552227219
 GameObject:
   m_ObjectHideFlags: 0
@@ -1705,6 +1908,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1665563895
 GameObject:
   m_ObjectHideFlags: 0
@@ -1760,6 +1966,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1672650276
 GameObject:
   m_ObjectHideFlags: 0
@@ -1815,6 +2024,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1682084715
 GameObject:
   m_ObjectHideFlags: 0
@@ -1870,6 +2082,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1731614849
 GameObject:
   m_ObjectHideFlags: 0
@@ -1925,6 +2140,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1 &1751778153
 GameObject:
   m_ObjectHideFlags: 0
@@ -1965,6 +2183,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!4 &1751778155
 Transform:
   m_ObjectHideFlags: 0
@@ -2020,6 +2241,9 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!4 &2066930614
 Transform:
   m_ObjectHideFlags: 0
@@ -2090,11 +2314,15 @@ MonoBehaviour:
   chunkCols: 4
   animationIndex: 1
   showChunkBounds: 1
+  renderCameras:
+  - {fileID: 376511007}
+  - {fileID: 1058486204}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 376511008}
+  - {fileID: 1058486205}
   - {fileID: 1066145274}
   - {fileID: 918438067}
   - {fileID: 1351093218}

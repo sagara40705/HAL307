@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d73c1bfe8a120fd46863aea88bfe9469
+guid: 84ed9780aec3c9240a40bb94c2169613
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,11 +31,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Yaa
+      name: muscle
       takeName: Take 001
       internalID: 1827226128182048838
       firstFrame: 0
-      lastFrame: 120
+      lastFrame: 90
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

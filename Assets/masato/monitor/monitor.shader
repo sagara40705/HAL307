@@ -43,7 +43,6 @@ Shader "Custom/LiveMonitor"
 
         Pass
         {
-            // このPassの名前
             // Unity上で直接見ることは少ないが、整理用に付けている
             Name "LiveMonitorForward"
 

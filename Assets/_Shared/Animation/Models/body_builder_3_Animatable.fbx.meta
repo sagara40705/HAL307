@@ -1,24 +1,9 @@
 fileFormatVersion: 2
-guid: d711868e37b1b3b4785ce935d7cc8b63
+guid: ec450b7f635c4124c8880ac3aaf8874f
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: standardSurface8
-    second: {fileID: 2100000, guid: 95e8d64a2553deb4ca9e673be0d2ca5e, type: 2}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: body_builder_3_Normal
-    second: {fileID: 2800000, guid: ce8b49f5b24ef004ead093f233d10fc5, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: body_builder_3_Roughness
-    second: {fileID: 2800000, guid: 6b2ef161d7167854db135c1d15da7380, type: 3}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

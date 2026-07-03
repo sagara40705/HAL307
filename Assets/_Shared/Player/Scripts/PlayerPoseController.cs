@@ -7,6 +7,7 @@ using RuntimeDebug;
 
 namespace Player
 {
+
     public class PlayerPoseContoroller : MonoBehaviour
     {
         [SerializeField] private PlayerContext _playerContext;
@@ -19,7 +20,8 @@ namespace Player
         [SerializeField] private Color _muscleColor;
 
 
-        [SerializeField] private string _currentPoseName = "None";  
+        [SerializeField] private string _currentPoseName = "None";
+        [SerializeField] private Animator _animator;
 
         private bool _isPose = false;
         private float _poseTimer = 0f;
@@ -36,6 +38,9 @@ namespace Player
             _poseParryJudge = poseContext?.GetPoseParryJudge;
             _poseStateTracker = poseContext?.GetPoseStateTracker;
             Debug.Log("PlayerPoseController Start. _poseParryJudge = " + _poseParryJudge);
+            //---animator
+            if (_animator == null)
+            { _animator = GetComponent<Animator>(); }
 
             // デバッグ用のUIを作成
             DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow("Player");
@@ -105,16 +110,22 @@ namespace Player
 
         private void ChangeColor(PoseID poseID)
         {
+            if (_animator == null)
+                return;
+
             switch (poseID)
             {
                 case PoseID.Pose_Yaa:
                     _colorChanger?.SetColor(_yaaColor);
+                    _animator.SetTrigger("Yaa");
                     break;
                 case PoseID.Pose_Power:
                     _colorChanger?.SetColor(_powerColor);
+                    _animator.SetTrigger("Power");
                     break;
                 case PoseID.Pose_Muscle:
                     _colorChanger?.SetColor(_muscleColor);
+                    _animator.SetTrigger("Muscle");
                     break;
                 default:
                     _colorChanger?.ResetColor();
@@ -129,6 +140,10 @@ namespace Player
             _poseStateTracker?.EndPose();
             _poseParryJudge?.EndPlayerPose();
             _colorChanger?.ResetColor();
+            if (_animator != null)
+            {
+                _animator.SetTrigger("Idle");
+            }
             _currentPoseName = "None";
             Debug.Log("Player pose ended.");
         }

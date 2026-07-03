@@ -128,13 +128,19 @@ public class ForwardProgressMover : MonoBehaviour
     private bool TryRegisterPlayer()
     {
         // Player本体を探して追加
-        Player.Proto_PlayerColorChanger player = Object.FindFirstObjectByType<Player.Proto_PlayerColorChanger>();
+        Player.PlayerPoseContoroller player = Object.FindFirstObjectByType<Player.PlayerPoseContoroller>();
         if (player == null)
         {
             return false;
         }
 
-        AddMoveTarget(player.transform);
+        Transform playerMoveTarget = player.MoveTargetTransform;
+        if (playerMoveTarget == null)
+        {
+            return false;
+        }
+
+        AddMoveTarget(playerMoveTarget);
         return true;
     }
 

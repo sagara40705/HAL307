@@ -24,6 +24,8 @@ namespace Player
         private bool _isPose = false;
         private float _poseTimer = 0f;
 
+        public Transform MoveTargetTransform => _colorChanger != null ? _colorChanger.transform : transform;
+
         // ポーズ時のイベント
         public event Action<PoseID> OnPoseStart; /*あう*/
 

@@ -72,7 +72,7 @@ namespace AudienceRequest
                          ResetUiVisual(obj, (PoseID)idx);
                          obj.SetActive(false);
                          obj.transform.SetParent(_uiParent.transform, false);
-                         obj.transform.localScale = Vector3.one;
+                         obj.transform.localScale = Vector3.one; // クリア時のスケールを維持
 
                      },
                      obj => Destroy(obj),

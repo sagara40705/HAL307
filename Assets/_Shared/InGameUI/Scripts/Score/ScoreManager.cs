@@ -5,15 +5,15 @@ public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
 
-    // 外部からは読み取り専用のプロパティ
     public int PlayerScore { get; private set; }
     public int Enemy1Score { get; private set; }
     public int Enemy2Score { get; private set; }
 
-    //
-    [SerializeField] private int AddScore = 10; // スコア加算量
+    [SerializeField] private int AddScore = 10;
 
-    // スコアが更新されたことをUI等に通知するイベント
+    [Header("フィーバー中のプレイヤー加算倍率")]
+    [SerializeField] private int feverScoreMultiplier = 2;
+
     public event Action OnScoreChanged;
 
     private void Awake()
@@ -21,8 +21,6 @@ public class ScoreManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            // シーンを跨いでもスコアを保持したい場合は以下を有効
-            // DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -31,13 +29,16 @@ public class ScoreManager : MonoBehaviour
     }
 
     // プレイヤースコア加算
-    public void AddPlayerScore(int score)
+    public void AddPlayerScore(int score, bool isFever = false)
     {
-        PlayerScore += score * AddScore;
-        OnScoreChanged?.Invoke(); // UI等に通知
+        int multiplier = isFever ? feverScoreMultiplier : 1;
+
+        PlayerScore += score * AddScore * multiplier;
+
+        OnScoreChanged?.Invoke();
     }
 
-    // エネミーのスコア加算（名前で自動判定）
+    // エネミーのスコア加算
     public void AddEnemyScore(int score, string enemyName)
     {
         if (enemyName == "Enemy1")
@@ -49,6 +50,6 @@ public class ScoreManager : MonoBehaviour
             Enemy2Score += score * AddScore;
         }
 
-        OnScoreChanged?.Invoke(); // UI等に通知
+        OnScoreChanged?.Invoke();
     }
 }

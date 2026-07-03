@@ -1000,8 +1000,8 @@ MonoBehaviour:
   _fillIncrease: 0.05
   _feverDuration: 10
   _resetFillOnFeverEnd: 1
-  _fireAnimObject: {fileID: 0}
-  _cutInObject: {fileID: 0}
+  _fireAnimObject: {fileID: 1491470896}
+  _cutInObject: {fileID: 918885603}
   _cutInDisplayTime: 3
 --- !u!4 &551905175
 Transform:
@@ -1286,7 +1286,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 794517803}
-  - component: {fileID: 794517804}
   m_Layer: 5
   m_Name: Gauge
   m_TagString: Untagged
@@ -1317,26 +1316,6 @@ RectTransform:
   m_AnchoredPosition: {x: -395, y: -403}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &794517804
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 794517802}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be3b0a418c324ed78e9a9940d2a42093, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.FeverGaugeController
-  _flameMaterial: {fileID: 2100000, guid: 20381abbc77054941abb9cd752d95570, type: 2}
-  _fillAmountProperty: _FillAmount
-  _fillIncrease: 0.05
-  _feverDuration: 10
-  _resetFillOnFeverEnd: 1
-  _fireAnimObject: {fileID: 1491470896}
-  _cutInObject: {fileID: 918885603}
-  _cutInDisplayTime: 3
 --- !u!1 &799775647
 GameObject:
   m_ObjectHideFlags: 0
@@ -1935,6 +1914,7 @@ GameObject:
   - component: {fileID: 895841680}
   - component: {fileID: 895841682}
   - component: {fileID: 895841681}
+  - component: {fileID: 895841683}
   m_Layer: 5
   m_Name: PlayerScore
   m_TagString: Untagged
@@ -2061,6 +2041,43 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 895841679}
   m_CullTransparentMesh: 1
+--- !u!114 &895841683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 895841679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e559b2b8a6c6d34fb87451e6c84a6d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreSpriteDisplay
+  digitImages:
+  - {fileID: 0}
+  normalSprites:
+  - {fileID: 332204940, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: -1958026581, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: -238383799, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: 1256732035, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: -822705266, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: -394712598, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: -1121468595, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: -1245684317, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: -1434283401, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  - {fileID: -354846174, guid: 04f7eb7d82b16f24398cfb81e0e4f8c1, type: 3}
+  feverSprites:
+  - {fileID: 344493702, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: -800139089, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: 18796931, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: -1365913319, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: -192781268, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: 1402888862, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: 1079202526, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: -500488137, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: 1936833344, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  - {fileID: -405588425, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
+  hideLeadingZero: 1
 --- !u!1 &918885603
 GameObject:
   m_ObjectHideFlags: 0
@@ -2105,7 +2122,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 918885603}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -2718,6 +2735,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
   AddScore: 100
+  feverScoreMultiplier: 2
 --- !u!224 &1376770249
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2935,7 +2953,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703384833}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 

@@ -79,7 +79,8 @@ namespace AudienceRequest
                 //
                 if (ScoreManager.Instance != null)
                 {
-                    ScoreManager.Instance.AddPlayerScore(value);
+                    bool isFever = _feverGaugeController != null && _feverGaugeController.IsFever;
+                    ScoreManager.Instance.AddPlayerScore(value, isFever);
                 }
             }
             else

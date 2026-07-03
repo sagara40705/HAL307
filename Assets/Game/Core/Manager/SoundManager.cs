@@ -5,6 +5,15 @@ using UnityEngine;
 
 public sealed class SoundManager : AppManagerBase<SoundManager>
 {
+    private enum CriAcbState
+    {
+        Ready,
+        AtomMissing,
+        CueSheetMissing,
+        CueSheetLoading,
+        CueSheetError,
+    }
+
     private const string MasterVolumeKey = "Sound.MasterVolume";
     private const string BgmVolumeKey = "Sound.BgmVolume";
     private const string SeVolumeKey = "Sound.SeVolume";
@@ -17,6 +26,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     [Header("CRI")]
     [SerializeField] private string cueSheetName = "CueSheet_0";
     [SerializeField] private bool validateCueNames = true;
+    [SerializeField, Min(0f)] private float criAtomReadyTimeoutSeconds = 5f;
 
     [Header("Runtime Settings")]
     [SerializeField, Min(1)] private int seSourcePoolSize = 8;
@@ -32,6 +42,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     private CriAtomExPlayback[] _sePlaybacks;
     private float[] _seBaseVolumes;
     private int _seSourceIndex;
+    private CriAcbState _lastCriAcbState = CriAcbState.AtomMissing;
 
     private Coroutine _bgmFadeCoroutine;
 
@@ -44,6 +55,8 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     private float _bgmVolume = 1f;
     private float _seVolume = 1f;
     private bool _isMuted;
+    private bool _isCriAvailable;
+    private bool _isCriUnavailableLoggedOnPlayback;
 
     public float MasterVolume => _masterVolume;
     public float BgmVolume => _bgmVolume;
@@ -51,6 +64,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     public bool IsMuted => _isMuted;
     public bool HasCurrentBgm => _hasCurrentBgm;
     public BgmId CurrentBgmId => _currentBgmId;
+    public bool IsCriAvailable => _isCriAvailable;
 
     // 初期化
     protected override IEnumerator OnInitialize()
@@ -68,19 +82,24 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
             yield break;
         }
 
-        while (CriAtom.CueSheetsAreLoading)
+        if (string.IsNullOrWhiteSpace(cueSheetName))
         {
-            yield return null;
+            DisableCriSound("CRI cue sheet name is empty.");
         }
-
-        _atomExAcb = CriAtom.GetAcb(cueSheetName);
-        if (_atomExAcb == null)
+        else
         {
-            FailInitialize($"CRI cue sheet was not found. CueSheetName='{cueSheetName}'");
-            yield break;
-        }
+            yield return WaitForCriAtomAcb();
 
-        CreateCriPlayers();
+            if (_atomExAcb == null)
+            {
+                DisableCriSound(GetCriAcbFailureMessage(_lastCriAcbState));
+            }
+            else
+            {
+                _isCriAvailable = true;
+                CreateCriPlayers();
+            }
+        }
 
         if (!BuildCatalogLookup())
         {
@@ -355,6 +374,94 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         Debug.LogWarning($"[SoundManager] CRI cue was not found. {label}, CueName='{cueName}'");
     }
 
+    private IEnumerator WaitForCriAtomAcb()
+    {
+        float timer = 0f;
+        _lastCriAcbState = CriAcbState.AtomMissing;
+
+        while (true)
+        {
+            CriAcbState state = TryGetCriAtomAcb(cueSheetName, out _atomExAcb);
+            _lastCriAcbState = state;
+            if (state == CriAcbState.Ready)
+            {
+                yield break;
+            }
+
+            bool canWait = state == CriAcbState.CueSheetLoading;
+            if (!canWait || timer >= criAtomReadyTimeoutSeconds)
+            {
+                yield break;
+            }
+
+            timer += Time.unscaledDeltaTime;
+            yield return null;
+        }
+    }
+
+    private void DisableCriSound(string reason)
+    {
+        _isCriAvailable = false;
+        _atomExAcb = null;
+        DisposeCriPlayers();
+        Debug.LogWarning($"[SoundManager] CRI sound is disabled. {reason}");
+    }
+
+    private static CriAcbState TryGetCriAtomAcb(string targetCueSheetName, out CriAtomExAcb acb)
+    {
+        acb = null;
+
+        CriAtom atom = UnityEngine.Object.FindFirstObjectByType<CriAtom>();
+        if (atom == null)
+        {
+            return CriAcbState.AtomMissing;
+        }
+
+        CriAtomCueSheet cueSheet = atom.GetCueSheetInternal(targetCueSheetName);
+        if (cueSheet == null)
+        {
+            return CriAcbState.CueSheetMissing;
+        }
+
+        if (cueSheet.IsLoading)
+        {
+            return CriAcbState.CueSheetLoading;
+        }
+
+        if (cueSheet.IsError)
+        {
+            return CriAcbState.CueSheetError;
+        }
+
+        acb = cueSheet.acb;
+        return acb != null ? CriAcbState.Ready : CriAcbState.CueSheetError;
+    }
+
+    private string GetCriAcbFailureMessage(CriAcbState state)
+    {
+        switch (state)
+        {
+            case CriAcbState.AtomMissing:
+                return
+                    "Active CriAtom component was not found. " +
+                    $"Add a CRIWARE/CRI Atom object to Boot scene and register CueSheetName='{cueSheetName}'.";
+            case CriAcbState.CueSheetMissing:
+                return
+                    $"CRI cue sheet is not registered. CueSheetName='{cueSheetName}'. " +
+                    "Set the same cue sheet name on the CriAtom component.";
+            case CriAcbState.CueSheetLoading:
+                return
+                    $"CRI cue sheet loading timed out. CueSheetName='{cueSheetName}', " +
+                    $"Timeout={criAtomReadyTimeoutSeconds:0.###} sec.";
+            case CriAcbState.CueSheetError:
+                return
+                    $"CRI cue sheet failed to load. CueSheetName='{cueSheetName}'. " +
+                    "Check the ACB/AWB file paths and StreamingAssets files on the CriAtom component.";
+            default:
+                return $"CRI cue sheet is not ready. CueSheetName='{cueSheetName}'.";
+        }
+    }
+
     private void StartBgmImmediate(BgmEntry entry)
     {
         _currentBgmId = entry.id;
@@ -447,9 +554,13 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
             return false;
         }
 
-        if (_atomExAcb == null)
+        if (!_isCriAvailable || _atomExAcb == null)
         {
-            Debug.LogWarning("[SoundManager] CRI ACB is not loaded.");
+            if (!_isCriUnavailableLoggedOnPlayback)
+            {
+                Debug.LogWarning("[SoundManager] Sound playback was skipped because CRI sound is disabled.");
+                _isCriUnavailableLoggedOnPlayback = true;
+            }
             return false;
         }
 

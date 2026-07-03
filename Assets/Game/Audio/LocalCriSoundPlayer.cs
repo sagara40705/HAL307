@@ -205,15 +205,24 @@ public sealed class LocalCriSoundPlayer : MonoBehaviour
             yield break;
         }
 
-        while (CriAtom.CueSheetsAreLoading)
+        CriAtomCueSheet targetCueSheet = FindCueSheet();
+        if (targetCueSheet == null)
+        {
+            Debug.LogWarning(
+                $"[LocalCriSoundPlayer] CRI cue sheet is not registered. CueSheet='{cueSheet}', GameObject='{name}'");
+            _playCoroutine = null;
+            yield break;
+        }
+
+        while (targetCueSheet.IsLoading)
         {
             yield return null;
         }
 
-        if (CriAtom.GetAcb(cueSheet) == null)
+        if (targetCueSheet.IsError)
         {
             Debug.LogWarning(
-                $"[LocalCriSoundPlayer] CRI cue sheet was not found. CueSheet='{cueSheet}', GameObject='{name}'");
+                $"[LocalCriSoundPlayer] CRI cue sheet failed to load. CueSheet='{cueSheet}', GameObject='{name}'");
             _playCoroutine = null;
             yield break;
         }
@@ -224,6 +233,18 @@ public sealed class LocalCriSoundPlayer : MonoBehaviour
         atomSource.Play();
 
         _playCoroutine = null;
+    }
+
+    private CriAtomCueSheet FindCueSheet()
+    {
+        CriAtom atom = UnityEngine.Object.FindFirstObjectByType<CriAtom>();
+        if (atom == null)
+        {
+            Debug.LogWarning($"[LocalCriSoundPlayer] Active CriAtom component was not found. GameObject='{name}'");
+            return null;
+        }
+
+        return atom.GetCueSheetInternal(cueSheet);
     }
 
     private float GetEffectiveVolume()

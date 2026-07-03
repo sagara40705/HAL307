@@ -17,7 +17,7 @@ public class UIManager : MonoBehaviour
     //[Header("タイトルUI")]
 
     [Header("ゲームUI")]
-    public GaugeController  gauge;   // ゲージ
+    public FeverGaugeController gauge;   // ゲージ
 
     [Header("スコアUI")]
     public TextMeshProUGUI playerScoreText;
@@ -78,16 +78,5 @@ public class UIManager : MonoBehaviour
     public void ShowResultScreen()
     {
         gamePanel.SetActive(false);
-    }
-
-    public void ReportHeartChanged(int count)
-    {
-        if(gauge != null)
-        gauge.AddPoints(count);
-    }
-
-    public void OnGaugeFull()
-    {
-        gauge.ResetGauge();
     }
 }

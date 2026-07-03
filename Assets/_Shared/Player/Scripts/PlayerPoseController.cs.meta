@@ -1,2 +1,16 @@
 fileFormatVersion: 2
 guid: c1f35e1586190c0428cc1dcc04a9fafe
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _playerContext: {instanceID: 0}
+  - _poseParryJudge: {instanceID: 0}
+  - _poseStateTracker: {instanceID: 0}
+  - _colorChanger: {instanceID: 0}
+  - _animator: {fileID: 1510528538214424341, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

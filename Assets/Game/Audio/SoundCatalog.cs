@@ -6,20 +6,26 @@ using UnityEngine;
 public sealed class BgmEntry
 {
     public BgmId id;
+    public string cueName;
     public AudioClip clip;
 
     [Range(0f, 1f)]
     public float volume = 1f;
+
+    public string CueName => string.IsNullOrWhiteSpace(cueName) ? id.ToString() : cueName;
 }
 
 [Serializable]
 public sealed class SeEntry
 {
     public SeId id;
+    public string cueName;
     public AudioClip clip;
 
     [Range(0f, 1f)]
     public float volume = 1f;
+
+    public string CueName => string.IsNullOrWhiteSpace(cueName) ? id.ToString() : cueName;
 }
 
 [CreateAssetMenu(menuName = "Game/Audio/SoundCatalog", fileName = "SoundCatalog")]

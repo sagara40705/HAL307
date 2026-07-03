@@ -332,10 +332,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoundManager
   catalog: {fileID: 11400000, guid: f8bb033a9dfe6904e85cc003e1cda917, type: 2}
   resourcesCatalogPath: Audio/SoundCatalog
-  audioMixer: {fileID: 0}
-  masterVolumeParameter: MasterVolume
-  bgmVolumeParameter: BgmVolume
-  seVolumeParameter: SeVolume
+  cueSheetName: CueSheet_0
+  validateCueNames: 1
   seSourcePoolSize: 8
   saveVolumeSettings: 1
 --- !u!4 &909709787

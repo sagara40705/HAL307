@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class SimpleAI : MonoBehaviour
 {
@@ -31,6 +32,9 @@ public class SimpleAI : MonoBehaviour
     private bool isParry = false;
     private  float PlayerPoint;
     private float EnemyPoint;
+    public int Powerpoint;
+    public int Massurupoint;
+    public int Yaapoint;
 
     void Start()
     {
@@ -66,7 +70,8 @@ public class SimpleAI : MonoBehaviour
                     isParry = true;
                     rend.material.color = ParryColor;
                     //敵のポイント取得
-                    PlayerPoint += 1f;
+                    //PlayerPoint += 1f;
+                    PowerPoint(Powerpoint);
                 }
 
                 break;
@@ -85,7 +90,8 @@ public class SimpleAI : MonoBehaviour
                     Debug.Log("Push!");
                     isParry = true;
                     rend.material.color = ParryColor;
-                    PlayerPoint += 1f;
+                    //PlayerPoint += 1f;
+                    MassuruPoint(Massurupoint);
                 }
 
                 break;
@@ -103,7 +109,8 @@ public class SimpleAI : MonoBehaviour
                     Debug.Log("Push!");
                     isParry = true;
                     rend.material.color = ParryColor;
-                    PlayerPoint += 1f;
+                    //PlayerPoint += 1f;
+                    YaaPoint(Yaapoint);
                 }
 
                 break;
@@ -150,5 +157,23 @@ public class SimpleAI : MonoBehaviour
             yield return new WaitForSeconds(stopTime);
 
         }
+    }
+
+    public int PowerPoint(int powerpoint)
+    {
+        powerpoint++;
+        return powerpoint;
+
+    }
+
+    public int MassuruPoint(int massurupoint)
+    {
+        massurupoint++;
+        return massurupoint;
+    }
+    public int YaaPoint(int yaapoint)
+    {
+        yaapoint++;
+        return yaapoint;
     }
 }

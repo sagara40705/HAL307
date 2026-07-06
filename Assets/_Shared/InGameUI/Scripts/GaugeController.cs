@@ -38,6 +38,7 @@ public class GaugeController : MonoBehaviour
         {
             // ゲージが満タンになったときの処理
             StartMaxGauge();
+            StartCoroutine(PlayFeverCutIn());
         }
 
     }
@@ -89,7 +90,7 @@ public class GaugeController : MonoBehaviour
     // マックス演出を開始するメソッド
     private void StartMaxGauge()
     {
-        StartCoroutine(PlayFeverCutIn());
+        CutInImage.gameObject.SetActive(true);
         isMaxActive = true;
         maxTimer = 0f; // タイマーをリセット
         currentPoints = maxPoints;

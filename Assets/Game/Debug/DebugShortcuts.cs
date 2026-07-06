@@ -18,7 +18,7 @@ public static class DebugShortcuts
     {
         if (!Enabled)
         {
-            return false;
+            //return false;
         }
 
         var keyboard = Keyboard.current;
@@ -34,7 +34,7 @@ public static class DebugShortcuts
     {
         if (!Enabled)
         {
-            return false;
+            //return false;
         }
 
         var keyboard = Keyboard.current;
@@ -48,19 +48,20 @@ public static class DebugShortcuts
 
     public static bool Combo(Key holdKey, Key triggerKey)
     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (!Enabled)
+        {
+            //return false;
+        }
+
         return Held(holdKey) && Pressed(triggerKey);
-#else
-        return false;
-#endif
     }
 
     public static bool Combo(Key holdKey1, Key holdKey2, Key triggerKey)
     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (!Enabled)
+        {
+            //return false;
+        }
         return Held(holdKey1) && Held(holdKey2) && Pressed(triggerKey);
-#else
-        return false;
-#endif  
     }
 }

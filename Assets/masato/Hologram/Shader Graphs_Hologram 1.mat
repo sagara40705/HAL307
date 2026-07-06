@@ -99,6 +99,6 @@ Material:
     m_Colors:
     - _FresnelColor: {r: 0, g: 3.9074647, b: 4, a: 1}
     - _HologramSpeed: {r: 0, g: 1, b: 0, a: 0}
-    - _HologramTiling: {r: 1, g: 5, b: 0, a: 0}
+    - _HologramTiling: {r: 1, g: 11.5, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

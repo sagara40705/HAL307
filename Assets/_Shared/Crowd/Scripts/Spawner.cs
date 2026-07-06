@@ -67,6 +67,11 @@ public class CrowdSpawner : MonoBehaviour
     [Header("Debug")]
     public bool showChunkBounds = true;
 
+    // CAMERA CULLING
+    //-----------------------------------------
+
+    [Header("Culling")]
+    public Camera[] renderCameras;
 
     // INTERNAL
     //-----------------------------------------
@@ -359,43 +364,29 @@ public class CrowdSpawner : MonoBehaviour
         // CAMERA FRUSTUM
         //---------------------------------
 
-        Plane[] planes =
-            GeometryUtility
-            .CalculateFrustumPlanes(
-                Camera.main
-            );
-
-        // DRAW ONLY VISIBLE CHUNKS
-        //---------------------------------
-
-        foreach (CrowdChunk chunk
-            in chunks)
+        foreach (CrowdChunk chunk in chunks)
         {
-            bool visible =
-                GeometryUtility
-                .TestPlanesAABB(
-                    planes,
-                    chunk.bounds
-                );
+            bool visible = false;
+
+            foreach (Camera cam in renderCameras)
+            {
+                if (cam == null)
+                    continue;
+
+                Plane[] planes = GeometryUtility.CalculateFrustumPlanes(cam);
+
+                if (GeometryUtility.TestPlanesAABB(planes, chunk.bounds))
+                {
+                    visible = true;
+                    break;
+                }
+            }
 
             if (!visible)
                 continue;
 
-            // VAT DATA
-            //-----------------------------
-
-            mpb.SetFloatArray(
-                "_AnimIndex",
-                chunk.animIndices
-            );
-
-            mpb.SetFloatArray(
-                "_DT",
-                chunk.timeOffsets
-            );
-
-            // DRAW
-            //-----------------------------
+            mpb.SetFloatArray("_AnimIndex", chunk.animIndices);
+            mpb.SetFloatArray("_DT", chunk.timeOffsets);
 
             Graphics.DrawMeshInstanced(
                 mesh,

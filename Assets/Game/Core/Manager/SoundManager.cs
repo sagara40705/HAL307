@@ -1,10 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using CriWare;
 using UnityEngine;
-using UnityEngine.Audio;
 
 public sealed class SoundManager : AppManagerBase<SoundManager>
 {
+    private enum CriAcbState
+    {
+        Ready,
+        AtomMissing,
+        CueSheetMissing,
+        CueSheetLoading,
+        CueSheetError,
+    }
+
     private const string MasterVolumeKey = "Sound.MasterVolume";
     private const string BgmVolumeKey = "Sound.BgmVolume";
     private const string SeVolumeKey = "Sound.SeVolume";
@@ -14,11 +23,10 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     [SerializeField] private SoundCatalog catalog;
     [SerializeField] private string resourcesCatalogPath = "Audio/SoundCatalog";
 
-    [Header("Optional AudioMixer")]
-    [SerializeField] private AudioMixer audioMixer;
-    [SerializeField] private string masterVolumeParameter = "MasterVolume";
-    [SerializeField] private string bgmVolumeParameter = "BgmVolume";
-    [SerializeField] private string seVolumeParameter = "SeVolume";
+    [Header("CRI")]
+    [SerializeField] private string cueSheetName = "CueSheet_0";
+    [SerializeField] private bool validateCueNames = true;
+    [SerializeField, Min(0f)] private float criAtomReadyTimeoutSeconds = 5f;
 
     [Header("Runtime Settings")]
     [SerializeField, Min(1)] private int seSourcePoolSize = 8;
@@ -27,10 +35,14 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     private readonly Dictionary<BgmId, BgmEntry> _bgmMap = new Dictionary<BgmId, BgmEntry>();
     private readonly Dictionary<SeId, SeEntry> _seMap = new Dictionary<SeId, SeEntry>();
 
-    private AudioSource _bgmSource;
-    private AudioSource[] _seSources;
+    private CriAtomExAcb _atomExAcb;
+    private CriAtomExPlayer _bgmPlayer;
+    private CriAtomExPlayback _bgmPlayback;
+    private CriAtomExPlayer[] _sePlayers;
+    private CriAtomExPlayback[] _sePlaybacks;
     private float[] _seBaseVolumes;
     private int _seSourceIndex;
+    private CriAcbState _lastCriAcbState = CriAcbState.AtomMissing;
 
     private Coroutine _bgmFadeCoroutine;
 
@@ -43,6 +55,8 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     private float _bgmVolume = 1f;
     private float _seVolume = 1f;
     private bool _isMuted;
+    private bool _isCriAvailable;
+    private bool _isCriUnavailableLoggedOnPlayback;
 
     public float MasterVolume => _masterVolume;
     public float BgmVolume => _bgmVolume;
@@ -50,12 +64,9 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     public bool IsMuted => _isMuted;
     public bool HasCurrentBgm => _hasCurrentBgm;
     public BgmId CurrentBgmId => _currentBgmId;
+    public bool IsCriAvailable => _isCriAvailable;
 
-    protected override void OnSingletonAwake()
-    {
-        CreateRuntimeAudioSources();
-    }
-
+    // 初期化
     protected override IEnumerator OnInitialize()
     {
         if (catalog == null && !string.IsNullOrWhiteSpace(resourcesCatalogPath))
@@ -71,6 +82,25 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
             yield break;
         }
 
+        if (string.IsNullOrWhiteSpace(cueSheetName))
+        {
+            DisableCriSound("CRI cue sheet name is empty.");
+        }
+        else
+        {
+            yield return WaitForCriAtomAcb();
+
+            if (_atomExAcb == null)
+            {
+                DisableCriSound(GetCriAcbFailureMessage(_lastCriAcbState));
+            }
+            else
+            {
+                _isCriAvailable = true;
+                CreateCriPlayers();
+            }
+        }
+
         if (!BuildCatalogLookup())
         {
             FailInitialize("SoundCatalog contains invalid or duplicate entries.");
@@ -79,10 +109,9 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
 
         LoadVolumeSettings();
         ApplyAllRuntimeVolumes();
-
-        yield break;
     }
 
+    // BGMの再生
     public void PlayBgm(BgmId id, float fadeTime = 0f, bool restartIfSame = false)
     {
         if (!EnsureReady())
@@ -96,13 +125,13 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
             return;
         }
 
-        if (!_bgmMap.TryGetValue(id, out BgmEntry entry) || entry.clip == null)
+        if (!_bgmMap.TryGetValue(id, out BgmEntry entry))
         {
             Debug.LogWarning($"[SoundManager] BGM not found. Id={id}");
             return;
         }
 
-        if (_hasCurrentBgm && _currentBgmId == id && _bgmSource.isPlaying && !restartIfSame)
+        if (_hasCurrentBgm && _currentBgmId == id && IsBgmPlayerActive() && !restartIfSame)
         {
             return;
         }
@@ -122,9 +151,10 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         _bgmFadeCoroutine = StartCoroutine(CoPlayBgmWithFade(entry, fadeTime));
     }
 
+    // BGMの停止
     public void StopBgm(float fadeTime = 0f)
     {
-        if (_bgmSource == null)
+        if (_bgmPlayer == null)
         { return; }
 
         if (_bgmFadeCoroutine != null)
@@ -133,16 +163,16 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
             _bgmFadeCoroutine = null;
         }
 
-        if (!_bgmSource.isPlaying || !_hasCurrentBgm)
+        if (!_hasCurrentBgm || !IsBgmPlayerActive())
         {
+            _bgmPlayer.Stop();
             ClearCurrentBgmState();
             return;
         }
 
         if (fadeTime <= 0f)
         {
-            _bgmSource.Stop();
-            _bgmSource.clip = null;
+            _bgmPlayer.Stop();
             ClearCurrentBgmState();
             return;
         }
@@ -150,6 +180,8 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         _bgmFadeCoroutine = StartCoroutine(CoStopBgmWithFade(fadeTime));
     }
 
+
+    // SEの再生
     public void PlaySe(SeId id, float volumeScale = 1f, float pitch = 1f)
     {
         if (!EnsureReady())
@@ -158,38 +190,42 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         if (id == SeId.None)
         { return; }
 
-        if (!_seMap.TryGetValue(id, out SeEntry entry) || entry.clip == null)
+        if (!_seMap.TryGetValue(id, out SeEntry entry))
         {
             Debug.LogWarning($"[SoundManager] SE not found. Id={id}");
             return;
         }
 
-        if (_seSources == null || _seSources.Length == 0)
+        if (_sePlayers == null || _sePlayers.Length == 0)
         {
-            Debug.LogWarning("[SoundManager] SE source pool is not created.");
+            Debug.LogWarning("[SoundManager] SE player pool is not created.");
             return;
         }
 
         int index = _seSourceIndex;
-        _seSourceIndex = (_seSourceIndex + 1) % _seSources.Length;
+        _seSourceIndex = (_seSourceIndex + 1) % _sePlayers.Length;
 
-        AudioSource source = _seSources[index];
+        CriAtomExPlayer player = _sePlayers[index];
         float baseVolume = Mathf.Clamp01(entry.volume) * Mathf.Clamp01(volumeScale);
 
         _seBaseVolumes[index] = baseVolume;
 
-        source.Stop();
-        source.clip = entry.clip;
-        source.loop = false;
-        source.pitch = Mathf.Clamp(pitch, 0.1f, 3f);
-        source.volume = GetEffectiveSeSourceVolume(baseVolume);
-        source.Play();
+        player.Stop(true);
+        player.ResetParameters();
+        player.SetCue(_atomExAcb, entry.CueName);
+        player.SetVolume(GetEffectiveSePlayerVolume(baseVolume));
+        player.SetPitch(PitchScaleToCents(pitch));
+        player.Loop(false);
+        _sePlaybacks[index] = player.Start();
     }
 
+    // UIの再生
     public void PlayUi(SeId id)
     {
         PlaySe(id, 1f, 1f);
     }
+
+    // マスターボリュームの設定
 
     public void SetMasterVolume(float volume01)
     {
@@ -198,6 +234,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         SaveVolumeSettingsIfNeeded();
     }
 
+    // BGMボリュームの設定
     public void SetBgmVolume(float volume01)
     {
         _bgmVolume = Mathf.Clamp01(volume01);
@@ -205,6 +242,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         SaveVolumeSettingsIfNeeded();
     }
 
+    // SEボリュームの設定
     public void SetSeVolume(float volume01)
     {
         _seVolume = Mathf.Clamp01(volume01);
@@ -212,6 +250,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         SaveVolumeSettingsIfNeeded();
     }
 
+    // ミュートの設定
     public void SetMute(bool mute)
     {
         _isMuted = mute;
@@ -219,32 +258,37 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         SaveVolumeSettingsIfNeeded();
     }
 
-    private void CreateRuntimeAudioSources()
+    protected override void OnApplicationQuit()
     {
-        if (_bgmSource == null)
+        DisposeCriPlayers();
+        base.OnApplicationQuit();
+    }
+
+    protected override void OnDestroy()
+    {
+        DisposeCriPlayers();
+        base.OnDestroy();
+    }
+
+    private void CreateCriPlayers()
+    {
+        if (_bgmPlayer == null)
         {
-            _bgmSource = gameObject.AddComponent<AudioSource>();
-            _bgmSource.playOnAwake = false;
-            _bgmSource.loop = true;
-            _bgmSource.spatialBlend = 0f;
+            _bgmPlayer = new CriAtomExPlayer();
         }
 
-        if (_seSources != null && _seSources.Length > 0)
+        if (_sePlayers != null && _sePlayers.Length > 0)
         { return; }
 
         int poolSize = Mathf.Max(1, seSourcePoolSize);
 
-        _seSources = new AudioSource[poolSize];
+        _sePlayers = new CriAtomExPlayer[poolSize];
+        _sePlaybacks = new CriAtomExPlayback[poolSize];
         _seBaseVolumes = new float[poolSize];
 
         for (int i = 0; i < poolSize; i++)
         {
-            AudioSource source = gameObject.AddComponent<AudioSource>();
-            source.playOnAwake = false;
-            source.loop = false;
-            source.spatialBlend = 0f;
-
-            _seSources[i] = source;
+            _sePlayers[i] = new CriAtomExPlayer();
             _seBaseVolumes[i] = 1f;
         }
     }
@@ -267,9 +311,9 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
                 continue;
             }
 
-            if (entry.clip == null)
+            if (string.IsNullOrWhiteSpace(entry.CueName))
             {
-                Debug.LogWarning($"[SoundManager] BGM clip is missing. Id={entry.id}");
+                Debug.LogWarning($"[SoundManager] BGM cue name is empty. Id={entry.id}");
                 continue;
             }
 
@@ -279,6 +323,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
                 return false;
             }
 
+            ValidateCueName(entry.CueName, $"BGM {entry.id}");
             _bgmMap.Add(entry.id, entry);
         }
 
@@ -295,9 +340,9 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
                 continue;
             }
 
-            if (entry.clip == null)
+            if (string.IsNullOrWhiteSpace(entry.CueName))
             {
-                Debug.LogWarning($"[SoundManager] SE clip is missing. Id={entry.id}");
+                Debug.LogWarning($"[SoundManager] SE cue name is empty. Id={entry.id}");
                 continue;
             }
 
@@ -307,10 +352,114 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
                 return false;
             }
 
+            ValidateCueName(entry.CueName, $"SE {entry.id}");
             _seMap.Add(entry.id, entry);
         }
 
         return true;
+    }
+
+    private void ValidateCueName(string cueName, string label)
+    {
+        if (!validateCueNames)
+        {
+            return;
+        }
+
+        if (_atomExAcb == null || _atomExAcb.Exists(cueName))
+        {
+            return;
+        }
+
+        Debug.LogWarning($"[SoundManager] CRI cue was not found. {label}, CueName='{cueName}'");
+    }
+
+    private IEnumerator WaitForCriAtomAcb()
+    {
+        float timer = 0f;
+        _lastCriAcbState = CriAcbState.AtomMissing;
+
+        while (true)
+        {
+            CriAcbState state = TryGetCriAtomAcb(cueSheetName, out _atomExAcb);
+            _lastCriAcbState = state;
+            if (state == CriAcbState.Ready)
+            {
+                yield break;
+            }
+
+            bool canWait = state == CriAcbState.CueSheetLoading;
+            if (!canWait || timer >= criAtomReadyTimeoutSeconds)
+            {
+                yield break;
+            }
+
+            timer += Time.unscaledDeltaTime;
+            yield return null;
+        }
+    }
+
+    private void DisableCriSound(string reason)
+    {
+        _isCriAvailable = false;
+        _atomExAcb = null;
+        DisposeCriPlayers();
+        Debug.LogWarning($"[SoundManager] CRI sound is disabled. {reason}");
+    }
+
+    private static CriAcbState TryGetCriAtomAcb(string targetCueSheetName, out CriAtomExAcb acb)
+    {
+        acb = null;
+
+        CriAtom atom = UnityEngine.Object.FindFirstObjectByType<CriAtom>();
+        if (atom == null)
+        {
+            return CriAcbState.AtomMissing;
+        }
+
+        CriAtomCueSheet cueSheet = atom.GetCueSheetInternal(targetCueSheetName);
+        if (cueSheet == null)
+        {
+            return CriAcbState.CueSheetMissing;
+        }
+
+        if (cueSheet.IsLoading)
+        {
+            return CriAcbState.CueSheetLoading;
+        }
+
+        if (cueSheet.IsError)
+        {
+            return CriAcbState.CueSheetError;
+        }
+
+        acb = cueSheet.acb;
+        return acb != null ? CriAcbState.Ready : CriAcbState.CueSheetError;
+    }
+
+    private string GetCriAcbFailureMessage(CriAcbState state)
+    {
+        switch (state)
+        {
+            case CriAcbState.AtomMissing:
+                return
+                    "Active CriAtom component was not found. " +
+                    $"Add a CRIWARE/CRI Atom object to Boot scene and register CueSheetName='{cueSheetName}'.";
+            case CriAcbState.CueSheetMissing:
+                return
+                    $"CRI cue sheet is not registered. CueSheetName='{cueSheetName}'. " +
+                    "Set the same cue sheet name on the CriAtom component.";
+            case CriAcbState.CueSheetLoading:
+                return
+                    $"CRI cue sheet loading timed out. CueSheetName='{cueSheetName}', " +
+                    $"Timeout={criAtomReadyTimeoutSeconds:0.###} sec.";
+            case CriAcbState.CueSheetError:
+                return
+                    $"CRI cue sheet failed to load. CueSheetName='{cueSheetName}'. " +
+                    "Check the ACB/AWB file paths and StreamingAssets files on the CriAtom component.";
+            default:
+                return $"CRI cue sheet is not ready. CueSheetName='{cueSheetName}'.";
+        }
     }
 
     private void StartBgmImmediate(BgmEntry entry)
@@ -320,18 +469,20 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         _currentBgmFade01 = 1f;
         _hasCurrentBgm = true;
 
-        _bgmSource.Stop();
-        _bgmSource.clip = entry.clip;
-        _bgmSource.loop = true;
-        _bgmSource.volume = GetEffectiveBgmSourceVolume(_currentBgmBaseVolume, _currentBgmFade01);
-        _bgmSource.Play();
+        _bgmPlayer.Stop();
+        _bgmPlayer.ResetParameters();
+        _bgmPlayer.SetCue(_atomExAcb, entry.CueName);
+        _bgmPlayer.SetVolume(GetEffectiveBgmPlayerVolume(_currentBgmBaseVolume, _currentBgmFade01));
+        _bgmPlayer.Loop(true);
+        _bgmPlayback = _bgmPlayer.Start();
     }
 
     private IEnumerator CoPlayBgmWithFade(BgmEntry nextEntry, float fadeTime)
     {
-        if (_hasCurrentBgm && _bgmSource.isPlaying)
+        if (_hasCurrentBgm && IsBgmPlayerActive())
         {
             yield return FadeCurrentBgm(0f, fadeTime);
+            _bgmPlayer.Stop();
         }
 
         _currentBgmId = nextEntry.id;
@@ -339,11 +490,11 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         _currentBgmFade01 = 0f;
         _hasCurrentBgm = true;
 
-        _bgmSource.Stop();
-        _bgmSource.clip = nextEntry.clip;
-        _bgmSource.loop = true;
-        _bgmSource.volume = GetEffectiveBgmSourceVolume(_currentBgmBaseVolume, _currentBgmFade01);
-        _bgmSource.Play();
+        _bgmPlayer.ResetParameters();
+        _bgmPlayer.SetCue(_atomExAcb, nextEntry.CueName);
+        _bgmPlayer.SetVolume(GetEffectiveBgmPlayerVolume(_currentBgmBaseVolume, _currentBgmFade01));
+        _bgmPlayer.Loop(true);
+        _bgmPlayback = _bgmPlayer.Start();
 
         yield return FadeCurrentBgm(1f, fadeTime);
 
@@ -354,8 +505,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     {
         yield return FadeCurrentBgm(0f, fadeTime);
 
-        _bgmSource.Stop();
-        _bgmSource.clip = null;
+        _bgmPlayer.Stop();
         ClearCurrentBgmState();
 
         _bgmFadeCoroutine = null;
@@ -369,7 +519,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         if (duration <= 0f)
         {
             _currentBgmFade01 = targetFade01;
-            _bgmSource.volume = GetEffectiveBgmSourceVolume(_currentBgmBaseVolume, _currentBgmFade01);
+            ApplyBgmPlayerVolume();
             yield break;
         }
 
@@ -379,13 +529,13 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
             float t = Mathf.Clamp01(time / duration);
 
             _currentBgmFade01 = Mathf.Lerp(startFade, targetFade01, t);
-            _bgmSource.volume = GetEffectiveBgmSourceVolume(_currentBgmBaseVolume, _currentBgmFade01);
+            ApplyBgmPlayerVolume();
 
             yield return null;
         }
 
         _currentBgmFade01 = targetFade01;
-        _bgmSource.volume = GetEffectiveBgmSourceVolume(_currentBgmBaseVolume, _currentBgmFade01);
+        ApplyBgmPlayerVolume();
     }
 
     private void ClearCurrentBgmState()
@@ -401,6 +551,16 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         if (!IsInitialized)
         {
             Debug.LogWarning("[SoundManager] Not initialized yet.");
+            return false;
+        }
+
+        if (!_isCriAvailable || _atomExAcb == null)
+        {
+            if (!_isCriUnavailableLoggedOnPlayback)
+            {
+                Debug.LogWarning("[SoundManager] Sound playback was skipped because CRI sound is disabled.");
+                _isCriUnavailableLoggedOnPlayback = true;
+            }
             return false;
         }
 
@@ -429,78 +589,57 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
 
     private void ApplyAllRuntimeVolumes()
     {
-        ApplyMixerVolumes();
-
-        if (_bgmSource != null)
-        {
-            _bgmSource.volume = GetEffectiveBgmSourceVolume(_currentBgmBaseVolume, _currentBgmFade01);
-        }
-
-        if (_seSources == null)
-        { return; }
-
-        for (int i = 0; i < _seSources.Length; i++)
-        {
-            if (_seSources[i] == null)
-            {
-                continue;
-            }
-
-            if (!_seSources[i].isPlaying)
-            {
-                continue;
-            }
-
-            _seSources[i].volume = GetEffectiveSeSourceVolume(_seBaseVolumes[i]);
-        }
+        ApplyBgmPlayerVolume();
+        ApplySePlayerVolumes();
     }
 
-    private void ApplyMixerVolumes()
+    private void ApplyBgmPlayerVolume()
     {
-        if (audioMixer == null)
+        if (_bgmPlayer == null || !_hasCurrentBgm)
         {
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(masterVolumeParameter))
+        _bgmPlayer.SetVolume(GetEffectiveBgmPlayerVolume(_currentBgmBaseVolume, _currentBgmFade01));
+        if (IsBgmPlayerActive())
         {
-            audioMixer.SetFloat(masterVolumeParameter, _isMuted ? -80f : Linear01ToDecibel(_masterVolume));
-        }
-
-        if (!string.IsNullOrWhiteSpace(bgmVolumeParameter))
-        {
-            audioMixer.SetFloat(bgmVolumeParameter, Linear01ToDecibel(_bgmVolume));
-        }
-
-        if (!string.IsNullOrWhiteSpace(seVolumeParameter))
-        {
-            audioMixer.SetFloat(seVolumeParameter, Linear01ToDecibel(_seVolume));
+            _bgmPlayer.Update(_bgmPlayback);
         }
     }
 
-    private float GetEffectiveBgmSourceVolume(float baseVolume, float fade01)
+    private void ApplySePlayerVolumes()
     {
-        float volume = Mathf.Clamp01(baseVolume) * Mathf.Clamp01(fade01);
-
-        if (audioMixer == null)
+        if (_sePlayers == null)
         {
-            volume *= GetRuntimeMasterScalar();
-            volume *= GetRuntimeChannelScalar(_bgmVolume);
+            return;
         }
 
+        for (int i = 0; i < _sePlayers.Length; i++)
+        {
+            CriAtomExPlayer player = _sePlayers[i];
+            if (player == null || !IsCriPlayerActive(player))
+            {
+                continue;
+            }
+
+            player.SetVolume(GetEffectiveSePlayerVolume(_seBaseVolumes[i]));
+            player.Update(_sePlaybacks[i]);
+        }
+    }
+
+    private float GetEffectiveBgmPlayerVolume(float baseVolume, float fade01)
+    {
+        float volume = Mathf.Clamp01(baseVolume) * Mathf.Clamp01(fade01);
+        volume *= GetRuntimeMasterScalar();
+        volume *= GetRuntimeChannelScalar(_bgmVolume);
         return Mathf.Clamp01(volume);
     }
 
-    private float GetEffectiveSeSourceVolume(float baseVolume)
+    private float GetEffectiveSePlayerVolume(float baseVolume)
     {
         float volume = Mathf.Clamp01(baseVolume);
-
-        if (audioMixer == null)
-        {
-            volume *= GetRuntimeMasterScalar();
-            volume *= GetRuntimeChannelScalar(_seVolume);
-        }
-
+        volume *= GetRuntimeMasterScalar();
+        volume *= GetRuntimeChannelScalar(_seVolume);
         return Mathf.Clamp01(volume);
     }
 
@@ -514,13 +653,61 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         return _isMuted ? 0f : channelVolume;
     }
 
-    private static float Linear01ToDecibel(float volume01)
+    private bool IsBgmPlayerActive()
     {
-        if (volume01 <= 0.0001f)
+        return IsCriPlayerActive(_bgmPlayer);
+    }
+
+    private static bool IsCriPlayerActive(CriAtomExPlayer player)
+    {
+        if (player == null)
         {
-            return -80f;
+            return false;
         }
 
-        return Mathf.Log10(volume01) * 20f;
+        CriAtomExPlayer.Status status = player.GetStatus();
+        return status == CriAtomExPlayer.Status.Prep || status == CriAtomExPlayer.Status.Playing;
+    }
+
+    private static float PitchScaleToCents(float pitchScale)
+    {
+        float clampedPitchScale = Mathf.Clamp(pitchScale, 0.1f, 3f);
+        return Mathf.Log(clampedPitchScale) / Mathf.Log(2f) * 1200f;
+    }
+
+    private void DisposeCriPlayers()
+    {
+        if (_bgmFadeCoroutine != null)
+        {
+            StopCoroutine(_bgmFadeCoroutine);
+            _bgmFadeCoroutine = null;
+        }
+
+        DisposePlayer(ref _bgmPlayer);
+
+        if (_sePlayers != null)
+        {
+            for (int i = 0; i < _sePlayers.Length; i++)
+            {
+                DisposePlayer(ref _sePlayers[i]);
+            }
+        }
+
+        _sePlayers = null;
+        _sePlaybacks = null;
+        _seBaseVolumes = null;
+        _atomExAcb = null;
+    }
+
+    private static void DisposePlayer(ref CriAtomExPlayer player)
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        player.Stop(true);
+        player.Dispose();
+        player = null;
     }
 }

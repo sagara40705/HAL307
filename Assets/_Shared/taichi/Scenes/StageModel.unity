@@ -473,6 +473,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &748665644
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 748665646}
+  - component: {fileID: 748665645}
+  m_Layer: 0
+  m_Name: MoveElevator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &748665645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748665644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9d40c06dc5d4f84d8f9c2147eb8112d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
+  Elevator_L: {fileID: 1837928963}
+  Elevator_R: {fileID: 1837928962}
+  Elevator_Centor: {fileID: 1837928961}
+--- !u!4 &748665646
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748665644}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -9.21234, y: -0, z: -10.32533}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &961590828
 GameObject:
   m_ObjectHideFlags: 0
@@ -1009,6 +1056,21 @@ MonoBehaviour:
   planeOffset: 0
   reflectionTextureProperty: _ReflectionTex
   reflectionVpProperty: _ReflectionVP
+--- !u!1 &1837928961 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -6050789392173002565, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
+  m_PrefabInstance: {fileID: 1837928958}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1837928962 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5209414144791839771, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
+  m_PrefabInstance: {fileID: 1837928958}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1837928963 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2762178798909294303, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
+  m_PrefabInstance: {fileID: 1837928958}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1915505985
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1133,3 +1195,4 @@ SceneRoots:
   - {fileID: 195996832}
   - {fileID: 967299055}
   - {fileID: 1837928958}
+  - {fileID: 748665646}

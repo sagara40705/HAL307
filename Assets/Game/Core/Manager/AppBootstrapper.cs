@@ -90,6 +90,15 @@ public sealed class AppBootstrapper : MonoBehaviour
             yield break;
         }
 
+        // PauseManager
+        yield return BootManager(
+            nameof(PauseManager),
+            () => PauseManager.CreateFromBootIfNeeded());
+        if (HasFailed)
+        {
+            yield break;
+        }
+
         /*
         yield return BootSingleton(
             nameof(SceneLoader),

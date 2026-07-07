@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+// インゲーム全体の進行Stateを順番に実行する制御
 public sealed class InGameFlowController : MonoBehaviour
 {
     [SerializeField] private InGameFlowContext context;
@@ -10,6 +11,7 @@ public sealed class InGameFlowController : MonoBehaviour
     private IInGameFlowState _currentState;
     private bool _isChangingState;
 
+    // Context未設定時の同一GameObject検索
     private void Awake()
     {
         if (context == null)
@@ -18,6 +20,7 @@ public sealed class InGameFlowController : MonoBehaviour
         }
     }
 
+    // 自動開始設定時の進行開始
     private void Start()
     {
         if (!playOnStart)
@@ -28,6 +31,7 @@ public sealed class InGameFlowController : MonoBehaviour
         StartFlow();
     }
 
+    // インゲーム進行の開始
     public void StartFlow()
     {
         if (_flowCoroutine != null)
@@ -38,6 +42,7 @@ public sealed class InGameFlowController : MonoBehaviour
         _flowCoroutine = StartCoroutine(FlowCoroutine());
     }
 
+    // 指定Stateへの切り替え開始
     public void ChangeState(IInGameFlowState nextState)
     {
         if (_isChangingState)
@@ -49,6 +54,7 @@ public sealed class InGameFlowController : MonoBehaviour
         StartCoroutine(ChangeStateCoroutine(nextState));
     }
 
+    // 標準のインゲーム進行順
     private IEnumerator FlowCoroutine()
     {
         yield return ChangeStateCoroutine(new GameStartFlowState());
@@ -60,6 +66,7 @@ public sealed class InGameFlowController : MonoBehaviour
         _flowCoroutine = null;
     }
 
+    // 現在StateのExitと次StateのEnter/Executeを実行
     private IEnumerator ChangeStateCoroutine(IInGameFlowState nextState)
     {
         if (nextState == null)

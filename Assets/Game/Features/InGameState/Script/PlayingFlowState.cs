@@ -1,8 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
+// 通常プレイ中State
 public sealed class PlayingFlowState : InGameFlowStateBase
 {
+    // ステージ終了通知まで待機
     public override IEnumerator Execute(InGameFlowContext context)
     {
         StageEndJudge stageEndJudge = context != null ? context.StageEndJudge : null;
@@ -13,6 +15,8 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         }
 
         bool isStageEnd = false;
+
+        // ステージ終了通知の受信
         void OnStageEnd()
         {
             isStageEnd = true;

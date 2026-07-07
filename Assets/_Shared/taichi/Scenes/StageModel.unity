@@ -345,7 +345,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: bf754a73a637c8e4dbb24f5d1277ecee, type: 2}
+  m_TargetTexture: {fileID: 8400000, guid: 614fb398aba2f504ca5c74fb8698d326, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -585,7 +585,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 8400000, guid: bf754a73a637c8e4dbb24f5d1277ecee, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -943,7 +943,7 @@ PrefabInstance:
     - target: {fileID: -6442298374534657108, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: f66b759327f7a1545811fe5575a78010, type: 2}
+      objectReference: {fileID: 2100000, guid: 71c3f4a482848ed48a3d13937d8aa9b3, type: 2}
     - target: {fileID: -4316134024345546222, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -963,7 +963,7 @@ PrefabInstance:
     - target: {fileID: 1171549304580213878, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: d5fff47749a47c3409df71104f342deb, type: 2}
+      objectReference: {fileID: 2100000, guid: c7e257e3f127a6744bb955717cf5c5ac, type: 2}
     - target: {fileID: 1273670593257116515, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 

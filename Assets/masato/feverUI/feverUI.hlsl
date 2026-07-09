@@ -1,201 +1,299 @@
-#ifndef FLAME_FIRE_INCLUDED
-#define FLAME_FIRE_INCLUDED
+#ifndef FEVER_SCREEN_EFFECT_INCLUDED
+#define FEVER_SCREEN_EFFECT_INCLUDED
 
-// リング本体の揺れに使うノイズ
-sampler2D _NoiseTex;
-float4 _NoiseTex_ST;
-
-// 先端炎の形に使うテクスチャ
-sampler2D _FlameTex;
-float4 _FlameTex_ST;
-
-// リング本体の流れる速さ
-float _FlameSpeed;
-
-// リング本体の炎模様の強さ
-float _FlameStrength;
-
-// 先端炎の向き補正角度
-float _FlameAngleOffset;
-
-// 先端炎の長さ
-float _TipLength;
-
-// 先端炎の横幅
-float _TipWidth;
-
-// 先端炎の強さ
-float _TipStrength;
-
-// 外側境界だけのぼかし幅
-float _OuterEdgeSoftness;
-
-// 2Dベクトルを角度で回転
-float2 Rotate2D(float2 v, float rad)
+// ================================================================
+// 頂点シェーダーへ渡される入力情報
+// ================================================================
+struct AppData
 {
-    float s = sin(rad);
-    float c = cos(rad);
-    return float2(v.x * c - v.y * s, v.x * s + v.y * c);
+    // UI Imageを構成している頂点の位置。
+    float4 vertex : POSITION;
+
+    // テクスチャ上の座標。
+    // 左下が(0, 0)、右上が(1, 1)。
+    float2 uv : TEXCOORD0;
+
+    // ImageコンポーネントのColor。
+    // Image側で設定した透明度も、この値に含まれる。
+    float4 color : COLOR;
+};
+
+
+// ================================================================
+// 頂点シェーダーからフラグメントシェーダーへ渡す情報
+// ================================================================
+struct VertexToFragment
+{
+    // 最終的に画面へ描画する頂点位置。
+    float4 vertex : SV_POSITION;
+
+    // フラグメントシェーダーで使用するUV座標。
+    float2 uv : TEXCOORD0;
+
+    // Imageコンポーネントから受け取った色。
+    float4 color : COLOR;
+};
+
+
+// ================================================================
+// MaterialとUnity UIから渡される変数
+// ================================================================
+
+// ImageのSource Imageに設定されたSprite Texture。
+// Source Imageが空の場合は、基本的に白テクスチャが使用される。
+sampler2D _MainTex;
+
+// 画面の一番外側に表示する色。
+float4 _Color;
+
+// 枠の内側に表示する発光色。
+float4 _GlowColor;
+
+// 枠を表示する太さ。
+float _Width;
+
+// 枠と透明部分の境界をぼかす幅。
+float _Softness;
+
+// エフェクト全体の表示強度。
+float _Intensity;
+
+// 明滅する速度。
+float _PulseSpeed;
+
+// 集中線の本数
+float _LineCount;
+// 集中線の細さ
+float _LineSharpness;
+// 集中線が中央方向へ伸びる長さ
+float _LineLength;
+// 点滅する速度
+float _BlinkSpeed;
+
+// ================================================================
+// 頂点シェーダー
+//
+// UI Imageの頂点位置を画面描画用の座標へ変換する。
+// 色の計算はほとんど行わず、必要な情報を次の処理へ渡す。
+// ================================================================
+VertexToFragment FeverVertex(AppData input)
+{
+    // フラグメントシェーダーへ渡す情報を作る。
+    VertexToFragment output;
+
+    // UI Imageの頂点位置を、
+    // Unityのオブジェクト座標からクリップ座標へ変換する。
+    output.vertex = UnityObjectToClipPos(input.vertex);
+
+    // ImageのUV座標をそのまま渡す。
+    output.uv = input.uv;
+
+    // ImageコンポーネントのColorをそのまま渡す。
+    output.color = input.color;
+
+    return output;
 }
 
-// 炎色とアルファを返す
-float4 GetFlameColor(
-    float2 uv,
-    float4 baseColor,
-    float angle01,
-    float dist,
-    float innerRadius,
-    float outerRadius,
-    float fillAmount,
-    float startAngle)
+
+// ================================================================
+// フラグメントシェーダー
+//
+// 画面上の各ピクセルについて、最終的な色と透明度を計算する。
+// ================================================================
+float4 FeverFragment(VertexToFragment input) : SV_Target
 {
-    float t = _Time.y;
-    float2 center = float2(0.5, 0.5);
-
     // ------------------------------------------------------------
-    // 1. リング本体を作る
+    // 1. UV座標を取得
     // ------------------------------------------------------------
 
-    // リング本体の揺れ
-    float2 bodyUV1 = uv * 2.6 + float2(0.0, -t * _FlameSpeed);
-    float2 bodyUV2 = uv * 5.0 + float2(t * 0.18, -t * (_FlameSpeed * 1.7));
+    float2 uv = input.uv;
 
-    float bodyNoise1 = tex2D(_NoiseTex, TRANSFORM_TEX(bodyUV1, _NoiseTex)).r;
-    float bodyNoise2 = tex2D(_NoiseTex, TRANSFORM_TEX(bodyUV2, _NoiseTex)).r;
-    float bodyNoise = lerp(bodyNoise1, bodyNoise2, 0.5);
-
-    // リング境界を少しだけ崩す
-    float bodyDistort = (bodyNoise - 0.5) * 0.018 * _FlameStrength;
-
-    float innerEdge = innerRadius + bodyDistort * 0.25;
-    float outerEdge = outerRadius + bodyDistort * 0.65;
-
-    // 外側だけ Inspector の値でぼかす
-    float outerMask = 1.0 - smoothstep(outerEdge - _OuterEdgeSoftness, outerEdge + _OuterEdgeSoftness, dist);
-
-    // 内側は今まで通り固定値のまま
-    float innerMask = smoothstep(innerEdge - 0.010, innerEdge + 0.010, dist);
-
-    float ringMask = saturate(innerMask * outerMask);
-
-    // リング内での位置
-    float ringLerp = saturate((dist - innerRadius) / max(outerRadius - innerRadius, 0.0001));
-
-    // 内側を少し熱くする
-    float radialHeat = 1.0 - ringLerp;
-
-    // 基本の熱量
-    float heat = saturate(bodyNoise * _FlameStrength + radialHeat * 0.70);
-    heat = pow(heat, 1.35);
-
-    // リング本体の炎色
-    float3 darkColor = float3(0.10, 0.01, 0.00);
-    float3 midColor = float3(0.80, 0.16, 0.01);
-    float3 hotColor = float3(1.00, 0.72, 0.12);
-
-    float3 flameColor = lerp(darkColor, midColor, heat);
-    flameColor = lerp(flameColor, hotColor, pow(saturate(heat), 2.3));
 
     // ------------------------------------------------------------
-    // 2. 先端位置を求める
+    // 2. 上下左右の画面端までの距離を計算
     // ------------------------------------------------------------
 
-    // 開始角度を 0～1 に変換
-    float start01 = startAngle / 360.0;
+    float distanceLeft = uv.x;
+    float distanceRight = 1.0 - uv.x;
+    float distanceBottom = uv.y;
+    float distanceTop = 1.0 - uv.y;
 
-    // FillAmount の位置に対応する実角度を復元
-    // 0 = 12時, 時計回りに進む
-    float tipAngle01 = frac(0.25 - start01 - fillAmount);
-    float tipAngle = tipAngle01 * (2.0 * 3.14159265);
+    // 現在のピクセルから最も近い画面端までの距離。
+    // 画面端では0、中央へ進むほど大きくなる。
+    float edgeDistance = min(
+        min(distanceLeft, distanceRight),
+        min(distanceBottom, distanceTop)
+    );
 
-    // 先端の外周位置
-    float2 tipDir = float2(cos(tipAngle), sin(tipAngle));
-    float2 tipPoint = center + tipDir * outerRadius;
-
-    // 外向きベクトル
-    float2 outward = normalize(tipDir);
-
-    // 外向きを基準に、Inspector で炎方向を回せるようにする
-    float flameAngleRad = radians(_FlameAngleOffset);
-    float2 flameDir = normalize(Rotate2D(outward, flameAngleRad));
-
-    // 炎の横方向
-    float2 flameSide = float2(-flameDir.y, flameDir.x);
 
     // ------------------------------------------------------------
-    // 3. 先端専用の局所座標を作る
+    // 3. 黄色い画面枠を作る
     // ------------------------------------------------------------
 
-    // 先端を原点にした相対位置
-    float2 rel = uv - tipPoint;
+    // 画面端を1、中央を0にする。
+    float edgeMask = 1.0 - smoothstep(
+        _Width,
+        _Width + _Softness,
+        edgeDistance
+    );
 
-    // flameDir 方向が「炎の伸びる向き」
-    float localY = dot(rel, flameDir);
-
-    // flameSide 方向が「炎の横幅」
-    float localX = dot(rel, flameSide);
-
-    // 炎のローカル UV
-    // localY=0 が炎の根元、+側へ伸びる
-    float flameU = 0.5 + localX / max(_TipWidth, 0.0001);
-    float flameV = 1.0 - (localY / max(_TipLength, 0.0001));
 
     // ------------------------------------------------------------
-    // 4. 先端炎テクスチャを使って炎の形を作る
+    // 4. 画面中央を原点にした座標を作る
     // ------------------------------------------------------------
 
-    // 炎は少し流す
-    float2 flameUV = float2(flameU, flameV + t * (_FlameSpeed * 0.45));
+    // UVの中心を(0, 0)にする。
+    //
+    // 左下は約(-0.5, -0.5)
+    // 右上は約( 0.5,  0.5)
+    float2 centeredUV = uv - 0.5;
 
-    // 炎テクスチャを取得
-    float4 flameTex = tex2D(_FlameTex, TRANSFORM_TEX(flameUV, _FlameTex));
+    // Game画面の横長比率を補正する。
+    // これを入れないと、集中線の角度が横方向に歪む。
+    float aspect = _ScreenParams.x / _ScreenParams.y;
+    centeredUV.x *= aspect;
 
-    // 写真系でも白黒系でも使いやすいように輝度を使う
-    float flameLuma = dot(flameTex.rgb, float3(0.299, 0.587, 0.114));
-
-    // テクスチャの alpha か輝度の大きい方を採用
-    float flameShape = max(flameTex.a, flameLuma);
-
-    // 炎の外側で勝手に出ないように、ローカル範囲でもマスク
-    float widthMask = saturate(1.0 - abs(localX) / max(_TipWidth, 0.0001));
-    float lengthMask = saturate(1.0 - saturate(localY / max(_TipLength, 0.0001)));
-    float baseTipMask = saturate(step(0.0, localY) * widthMask * lengthMask);
-
-    // 先端炎の最終形
-    float tipMask = flameShape * baseTipMask * _TipStrength;
-
-    // 先端の炎がリング外へ少しはみ出せるようにする
-    float finalMask = max(ringMask, tipMask);
 
     // ------------------------------------------------------------
-    // 5. 先端炎の色を作る
+    // 5. 中央から見た角度を計算
     // ------------------------------------------------------------
 
-    // 炎テクスチャの根元は赤橙、明るいところは黄白
-    float3 tipOuterColor = float3(1.00, 0.28, 0.02);
-    float3 tipInnerColor = float3(1.00, 0.95, 0.72);
+    // atan2によって、現在のピクセルが
+    // 中央から見てどの方向にあるかを取得する。
+    //
+    // 結果は約 -3.14 から 3.14。
+    float angle = atan2(
+        centeredUV.y,
+        centeredUV.x
+    );
 
-    // 炎の芯
-    float tipCore = pow(saturate(flameShape), 2.5) * baseTipMask;
-
-    // 先端炎を加算
-    flameColor += tipOuterColor * tipMask;
-    flameColor += tipInnerColor * tipCore * (_TipStrength * 0.85);
-
-    // リングと先端のつなぎ目を少し明るくする
-    float joinMask = saturate(1.0 - abs(dist - outerRadius) / 0.04) * baseTipMask;
-    flameColor += hotColor * joinMask * 0.35 * _TipStrength;
 
     // ------------------------------------------------------------
-    // 6. 最終色
+    // 6. 角度を使って漫画の集中線を作る
     // ------------------------------------------------------------
 
-    float alpha = baseColor.a * saturate(finalMask);
+    // angleへLineCountを掛けてcosへ渡すことで、
+    // 中央から放射状に並ぶ模様を作る。
+    float lineWave = cos(
+        angle * _LineCount
+    );
 
-    // 暗部を少し残して、ベタッとしすぎないようにする
-    flameColor *= lerp(0.78, 1.12, heat);
+    // cosの負の部分を消して、線になる部分だけを残す。
+    lineWave = saturate(lineWave);
 
-    return float4(flameColor * baseColor.rgb, alpha);
+    // LineSharpnessで線を細くする。
+    //
+    // 小さい値：太い光の筋
+    // 大きい値：細い漫画の集中線
+    float lineMask = pow(
+        lineWave,
+        _LineSharpness
+    );
+
+
+    // ------------------------------------------------------------
+    // 7. 集中線を画面端付近だけに表示する
+    // ------------------------------------------------------------
+
+    // 画面中央まで線が入りすぎないようにする。
+    //
+    // edgeDistanceが小さい画面端では1。
+    // 中央へ進むにつれて0になる。
+    float lineLengthMask = 1.0 - smoothstep(
+        _LineLength,
+        _LineLength + _Softness,
+        edgeDistance
+    );
+
+    // 放射状模様と長さ制限を掛け合わせる。
+    lineMask *= lineLengthMask;
+
+
+    // ------------------------------------------------------------
+    // 8. 点滅を作る
+    // ------------------------------------------------------------
+
+    // 0から1の間を往復する値を作る。
+    float blinkWave =
+        sin(_Time.y * _BlinkSpeed) * 0.5 + 0.5;
+
+    // smoothstepで明るい時間と暗い時間をはっきり分ける。
+    //
+    // 通常のsinだけより、漫画的な点滅になる。
+    float blink = smoothstep(
+        0.3,
+        0.75,
+        blinkWave
+    );
+
+
+    // ------------------------------------------------------------
+    // 9. 通常の発光も少し残す
+    // ------------------------------------------------------------
+
+    // 完全に消えると見づらいため、
+    // 弱い発光を残しながら点滅させる。
+    float pulse = lerp(
+        0.45,
+        1.0,
+        blink
+    );
+
+
+    // ------------------------------------------------------------
+    // 10. 色を計算
+    // ------------------------------------------------------------
+
+    // 画面端から枠の内側までを0から1へ変換する。
+    float glowPosition = saturate(
+        edgeDistance / max(_Width, 0.001)
+    );
+
+    // 外側をオレンジ、内側を黄色にする。
+    float3 baseColor = lerp(
+        _Color.rgb,
+        _GlowColor.rgb,
+        glowPosition
+    );
+
+    // 集中線は通常の枠より明るくする。
+    float3 lineColor = _GlowColor.rgb * 1.8;
+
+    // lineMaskを使って通常色と集中線の色を混ぜる。
+    float3 finalColor = lerp(
+        baseColor,
+        lineColor,
+        lineMask
+    );
+
+
+    // ------------------------------------------------------------
+    // 11. 最終的な透明度を計算
+    // ------------------------------------------------------------
+
+    float textureAlpha = tex2D(
+        _MainTex,
+        uv
+    ).a;
+
+    // 枠と集中線を合成する。
+    //
+    // 集中線部分は強く点滅させる。
+    float combinedMask = max(
+        edgeMask * 0.6,
+        lineMask
+    );
+
+    float alpha =
+        combinedMask *
+        pulse *
+        _Intensity *
+        input.color.a *
+        textureAlpha;
+
+    return float4(
+        finalColor,
+        saturate(alpha)
+    );
 }
-
 #endif

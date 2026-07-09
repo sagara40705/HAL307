@@ -78,4 +78,9 @@ public class StageEndJudge : MonoBehaviour
     {
 
     }
+
+    public void ResetJudge()
+    {
+        _isJudged = false;
+    }
 }

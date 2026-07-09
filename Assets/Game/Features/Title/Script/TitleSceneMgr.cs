@@ -16,7 +16,15 @@ public class TitleSceneMgr : MonoBehaviour
         // デバッグ用のスペースキーで次のシーンに遷移
         if (DebugShortcuts.Pressed(_key))
         {
-            SceneLoader.Load(_nextSceneName);
+            PauseManager.Instance.OpenPause();
+            //SceneLoader.Load(_nextSceneName);
         }
+
+        if (DebugShortcuts.Pressed(UnityEngine.InputSystem.Key.LeftCtrl))
+        {
+            PauseManager.Instance.ClosePause();
+            //SceneLoader.Load(_nextSceneName);
+        }
+
     }
 }

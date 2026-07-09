@@ -24,16 +24,16 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 8400000, guid: bf754a73a637c8e4dbb24f5d1277ecee, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AmbientStrength: 0.05
-    - _LedCount: 160
-    - _LedDotSize: 0.45
-    - _Monitorlight: 1.8
-    - _Saturation: 1.2
+    - _AmbientStrength: 0.018
+    - _LedCount: 400
+    - _LedDotSize: 0.607
+    - _Monitorlight: 4.18
+    - _Saturation: 1.787
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

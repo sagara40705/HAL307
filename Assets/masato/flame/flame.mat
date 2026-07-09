@@ -43,9 +43,9 @@ Material:
     - _FlameStrength: 0.8
     - _FlickerSpeed: 6
     - _FlickerStrength: 0.08
-    - _InnerRadius: 0.301
+    - _InnerRadius: 0.325
     - _OuterEdgeSoftness: 0.001
-    - _OuterRadius: 0.5
+    - _OuterRadius: 0.436
     - _Radius: 0.4
     - _Scale: 0.75
     - _StartAngle: 0

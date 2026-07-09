@@ -156,7 +156,6 @@ MonoBehaviour:
   - VoiceAi
   - InGameUI
   - AudienceRequest
-  - crowdtest
 --- !u!4 &773442693
 Transform:
   m_ObjectHideFlags: 0

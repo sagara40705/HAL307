@@ -29,11 +29,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AmbientStrength: 0.053
-    - _LedCount: 112
+    - _AmbientStrength: 0.018
+    - _LedCount: 400
     - _LedDotSize: 0.607
-    - _Monitorlight: 2.78
-    - _Saturation: 0.98
+    - _Monitorlight: 4.18
+    - _Saturation: 1.787
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

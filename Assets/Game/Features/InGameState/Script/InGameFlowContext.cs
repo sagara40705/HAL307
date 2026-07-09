@@ -1,14 +1,48 @@
 using UnityEngine;
 
-// インゲーム進行Stateから参照する外部要素の保持
+// Scene references used by in-game flow states.
 public sealed class InGameFlowContext : MonoBehaviour
 {
     [SerializeField] private ForwardProgressMover forwardProgressMover;
     [SerializeField] private StageEndJudge stageEndJudge;
+    [SerializeField] private ScoreManager scoreManager;
 
-    // 前進制御
+    // Forward movement controller.
     public ForwardProgressMover ForwardProgressMover => forwardProgressMover;
 
-    // ステージ終了判定
+    // Stage end trigger.
     public StageEndJudge StageEndJudge => stageEndJudge;
+
+    // Score source.
+    public ScoreManager ScoreSource
+    {
+        get
+        {
+            ResolveScoreManager();
+            return scoreManager;
+        }
+    }
+
+    // Current player score.
+    public int CurrentPlayerScore => ScoreSource != null ? ScoreSource.PlayerScore : 0;
+
+    private void Awake()
+    {
+        ResolveScoreManager();
+    }
+
+    // Finds ScoreManager when inspector reference is empty.
+    private void ResolveScoreManager()
+    {
+        if (scoreManager != null)
+        {
+            return;
+        }
+
+        scoreManager = global::ScoreManager.Instance;
+        if (scoreManager == null)
+        {
+            scoreManager = FindFirstObjectByType<ScoreManager>();
+        }
+    }
 }

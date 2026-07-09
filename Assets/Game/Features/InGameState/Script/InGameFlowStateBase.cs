@@ -1,21 +1,21 @@
 using System.Collections;
 
-// インゲーム進行Stateの基底クラス
+// Base class for in-game flow states.
 public abstract class InGameFlowStateBase : IInGameFlowState
 {
-    // クラス名を標準のState名にする
+    // Uses class name as default state name.
     public virtual string StateName => GetType().Name;
 
-    // State開始時の標準処理
+    // Default enter logic.
     public virtual IEnumerator Enter(InGameFlowContext context)
     {
         yield break;
     }
 
-    // State中のメイン処理
+    // Main state body.
     public abstract IEnumerator Execute(InGameFlowContext context);
 
-    // State終了時の標準処理
+    // Default exit logic.
     public virtual IEnumerator Exit(InGameFlowContext context)
     {
         yield break;

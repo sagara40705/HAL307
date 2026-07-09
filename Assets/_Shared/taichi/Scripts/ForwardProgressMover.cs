@@ -255,4 +255,10 @@ public class ForwardProgressMover : MonoBehaviour
         _isStopped = true;
         _canMove = false;
     }
+
+    public void ResumeMove()
+    {
+        _isStopped = false;
+        _canMove = true;
+    }
 }

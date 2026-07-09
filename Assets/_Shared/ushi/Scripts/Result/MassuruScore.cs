@@ -9,7 +9,7 @@ namespace ushi.Sandbox
         void Start()
         {
             Text scoreText = scoreObject.GetComponent<Text>();
-            scoreText.text = "マッスル乱入回数:";
+            scoreText.text = "マッスル乱入回数:";//乱入した回数の変数を+として書く書き方はResultScene参照
 
         }
 

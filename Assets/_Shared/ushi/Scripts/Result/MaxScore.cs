@@ -9,7 +9,7 @@ namespace ushi.Sandbox
         void Start()
         {
             Text scoreText = scoreObject.GetComponent<Text>();
-            scoreText.text = "最終点数:";
+            scoreText.text = "最終点数:";//最終点数の変数を+として書く書き方はResultScene参照
         }
 
         // Update is called once per frame

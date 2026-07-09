@@ -18,7 +18,7 @@ namespace ushi.Sandbox
         void Update()
         {
             Text scoreText = scoreObject.GetComponent<Text>();
-            scoreText.text = "Score:"+ Resultpoint;
+            scoreText.text = "パリィ成功回数:"+ Resultpoint;
         }
     }
 }

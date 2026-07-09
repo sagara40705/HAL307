@@ -10,20 +10,18 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private float maxValue = 1.0f;
     [SerializeField] private float minValue = 0.0f;
 
-    [Header("距離で減少させるやつ")]
-    [SerializeField] private Transform distanceFromObject;
-    [SerializeField] private Transform distanceToObject;
-    [SerializeField] private float arriveDistance = 0.2f;
-
     [Header("警告UI")]
     [SerializeField] private GameObject warningUI;
-    [SerializeField] private float warningThreshold = 0.2f;
+    [SerializeField] private float warningThreshold = 0.05f;
 
     [Header("Fade演出時に非表示にするUI")]
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
 
+    [Header("フェード設定")]
+    [SerializeField] private float fadeInDelay = 2f;
+    [SerializeField] private float fadeThreshold = 0.035f;
+
     private float currentValue;
-    private float startDistance;
     private bool isTransitionStarted = false;
 
     private void Start()
@@ -40,37 +38,13 @@ public class WaveGaugeController : MonoBehaviour
 
         if (waveMaterial == null)
         {
-            Debug.LogError("WaveMaterialが見つかりません。");
-            return;
-        }
-
-        if (distanceFromObject == null || distanceToObject == null)
-        {
-            Debug.LogError("距離を測るオブジェクトが設定されていません。", this);
-            return;
-        }
-
-        startDistance = Vector3.Distance(
-         distanceFromObject.position,
-        distanceToObject.position
-        );
-
-        if (startDistance <= arriveDistance)
-        {
-            Debug.LogWarning(
-                "[WaveGaugeController] 開始時点でDistanceFromObjectとDistanceToObjectが近すぎます。距離設定を確認してください。",
-                this
-            );
-
-            currentValue = maxValue;
-            waveMaterial.SetFloat(propertyName, currentValue);
-
+            Debug.LogError("[WaveGaugeController] WaveMaterial が見つかりません。", this);
             enabled = false;
-
             return;
         }
+
         currentValue = maxValue;
-        waveMaterial.SetFloat(propertyName, currentValue);
+        SetGaugeValue(currentValue);
 
         if (warningUI != null)
         {
@@ -85,38 +59,24 @@ public class WaveGaugeController : MonoBehaviour
             return;
         }
 
-        if (distanceFromObject == null || distanceToObject == null)
-        {
-            return;
-        }
-
         if (isTransitionStarted)
         {
             return;
         }
 
-        float currentDistance = Vector3.Distance(
-            distanceFromObject.position,
-            distanceToObject.position
-        );
+        StageProgressProvider provider = StageProgressProvider.Instance;
 
-        if (currentDistance <= arriveDistance)
+        if (provider == null)
         {
-            SetGaugeValue(minValue);
-            StartGaugeEmptyTransition();
             return;
         }
 
-        float distanceRate = Mathf.InverseLerp(
-            arriveDistance,
-            startDistance,
-            currentDistance
-        );
+        float gaugeRate = Mathf.Clamp01(provider.GaugeRate);
 
         currentValue = Mathf.Lerp(
             minValue,
             maxValue,
-            distanceRate
+            gaugeRate
         );
 
         currentValue = Mathf.Clamp(
@@ -127,16 +87,34 @@ public class WaveGaugeController : MonoBehaviour
 
         SetGaugeValue(currentValue);
 
+        Debug.Log($"[WaveGaugeController] gaugeRate={gaugeRate}, currentValue={currentValue}, IsArrived={provider.IsArrived}",
+            this);
+
+        // 警告UIは GaugeRate 基準で判定する
         if (warningUI != null)
         {
             warningUI.SetActive(currentValue <= warningThreshold);
+        }
+
+        if (provider.IsArrived || currentValue <= fadeThreshold)
+        {
+            SetGaugeValue(minValue);
+            StartGaugeEmptyTransition();
         }
     }
 
     private void SetGaugeValue(float value)
     {
-        currentValue = Mathf.Clamp(value, minValue, maxValue);
-        waveMaterial.SetFloat(propertyName, currentValue);
+        currentValue = Mathf.Clamp(
+            value,
+            minValue,
+            maxValue
+        );
+
+        waveMaterial.SetFloat(
+            propertyName,
+            currentValue
+        );
     }
 
     private void StartGaugeEmptyTransition()
@@ -171,7 +149,10 @@ public class WaveGaugeController : MonoBehaviour
     private async UniTaskVoid PlayGaugeEmptyTransition()
     {
         await TransitionManager.PlayDumbbellFadeOut();
-        await UniTask.Delay(2000);
+
+        await UniTask.Delay(
+            (int)(fadeInDelay * 1000)
+        );
 
         await TransitionManager.FadeIn();
     }

@@ -175,14 +175,13 @@ MonoBehaviour:
   propertyName: _BaseLine
   maxValue: 0.7
   minValue: 0
-  distanceFromObject: {fileID: 8586093881180285886, guid: 543c7a7eb3f9c8a43a7a06aa5b3aa19b, type: 3}
-  distanceToObject: {fileID: 7355764406877124683, guid: 18bc3157fd4abdd4b9b2081278c64d88, type: 3}
-  arriveDistance: 1
   warningUI: {fileID: 811645271}
-  warningThreshold: 0.03
+  warningThreshold: 0.04
   hideOnWaveEffectUis:
   - {fileID: 1718496973}
   - {fileID: 2119480822}
+  fadeInDelay: 2
+  fadeThreshold: 0.035
 --- !u!1 &36460463
 GameObject:
   m_ObjectHideFlags: 0

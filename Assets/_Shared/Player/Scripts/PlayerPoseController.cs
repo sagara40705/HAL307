@@ -101,6 +101,11 @@ namespace Player
 
         public void TryOnPose(PoseID poseID)
         {
+            if (InGameFlowLock.IsGameStartActionPlaying)
+            {
+                return;
+            }
+
             if (!_isPose)
             {
                 OnPose(poseID);

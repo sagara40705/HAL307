@@ -12,7 +12,14 @@ public sealed class InGameFlowContext : MonoBehaviour
     [SerializeField] private EnemyLineupManager enemyLineupManager;
 
     // 前進制御
-    public ForwardProgressMover ForwardProgressMover => forwardProgressMover;
+    public ForwardProgressMover ForwardProgressMover
+    {
+        get
+        {
+            ResolveForwardProgressMover();
+            return forwardProgressMover;
+        }
+    }
 
     // ステージ終了判定
     public StageEndJudge StageEndJudge
@@ -69,8 +76,20 @@ public sealed class InGameFlowContext : MonoBehaviour
     private void Awake()
     {
         ResolveStageModelContext();
+        ResolveForwardProgressMover();
         ResolveScoreManager();
         ResolveEnemyLineupManager();
+    }
+
+    // Inspector未設定時のForwardProgressMover検索
+    private void ResolveForwardProgressMover()
+    {
+        if (forwardProgressMover != null)
+        {
+            return;
+        }
+
+        forwardProgressMover = FindFirstObjectByType<ForwardProgressMover>();
     }
 
     // Inspector未設定時のStageModelContext検索

@@ -63,6 +63,11 @@ public class ForwardProgressMover : MonoBehaviour
             return;
         }
 
+        if (InGameFlowLock.IsGameStartActionPlaying)
+        {
+            return;
+        }
+
         if (IsAnyPosing())
         {
             return;
@@ -237,7 +242,7 @@ public class ForwardProgressMover : MonoBehaviour
 
     private void StartMove()
     {
-        if (_canMove || _isStopped)
+        if (_canMove || _isStopped || InGameFlowLock.IsGameStartActionPlaying)
         {
             return;
         }

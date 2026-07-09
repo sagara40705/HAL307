@@ -5,6 +5,8 @@ public sealed class GameStartFlowState : InGameFlowStateBase
 {
     private readonly StageData _stageData;
 
+    public bool IsPresentationFinished { get; private set; }
+
     public GameStartFlowState(StageData stageData)
     {
         _stageData = stageData;
@@ -13,6 +15,8 @@ public sealed class GameStartFlowState : InGameFlowStateBase
     // ゲーム開始演出の実行
     public override IEnumerator Execute(InGameFlowContext context)
     {
+        IsPresentationFinished = false;
+
         if (_stageData != null && _stageData.HasInitialEnemies)
         {
             if (context == null || context.EnemyLineup == null)
@@ -26,11 +30,20 @@ public sealed class GameStartFlowState : InGameFlowStateBase
         }
 
         InGamePresentationAction action = _stageData != null ? _stageData.GameStartAction : null;
-        if (action == null)
-        {
-            yield break;
-        }
+        InGameFlowLock.BeginGameStartAction();
+        context?.ForwardProgressMover?.StopMove();
 
-        yield return action.Play(context);
+        try
+        {
+            if (action != null)
+            {
+                yield return action.Play(context);
+            }
+        }
+        finally
+        {
+            InGameFlowLock.EndGameStartAction();
+            IsPresentationFinished = true;
+        }
     }
 }

@@ -41,6 +41,11 @@ public class VoiceCommandAction : MonoBehaviour
             return;
         }
 
+        if (InGameFlowLock.IsGameStartActionPlaying)
+        {
+            return;
+        }
+
         if (logCommand)
         {
             Debug.Log("[Action] command = " + command +

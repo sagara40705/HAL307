@@ -69,7 +69,12 @@ public sealed class InGameFlowController : MonoBehaviour
     {
         _currentWaveIndex = 0;
 
-        yield return ChangeStateCoroutine(new GameStartFlowState(stageData));
+        var gameStartState = new GameStartFlowState(stageData);
+        yield return ChangeStateCoroutine(gameStartState);
+        while (!gameStartState.IsPresentationFinished)
+        {
+            yield return null;
+        }
 
         while (stageData.HasWave(_currentWaveIndex))
         {

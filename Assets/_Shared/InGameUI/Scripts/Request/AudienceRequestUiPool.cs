@@ -129,6 +129,14 @@ namespace AudienceRequest
         // 指定ポーズのUIを演出付きで消す
         public void PlayClearEffectAndRelease(PoseID pose, bool isPlayer)
         {
+            Debug.Log($"[TimeScale Check] Time.timeScale = {Time.timeScale}");
+            if (!IsValidPose(pose))
+            {
+
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return;
+            }
+
             if (!IsValidPose(pose))
             {
                 Debug.LogError($"Invalid audience request pose: {pose}");
@@ -192,12 +200,34 @@ namespace AudienceRequest
 
         private IEnumerator ReleaseAfterDelay(GameObject obj, PoseID pose, float delay)
         {
-            yield return new WaitForSeconds(delay);
+            Debug.Log($"[AudienceRequestUiPool] Release wait start : {pose}");
 
-            if (obj != null && IsValidPose(pose))
+            yield return new WaitForSecondsRealtime(delay);
+
+            Debug.Log($"[AudienceRequestUiPool] Release execute : {pose}");
+
+            if (obj == null)
             {
-                _uiPools[(int)pose].Release(obj);
+                yield break;
             }
+
+            // 念のため、Release前に強制的に非表示にする
+            obj.SetActive(false);
+
+            if (!IsValidPose(pose))
+            {
+                yield break;
+            }
+
+            int poseIndex = (int)pose;
+
+            if (poseIndex < 0 || poseIndex >= _uiPools.Count)
+            {
+                Debug.LogError($"[AudienceRequestUiPool] UI Pool is missing for pose : {pose}");
+                yield break;
+            }
+
+            _uiPools[poseIndex].Release(obj);
         }
 
 

@@ -172,10 +172,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveGaugeController
   waveMaterial: {fileID: 2100000, guid: 343ab00e3639d9246b71ddd9a09ead13, type: 2}
-  decreaseSpeed: 0.01
   propertyName: _BaseLine
   maxValue: 0.7
   minValue: 0
+  distanceFromObject: {fileID: 8586093881180285886, guid: 543c7a7eb3f9c8a43a7a06aa5b3aa19b, type: 3}
+  distanceToObject: {fileID: 7355764406877124683, guid: 18bc3157fd4abdd4b9b2081278c64d88, type: 3}
+  arriveDistance: 1
   warningUI: {fileID: 811645271}
   warningThreshold: 0.03
   hideOnWaveEffectUis:
@@ -439,6 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baaa62f64f6a6fc48919752b66c0356e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.AudienceRequestSystem
+  _isTutorialMode: 0
   _maxRequestCount: 50
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}

@@ -29,9 +29,7 @@ namespace AudienceRequest
         // 初期化
         private void Start()
         {
-            _requestTimer = 0f;
-            _currentRequestCount = 0;
-            _audienceRequests.ClearAll();
+            ResetRequests();
 
             if (_feverGaugeController == null)
             {
@@ -63,6 +61,14 @@ namespace AudienceRequest
         }
 
         // リクエストをクリアする関数
+        public void ResetRequests()
+        {
+            _requestTimer = 0f;
+            _currentRequestCount = 0;
+            _audienceRequests?.ClearAll();
+            _uiPool?.ClearAllUiPools();
+        }
+
         public void ClearRequest(PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
         {
             int value = _audienceRequests.GetCount(poseID);

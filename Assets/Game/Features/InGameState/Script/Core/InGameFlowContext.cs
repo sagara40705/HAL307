@@ -1,3 +1,4 @@
+using AudienceRequest;
 using Enemy;
 using UnityEngine;
 
@@ -11,6 +12,9 @@ public sealed class InGameFlowContext : MonoBehaviour
     [SerializeField] private ScoreManager scoreManager;
     [SerializeField] private EnemyLineupManager enemyLineupManager;
     [SerializeField] private InGamePresentationEventRegistry presentationEventRegistry;
+    [SerializeField] private WaveGaugeController waveGaugeController;
+    [SerializeField] private InGamePresentationAction resetPositionAction;
+    [SerializeField] private AudienceRequestSystem audienceRequestSystem;
 
     // 前進制御
     public ForwardProgressMover ForwardProgressMover
@@ -83,6 +87,26 @@ public sealed class InGameFlowContext : MonoBehaviour
         }
     }
 
+    public WaveGaugeController WaveGauge
+    {
+        get
+        {
+            ResolveWaveGaugeController();
+            return waveGaugeController;
+        }
+    }
+
+    public InGamePresentationAction ResetPositionAction => resetPositionAction;
+
+    public AudienceRequestSystem AudienceRequest
+    {
+        get
+        {
+            ResolveAudienceRequestSystem();
+            return audienceRequestSystem;
+        }
+    }
+
     private void Awake()
     {
         ResolveStageModelContext();
@@ -90,6 +114,8 @@ public sealed class InGameFlowContext : MonoBehaviour
         ResolveScoreManager();
         ResolveEnemyLineupManager();
         ResolvePresentationEventRegistry();
+        ResolveWaveGaugeController();
+        ResolveAudienceRequestSystem();
     }
 
     // Inspector未設定時のForwardProgressMover検索
@@ -163,5 +189,25 @@ public sealed class InGameFlowContext : MonoBehaviour
         {
             presentationEventRegistry = FindFirstObjectByType<InGamePresentationEventRegistry>();
         }
+    }
+
+    private void ResolveWaveGaugeController()
+    {
+        if (waveGaugeController != null)
+        {
+            return;
+        }
+
+        waveGaugeController = FindFirstObjectByType<WaveGaugeController>();
+    }
+
+    private void ResolveAudienceRequestSystem()
+    {
+        if (audienceRequestSystem != null)
+        {
+            return;
+        }
+
+        audienceRequestSystem = FindFirstObjectByType<AudienceRequestSystem>();
     }
 }

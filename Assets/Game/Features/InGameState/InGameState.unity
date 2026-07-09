@@ -480,6 +480,10 @@ MonoBehaviour:
   stageEndJudge: {fileID: 0}
   scoreManager: {fileID: 0}
   enemyLineupManager: {fileID: 0}
+  presentationEventRegistry: {fileID: 0}
+  waveGaugeController: {fileID: 0}
+  resetPositionAction: {fileID: 11400000, guid: cd526890cf05dd648882b79fa41b73d5, type: 2}
+  audienceRequestSystem: {fileID: 0}
 --- !u!4 &1717693390
 Transform:
   m_ObjectHideFlags: 0

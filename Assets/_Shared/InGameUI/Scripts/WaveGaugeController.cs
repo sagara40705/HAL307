@@ -67,6 +67,35 @@ public class WaveGaugeController : MonoBehaviour
         }
     }
 
+    public void ResetWaveGauge()
+    {
+        TransitionManager.ResetImmediate();
+
+        isTransitionStarted = false;
+        currentValue = maxValue;
+
+        if (waveMaterial == null)
+        {
+            Image image = GetComponent<Image>();
+            if (image != null)
+            {
+                waveMaterial = image.material;
+            }
+        }
+
+        if (waveMaterial != null)
+        {
+            waveMaterial.SetFloat(propertyName, currentValue);
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(false);
+        }
+
+        ShowOtherUis();
+    }
+
     private void SetupStageEndJudge()
     {
         if (stageEndJudge != null)
@@ -116,6 +145,17 @@ public class WaveGaugeController : MonoBehaviour
             if (ui != null)
             {
                 ui.SetActive(false);
+            }
+        }
+    }
+
+    private void ShowOtherUis()
+    {
+        foreach (GameObject ui in hideOnWaveEffectUis)
+        {
+            if (ui != null)
+            {
+                ui.SetActive(true);
             }
         }
     }

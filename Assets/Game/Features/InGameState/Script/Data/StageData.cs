@@ -1,3 +1,4 @@
+using Enemy;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "StageData", menuName = "Game/InGame/Stage Data")]
@@ -10,12 +11,17 @@ public sealed class StageData : ScriptableObject
     [Header("Scene")]
     [SerializeField] private string resultSceneName = "Result";
 
+    [Header("Enemy")]
+    [SerializeField] private EnemyLineupEntry[] initialEnemies;
+
     [Header("Wave")]
     [SerializeField] private WaveData[] waves;
 
     public InGamePresentationAction GameStartAction => gameStartAction;
     public InGamePresentationAction GameEndAction => gameEndAction;
     public string ResultSceneName => resultSceneName;
+    public EnemyLineupEntry[] InitialEnemies => initialEnemies;
+    public bool HasInitialEnemies => initialEnemies != null && initialEnemies.Length > 0;
     public int WaveCount => waves != null ? waves.Length : 0;
 
     // Wave番号に対応するWaveData取得

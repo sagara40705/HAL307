@@ -86,7 +86,8 @@ public sealed class InGameFlowController : MonoBehaviour
                 break;
             }
 
-            yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave));
+            WaveData nextWave = stageData.GetWaveOrNull(_currentWaveIndex + 1);
+            yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave, nextWave));
             _currentWaveIndex++;
         }
 

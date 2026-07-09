@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 232563141}
   - component: {fileID: 232563140}
+  - component: {fileID: 232563142}
   m_Layer: 0
   m_Name: EnemyGenerator
   m_TagString: Untagged
@@ -146,13 +147,35 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e2fec992207e514fbfd0c8762de70ba, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyGenerator
   _enemyRegistry: {fileID: 904307783}
   _poseController: {fileID: 535028703}
   _enemyContext: {fileID: 770144274}
   _parent: {fileID: 904307782}
   _spawnData: {fileID: 11400000, guid: 10a6a492d28b84840b91eff81192bb69, type: 2}
+--- !u!114 &232563142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232563139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f5f2f7d547b4c94a6c3a8996da87f3d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyLineupManager
+  _enemyGenerator: {fileID: 232563140}
+  _enemyRegistry: {fileID: 904307783}
+  _scoreManager: {fileID: 0}
+  _forwardProgressMover: {fileID: 0}
+  _enemy1: {fileID: 0}
+  _enemy2: {fileID: 0}
+  _enemy1SpawnPoint: {fileID: 0}
+  _enemy2SpawnPoint: {fileID: 0}
+  _replacementEnemyData: {fileID: 0}
+  _resetScoreOnReplace: 1
 --- !u!4 &232563141
 Transform:
   m_ObjectHideFlags: 0
@@ -319,7 +342,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 529276125}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4fd4cbaddcc01eb4aa30b7c3f14a2a9d, type: 3}
   m_Name: 

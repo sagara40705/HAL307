@@ -1,3 +1,4 @@
+using Enemy;
 using UnityEngine;
 
 // インゲーム進行Stateから参照するシーン要素
@@ -8,6 +9,7 @@ public sealed class InGameFlowContext : MonoBehaviour
     [SerializeField] private ForwardProgressMover forwardProgressMover;
     [SerializeField] private StageEndJudge stageEndJudge;
     [SerializeField] private ScoreManager scoreManager;
+    [SerializeField] private EnemyLineupManager enemyLineupManager;
 
     // 前進制御
     public ForwardProgressMover ForwardProgressMover => forwardProgressMover;
@@ -55,10 +57,20 @@ public sealed class InGameFlowContext : MonoBehaviour
     // 現在のプレイヤースコア
     public int CurrentPlayerScore => ScoreSource != null ? ScoreSource.PlayerScore : 0;
 
+    public EnemyLineupManager EnemyLineup
+    {
+        get
+        {
+            ResolveEnemyLineupManager();
+            return enemyLineupManager;
+        }
+    }
+
     private void Awake()
     {
         ResolveStageModelContext();
         ResolveScoreManager();
+        ResolveEnemyLineupManager();
     }
 
     // Inspector未設定時のStageModelContext検索
@@ -94,5 +106,16 @@ public sealed class InGameFlowContext : MonoBehaviour
         {
             scoreManager = FindFirstObjectByType<ScoreManager>();
         }
+    }
+
+    // Inspector未設定時のEnemyLineupManager検索
+    private void ResolveEnemyLineupManager()
+    {
+        if (enemyLineupManager != null)
+        {
+            return;
+        }
+
+        enemyLineupManager = FindFirstObjectByType<EnemyLineupManager>();
     }
 }

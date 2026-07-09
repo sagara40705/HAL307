@@ -14,6 +14,8 @@ public class SubmonitorMove : MonoBehaviour
     private Transform player;
     private Transform enemyL;
     private Transform enemyR;
+    private Enemy.EnemyLineupManager enemyLineupManager;
+    private Enemy.EnemyRegistry enemyRegistry;
 
     //現在見ているターゲット
     private Transform currentTarget;
@@ -33,45 +35,25 @@ public class SubmonitorMove : MonoBehaviour
 
     //移動しているかのフラグ
     private bool isMoving = false;
+    private bool isCameraInitialized = false;
 
     void Start()
     {
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-        GameObject enemyLObject = GameObject.FindGameObjectWithTag("EnemyL");
-        GameObject enemyRObject = GameObject.FindGameObjectWithTag("EnemyR");
-        
-        if (enemyLObject != null)
-        {
-            enemyL = enemyLObject.transform;
-        }
-
-        if (enemyRObject != null)
-        {
-            enemyR = enemyRObject.transform;
-        }
-
-        if (playerObject == null || enemyL == null || enemyR == null)
-        {
-            return;
-        }
-
-        player = playerObject.transform;
-        if (cameraPivot == null)
-        {
-            GameObject pivotObject = new GameObject("CameraPivot");
-            cameraPivot = pivotObject.transform;
-        }
-
-        cameraPivot.SetParent(player);
-        cameraPivot.localPosition = Vector3.zero;
-        cameraPivot.localRotation = Quaternion.identity;
-        transform.SetParent(cameraPivot);
-        transform.localPosition = new Vector3(0f, 1.8f, 5f);
-        transform.LookAt(player.position + new Vector3(0f, 1.2f, 0f));
+        ResolvePlayer();
+        ResolveEnemies();
+        SetupCameraPivot();
     }
 
     void Update()
     {
+        if (!isCameraInitialized)
+        {
+            ResolvePlayer();
+            SetupCameraPivot();
+        }
+
+        ResolveEnemies();
+
         if (isMoving)
         {
             moveTimer += Time.deltaTime;
@@ -95,7 +77,17 @@ public class SubmonitorMove : MonoBehaviour
 
         if (isStopFront == false && isMoving == false)
         {
+            if (cameraPivot == null)
+            {
+                return;
+            }
+
             cameraPivot.Rotate(0f, moveSpeed * Time.deltaTime, 0f);
+        }
+
+        if (Keyboard.current == null)
+        {
+            return;
         }
 
         if (Keyboard.current.enterKey.wasPressedThisFrame)
@@ -140,6 +132,11 @@ public class SubmonitorMove : MonoBehaviour
 
     private void MoveToFront(Transform target, bool restartRotation)
     {
+        if (target == null)
+        {
+            return;
+        }
+
         isStopFront = true;
 
         startPosition = transform.position;
@@ -153,5 +150,111 @@ public class SubmonitorMove : MonoBehaviour
 
         currentTarget = target;
         restartRotationAfterMove = restartRotation;
+    }
+
+    private void ResolvePlayer()
+    {
+        if (player != null)
+        {
+            return;
+        }
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject == null)
+        {
+            return;
+        }
+
+        player = playerObject.transform;
+    }
+
+    private void ResolveEnemies()
+    {
+        ResolveEnemiesFromLineup();
+
+        if (enemyL != null && enemyR != null)
+        {
+            return;
+        }
+
+        ResolveEnemiesFromRegistry();
+    }
+
+    private void ResolveEnemiesFromLineup()
+    {
+        if (enemyLineupManager == null)
+        {
+            enemyLineupManager = Object.FindFirstObjectByType<Enemy.EnemyLineupManager>();
+        }
+
+        if (enemyLineupManager == null)
+        {
+            return;
+        }
+
+        Enemy.Enemy enemy1 = enemyLineupManager.Enemy1;
+        Enemy.Enemy enemy2 = enemyLineupManager.Enemy2;
+
+        if (enemy1 != null)
+        {
+            enemyL = enemy1.transform;
+        }
+
+        if (enemy2 != null)
+        {
+            enemyR = enemy2.transform;
+        }
+    }
+
+    private void ResolveEnemiesFromRegistry()
+    {
+        if (enemyRegistry == null)
+        {
+            enemyRegistry = Object.FindFirstObjectByType<Enemy.EnemyRegistry>();
+        }
+
+        if (enemyRegistry == null)
+        {
+            return;
+        }
+
+        foreach (Enemy.Enemy enemy in enemyRegistry.Enemies)
+        {
+            if (enemy == null)
+            {
+                continue;
+            }
+
+            if (enemy.name == Enemy.EnemySlotId.Enemy1.ToString())
+            {
+                enemyL = enemy.transform;
+            }
+            else if (enemy.name == Enemy.EnemySlotId.Enemy2.ToString())
+            {
+                enemyR = enemy.transform;
+            }
+        }
+    }
+
+    private void SetupCameraPivot()
+    {
+        if (isCameraInitialized || player == null)
+        {
+            return;
+        }
+
+        if (cameraPivot == null)
+        {
+            GameObject pivotObject = new GameObject("CameraPivot");
+            cameraPivot = pivotObject.transform;
+        }
+
+        cameraPivot.SetParent(player);
+        cameraPivot.localPosition = Vector3.zero;
+        cameraPivot.localRotation = Quaternion.identity;
+        transform.SetParent(cameraPivot);
+        transform.localPosition = new Vector3(0f, 1.8f, 5f);
+        transform.LookAt(player.position + new Vector3(0f, 1.2f, 0f));
+        isCameraInitialized = true;
     }
 }

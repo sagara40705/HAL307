@@ -261,4 +261,19 @@ public class ForwardProgressMover : MonoBehaviour
         _isStopped = false;
         _canMove = true;
     }
+
+    public void RegisterMoveTarget(Transform target)
+    {
+        AddMoveTarget(target);
+    }
+
+    public void UnregisterMoveTarget(Transform target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        _moveTargets.Remove(target);
+    }
 }

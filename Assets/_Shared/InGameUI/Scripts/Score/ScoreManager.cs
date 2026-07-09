@@ -41,13 +41,54 @@ public class ScoreManager : MonoBehaviour
     // エネミーのスコア加算
     public void AddEnemyScore(int score, string enemyName)
     {
-        if (enemyName == "Enemy1")
+        if (!Enum.TryParse(enemyName, out Enemy.EnemySlotId slot))
+        {
+            Debug.LogWarning($"[ScoreManager] AddEnemyScore skipped. Reason=Unknown enemyName. EnemyName={enemyName}");
+            OnScoreChanged?.Invoke();
+            return;
+        }
+
+        AddEnemyScore(score, slot);
+    }
+
+    public void AddEnemyScore(int score, Enemy.EnemySlotId slot)
+    {
+        if (slot == Enemy.EnemySlotId.Enemy1)
         {
             Enemy1Score += score * AddScore;
         }
-        else if (enemyName == "Enemy2")
+        else if (slot == Enemy.EnemySlotId.Enemy2)
         {
             Enemy2Score += score * AddScore;
+        }
+
+        OnScoreChanged?.Invoke();
+    }
+
+    public int GetEnemyScore(Enemy.EnemySlotId slot)
+    {
+        if (slot == Enemy.EnemySlotId.Enemy1)
+        {
+            return Enemy1Score;
+        }
+
+        return Enemy2Score;
+    }
+
+    public Enemy.EnemySlotId GetLowestEnemySlot()
+    {
+        return Enemy1Score <= Enemy2Score ? Enemy.EnemySlotId.Enemy1 : Enemy.EnemySlotId.Enemy2;
+    }
+
+    public void ResetEnemyScore(Enemy.EnemySlotId slot)
+    {
+        if (slot == Enemy.EnemySlotId.Enemy1)
+        {
+            Enemy1Score = 0;
+        }
+        else if (slot == Enemy.EnemySlotId.Enemy2)
+        {
+            Enemy2Score = 0;
         }
 
         OnScoreChanged?.Invoke();

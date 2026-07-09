@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 25093265}
   - component: {fileID: 25093264}
+  - component: {fileID: 25093266}
   m_Layer: 0
   m_Name: InGameFlowController
   m_TagString: Untagged
@@ -151,6 +152,20 @@ MonoBehaviour:
   stageData: {fileID: 11400000, guid: f44bee14d7e0dac4bbb5a84ab221e057, type: 2}
   context: {fileID: 1717693389}
   playOnStart: 1
+--- !u!114 &25093266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 25093263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c081433f5a744c390e6d8dc9d1f5232, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::StateTraker
+  flowController: {fileID: 25093264}
+  flowContext: {fileID: 1717693389}
 --- !u!4 &25093265
 Transform:
   m_ObjectHideFlags: 0

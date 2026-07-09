@@ -38,6 +38,17 @@ public class ScoreManager : MonoBehaviour
         OnScoreChanged?.Invoke();
     }
 
+    public void SetPlayerScoreAtLeast(int score)
+    {
+        if (PlayerScore >= score)
+        {
+            return;
+        }
+
+        PlayerScore = score;
+        OnScoreChanged?.Invoke();
+    }
+
     // エネミーのスコア加算
     public void AddEnemyScore(int score, string enemyName)
     {

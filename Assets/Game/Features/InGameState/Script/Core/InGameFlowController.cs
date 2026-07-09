@@ -14,6 +14,11 @@ public sealed class InGameFlowController : MonoBehaviour
     private int _currentWaveIndex;
 
     public int CurrentWaveIndex => _currentWaveIndex;
+    public WaveData CurrentWaveData => stageData != null ? stageData.GetWaveOrNull(_currentWaveIndex) : null;
+    public string CurrentStateName => _currentState != null ? _currentState.StateName : "None";
+    public bool IsFlowRunning => _flowCoroutine != null;
+    public bool IsChangingState => _isChangingState;
+    public int CurrentTargetScore => CurrentWaveData != null ? CurrentWaveData.TargetScore : 0;
 
     // Context未設定時の同一GameObject検索
     private void Awake()

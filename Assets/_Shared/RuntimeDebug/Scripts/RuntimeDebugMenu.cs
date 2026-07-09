@@ -67,7 +67,12 @@ namespace RuntimeDebug
 
         public static void Draw()
         {
-            // RuntimeDebug is displayed in the Unity Editor window.
+            //if (!IsVisible)
+            //{
+            //    return;
+            //}
+
+            //DrawContents();
         }
 
         public static void Clear()

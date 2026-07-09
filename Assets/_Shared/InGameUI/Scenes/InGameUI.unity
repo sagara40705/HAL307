@@ -172,10 +172,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveGaugeController
   waveMaterial: {fileID: 2100000, guid: 343ab00e3639d9246b71ddd9a09ead13, type: 2}
-  decreaseSpeed: 0.01
   propertyName: _BaseLine
   maxValue: 0.7
   minValue: 0
+  stageEndJudge: {fileID: 0}
   warningUI: {fileID: 811645271}
   warningThreshold: 0.03
   hideOnWaveEffectUis:

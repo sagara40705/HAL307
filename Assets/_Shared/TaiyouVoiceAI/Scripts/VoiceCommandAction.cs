@@ -41,7 +41,7 @@ public class VoiceCommandAction : MonoBehaviour
             return;
         }
 
-        if (InGameFlowLock.IsGameStartActionPlaying)
+        if (InGameFlowLock.IsPresentationPlaying)
         {
             return;
         }

@@ -63,7 +63,7 @@ public class ForwardProgressMover : MonoBehaviour
             return;
         }
 
-        if (InGameFlowLock.IsGameStartActionPlaying)
+        if (InGameFlowLock.IsPresentationPlaying)
         {
             return;
         }
@@ -242,7 +242,7 @@ public class ForwardProgressMover : MonoBehaviour
 
     private void StartMove()
     {
-        if (_canMove || _isStopped || InGameFlowLock.IsGameStartActionPlaying)
+        if (_canMove || _isStopped || InGameFlowLock.IsPresentationPlaying)
         {
             return;
         }

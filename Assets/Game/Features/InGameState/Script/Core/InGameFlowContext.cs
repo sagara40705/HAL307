@@ -10,6 +10,7 @@ public sealed class InGameFlowContext : MonoBehaviour
     [SerializeField] private StageEndJudge stageEndJudge;
     [SerializeField] private ScoreManager scoreManager;
     [SerializeField] private EnemyLineupManager enemyLineupManager;
+    [SerializeField] private InGamePresentationEventRegistry presentationEventRegistry;
 
     // 前進制御
     public ForwardProgressMover ForwardProgressMover
@@ -73,12 +74,22 @@ public sealed class InGameFlowContext : MonoBehaviour
         }
     }
 
+    public InGamePresentationEventRegistry PresentationEventRegistry
+    {
+        get
+        {
+            ResolvePresentationEventRegistry();
+            return presentationEventRegistry;
+        }
+    }
+
     private void Awake()
     {
         ResolveStageModelContext();
         ResolveForwardProgressMover();
         ResolveScoreManager();
         ResolveEnemyLineupManager();
+        ResolvePresentationEventRegistry();
     }
 
     // Inspector未設定時のForwardProgressMover検索
@@ -136,5 +147,21 @@ public sealed class InGameFlowContext : MonoBehaviour
         }
 
         enemyLineupManager = FindFirstObjectByType<EnemyLineupManager>();
+    }
+
+    // Inspector譛ｪ險ｭ螳壽凾縺ｮInGamePresentationEventRegistry讀懃ｴ｢
+    private void ResolvePresentationEventRegistry()
+    {
+        if (presentationEventRegistry != null)
+        {
+            return;
+        }
+
+        ResolveStageModelContext();
+        presentationEventRegistry = stageModelContext != null ? stageModelContext.PresentationEventRegistry : null;
+        if (presentationEventRegistry == null)
+        {
+            presentationEventRegistry = FindFirstObjectByType<InGamePresentationEventRegistry>();
+        }
     }
 }

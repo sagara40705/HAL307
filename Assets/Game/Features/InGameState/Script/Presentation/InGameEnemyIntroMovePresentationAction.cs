@@ -19,27 +19,31 @@ public sealed class InGameEnemyIntroMovePresentationAction : InGamePresentationA
             yield break;
         }
 
-        yield return MoveEnemies(lineup.Enemy1, lineup.Enemy2);
+        Player.PlayerPoseContoroller player = Object.FindFirstObjectByType<Player.PlayerPoseContoroller>();
+        yield return MoveTargets(lineup.Enemy1, lineup.Enemy2, player);
     }
 
-    private IEnumerator MoveEnemies(global::Enemy.Enemy enemy1, global::Enemy.Enemy enemy2)
+    private IEnumerator MoveTargets(global::Enemy.Enemy enemy1, global::Enemy.Enemy enemy2, Player.PlayerPoseContoroller player)
     {
         Transform enemy1Transform = enemy1 != null ? enemy1.transform : null;
         Transform enemy2Transform = enemy2 != null ? enemy2.transform : null;
+        Transform playerTransform = player != null ? player.MoveTargetTransform : null;
 
-        if (enemy1Transform == null && enemy2Transform == null)
+        if (enemy1Transform == null && enemy2Transform == null && playerTransform == null)
         {
             yield break;
         }
 
         Vector3 enemy1StartPosition = enemy1Transform != null ? enemy1Transform.position : Vector3.zero;
         Vector3 enemy2StartPosition = enemy2Transform != null ? enemy2Transform.position : Vector3.zero;
+        Vector3 playerStartPosition = playerTransform != null ? playerTransform.position : Vector3.zero;
         Vector3 direction = GetMoveDirection();
 
         if (totalDurationSeconds <= 0f)
         {
             ApplyMovePosition(enemy1Transform, enemy1StartPosition, direction, 0f);
             ApplyMovePosition(enemy2Transform, enemy2StartPosition, direction, 0f);
+            ApplyMovePosition(playerTransform, playerStartPosition, direction, 0f);
             yield break;
         }
 
@@ -48,6 +52,7 @@ public sealed class InGameEnemyIntroMovePresentationAction : InGamePresentationA
         {
             ApplyMovePosition(enemy1Transform, enemy1StartPosition, direction, elapsed);
             ApplyMovePosition(enemy2Transform, enemy2StartPosition, direction, elapsed);
+            ApplyMovePosition(playerTransform, playerStartPosition, direction, elapsed);
 
             yield return null;
             elapsed += Time.deltaTime;
@@ -55,6 +60,7 @@ public sealed class InGameEnemyIntroMovePresentationAction : InGamePresentationA
 
         ApplyMovePosition(enemy1Transform, enemy1StartPosition, direction, totalDurationSeconds);
         ApplyMovePosition(enemy2Transform, enemy2StartPosition, direction, totalDurationSeconds);
+        ApplyMovePosition(playerTransform, playerStartPosition, direction, totalDurationSeconds);
     }
 
     private Vector3 GetMoveDirection()

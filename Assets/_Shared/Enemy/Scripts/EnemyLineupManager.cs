@@ -22,8 +22,17 @@ namespace Enemy
         [SerializeField] private EnemyData _replacementEnemyData;
         [SerializeField] private bool _resetScoreOnReplace = true;
 
+        private bool _hasPendingReplacement;
+        private EnemySlotId _pendingReplacementSlot;
+        private Enemy _pendingOldEnemy;
+        private Enemy _pendingNewEnemy;
+
         public Enemy Enemy1 => GetEnemy(EnemySlotId.Enemy1);
         public Enemy Enemy2 => GetEnemy(EnemySlotId.Enemy2);
+        public bool HasPendingReplacement => _hasPendingReplacement;
+        public EnemySlotId PendingReplacementSlot => _pendingReplacementSlot;
+        public Enemy PendingOldEnemy => _pendingOldEnemy;
+        public Enemy PendingNewEnemy => _pendingNewEnemy;
 
         private void Awake()
         {
@@ -82,6 +91,105 @@ namespace Enemy
         {
             EnemySlotId slot = GetLowestScoreSlot();
             return ReplaceEnemy(slot, enemyData, position, rotation);
+        }
+
+        public Enemy BeginLowestScoreEnemyReplacement(EnemyData enemyData, Vector3 position, Quaternion rotation)
+        {
+            EnemySlotId slot = GetLowestScoreSlot();
+            return BeginEnemyReplacement(slot, enemyData, position, rotation);
+        }
+
+        public Enemy BeginEnemyReplacement(EnemySlotId slot, EnemyData enemyData, Vector3 position, Quaternion rotation)
+        {
+            ResolveReferences();
+            ResolveSlotEnemies();
+
+            if (_hasPendingReplacement)
+            {
+                Debug.LogWarning("[EnemyLineupManager] BeginEnemyReplacement skipped. Reason=Pending replacement already exists.");
+                return _pendingNewEnemy;
+            }
+
+            if (enemyData == null)
+            {
+                Debug.LogWarning("[EnemyLineupManager] BeginEnemyReplacement skipped. Reason=EnemyData is null.");
+                return null;
+            }
+
+            if (_enemyGenerator == null)
+            {
+                Debug.LogWarning("[EnemyLineupManager] BeginEnemyReplacement skipped. Reason=EnemyGenerator is null.");
+                return null;
+            }
+
+            Enemy oldEnemy = GetEnemy(slot);
+            Enemy newEnemy = _enemyGenerator.Generate(enemyData, slot, position, rotation);
+            if (newEnemy == null)
+            {
+                Debug.LogWarning($"[EnemyLineupManager] BeginEnemyReplacement failed. Slot={slot}");
+                return null;
+            }
+
+            newEnemy.name = $"{slot}_Incoming";
+
+            _hasPendingReplacement = true;
+            _pendingReplacementSlot = slot;
+            _pendingOldEnemy = oldEnemy;
+            _pendingNewEnemy = newEnemy;
+
+            Debug.Log($"[EnemyLineupManager] Began enemy replacement. Slot={slot}, Enemy={newEnemy.name}");
+            return newEnemy;
+        }
+
+        public Enemy CommitPendingReplacement()
+        {
+            if (!_hasPendingReplacement)
+            {
+                return null;
+            }
+
+            EnemySlotId slot = _pendingReplacementSlot;
+            Enemy oldEnemy = _pendingOldEnemy;
+            Enemy newEnemy = _pendingNewEnemy;
+
+            if (oldEnemy != null)
+            {
+                _forwardProgressMover?.UnregisterMoveTarget(oldEnemy.transform);
+                Destroy(oldEnemy.gameObject);
+            }
+
+            SetEnemy(slot, null);
+
+            if (newEnemy != null)
+            {
+                newEnemy.name = slot.ToString();
+                SetEnemy(slot, newEnemy);
+                _forwardProgressMover?.RegisterMoveTarget(newEnemy.transform);
+            }
+
+            if (_resetScoreOnReplace)
+            {
+                _scoreManager?.ResetEnemyScore(slot);
+            }
+
+            ClearPendingReplacement();
+            Debug.Log($"[EnemyLineupManager] Committed enemy replacement. Slot={slot}, Enemy={(newEnemy != null ? newEnemy.name : "null")}");
+            return newEnemy;
+        }
+
+        public void CancelPendingReplacement()
+        {
+            if (!_hasPendingReplacement)
+            {
+                return;
+            }
+
+            if (_pendingNewEnemy != null)
+            {
+                Destroy(_pendingNewEnemy.gameObject);
+            }
+
+            ClearPendingReplacement();
         }
 
         // 指定した枠の敵を入れ替え
@@ -234,6 +342,13 @@ namespace Enemy
             }
 
             _enemy2 = enemy;
+        }
+
+        private void ClearPendingReplacement()
+        {
+            _hasPendingReplacement = false;
+            _pendingOldEnemy = null;
+            _pendingNewEnemy = null;
         }
 
         private Vector3 GetSpawnPosition(EnemySlotId slot, Enemy currentEnemy)

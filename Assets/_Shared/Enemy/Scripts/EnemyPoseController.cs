@@ -40,7 +40,7 @@ namespace Enemy
         // Update is called once per frame
         private void Update()
         {
-            if (InGameFlowLock.IsGameStartActionPlaying)
+            if (InGameFlowLock.IsPresentationPlaying)
             {
                 _timer = 0f;
                 return;

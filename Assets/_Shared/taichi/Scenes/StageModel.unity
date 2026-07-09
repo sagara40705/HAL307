@@ -1152,6 +1152,50 @@ MonoBehaviour:
   planeOffset: 0
   reflectionTextureProperty: _ReflectionTex
   reflectionVpProperty: _ReflectionVP
+--- !u!1 &1903229664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1903229666}
+  - component: {fileID: 1903229665}
+  m_Layer: 0
+  m_Name: IntroSmoke
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1903229665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903229664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3047166a6f2176479c0b23e0c5ecb34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IntroSmoke
+--- !u!4 &1903229666
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903229664}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.46462, y: -0, z: -47.00404}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1915505985
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1271,6 +1315,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2000000002}
   - component: {fileID: 2000000003}
+  - component: {fileID: 2000000004}
   m_Layer: 0
   m_Name: StageModelContext
   m_TagString: Untagged
@@ -1310,6 +1355,52 @@ MonoBehaviour:
   _contextName: StageModelContext
   stageEndJudge: {fileID: 1170876505}
   waveEndArea: {fileID: 746261350}
+  presentationEventRegistry: {fileID: 2000000004}
+--- !u!114 &2000000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ad3f140124469390f2d986b61e5a8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InGamePresentationEventRegistry
+  events:
+  - eventName: IntroSmoke.InstanceSmoke
+    onInvoke:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1903229665}
+          m_TargetAssemblyTypeName: IntroSmoke, Assembly-CSharp
+          m_MethodName: InstanceSmoke
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventName: IntroSmoke.ClearSmoke
+    onInvoke:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1903229665}
+          m_TargetAssemblyTypeName: IntroSmoke, Assembly-CSharp
+          m_MethodName: ClearSmoke
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1327,3 +1418,4 @@ SceneRoots:
   - {fileID: 1094592047}
   - {fileID: 2000000002}
   - {fileID: 1576856035}
+  - {fileID: 1903229666}

@@ -17,26 +17,42 @@ public sealed class WaveTransitionFlowState : InGameFlowStateBase
         _nextWave = nextWave;
     }
 
-    // 完了したWaveの変更演出を実行
     public override IEnumerator Execute(InGameFlowContext context)
     {
+        bool hasReplacement = _nextWave != null && _nextWave.HasReplacementEnemy;
+        Enemy.EnemyLineupManager enemyLineup = context != null ? context.EnemyLineup : null;
+
+        if (hasReplacement)
+        {
+            if (enemyLineup == null)
+            {
+                UnityEngine.Debug.LogWarning("[WaveTransitionFlowState] Enemy replacement skipped. Reason=EnemyLineupManager is null.");
+            }
+            else
+            {
+                enemyLineup.BeginLowestScoreEnemyReplacement(_nextWave.ReplacementEnemyData, _nextWave.ReplacementEnemyPosition, _nextWave.ReplacementEnemyRotation);
+            }
+        }
+
         InGamePresentationAction action = _completedWave?.WaveTransitionAction;
         if (action != null)
         {
-            yield return action.Play(context);
+            InGameFlowLock.BeginPresentation();
+            try
+            {
+                yield return action.Play(context);
+            }
+            finally
+            {
+                InGameFlowLock.EndPresentation();
+            }
         }
 
-        if (_nextWave == null || !_nextWave.HasReplacementEnemy)
+        if (!hasReplacement || enemyLineup == null)
         {
             yield break;
         }
 
-        if (context == null || context.EnemyLineup == null)
-        {
-            UnityEngine.Debug.LogWarning("[WaveTransitionFlowState] Enemy replacement skipped. Reason=EnemyLineupManager is null.");
-            yield break;
-        }
-
-        context.EnemyLineup.ReplaceLowestScoreEnemy(_nextWave.ReplacementEnemyData, _nextWave.ReplacementEnemyPosition, _nextWave.ReplacementEnemyRotation);
+        enemyLineup.CommitPendingReplacement();
     }
 }

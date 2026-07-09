@@ -16,7 +16,15 @@ public sealed class GameEndFlowState : InGameFlowStateBase
         InGamePresentationAction action = _stageData != null ? _stageData.GameEndAction : null;
         if (action != null)
         {
-            yield return action.Play(context);
+            InGameFlowLock.BeginPresentation();
+            try
+            {
+                yield return action.Play(context);
+            }
+            finally
+            {
+                InGameFlowLock.EndPresentation();
+            }
         }
 
         string resultSceneName = _stageData != null ? _stageData.ResultSceneName : string.Empty;

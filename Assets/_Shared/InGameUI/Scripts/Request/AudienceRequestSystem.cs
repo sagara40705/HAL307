@@ -42,6 +42,8 @@ namespace AudienceRequest
         // 毎フレーム更新
         private void Update()
         {
+            if (InGameFlowLock.IsPresentationPlaying) { return; }
+
             // リクエストが満杯の場合は新しいリクエストを生成しない   
             if (FullRequest()) { return; }
 
@@ -98,6 +100,8 @@ namespace AudienceRequest
         // リクエスト発生関数
         private void GenerateRequest()
         {
+            if (InGameFlowLock.IsPresentationPlaying) { return; }
+
             if (FullRequest()) { return; }
             // 生成できるリクエストの数を計算
             int canSpawnCount = Mathf.Min(3, _maxRequestCount - _currentRequestCount);

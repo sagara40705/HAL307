@@ -176,7 +176,7 @@ namespace Enemy
 
         public PoseID RandomPose()
         {
-            if (InGameFlowLock.IsGameStartActionPlaying)
+            if (InGameFlowLock.IsPresentationPlaying)
             {
                 return PoseID.None;
             }
@@ -192,7 +192,7 @@ namespace Enemy
 
         public void Pause(EnemyPoseData poseData)
         {
-            if (InGameFlowLock.IsGameStartActionPlaying)
+            if (InGameFlowLock.IsPresentationPlaying)
             {
                 return;
             }

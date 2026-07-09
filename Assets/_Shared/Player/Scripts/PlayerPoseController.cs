@@ -101,7 +101,7 @@ namespace Player
 
         public void TryOnPose(PoseID poseID)
         {
-            if (InGameFlowLock.IsGameStartActionPlaying)
+            if (InGameFlowLock.IsPresentationPlaying)
             {
                 return;
             }

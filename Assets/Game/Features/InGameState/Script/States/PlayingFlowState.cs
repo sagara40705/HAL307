@@ -23,7 +23,16 @@ public sealed class PlayingFlowState : InGameFlowStateBase
             yield break;
         }
 
-        yield return action.Play(context);
+        InGameFlowLock.BeginPresentation();
+        try
+        {
+            yield return action.Play(context);
+        }
+        finally
+        {
+            InGameFlowLock.EndPresentation();
+        }
+
         context?.ForwardProgressMover?.ResumeMove();
     }
 

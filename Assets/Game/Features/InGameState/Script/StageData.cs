@@ -18,7 +18,7 @@ public sealed class StageData : ScriptableObject
     public string ResultSceneName => resultSceneName;
     public int WaveCount => waves != null ? waves.Length : 0;
 
-    // Gets wave data by index.
+    // Wave番号に対応するWaveData取得
     public WaveData GetWaveOrNull(int waveIndex)
     {
         if (waves == null)
@@ -34,7 +34,7 @@ public sealed class StageData : ScriptableObject
         return waves[waveIndex];
     }
 
-    // Checks whether the wave index exists.
+    // Wave番号の存在確認
     public bool HasWave(int waveIndex)
     {
         return GetWaveOrNull(waveIndex) != null;

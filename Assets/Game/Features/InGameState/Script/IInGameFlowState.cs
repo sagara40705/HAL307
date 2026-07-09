@@ -1,17 +1,17 @@
 using System.Collections;
 
-// Common interface for in-game flow states.
+// インゲーム進行Stateの共通インターフェース
 public interface IInGameFlowState
 {
-    // State name for logs.
+    // ログ表示用のState名
     string StateName { get; }
 
-    // Logic before the main state body.
+    // Stateメイン処理前の処理
     IEnumerator Enter(InGameFlowContext context);
 
-    // Main state body.
+    // State中のメイン処理
     IEnumerator Execute(InGameFlowContext context);
 
-    // Logic after the main state body.
+    // Stateメイン処理後の処理
     IEnumerator Exit(InGameFlowContext context);
 }

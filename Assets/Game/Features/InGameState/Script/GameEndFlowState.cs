@@ -1,6 +1,6 @@
 using System.Collections;
 
-// Game end presentation and result transition state.
+// ゲーム終了演出とリザルト遷移State
 public sealed class GameEndFlowState : InGameFlowStateBase
 {
     private readonly StageData _stageData;
@@ -10,7 +10,7 @@ public sealed class GameEndFlowState : InGameFlowStateBase
         _stageData = stageData;
     }
 
-    // Plays game end presentation and loads result scene.
+    // ゲーム終了演出の実行とリザルトシーン読み込み
     public override IEnumerator Execute(InGameFlowContext context)
     {
         InGamePresentationAction action = _stageData != null ? _stageData.GameEndAction : null;

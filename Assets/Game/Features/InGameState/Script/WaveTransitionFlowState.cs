@@ -1,6 +1,6 @@
 using System.Collections;
 
-// Wave transition presentation state.
+// Wave変更演出State
 public sealed class WaveTransitionFlowState : InGameFlowStateBase
 {
     private readonly WaveData _completedWave;
@@ -10,7 +10,7 @@ public sealed class WaveTransitionFlowState : InGameFlowStateBase
         _completedWave = completedWave;
     }
 
-    // Plays the completed wave transition action.
+    // 完了したWaveの変更演出を実行
     public override IEnumerator Execute(InGameFlowContext context)
     {
         InGamePresentationAction action = _completedWave?.WaveTransitionAction;

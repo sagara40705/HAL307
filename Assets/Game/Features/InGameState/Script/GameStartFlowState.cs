@@ -1,6 +1,6 @@
 using System.Collections;
 
-// Game start presentation state.
+// ゲーム開始演出State
 public sealed class GameStartFlowState : InGameFlowStateBase
 {
     private readonly StageData _stageData;
@@ -10,7 +10,7 @@ public sealed class GameStartFlowState : InGameFlowStateBase
         _stageData = stageData;
     }
 
-    // Plays game start presentation.
+    // ゲーム開始演出の実行
     public override IEnumerator Execute(InGameFlowContext context)
     {
         InGamePresentationAction action = _stageData != null ? _stageData.GameStartAction : null;

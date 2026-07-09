@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-// Controls in-game flow and wave progression.
+// インゲーム進行とWave進行の制御
 public sealed class InGameFlowController : MonoBehaviour
 {
     [SerializeField] private StageData stageData;
@@ -15,7 +15,7 @@ public sealed class InGameFlowController : MonoBehaviour
 
     public int CurrentWaveIndex => _currentWaveIndex;
 
-    // Finds context on the same GameObject when unset.
+    // Context未設定時の同一GameObject検索
     private void Awake()
     {
         if (context == null)
@@ -24,7 +24,7 @@ public sealed class InGameFlowController : MonoBehaviour
         }
     }
 
-    // Starts flow automatically when enabled.
+    // 自動開始設定時の進行開始
     private void Start()
     {
         if (!playOnStart)
@@ -35,7 +35,7 @@ public sealed class InGameFlowController : MonoBehaviour
         StartFlow();
     }
 
-    // Starts the in-game flow.
+    // インゲーム進行の開始
     public void StartFlow()
     {
         if (_flowCoroutine != null)
@@ -52,7 +52,7 @@ public sealed class InGameFlowController : MonoBehaviour
         _flowCoroutine = StartCoroutine(FlowCoroutine());
     }
 
-    // Starts transition to the specified state.
+    // 指定Stateへの切り替え開始
     public void ChangeState(IInGameFlowState nextState)
     {
         if (_isChangingState)
@@ -64,7 +64,7 @@ public sealed class InGameFlowController : MonoBehaviour
         StartCoroutine(ChangeStateCoroutine(nextState));
     }
 
-    // Standard stage flow.
+    // 標準のステージ進行
     private IEnumerator FlowCoroutine()
     {
         _currentWaveIndex = 0;
@@ -95,7 +95,7 @@ public sealed class InGameFlowController : MonoBehaviour
         _flowCoroutine = null;
     }
 
-    // Executes current Exit, next Enter, and next Execute.
+    // 現在StateのExitと次StateのEnter/Executeを実行
     private IEnumerator ChangeStateCoroutine(IInGameFlowState nextState)
     {
         if (nextState == null)

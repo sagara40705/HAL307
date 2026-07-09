@@ -8,7 +8,7 @@ public enum WaveResultCheckResult
     GameEnd,
 }
 
-// Score check state after StageEndJudge.
+// StageEndJudge後のスコア判定State
 public sealed class WaveResultCheckFlowState : InGameFlowStateBase
 {
     private readonly WaveData _waveData;
@@ -25,7 +25,7 @@ public sealed class WaveResultCheckFlowState : InGameFlowStateBase
         _hasNextWave = hasNextWave;
     }
 
-    // Determines the next flow branch from score and remaining waves.
+    // スコアと残りWave数による次の分岐判定
     public override IEnumerator Execute(InGameFlowContext context)
     {
         if (_waveData == null)

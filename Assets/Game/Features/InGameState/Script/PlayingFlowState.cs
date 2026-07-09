@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-// Gameplay state that waits for StageEndJudge.
+// StageEndJudgeを待つ通常プレイState
 public sealed class PlayingFlowState : InGameFlowStateBase
 {
     private readonly WaveData _waveData;
@@ -11,7 +11,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         _waveData = waveData;
     }
 
-    // Plays optional wave start presentation.
+    // Wave開始演出の実行
     public override IEnumerator Enter(InGameFlowContext context)
     {
         context?.StageEndJudge?.ResetJudge();
@@ -27,7 +27,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.ForwardProgressMover?.ResumeMove();
     }
 
-    // Waits until StageEndJudge emits OnStageEnd.
+    // StageEndJudgeの終了通知まで待機
     public override IEnumerator Execute(InGameFlowContext context)
     {
         StageEndJudge stageEndJudge = context != null ? context.StageEndJudge : null;
@@ -39,7 +39,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
 
         bool isStageEnd = false;
 
-        // Stage end callback.
+        // ステージ終了通知の受信
         void OnStageEnd()
         {
             isStageEnd = true;

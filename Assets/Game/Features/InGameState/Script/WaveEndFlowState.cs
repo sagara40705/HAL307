@@ -1,1 +1,1 @@
-// Obsolete. Wave result branching is handled by WaveResultCheckFlowState.
+// 廃止。Wave結果分岐はWaveResultCheckFlowStateで管理

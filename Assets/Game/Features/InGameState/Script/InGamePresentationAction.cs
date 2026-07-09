@@ -1,9 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-// Presentation action data executed by in-game flow states.
+// インゲーム進行Stateから実行する演出データ
 public abstract class InGamePresentationAction : ScriptableObject
 {
-    // Executes presentation logic.
+    // 演出処理の実行
     public abstract IEnumerator Play(InGameFlowContext context);
 }

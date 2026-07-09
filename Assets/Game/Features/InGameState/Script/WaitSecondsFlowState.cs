@@ -1,1 +1,1 @@
-// Obsolete. Use InGamePresentationAction or InGameWaitPresentationAction.
+// 廃止。InGamePresentationActionまたはInGameWaitPresentationActionを使用

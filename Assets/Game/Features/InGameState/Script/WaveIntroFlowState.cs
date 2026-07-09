@@ -1,1 +1,1 @@
-// Obsolete. Wave start presentation is handled by PlayingFlowState and WaveData.
+// 廃止。Wave開始演出はPlayingFlowStateとWaveDataで管理

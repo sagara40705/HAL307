@@ -6,7 +6,7 @@ public sealed class InGameWaitPresentationAction : InGamePresentationAction
 {
     [SerializeField, Min(0f)] private float seconds = 1f;
 
-    // Waits for the configured duration.
+    // 設定秒数の待機
     public override IEnumerator Play(InGameFlowContext context)
     {
         if (seconds <= 0f)

@@ -333,8 +333,74 @@ namespace AudienceRequest
             int poseIndex = (int)pose;
             return poseIndex >= 0 && poseIndex < (int)PoseID.Pose_Count;
         }
+
+        public GameObject GenerateInArea(PoseID pose, Vector2 areaMin, Vector2 areaMax)
+        {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return null;
+            }
+
+            if (!TryFindSpawnPositionInArea(areaMin, areaMax, out Vector2 spawnPos))
+            {
+                return null;
+            }
+
+            GameObject obj = _uiPools[(int)pose].Get();
+
+            obj.transform.SetParent(_uiParent.transform, false);
+            obj.transform.localScale = Vector3.one;
+
+            RectTransform rect = obj.GetComponent<RectTransform>();
+
+            if (rect != null)
+            {
+                rect.anchoredPosition = spawnPos;
+            }
+
+            Image img = obj.GetComponent<Image>();
+
+            if (img != null)
+            {
+                if (TryGetSpritePair(pose, out SpritePair spriteSetting))
+                {
+                    img.sprite = spriteSetting.originalSprite;
+                }
+            }
+
+            _activeUis[(int)pose].Add(obj);
+
+            return obj;
+        }
+
+        private bool TryFindSpawnPositionInArea(Vector2 areaMin, Vector2 areaMax, out Vector2 pos)
+        {
+            for (int i = 0; i < _maxAttempts; i++)
+            {
+                Vector2 candidate = new Vector2(
+                    Random.Range(areaMin.x, areaMax.x),
+                    Random.Range(areaMin.y, areaMax.y)
+                );
+
+                if (IsInsideForbiddenArea(candidate))
+                {
+                    continue;
+                }
+
+                if (IsOverlapping(candidate))
+                {
+                    continue;
+                }
+
+                pos = candidate;
+                return true;
+            }
+
+            pos = Vector2.zero;
+            return false;
+        }
+
     }
-
-
 }
 

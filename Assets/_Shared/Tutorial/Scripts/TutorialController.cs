@@ -9,7 +9,7 @@ public class TutorialController : MonoBehaviour
     [SerializeField] private RectTransform contentRoot;
 
     [Header("ページ設定")]
-    [SerializeField] private float pageWidth = 1920f;
+    [SerializeField] private float pageWidth = 1280f;
     [SerializeField] private float slideDuration = 0.3f;
 
     [Header("ページ番号表示")]
@@ -17,6 +17,9 @@ public class TutorialController : MonoBehaviour
 
     [Header("モデル制御")]
     [SerializeField] private TutorialModelController modelController;
+
+    [Header("UI制御")]
+    [SerializeField] private TutorialDemoController demoController;
 
     private int currentPage = 0;
     private bool isSliding = false;
@@ -28,6 +31,11 @@ public class TutorialController : MonoBehaviour
         if (modelController != null)
         {
             modelController.PlayByPage(currentPage);
+        }
+
+        if (demoController != null)
+        {
+            demoController.ApplyPageDemo(currentPage);
         }
     }
 
@@ -124,6 +132,11 @@ public class TutorialController : MonoBehaviour
         if (modelController != null)
         {
             modelController.PlayByPage(currentPage);
+        }
+
+        if (demoController != null)
+        {
+            demoController.ApplyPageDemo(currentPage);
         }
 
         isSliding = false;

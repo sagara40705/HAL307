@@ -1,17 +1,28 @@
 using System.Collections;
 
-// ゲーム終了演出State
-public sealed class GameEndFlowState : WaitSecondsFlowState
+// Game end presentation and result transition state.
+public sealed class GameEndFlowState : InGameFlowStateBase
 {
-    // 仮の待機時間設定
-    public GameEndFlowState() : base(1f)
+    private readonly StageData _stageData;
+
+    public GameEndFlowState(StageData stageData)
     {
+        _stageData = stageData;
     }
 
-    // ゲーム終了演出またはリザルト遷移の開始処理
-    public override IEnumerator Enter(InGameFlowContext context)
+    // Plays game end presentation and loads result scene.
+    public override IEnumerator Execute(InGameFlowContext context)
     {
-        // Game end presentation or result transition hook.
-        yield break;
+        InGamePresentationAction action = _stageData != null ? _stageData.GameEndAction : null;
+        if (action != null)
+        {
+            yield return action.Play(context);
+        }
+
+        string resultSceneName = _stageData != null ? _stageData.ResultSceneName : string.Empty;
+        if (!string.IsNullOrWhiteSpace(resultSceneName))
+        {
+            SceneLoader.Load(resultSceneName);
+        }
     }
 }

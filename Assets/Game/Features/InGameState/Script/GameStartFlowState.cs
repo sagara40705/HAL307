@@ -1,17 +1,24 @@
 using System.Collections;
 
-// ゲーム開始演出State
-public sealed class GameStartFlowState : WaitSecondsFlowState
+// Game start presentation state.
+public sealed class GameStartFlowState : InGameFlowStateBase
 {
-    // 仮の待機時間設定
-    public GameStartFlowState() : base(1f)
+    private readonly StageData _stageData;
+
+    public GameStartFlowState(StageData stageData)
     {
+        _stageData = stageData;
     }
 
-    // ゲーム開始演出の開始処理
-    public override IEnumerator Enter(InGameFlowContext context)
+    // Plays game start presentation.
+    public override IEnumerator Execute(InGameFlowContext context)
     {
-        // Game start presentation hook.
-        yield break;
+        InGamePresentationAction action = _stageData != null ? _stageData.GameStartAction : null;
+        if (action == null)
+        {
+            yield break;
+        }
+
+        yield return action.Play(context);
     }
 }

@@ -1,17 +1,21 @@
 using System.Collections;
 using UnityEngine;
 
-// インゲーム全体の進行Stateを順番に実行する制御
+// Controls in-game flow and wave progression.
 public sealed class InGameFlowController : MonoBehaviour
 {
+    [SerializeField] private StageData stageData;
     [SerializeField] private InGameFlowContext context;
     [SerializeField] private bool playOnStart = true;
 
     private Coroutine _flowCoroutine;
     private IInGameFlowState _currentState;
     private bool _isChangingState;
+    private int _currentWaveIndex;
 
-    // Context未設定時の同一GameObject検索
+    public int CurrentWaveIndex => _currentWaveIndex;
+
+    // Finds context on the same GameObject when unset.
     private void Awake()
     {
         if (context == null)
@@ -20,7 +24,7 @@ public sealed class InGameFlowController : MonoBehaviour
         }
     }
 
-    // 自動開始設定時の進行開始
+    // Starts flow automatically when enabled.
     private void Start()
     {
         if (!playOnStart)
@@ -31,7 +35,7 @@ public sealed class InGameFlowController : MonoBehaviour
         StartFlow();
     }
 
-    // インゲーム進行の開始
+    // Starts the in-game flow.
     public void StartFlow()
     {
         if (_flowCoroutine != null)
@@ -39,10 +43,16 @@ public sealed class InGameFlowController : MonoBehaviour
             return;
         }
 
+        if (stageData == null)
+        {
+            Debug.LogError("[InGameFlowController] StartFlow failed. Reason=StageData is not assigned.");
+            return;
+        }
+
         _flowCoroutine = StartCoroutine(FlowCoroutine());
     }
 
-    // 指定Stateへの切り替え開始
+    // Starts transition to the specified state.
     public void ChangeState(IInGameFlowState nextState)
     {
         if (_isChangingState)
@@ -54,19 +64,38 @@ public sealed class InGameFlowController : MonoBehaviour
         StartCoroutine(ChangeStateCoroutine(nextState));
     }
 
-    // 標準のインゲーム進行順
+    // Standard stage flow.
     private IEnumerator FlowCoroutine()
     {
-        yield return ChangeStateCoroutine(new GameStartFlowState());
-        yield return ChangeStateCoroutine(new WaveIntroFlowState());
-        yield return ChangeStateCoroutine(new PlayingFlowState());
-        yield return ChangeStateCoroutine(new WaveEndFlowState());
-        yield return ChangeStateCoroutine(new GameEndFlowState());
+        _currentWaveIndex = 0;
+
+        yield return ChangeStateCoroutine(new GameStartFlowState(stageData));
+
+        while (stageData.HasWave(_currentWaveIndex))
+        {
+            WaveData currentWave = stageData.GetWaveOrNull(_currentWaveIndex);
+            yield return ChangeStateCoroutine(new PlayingFlowState(currentWave));
+
+            int currentScore = context != null ? context.CurrentPlayerScore : 0;
+            bool hasNextWave = stageData.HasWave(_currentWaveIndex + 1);
+            var resultCheckState = new WaveResultCheckFlowState(currentWave, currentScore, hasNextWave);
+            yield return ChangeStateCoroutine(resultCheckState);
+
+            if (resultCheckState.Result != WaveResultCheckResult.NextWave)
+            {
+                break;
+            }
+
+            yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave));
+            _currentWaveIndex++;
+        }
+
+        yield return ChangeStateCoroutine(new GameEndFlowState(stageData));
 
         _flowCoroutine = null;
     }
 
-    // 現在StateのExitと次StateのEnter/Executeを実行
+    // Executes current Exit, next Enter, and next Execute.
     private IEnumerator ChangeStateCoroutine(IInGameFlowState nextState)
     {
         if (nextState == null)

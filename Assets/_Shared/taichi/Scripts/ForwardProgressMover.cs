@@ -26,6 +26,8 @@ public class ForwardProgressMover : MonoBehaviour
     private bool _canMove;
     private bool _isStopped;
 
+    public Transform CameraTransform => _cameraTransform;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

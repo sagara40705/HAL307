@@ -5,8 +5,6 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Collider))]
 public class StageEndJudge : MonoBehaviour
 {
-    private const string DebugWindowName = "Stage";
-
     // 当たったか判定する対象
     [SerializeField] private GameObject _targetObject;
 
@@ -25,16 +23,6 @@ public class StageEndJudge : MonoBehaviour
     private void Awake()
     {
         SetTriggerColliders();
-    }
-
-    private void Start()
-    {
-        CreateDebugMenu();
-    }
-
-    private void OnDestroy()
-    {
-        RuntimeDebug.DebugMenu.DestroyWindow(DebugWindowName);
     }
 
     private void OnValidate()
@@ -142,10 +130,4 @@ public class StageEndJudge : MonoBehaviour
         Debug.Log($"[StageEndJudge] Player score forced to target. TargetScore={currentWave.TargetScore}");
     }
 
-    private void CreateDebugMenu()
-    {
-        RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
-        window.CreateButton("Force Wave Clear", ForceStageEndWithTargetScore);
-        window.CreateButton("Force Wave Failed", ForceStageEndWithoutScore);
-    }
 }

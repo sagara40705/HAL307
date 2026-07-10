@@ -46,10 +46,22 @@ namespace RuntimeDebug
             DebugMenu.NotifyChanged();
         }
 
+        public void CreateOrReplaceButton(string name, Action onClick)
+        {
+            RemoveItem(name);
+            items.Add(new DebugButtonItem(name, onClick));
+            DebugMenu.NotifyChanged();
+        }
+
         public void CreateMessage(string name, Func<string> getter)
         {
             items.Add(new DebugMessageItem(name, getter));
             DebugMenu.NotifyChanged();
+        }
+
+        private void RemoveItem(string name)
+        {
+            items.RemoveAll(item => item.Name == name);
         }
 
         public void Draw()

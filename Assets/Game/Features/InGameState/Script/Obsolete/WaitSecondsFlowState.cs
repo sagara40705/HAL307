@@ -1,0 +1,1 @@
+// 廃止。InGamePresentationActionまたはInGameWaitPresentationActionを使用

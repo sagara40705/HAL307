@@ -129,6 +129,9 @@ GameObject:
   m_Component:
   - component: {fileID: 232563141}
   - component: {fileID: 232563140}
+  - component: {fileID: 232563142}
+  - component: {fileID: 232563143}
+  - component: {fileID: 232563144}
   m_Layer: 0
   m_Name: EnemyGenerator
   m_TagString: Untagged
@@ -168,6 +171,129 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &232563142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232563139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f5f2f7d547b4c94a6c3a8996da87f3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyLineupManager
+  _enemyGenerator: {fileID: 232563140}
+  _enemyRegistry: {fileID: 904307783}
+  _scoreManager: {fileID: 0}
+  _forwardProgressMover: {fileID: 0}
+  _enemy1: {fileID: 0}
+  _enemy2: {fileID: 0}
+  _enemy1SpawnPoint: {fileID: 0}
+  _enemy2SpawnPoint: {fileID: 0}
+  _replacementEnemyData: {fileID: 0}
+  _resetScoreOnReplace: 1
+--- !u!114 &232563143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232563139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d3a8e724d0a4e1498b1f7e8f6b83c2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyWavePresentationBridge
+  _enemyLineupManager: {fileID: 232563142}
+  _onRemovingEnemy:
+    m_PersistentCalls:
+      m_Calls: []
+  _onIncomingEnemy:
+    m_PersistentCalls:
+      m_Calls: []
+  _removingEnemyEventSets:
+  - eventSetName: Sample.RemovingEnemy
+    onInvoke:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2126717749}
+          m_TargetAssemblyTypeName: Enemy_SampleEffect, Assembly-CSharp
+          m_MethodName: Start_SampleEffect_Dead
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  _incomingEnemyEventSets:
+  - eventSetName: Sample.IncomingEnemy
+    onInvoke:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2126717749}
+          m_TargetAssemblyTypeName: Enemy_SampleEffect, Assembly-CSharp
+          m_MethodName: Start_SampleEffect_Incoming
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  _onNoPendingReplacement:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &232563144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232563139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ad3f140124469390f2d986b61e5a8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InGamePresentationEventRegistry
+  events:
+  - eventName: Sample.IncomingEnemy
+    onInvoke:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 232563143}
+          m_TargetAssemblyTypeName: Enemy.EnemyWavePresentationBridge, Assembly-CSharp
+          m_MethodName: InvokeIncomingEnemy
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: Sample.IncomingEnemy
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventName: Sample.RemovingEnemy
+    onInvoke:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 232563143}
+          m_TargetAssemblyTypeName: Enemy.EnemyWavePresentationBridge, Assembly-CSharp
+          m_MethodName: InvokeRemovingEnemy
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: Sample.RemovingEnemy
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &504420564
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,7 +445,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 529276125}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4fd4cbaddcc01eb4aa30b7c3f14a2a9d, type: 3}
   m_Name: 
@@ -668,6 +794,54 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!1 &2126717748
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2126717750}
+  - component: {fileID: 2126717749}
+  m_Layer: 0
+  m_Name: Enemy_SampleEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2126717749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2126717748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebd748cf85164e4cafe867490a4ac48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy_SampleEffect
+  _incomingDuration: 3
+  _incomingSpeed: 1
+  _deadDuration: 3
+  _deadSpeed: 1
+--- !u!4 &2126717750
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2126717748}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.22298, y: 0, z: 1.63389}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -680,3 +854,4 @@ SceneRoots:
   - {fileID: 232563141}
   - {fileID: 535028704}
   - {fileID: 1456485779}
+  - {fileID: 2126717750}

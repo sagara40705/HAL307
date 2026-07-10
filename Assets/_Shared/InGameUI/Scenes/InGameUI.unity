@@ -175,6 +175,7 @@ MonoBehaviour:
   propertyName: _BaseLine
   maxValue: 0.7
   minValue: 0
+  stageEndJudge: {fileID: 0}
   warningUI: {fileID: 811645271}
   warningThreshold: 0.04
   hideOnWaveEffectUis:

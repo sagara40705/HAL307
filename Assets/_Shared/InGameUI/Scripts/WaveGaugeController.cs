@@ -4,120 +4,117 @@ using Cysharp.Threading.Tasks;
 
 public class WaveGaugeController : MonoBehaviour
 {
-    [Header("Waveゲージ")]
     [SerializeField] private Material waveMaterial;
     [SerializeField] private string propertyName = "_BaseLine";
     [SerializeField] private float maxValue = 1.0f;
     [SerializeField] private float minValue = 0.0f;
+    [SerializeField] private StageEndJudge stageEndJudge;
 
     [Header("警告UI")]
     [SerializeField] private GameObject warningUI;
-    [SerializeField] private float warningThreshold = 0.05f;
+    [SerializeField] private float warningThreshold = 0.2f;
 
-    [Header("Fade演出時に非表示にするUI")]
+    [Header("Wave演出時に非表示にするUI")]
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
 
-    [Header("フェード設定")]
-    [SerializeField] private float fadeInDelay = 2f;
-    [SerializeField] private float fadeThreshold = 0.035f;
-
     private float currentValue;
-    private bool isTransitionStarted = false;
+    private bool isTransitionStarted;
 
     private void Start()
     {
         if (waveMaterial == null)
         {
             Image image = GetComponent<Image>();
-
             if (image != null)
             {
                 waveMaterial = image.material;
             }
         }
 
-        if (waveMaterial == null)
+        if (waveMaterial != null)
         {
-            Debug.LogError("[WaveGaugeController] WaveMaterial が見つかりません。", this);
-            enabled = false;
-            return;
+            currentValue = maxValue;
+            waveMaterial.SetFloat(propertyName, currentValue);
         }
-
-        currentValue = maxValue;
-        SetGaugeValue(currentValue);
+        else
+        {
+            Debug.LogError("WaveMaterial was not found.");
+        }
 
         if (warningUI != null)
         {
             warningUI.SetActive(false);
         }
+
+        SetupStageEndJudge();
+    }
+
+    private void OnDestroy()
+    {
+        if (stageEndJudge == null)
+        {
+            return;
+        }
+
+        stageEndJudge.OnStageEnd -= OnStageEnd;
     }
 
     private void Update()
     {
+        if (stageEndJudge == null)
+        {
+            SetupStageEndJudge();
+        }
+    }
+
+    public void ResetWaveGauge()
+    {
+        TransitionManager.ResetImmediate();
+
+        isTransitionStarted = false;
+        currentValue = maxValue;
+
         if (waveMaterial == null)
         {
-            return;
+            Image image = GetComponent<Image>();
+            if (image != null)
+            {
+                waveMaterial = image.material;
+            }
         }
 
-        if (isTransitionStarted)
+        if (waveMaterial != null)
         {
-            return;
+            waveMaterial.SetFloat(propertyName, currentValue);
         }
 
-        StageProgressProvider provider = StageProgressProvider.Instance;
-
-        if (provider == null)
-        {
-            return;
-        }
-
-        float gaugeRate = Mathf.Clamp01(provider.GaugeRate);
-
-        currentValue = Mathf.Lerp(
-            minValue,
-            maxValue,
-            gaugeRate
-        );
-
-        currentValue = Mathf.Clamp(
-            currentValue,
-            minValue,
-            maxValue
-        );
-
-        SetGaugeValue(currentValue);
-
-        Debug.Log($"[WaveGaugeController] gaugeRate={gaugeRate}, currentValue={currentValue}, IsArrived={provider.IsArrived}",
-            this);
-
-        // 警告UIは GaugeRate 基準で判定する
         if (warningUI != null)
         {
-            warningUI.SetActive(currentValue <= warningThreshold);
+            warningUI.SetActive(false);
         }
 
-        if (provider.IsArrived || currentValue <= fadeThreshold)
-        {
-            SetGaugeValue(minValue);
-            StartGaugeEmptyTransition();
-        }
+        ShowOtherUis();
     }
 
-    private void SetGaugeValue(float value)
+    private void SetupStageEndJudge()
     {
-        currentValue = Mathf.Clamp(
-            value,
-            minValue,
-            maxValue
-        );
+        if (stageEndJudge != null)
+        {
+            return;
+        }
 
-        waveMaterial.SetFloat(
-            propertyName,
-            currentValue
-        );
+        StageModelContext stageModelContext = FindFirstObjectByType<StageModelContext>();
+        stageEndJudge = stageModelContext != null ? stageModelContext.StageEndJudge : FindFirstObjectByType<StageEndJudge>();
+        if (stageEndJudge == null)
+        {
+            return;
+        }
+
+        stageEndJudge.OnStageEnd -= OnStageEnd;
+        stageEndJudge.OnStageEnd += OnStageEnd;
     }
 
-    private void StartGaugeEmptyTransition()
+    private void OnStageEnd()
     {
         if (isTransitionStarted)
         {
@@ -125,10 +122,16 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         isTransitionStarted = true;
+        currentValue = minValue;
+
+        if (waveMaterial != null)
+        {
+            waveMaterial.SetFloat(propertyName, currentValue);
+        }
 
         if (warningUI != null)
         {
-            warningUI.SetActive(true);
+            warningUI.SetActive(currentValue <= warningThreshold);
         }
 
         HideOtherUis();
@@ -146,14 +149,19 @@ public class WaveGaugeController : MonoBehaviour
         }
     }
 
+    private void ShowOtherUis()
+    {
+        foreach (GameObject ui in hideOnWaveEffectUis)
+        {
+            if (ui != null)
+            {
+                ui.SetActive(true);
+            }
+        }
+    }
+
     private async UniTaskVoid PlayGaugeEmptyTransition()
     {
         await TransitionManager.PlayDumbbellFadeOut();
-
-        await UniTask.Delay(
-            (int)(fadeInDelay * 1000)
-        );
-
-        await TransitionManager.FadeIn();
     }
 }

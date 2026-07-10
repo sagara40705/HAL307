@@ -63,6 +63,11 @@ public class ForwardProgressMover : MonoBehaviour
             return;
         }
 
+        if (InGameFlowLock.IsPresentationPlaying)
+        {
+            return;
+        }
+
         if (IsAnyPosing())
         {
             return;
@@ -237,7 +242,7 @@ public class ForwardProgressMover : MonoBehaviour
 
     private void StartMove()
     {
-        if (_canMove || _isStopped)
+        if (_canMove || _isStopped || InGameFlowLock.IsPresentationPlaying)
         {
             return;
         }
@@ -260,5 +265,20 @@ public class ForwardProgressMover : MonoBehaviour
     {
         _isStopped = false;
         _canMove = true;
+    }
+
+    public void RegisterMoveTarget(Transform target)
+    {
+        AddMoveTarget(target);
+    }
+
+    public void UnregisterMoveTarget(Transform target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        _moveTargets.Remove(target);
     }
 }

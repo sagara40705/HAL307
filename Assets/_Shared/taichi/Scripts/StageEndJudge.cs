@@ -5,6 +5,8 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Collider))]
 public class StageEndJudge : MonoBehaviour
 {
+    private const string DebugWindowName = "Stage";
+
     // 当たったか判定する対象
     [SerializeField] private GameObject _targetObject;
 
@@ -25,6 +27,16 @@ public class StageEndJudge : MonoBehaviour
         SetTriggerColliders();
     }
 
+    private void Start()
+    {
+        CreateDebugMenu();
+    }
+
+    private void OnDestroy()
+    {
+        RuntimeDebug.DebugMenu.DestroyWindow(DebugWindowName);
+    }
+
     private void OnValidate()
     {
         SetTriggerColliders();
@@ -35,8 +47,33 @@ public class StageEndJudge : MonoBehaviour
         if (_isOnce && _isJudged) { return; }
         if (!IsTargetObject(other)) { return; }
 
+        NotifyStageEnd(other.name);
+    }
+
+    public void ForceStageEnd()
+    {
+        ForceStageEndWithoutScore();
+    }
+
+    public void ForceStageEndWithoutScore()
+    {
+        if (_isOnce && _isJudged) { return; }
+
+        NotifyStageEnd("Debug");
+    }
+
+    public void ForceStageEndWithTargetScore()
+    {
+        if (_isOnce && _isJudged) { return; }
+
+        GiveCurrentWaveTargetScore();
+        NotifyStageEnd("Debug Clear");
+    }
+
+    private void NotifyStageEnd(string sourceName)
+    {
         _isJudged = true;
-        Debug.Log("StageEndJudge: Stage End Triggered by " + other.name);
+        Debug.Log("StageEndJudge: Stage End Triggered by " + sourceName);
         OnStageEnd?.Invoke();
         _onStageEnd?.Invoke();
     }
@@ -82,5 +119,33 @@ public class StageEndJudge : MonoBehaviour
     public void ResetJudge()
     {
         _isJudged = false;
+    }
+
+    private void GiveCurrentWaveTargetScore()
+    {
+        InGameFlowController flowController = FindFirstObjectByType<InGameFlowController>();
+        WaveData currentWave = flowController != null ? flowController.CurrentWaveData : null;
+        if (currentWave == null)
+        {
+            Debug.LogWarning("[StageEndJudge] Target score was not added. Reason=CurrentWaveData is null.");
+            return;
+        }
+
+        ScoreManager scoreManager = ScoreManager.Instance != null ? ScoreManager.Instance : FindFirstObjectByType<ScoreManager>();
+        if (scoreManager == null)
+        {
+            Debug.LogWarning("[StageEndJudge] Target score was not added. Reason=ScoreManager is null.");
+            return;
+        }
+
+        scoreManager.SetPlayerScoreAtLeast(currentWave.TargetScore);
+        Debug.Log($"[StageEndJudge] Player score forced to target. TargetScore={currentWave.TargetScore}");
+    }
+
+    private void CreateDebugMenu()
+    {
+        RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
+        window.CreateButton("Force Wave Clear", ForceStageEndWithTargetScore);
+        window.CreateButton("Force Wave Failed", ForceStageEndWithoutScore);
     }
 }

@@ -198,6 +198,27 @@ namespace AudienceRequest
             _activeUis[(int)pose].Clear();
         }
 
+        public void ClearAllUiPools()
+        {
+            for (int i = 0; i < _activeUis.Count; i++)
+            {
+                List<GameObject> activeList = _activeUis[i];
+                ObjectPool<GameObject> pool = _uiPools[i];
+
+                foreach (GameObject obj in activeList)
+                {
+                    if (obj == null)
+                    {
+                        continue;
+                    }
+
+                    pool.Release(obj);
+                }
+
+                activeList.Clear();
+            }
+        }
+
         private IEnumerator ReleaseAfterDelay(GameObject obj, PoseID pose, float delay)
         {
             Debug.Log($"[AudienceRequestUiPool] Release wait start : {pose}");

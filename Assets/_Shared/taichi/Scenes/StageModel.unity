@@ -273,10 +273,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ForwardProgressMover
   _stageEndJudgeTransform: {fileID: 1170876506}
   _cameraTransform: {fileID: 1576856035}
-  _poseContextName: PoseContext
-  _poseContext: {fileID: 0}
+  _moveSettings: {fileID: 11400000, guid: 57d2a136a1df4d24b9ae025d748e688c, type: 2}
   _autoRegisterTimeout: 5
-  _moveSpeed: 1
+  _fallbackEnemyMoveSpeed: 1
+  _fallbackPlayerMoveSpeed: 1
+  _fallbackLeaderSpeedMultiplier: 0.5
 --- !u!4 &394115202
 Transform:
   m_ObjectHideFlags: 0

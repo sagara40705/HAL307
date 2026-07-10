@@ -65,6 +65,33 @@ public class WaveGaugeController : MonoBehaviour
         {
             SetupStageEndJudge();
         }
+
+        if (StageProgressProvider.Instance == null)
+        {
+            return;
+        }
+
+        currentValue =
+            Mathf.Lerp(
+                minValue,
+                maxValue,
+                StageProgressProvider.Instance.GaugeRate
+            );
+
+        if (waveMaterial != null)
+        {
+            waveMaterial.SetFloat(
+                propertyName,
+                currentValue
+            );
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(
+                currentValue <= warningThreshold
+            );
+        }
     }
 
     public void ResetWaveGauge()

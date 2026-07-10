@@ -71,6 +71,11 @@ public class StageProgressProvider : MonoBehaviour
             currentDistance
         );
 
+        Debug.Log(
+    $"GaugeRate={GaugeRate} " +
+    $"Current={currentDistance}"
+);
+
         GaugeRate = Mathf.Clamp01(GaugeRate);
         IsArrived = false;
     }

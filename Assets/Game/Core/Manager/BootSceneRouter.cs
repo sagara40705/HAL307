@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public sealed class BootSceneRouter : MonoBehaviour
 {
@@ -36,7 +35,20 @@ public sealed class BootSceneRouter : MonoBehaviour
             yield break;
         }
 
-        yield return SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Single);
+        if (!Application.CanStreamedLevelBeLoaded(nextSceneName))
+        {
+            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=Scene cannot be loaded. Scene='{nextSceneName}'. Check Build Settings scene list or Build Profile scene list.");
+            yield break;
+        }
+
+        SceneLoader sceneLoader = SceneLoader.Instance;
+        if (sceneLoader == null || !sceneLoader.IsInitialized)
+        {
+            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=SceneLoader is not ready. Scene='{nextSceneName}'");
+            yield break;
+        }
+
+        yield return sceneLoader.LoadAsync(nextSceneName);
     }
 
     private string GetNextSceneName()

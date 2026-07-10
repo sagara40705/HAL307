@@ -229,7 +229,7 @@ MonoBehaviour:
   startPoint: {fileID: 1576856035}
   endPoint: {fileID: 746261350}
   currentPoint: {fileID: 1576856035}
-  arriveDistance: 1
+  arriveDistance: 23.6
 --- !u!4 &183023184
 Transform:
   m_ObjectHideFlags: 0

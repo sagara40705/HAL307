@@ -177,7 +177,7 @@ MonoBehaviour:
   minValue: 0
   stageEndJudge: {fileID: 0}
   warningUI: {fileID: 811645271}
-  warningThreshold: 0.04
+  warningThreshold: 0.1
   hideOnWaveEffectUis:
   - {fileID: 1718496973}
   - {fileID: 2119480822}
@@ -2390,7 +2390,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 811645271}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 

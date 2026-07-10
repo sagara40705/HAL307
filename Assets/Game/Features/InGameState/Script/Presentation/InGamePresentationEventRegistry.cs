@@ -6,6 +6,34 @@ public sealed class InGamePresentationEventRegistry : MonoBehaviour
 {
     [SerializeField] private EventEntry[] events;
 
+    public static bool InvokeFromLoadedScenes(string eventName)
+    {
+        InGamePresentationEventRegistry[] registries = FindObjectsByType<InGamePresentationEventRegistry>(FindObjectsSortMode.None);
+        if (registries == null || registries.Length <= 0)
+        {
+            Debug.LogWarning($"[InGamePresentationEventRegistry] Event registry was not found. EventName={eventName}");
+            return false;
+        }
+
+        bool invoked = false;
+        foreach (InGamePresentationEventRegistry registry in registries)
+        {
+            if (registry == null)
+            {
+                continue;
+            }
+
+            invoked |= registry.TryInvoke(eventName);
+        }
+
+        if (!invoked)
+        {
+            Debug.LogWarning($"[InGamePresentationEventRegistry] Event was not found. EventName={eventName}");
+        }
+
+        return invoked;
+    }
+
     public bool Invoke(string eventName)
     {
         if (string.IsNullOrWhiteSpace(eventName))
@@ -32,6 +60,27 @@ public sealed class InGamePresentationEventRegistry : MonoBehaviour
         }
 
         Debug.LogWarning($"[InGamePresentationEventRegistry] Event was not found. EventName={eventName}");
+        return false;
+    }
+
+    public bool TryInvoke(string eventName)
+    {
+        if (string.IsNullOrWhiteSpace(eventName) || events == null || events.Length <= 0)
+        {
+            return false;
+        }
+
+        foreach (EventEntry entry in events)
+        {
+            if (entry == null || !entry.IsMatch(eventName))
+            {
+                continue;
+            }
+
+            entry.Invoke();
+            return true;
+        }
+
         return false;
     }
 

@@ -51,12 +51,10 @@ public class WaveGaugeController : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (stageEndJudge == null)
+        if (stageEndJudge != null)
         {
-            return;
+            stageEndJudge.OnStageEnd -= OnStageEnd;
         }
-
-        stageEndJudge.OnStageEnd -= OnStageEnd;
     }
 
     private void Update()

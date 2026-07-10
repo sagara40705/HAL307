@@ -1,47 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
-using Pose;
 using UnityEngine;
 
 public class ForwardProgressMover : MonoBehaviour
 {
-    // Stage終了判定用のオブジェクト
     [SerializeField] private Transform _stageEndJudgeTransform;
     [SerializeField] private Transform _cameraTransform;
+    [SerializeField] private ForwardProgressMoveSettings _moveSettings;
 
-    // Pose状態を取得するContext
-    [SerializeField] private string _poseContextName = "PoseContext";
-    [SerializeField] private PoseContext _poseContext;
-
-    // 自動登録の待ち時間
     [SerializeField, Min(0f)] private float _autoRegisterTimeout = 5f;
+    [SerializeField, Min(0f)] private float _fallbackEnemyMoveSpeed = 1f;
+    [SerializeField, Min(0f)] private float _fallbackPlayerMoveSpeed = 1f;
+    [SerializeField, Range(0f, 1f)] private float _fallbackLeaderSpeedMultiplier = 0.5f;
 
-    [SerializeField, Min(0f)] private float _moveSpeed = 1f;
-
-    // 前進させる対象
-    private readonly List<Transform> _moveTargets = new();
+    private readonly List<MoveActor> _moveActors = new();
     private StageEndJudge _stageEndJudge;
-    private PoseStateTracker _poseStateTracker;
-    private bool _poseStateTrackerWarningLogged;
     private bool _canMove;
     private bool _isStopped;
+    private bool _hasLeaderFollowPosition;
+    private float _lastLeaderForwardPosition;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public Transform CameraTransform => _cameraTransform;
+
+    private float EnemyMoveSpeed => _moveSettings != null ? _moveSettings.EnemyMoveSpeed : _fallbackEnemyMoveSpeed;
+    private float PlayerMoveSpeed => _moveSettings != null ? _moveSettings.PlayerMoveSpeed : _fallbackPlayerMoveSpeed;
+    private float LeaderSpeedMultiplier => _moveSettings != null ? _moveSettings.LeaderSpeedMultiplier : _fallbackLeaderSpeedMultiplier;
+
+    private void Start()
     {
-        //　判定用オブジェクト
-        AddMoveTarget(_stageEndJudgeTransform);
-
-        //　カメラ
-        AddMoveTarget(_cameraTransform);
-
-        //　ステージ終了判定
         SetupStageEndJudge();
-
-        //　Pose状態
-        SetupPoseStateTracker(true);
-
-        //　プレイヤーと敵
         StartCoroutine(RegisterPlayerAndEnemiesCoroutine());
     }
 
@@ -55,8 +42,7 @@ public class ForwardProgressMover : MonoBehaviour
         _stageEndJudge.OnStageEnd -= StopMove;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (!_canMove || _isStopped)
         {
@@ -65,43 +51,27 @@ public class ForwardProgressMover : MonoBehaviour
 
         if (InGameFlowLock.IsPresentationPlaying)
         {
+            ResetLeaderFollowPosition();
             return;
         }
 
-        if (IsAnyPosing())
-        {
-            return;
-        }
-
-        // 前進させる
-        float moveDistance = _moveSpeed * Time.deltaTime;
-        foreach (var target in _moveTargets)
-        {
-            if (target == null)
-            {
-                continue;
-            }
-
-            target.position += Vector3.forward * moveDistance;
-        }
+        MoveActors(Time.deltaTime);
+        MoveFollowersToLeader();
     }
 
     private IEnumerator RegisterPlayerAndEnemiesCoroutine()
     {
-        // Playerと敵が生成されるまで待って追加する
         float elapsedTime = 0f;
         bool playerRegistered = false;
         bool enemiesRegistered = false;
 
         while (elapsedTime <= _autoRegisterTimeout && (!playerRegistered || !enemiesRegistered))
         {
-            //　プレイヤー
             if (!playerRegistered)
             {
                 playerRegistered = TryRegisterPlayer();
             }
 
-            //　敵
             if (!enemiesRegistered)
             {
                 enemiesRegistered = TryRegisterEnemies();
@@ -132,8 +102,7 @@ public class ForwardProgressMover : MonoBehaviour
 
     private bool TryRegisterPlayer()
     {
-        // Player本体を探して追加
-        Player.PlayerPoseContoroller player = Object.FindFirstObjectByType<Player.PlayerPoseContoroller>();
+        Player.PlayerPoseContoroller player = FindFirstObjectByType<Player.PlayerPoseContoroller>();
         if (player == null)
         {
             return false;
@@ -145,19 +114,19 @@ public class ForwardProgressMover : MonoBehaviour
             return false;
         }
 
-        AddMoveTarget(playerMoveTarget);
+        AddOrUpdateActor(playerMoveTarget, MoveActorKind.Player, null, player);
         return true;
     }
 
     private bool TryRegisterEnemies()
     {
-        // 登録済みの敵を探して追加
-        Enemy.EnemyRegistry enemyRegistry = Object.FindFirstObjectByType<Enemy.EnemyRegistry>();
-        if (enemyRegistry == null || enemyRegistry.Count <= 0)
+        Enemy.EnemyRegistry enemyRegistry = FindFirstObjectByType<Enemy.EnemyRegistry>();
+        if (enemyRegistry == null || enemyRegistry.Count < 2)
         {
             return false;
         }
 
+        int registeredCount = 0;
         foreach (Enemy.Enemy enemy in enemyRegistry.Enemies)
         {
             if (enemy == null)
@@ -165,26 +134,172 @@ public class ForwardProgressMover : MonoBehaviour
                 continue;
             }
 
-            AddMoveTarget(enemy.transform);
+            AddOrUpdateActor(enemy.transform, MoveActorKind.Enemy, enemy, null);
+            registeredCount++;
         }
 
-        return true;
+        return registeredCount >= 2;
     }
 
-    private void AddMoveTarget(Transform target)
+    private void MoveActors(float deltaTime)
     {
-        // nullと重複は追加しない
-        if (target == null || _moveTargets.Contains(target))
+        RemoveMissingActors();
+
+        if (_moveActors.Count == 0)
+        {
+            ResetLeaderFollowPosition();
+            return;
+        }
+
+        float leaderForwardPosition = GetLeaderForwardPosition();
+        float rearForwardPosition = GetRearForwardPosition();
+        bool shouldSlowLeader = leaderForwardPosition - rearForwardPosition > 0.01f;
+        float leaderMultiplier = Mathf.Clamp01(LeaderSpeedMultiplier);
+
+        foreach (MoveActor actor in _moveActors)
+        {
+            if (actor == null || actor.Transform == null || actor.IsPosing)
+            {
+                continue;
+            }
+
+            float speed = actor.Kind == MoveActorKind.Player ? PlayerMoveSpeed : EnemyMoveSpeed;
+            if (shouldSlowLeader && IsLeader(actor, leaderForwardPosition))
+            {
+                speed *= leaderMultiplier;
+            }
+
+            actor.Transform.position += Vector3.forward * speed * deltaTime;
+        }
+    }
+
+    private void MoveFollowersToLeader()
+    {
+        RemoveMissingActors();
+
+        if (_moveActors.Count == 0)
+        {
+            ResetLeaderFollowPosition();
+            return;
+        }
+
+        float leaderForwardPosition = GetLeaderForwardPosition();
+        if (!_hasLeaderFollowPosition)
+        {
+            _lastLeaderForwardPosition = leaderForwardPosition;
+            _hasLeaderFollowPosition = true;
+            return;
+        }
+
+        float moveDistance = leaderForwardPosition - _lastLeaderForwardPosition;
+        _lastLeaderForwardPosition = leaderForwardPosition;
+
+        if (moveDistance <= 0f)
         {
             return;
         }
 
-        _moveTargets.Add(target);
+        MoveFollower(_cameraTransform, moveDistance);
+        MoveFollower(_stageEndJudgeTransform, moveDistance);
+    }
+
+    private void MoveFollower(Transform target, float moveDistance)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        target.position += Vector3.forward * moveDistance;
+    }
+
+    private float GetLeaderForwardPosition()
+    {
+        float leaderForwardPosition = float.NegativeInfinity;
+        foreach (MoveActor actor in _moveActors)
+        {
+            if (actor == null || actor.Transform == null)
+            {
+                continue;
+            }
+
+            leaderForwardPosition = Mathf.Max(leaderForwardPosition, actor.Transform.position.z);
+        }
+
+        return leaderForwardPosition;
+    }
+
+    private float GetRearForwardPosition()
+    {
+        float rearForwardPosition = float.PositiveInfinity;
+        foreach (MoveActor actor in _moveActors)
+        {
+            if (actor == null || actor.Transform == null)
+            {
+                continue;
+            }
+
+            rearForwardPosition = Mathf.Min(rearForwardPosition, actor.Transform.position.z);
+        }
+
+        return rearForwardPosition;
+    }
+
+    private bool IsLeader(MoveActor actor, float leaderForwardPosition)
+    {
+        if (actor == null || actor.Transform == null)
+        {
+            return false;
+        }
+
+        return Mathf.Abs(actor.Transform.position.z - leaderForwardPosition) <= 0.01f;
+    }
+
+    private void AddOrUpdateActor(Transform target, MoveActorKind kind, Enemy.Enemy enemy, Player.PlayerPoseContoroller player)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        MoveActor actor = FindActor(target);
+        if (actor == null)
+        {
+            _moveActors.Add(new MoveActor(target, kind, enemy, player));
+            ResetLeaderFollowPosition();
+            return;
+        }
+
+        actor.Update(kind, enemy, player);
+    }
+
+    private MoveActor FindActor(Transform target)
+    {
+        foreach (MoveActor actor in _moveActors)
+        {
+            if (actor != null && actor.Transform == target)
+            {
+                return actor;
+            }
+        }
+
+        return null;
+    }
+
+    private void RemoveMissingActors()
+    {
+        for (int i = _moveActors.Count - 1; i >= 0; i--)
+        {
+            if (_moveActors[i] == null || _moveActors[i].Transform == null)
+            {
+                _moveActors.RemoveAt(i);
+                ResetLeaderFollowPosition();
+            }
+        }
     }
 
     private void SetupStageEndJudge()
     {
-        // Stage終了判定を探して停止処理を登録
         if (_stageEndJudgeTransform == null)
         {
             Debug.LogWarning("[ForwardProgressMover] StageEndJudge target was not set.");
@@ -201,53 +316,21 @@ public class ForwardProgressMover : MonoBehaviour
         _stageEndJudge.OnStageEnd += StopMove;
     }
 
-    private void SetupPoseStateTracker(bool logWarning)
-    {
-        if (_poseStateTracker != null)
-        {
-            return;
-        }
-
-        if (_poseContext == null)
-        {
-            if (logWarning)
-            {
-                ContextManager contextManager = ContextManager.Instance;
-                if (contextManager != null && !string.IsNullOrWhiteSpace(_poseContextName))
-                {
-                    _poseContext = contextManager.Get<PoseContext>(_poseContextName);
-                }
-            }
-            else
-            {
-                _poseContext = Object.FindFirstObjectByType<PoseContext>();
-            }
-        }
-
-        _poseStateTracker = _poseContext?.GetPoseStateTracker;
-        if (_poseStateTracker != null || !logWarning || _poseStateTrackerWarningLogged)
-        {
-            return;
-        }
-
-        _poseStateTrackerWarningLogged = true;
-        Debug.LogWarning("[ForwardProgressMover] PoseStateTracker was not found.");
-    }
-
-    private bool IsAnyPosing()
-    {
-        SetupPoseStateTracker(false);
-        return _poseStateTracker != null && _poseStateTracker.IsAnyPosing;
-    }
-
     private void StartMove()
     {
-        if (_canMove || _isStopped || InGameFlowLock.IsPresentationPlaying)
+        if (_canMove || _isStopped)
         {
             return;
         }
 
+        ResetLeaderFollowPosition();
         _canMove = true;
+    }
+
+    private void ResetLeaderFollowPosition()
+    {
+        _hasLeaderFollowPosition = false;
+        _lastLeaderForwardPosition = 0f;
     }
 
     public void StopMove()
@@ -259,17 +342,38 @@ public class ForwardProgressMover : MonoBehaviour
 
         _isStopped = true;
         _canMove = false;
+        ResetLeaderFollowPosition();
     }
 
     public void ResumeMove()
     {
         _isStopped = false;
         _canMove = true;
+        ResetLeaderFollowPosition();
     }
 
     public void RegisterMoveTarget(Transform target)
     {
-        AddMoveTarget(target);
+        if (target == null)
+        {
+            return;
+        }
+
+        Enemy.Enemy enemy = target.GetComponentInParent<Enemy.Enemy>();
+        if (enemy != null)
+        {
+            AddOrUpdateActor(enemy.transform, MoveActorKind.Enemy, enemy, null);
+            return;
+        }
+
+        Player.PlayerPoseContoroller player = target.GetComponentInParent<Player.PlayerPoseContoroller>();
+        if (player != null)
+        {
+            AddOrUpdateActor(player.MoveTargetTransform, MoveActorKind.Player, null, player);
+            return;
+        }
+
+        AddOrUpdateActor(target, MoveActorKind.Enemy, null, null);
     }
 
     public void UnregisterMoveTarget(Transform target)
@@ -279,6 +383,43 @@ public class ForwardProgressMover : MonoBehaviour
             return;
         }
 
-        _moveTargets.Remove(target);
+        for (int i = _moveActors.Count - 1; i >= 0; i--)
+        {
+            MoveActor actor = _moveActors[i];
+            if (actor == null || actor.Transform == target || actor.Transform == null || actor.Transform.IsChildOf(target))
+            {
+                _moveActors.RemoveAt(i);
+            }
+        }
+
+        ResetLeaderFollowPosition();
+    }
+
+    private enum MoveActorKind
+    {
+        Enemy,
+        Player
+    }
+
+    private sealed class MoveActor
+    {
+        public MoveActor(Transform transform, MoveActorKind kind, Enemy.Enemy enemy, Player.PlayerPoseContoroller player)
+        {
+            Transform = transform;
+            Update(kind, enemy, player);
+        }
+
+        public Transform Transform { get; }
+        public MoveActorKind Kind { get; private set; }
+        public Enemy.Enemy Enemy { get; private set; }
+        public Player.PlayerPoseContoroller Player { get; private set; }
+        public bool IsPosing => Enemy != null ? Enemy.IsPosing : Player != null && Player.IsPosing;
+
+        public void Update(MoveActorKind kind, Enemy.Enemy enemy, Player.PlayerPoseContoroller player)
+        {
+            Kind = kind;
+            Enemy = enemy;
+            Player = player;
+        }
     }
 }

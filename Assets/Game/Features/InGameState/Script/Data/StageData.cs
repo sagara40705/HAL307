@@ -10,6 +10,7 @@ public sealed class StageData : ScriptableObject
 
     [Header("Scene")]
     [SerializeField] private string resultSceneName = "Result";
+    [SerializeField] private Vector3 cameraInitialPosition;
 
     [Header("Enemy")]
     [SerializeField] private EnemyLineupEntry[] initialEnemies;
@@ -20,6 +21,7 @@ public sealed class StageData : ScriptableObject
     public InGamePresentationAction GameStartAction => gameStartAction;
     public InGamePresentationAction GameEndAction => gameEndAction;
     public string ResultSceneName => resultSceneName;
+    public Vector3 CameraInitialPosition => cameraInitialPosition;
     public EnemyLineupEntry[] InitialEnemies => initialEnemies;
     public bool HasInitialEnemies => initialEnemies != null && initialEnemies.Length > 0;
     public int WaveCount => waves != null ? waves.Length : 0;

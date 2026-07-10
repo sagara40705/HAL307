@@ -4,10 +4,12 @@ using UnityEngine;
 // StageEndJudgeを待つ通常プレイState
 public sealed class PlayingFlowState : InGameFlowStateBase
 {
+    private readonly StageData _stageData;
     private readonly WaveData _waveData;
 
-    public PlayingFlowState(WaveData waveData)
+    public PlayingFlowState(StageData stageData, WaveData waveData)
     {
+        _stageData = stageData;
         _waveData = waveData;
     }
 
@@ -17,6 +19,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.StageEndJudge?.ResetJudge();
         context?.WaveGauge?.ResetWaveGauge();
         context?.AudienceRequest?.ResetRequests();
+        context?.ResetCameraPosition(_stageData);
         BeginWaveEnemyReplacement(context);
 
         InGamePresentationAction action = _waveData?.WaveStartAction;

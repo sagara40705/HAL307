@@ -197,54 +197,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 733fc6897033cb04eaf205a551092b1b, type: 3}
---- !u!1 &183023182
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 183023184}
-  - component: {fileID: 183023183}
-  m_Layer: 0
-  m_Name: StageProgressProvider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &183023183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 183023182}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aeda3e79126ee094da32ba322508b3ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StageProgressProvider
-  startPoint: {fileID: 1576856035}
-  endPoint: {fileID: 746261350}
-  currentPoint: {fileID: 1576856035}
-  arriveDistance: 23.6
---- !u!4 &183023184
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 183023182}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.8496, y: 10.97387, z: 45.87175}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &195996830
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,7 +224,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6e4d66f4069fdd40b6e12fb122c27e1, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::StageSceneMgr
   _nextSceneName: Result
 --- !u!4 &195996832
@@ -321,10 +273,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ForwardProgressMover
   _stageEndJudgeTransform: {fileID: 1170876506}
   _cameraTransform: {fileID: 1576856035}
-  _poseContextName: PoseContext
-  _poseContext: {fileID: 0}
+  _moveSettings: {fileID: 11400000, guid: 57d2a136a1df4d24b9ae025d748e688c, type: 2}
   _autoRegisterTimeout: 5
-  _moveSpeed: 1
+  _fallbackEnemyMoveSpeed: 1
+  _fallbackPlayerMoveSpeed: 1
+  _fallbackLeaderSpeedMultiplier: 0.5
 --- !u!4 &394115202
 Transform:
   m_ObjectHideFlags: 0
@@ -743,19 +696,7 @@ MonoBehaviour:
   _isOnce: 1
   _onStageEnd:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 195996831}
-        m_TargetAssemblyTypeName: StageSceneMgr, Assembly-CSharp
-        m_MethodName: GoResultScene
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
+      m_Calls: []
 --- !u!4 &1170876506
 Transform:
   m_ObjectHideFlags: 0
@@ -819,6 +760,99 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!1 &1185874359
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1185874361}
+  - component: {fileID: 1185874360}
+  m_Layer: 0
+  m_Name: IntroCountDown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1185874360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185874359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53e7bc0172570564d88760396e0d8bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IntroCoutDown
+--- !u!4 &1185874361
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185874359}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.72281, y: -0, z: -2.39359}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1458601916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1458601918}
+  - component: {fileID: 1458601917}
+  m_Layer: 0
+  m_Name: StageElevator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1458601917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458601916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce577bb8e5b501047bf9501c0f1e8913, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::StageElevator
+  _elevatorLeftTf: {fileID: 1837928963}
+  _elevatorCenterTf: {fileID: 1837928962}
+  _elevatorRightTf: {fileID: 1837928961}
+  _moveDuration: 3
+  _moveSpeed: 1
+--- !u!4 &1458601918
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458601916}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.88213, y: 0, z: -26.81129}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1506163265
 GameObject:
   m_ObjectHideFlags: 0
@@ -1200,6 +1234,21 @@ MonoBehaviour:
   planeOffset: 0
   reflectionTextureProperty: _ReflectionTex
   reflectionVpProperty: _ReflectionVP
+--- !u!4 &1837928961 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7307310281076170523, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
+  m_PrefabInstance: {fileID: 1837928958}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1837928962 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -9167738339432366511, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
+  m_PrefabInstance: {fileID: 1837928958}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1837928963 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -3917463989760026909, guid: 80e9bd2cf04f76a45978fd6069f4d27a, type: 3}
+  m_PrefabInstance: {fileID: 1837928958}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1903229664
 GameObject:
   m_ObjectHideFlags: 0
@@ -1430,9 +1479,9 @@ MonoBehaviour:
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 
+            m_StringArgument:
             m_BoolArgument: 0
-          m_CallState: 2
+          m_CallState: 1
   - eventName: IntroSmoke.ClearSmoke
     onInvoke:
       m_PersistentCalls:
@@ -1446,9 +1495,41 @@ MonoBehaviour:
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
+            m_StringArgument:
+            m_BoolArgument: 0
+          m_CallState: 1
+  - eventName: IntroCountDown.StartCoutDown
+    onInvoke:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1185874360}
+          m_TargetAssemblyTypeName: IntroCoutDown, Assembly-CSharp
+          m_MethodName: StartCountDown
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
-          m_CallState: 2
+          m_CallState: 1
+  - eventName: StageElevator.StartElevator
+    onInvoke:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1458601917}
+          m_TargetAssemblyTypeName: StageElevator, Assembly-CSharp
+          m_MethodName: StartElevator
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument:
+            m_BoolArgument: 0
+          m_CallState: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1467,4 +1548,5 @@ SceneRoots:
   - {fileID: 2000000002}
   - {fileID: 1576856035}
   - {fileID: 1903229666}
-  - {fileID: 183023184}
+  - {fileID: 1185874361}
+  - {fileID: 1458601918}

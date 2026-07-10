@@ -20,7 +20,14 @@ public abstract class SceneCoreBase : MonoBehaviour
             if (!string.IsNullOrEmpty(sceneName))
             {
                 yield return StartCoroutine(sceneLoader.LoadAdditiveAsync(sceneName));
-                Debug.Log($"Loaded scene: {sceneName}");
+                if (sceneLoader.IsSceneLoaded(sceneName))
+                {
+                    Debug.Log($"Loaded scene: {sceneName}");
+                }
+                else
+                {
+                    Debug.LogError($"[SceneCoreBase] Scene load did not complete. Scene='{sceneName}'");
+                }
             }
             else
             {

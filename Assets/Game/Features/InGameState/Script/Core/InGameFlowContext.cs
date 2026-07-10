@@ -107,6 +107,23 @@ public sealed class InGameFlowContext : MonoBehaviour
         }
     }
 
+    public void ResetCameraPosition(StageData stageData)
+    {
+        if (stageData == null)
+        {
+            return;
+        }
+
+        Transform cameraTransform = ForwardProgressMover != null ? ForwardProgressMover.CameraTransform : null;
+        if (cameraTransform == null)
+        {
+            Debug.LogWarning("[InGameFlowContext] Camera transform was not found.");
+            return;
+        }
+
+        cameraTransform.position = stageData.CameraInitialPosition;
+    }
+
     private void Awake()
     {
         ResolveStageModelContext();

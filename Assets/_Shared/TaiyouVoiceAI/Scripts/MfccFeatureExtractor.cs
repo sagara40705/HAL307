@@ -18,8 +18,8 @@ using UnityEngine;
 /// 生成したMFCCはONNXモデルの入力として使用する。
 public class MfccFeatureExtractor : MonoBehaviour
 {
-    public const int MfccCount = 20;
-    public const int TargetWidth = 32;
+    public const int MfccCount = 24;
+    public const int TargetWidth = 64;
 
     [Header("Audio Settings")]
     [SerializeField] private int sampleRate = 16000;

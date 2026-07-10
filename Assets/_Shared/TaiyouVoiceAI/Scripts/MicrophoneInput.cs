@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class MicrophoneInput : MonoBehaviour
@@ -5,55 +6,83 @@ public class MicrophoneInput : MonoBehaviour
     [SerializeField] private int sampleRate = 16000;
     [SerializeField] private int recordLengthSec = 1;
 
-    private AudioClip micClip;
-    private string micDevice;
-
-    public int SampleRate => sampleRate;
-    public int RecordLengthSec => recordLengthSec;
+    private AudioClip microphoneClip;
+    private string deviceName;
+    private int sampleCount;
 
     private void Start()
     {
-        StartRecording();
+        sampleCount = sampleRate * recordLengthSec;
+        StartCoroutine(StartRecordingWithRetry());
     }
 
-    public void StartRecording()
+    private IEnumerator StartRecordingWithRetry()
     {
-        if (Microphone.devices.Length == 0)
+        yield return new WaitForSeconds(1.0f);
+
+        for (int i = 0; i < 10; i++)
         {
-            Debug.LogError("É}ÉCÉNÇ™å©Ç¬Ç©ÇËÇ‹ÇπÇÒ");
-            return;
+            Debug.Log($"„Éû„Ç§„ÇØÁ¢∫Ë™ç {i + 1}ÂõûÁõÆ / „Éû„Ç§„ÇØÊï∞: {Microphone.devices.Length}");
+
+            if (Microphone.devices.Length > 0)
+            {
+                deviceName = Microphone.devices[0];
+                StartRecording();
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.5f);
         }
 
-        micDevice = Microphone.devices[0];
-        Debug.Log("égópÉ}ÉCÉN: " + micDevice);
+        Debug.LogError("„Éû„Ç§„ÇØ„ÅåË¶ã„Å§„Åã„Çä„Åæ„Åõ„Çì„ÄÇ");
+    }
 
-        micClip = Microphone.Start(micDevice, true, recordLengthSec, sampleRate);
+    private void StartRecording()
+    {
+        Debug.Log("‰ΩøÁî®„Åô„Çã„Éû„Ç§„ÇØ: " + deviceName);
+
+        microphoneClip = Microphone.Start(
+            deviceName,
+            true,
+            recordLengthSec,
+            sampleRate
+        );
+
+        Debug.Log("„Éû„Ç§„ÇØÈå≤Èü≥ÈñãÂßã");
     }
 
     public float[] GetLatestSamples()
     {
-        if (micClip == null)
+        if (microphoneClip == null)
         {
-            Debug.LogWarning("É}ÉCÉNò^âπÇ™äJénÇ≥ÇÍÇƒÇ¢Ç‹ÇπÇÒ");
             return null;
         }
 
-        int sampleCount = micClip.samples;
-        float[] samples = new float[sampleCount];
-        micClip.GetData(samples, 0);
-        return samples;
-    }
+        int micPosition = Microphone.GetPosition(deviceName);
 
-    public bool IsRecording()
-    {
-        return micClip != null && Microphone.IsRecording(micDevice);
+        if (micPosition <= 0)
+        {
+            return null;
+        }
+
+        float[] samples = new float[sampleCount];
+
+        int startPosition = micPosition - sampleCount;
+        if (startPosition < 0)
+        {
+            startPosition += microphoneClip.samples;
+        }
+
+        microphoneClip.GetData(samples, startPosition);
+
+        return samples;
     }
 
     private void OnDisable()
     {
-        if (!string.IsNullOrEmpty(micDevice) && Microphone.IsRecording(micDevice))
+        if (!string.IsNullOrEmpty(deviceName) && Microphone.IsRecording(deviceName))
         {
-            Microphone.End(micDevice);
+            Microphone.End(deviceName);
         }
     }
 }

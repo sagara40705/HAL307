@@ -1,121 +1,248 @@
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
-
-public class TitleSceneController : MonoBehaviour
+public class VoiceMenuController : MonoBehaviour
 {
-    [Header("メニューの項目")]
-    public RectTransform menuItems;
+    [Header("Menu")]
+    [SerializeField] private GameObject menuPanel;
+    [SerializeField] private bool pauseGameWhenOpen = true;
 
-    [Header("選択アイコン")]
-    public RectTransform iconLeft;
-    public RectTransform iconRight;
-    public float iconOffsetX = 80f;
+    [Header("Select Light")]
+    [SerializeField] private RectTransform selectLight;
 
-    [Header("選択中の色")]
-    public Color selectedColor = Color.yellow;
-    public Color normalColor = Color.white;
+    [Header("Menu Items")]
+    [SerializeField] private RectTransform[] menuItems;
 
-    [Header("Scene")]
-    [SerializeField] private string nextSceneName = "Prototype";
+    [Header("Actions")]
+    [SerializeField] private UnityEvent[] onDecideEvents;
 
-    private int currentIndex = 0;
+    [Header("Debug Key Input")]
+    [SerializeField] private bool enableDebugKeyInput = true;
+    [SerializeField] private KeyCode openMenuKey = KeyCode.T;
+    [SerializeField] private KeyCode closeMenuKey = KeyCode.Escape;
+    [SerializeField] private KeyCode upKey = KeyCode.UpArrow;
+    [SerializeField] private KeyCode upKey2 = KeyCode.W;
+    [SerializeField] private KeyCode downKey = KeyCode.DownArrow;
+    [SerializeField] private KeyCode downKey2 = KeyCode.S;
+    [SerializeField] private KeyCode decideKey = KeyCode.Return;
+    [SerializeField] private KeyCode decideKey2 = KeyCode.Space;
 
-    void Start()
+    [Header("Debug Time Rule")]
+    [SerializeField] private bool requireOpenBeforeControl = true;
+
+    private int currentIndex;
+    private bool isMenuOpen;
+
+    private void Start()
     {
-        UpdateMenuVisuals();
+        if (menuPanel != null)
+        {
+            isMenuOpen = menuPanel.activeSelf;
+        }
+
+        currentIndex = 0;
+        UpdateSelectLight();
     }
 
-    void Update()
+    private void Update()
     {
-        // 
-        bool upPressed = false;
-        bool downPressed = false;
-        bool submitPressed = false;
-
-        // キーボードの判定
-        if (Keyboard.current != null)
+        if (!enableDebugKeyInput)
         {
-            upPressed |= Keyboard.current.upArrowKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame;
-            downPressed |= Keyboard.current.downArrowKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame;
-            submitPressed |= Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame;
+            return;
         }
 
-        // ゲームパッドの判定
-        if (Gamepad.current != null)
+        // デバッグ用：Tで音声の「time」と同じ動き
+        if (Input.GetKeyDown(openMenuKey))
         {
-            upPressed |= Gamepad.current.dpad.up.wasPressedThisFrame || Gamepad.current.leftStick.up.wasPressedThisFrame;
-            downPressed |= Gamepad.current.dpad.down.wasPressedThisFrame || Gamepad.current.leftStick.down.wasPressedThisFrame;
-            submitPressed |= Gamepad.current.buttonSouth.wasPressedThisFrame; // PSなら×/〇、XboxならAボタン
+            OpenMenu();
         }
 
-        // 入力処理の実行
-        if (upPressed)
+        // デバッグ用：Escapeで閉じる
+        if (Input.GetKeyDown(closeMenuKey))
         {
-            currentIndex = (currentIndex - 1 + menuItems.childCount) % menuItems.childCount;
-            UpdateMenuVisuals();
-        }
-        else if (downPressed)
-        {
-            currentIndex = (currentIndex + 1) % menuItems.childCount;
-            UpdateMenuVisuals();
+            CloseMenu();
         }
 
-        if (submitPressed)
+        // requireOpenBeforeControl がONなら、メニューが開いている時だけ上下決定を受け付ける
+        if (requireOpenBeforeControl && !isMenuOpen)
         {
-            ExecuteSelection();
+            return;
+        }
+
+        if (Input.GetKeyDown(upKey) || Input.GetKeyDown(upKey2))
+        {
+            MoveUp();
+        }
+
+        if (Input.GetKeyDown(downKey) || Input.GetKeyDown(downKey2))
+        {
+            MoveDown();
+        }
+
+        if (Input.GetKeyDown(decideKey) || Input.GetKeyDown(decideKey2))
+        {
+            Decide();
         }
     }
 
-    void UpdateMenuVisuals()
+    /// <summary>
+    /// MenuVoiceCommandAction から呼ばれる。
+    /// ue / sita / kettei / time に対応。
+    /// </summary>
+    public void OnVoiceCommand(string command)
     {
-        for (int i = 0; i < menuItems.childCount; i++)
+        if (string.IsNullOrWhiteSpace(command))
         {
-            var text = menuItems.GetChild(i).GetComponent<TextMeshProUGUI>();
-            if (text != null)
-            {
-                text.color = (i == currentIndex) ? selectedColor : normalColor;
-            }
+            return;
+        }
 
-            if (i == currentIndex)
-            {
-                if (iconLeft != null)
+        command = command.Trim().ToLowerInvariant();
+
+        switch (command)
+        {
+            case "time":
+                OpenMenu();
+                break;
+
+            case "ue":
+                if (!requireOpenBeforeControl || isMenuOpen)
                 {
-                    iconLeft.SetParent(menuItems.GetChild(i), false);
-                    iconLeft.anchoredPosition = new Vector2(-iconOffsetX, 10);
+                    MoveUp();
                 }
-                if (iconRight != null)
-                {
-                    iconRight.SetParent(menuItems.GetChild(i), false);
-                    iconRight.anchoredPosition = new Vector2(iconOffsetX, 10);
-                }
-            }
+                break;
 
-            menuItems.GetChild(i).localScale = (i == currentIndex) ? Vector3.one * 1.2f : Vector3.one;
+            case "sita":
+                if (!requireOpenBeforeControl || isMenuOpen)
+                {
+                    MoveDown();
+                }
+                break;
+
+            case "kettei":
+                if (!requireOpenBeforeControl || isMenuOpen)
+                {
+                    Decide();
+                }
+                break;
         }
     }
 
-    async UniTaskVoid ExecuteSelection()
+    public void OpenMenu()
     {
-        var selectedItem = menuItems.GetChild(currentIndex).name;
-
-        switch (selectedItem)
+        if (menuPanel != null)
         {
-            case "Start":
-                await TransitionManager.PlayDumbbellFadeOut();
-                SceneLoader.Load(nextSceneName);
-                break;
-
-            case "Exit":
-                Application.Quit();
-                break;
-
-            default:
-                Debug.LogWarning("未定義のメニュー項目が選択されました: " + selectedItem);
-                break;
+            menuPanel.SetActive(true);
         }
+
+        isMenuOpen = true;
+        currentIndex = 0;
+        UpdateSelectLight();
+
+        if (pauseGameWhenOpen)
+        {
+            Time.timeScale = 0f;
+        }
+
+        Debug.Log("[VoiceMenuController] メニューを開きました");
+    }
+
+    public void CloseMenu()
+    {
+        if (menuPanel != null)
+        {
+            menuPanel.SetActive(false);
+        }
+
+        isMenuOpen = false;
+
+        if (selectLight != null)
+        {
+            selectLight.gameObject.SetActive(false);
+        }
+
+        if (pauseGameWhenOpen)
+        {
+            Time.timeScale = 1f;
+        }
+
+        Debug.Log("[VoiceMenuController] メニューを閉じました");
+    }
+
+    public void MoveUp()
+    {
+        if (menuItems == null || menuItems.Length == 0)
+        {
+            return;
+        }
+
+        currentIndex--;
+
+        if (currentIndex < 0)
+        {
+            currentIndex = menuItems.Length - 1;
+        }
+
+        UpdateSelectLight();
+        Debug.Log("[VoiceMenuController] 上へ移動: " + currentIndex);
+    }
+
+    public void MoveDown()
+    {
+        if (menuItems == null || menuItems.Length == 0)
+        {
+            return;
+        }
+
+        currentIndex++;
+
+        if (currentIndex >= menuItems.Length)
+        {
+            currentIndex = 0;
+        }
+
+        UpdateSelectLight();
+        Debug.Log("[VoiceMenuController] 下へ移動: " + currentIndex);
+    }
+
+    public void Decide()
+    {
+        Debug.Log("[VoiceMenuController] 決定: " + currentIndex);
+
+        if (onDecideEvents == null)
+        {
+            return;
+        }
+
+        if (currentIndex < 0 || currentIndex >= onDecideEvents.Length)
+        {
+            return;
+        }
+
+        onDecideEvents[currentIndex]?.Invoke();
+    }
+
+    private void UpdateSelectLight()
+    {
+        if (selectLight == null)
+        {
+            return;
+        }
+
+        if (menuItems == null || menuItems.Length == 0)
+        {
+            selectLight.gameObject.SetActive(false);
+            return;
+        }
+
+        RectTransform target = menuItems[currentIndex];
+        if (target == null)
+        {
+            selectLight.gameObject.SetActive(false);
+            return;
+        }
+
+        selectLight.gameObject.SetActive(isMenuOpen || menuPanel == null || menuPanel.activeSelf);
+        selectLight.position = target.position;
+        selectLight.sizeDelta = target.sizeDelta;
     }
 }

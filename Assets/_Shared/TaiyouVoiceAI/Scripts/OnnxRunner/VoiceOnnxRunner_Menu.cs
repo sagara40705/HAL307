@@ -283,4 +283,14 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         worker?.Dispose();
         worker = null;
     }
+
+    public void SetMinVolumeThreshold(float value)
+    {
+        minVolumeThreshold = value;
+    }
+
+    public float GetMinVolumeThreshold()
+    {
+        return minVolumeThreshold;
+    }
 }

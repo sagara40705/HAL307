@@ -130,6 +130,8 @@ GameObject:
   - component: {fileID: 232563141}
   - component: {fileID: 232563140}
   - component: {fileID: 232563142}
+  - component: {fileID: 232563143}
+  - component: {fileID: 232563144}
   m_Layer: 0
   m_Name: EnemyGenerator
   m_TagString: Untagged
@@ -176,6 +178,41 @@ MonoBehaviour:
   _enemy2SpawnPoint: {fileID: 0}
   _replacementEnemyData: {fileID: 0}
   _resetScoreOnReplace: 1
+--- !u!114 &232563143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232563139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d3a8e724d0a4e1498b1f7e8f6b83c2a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy.EnemyWavePresentationBridge
+  _enemyLineupManager: {fileID: 232563142}
+  _onRemovingEnemy:
+    m_PersistentCalls:
+      m_Calls: []
+  _onIncomingEnemy:
+    m_PersistentCalls:
+      m_Calls: []
+  _onNoPendingReplacement:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &232563144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232563139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ad3f140124469390f2d986b61e5a8f, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::InGamePresentationEventRegistry
+  events: []
 --- !u!4 &232563141
 Transform:
   m_ObjectHideFlags: 0

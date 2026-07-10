@@ -26,13 +26,6 @@ public sealed class InGameUnityEventPresentationAction : InGamePresentationActio
             return;
         }
 
-        InGamePresentationEventRegistry registry = context != null ? context.PresentationEventRegistry : Object.FindFirstObjectByType<InGamePresentationEventRegistry>();
-        if (registry == null)
-        {
-            Debug.LogWarning($"[InGameUnityEventPresentationAction] Event registry was not found. EventName={registeredEventName}");
-            return;
-        }
-
-        registry.Invoke(registeredEventName);
+        InGamePresentationEventRegistry.InvokeFromLoadedScenes(registeredEventName);
     }
 }

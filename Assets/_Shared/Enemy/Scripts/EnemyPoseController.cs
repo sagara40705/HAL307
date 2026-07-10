@@ -40,6 +40,12 @@ namespace Enemy
         // Update is called once per frame
         private void Update()
         {
+            if (InGameFlowLock.IsPresentationPlaying)
+            {
+                _timer = 0f;
+                return;
+            }
+
             if (_isPaused)
             {
                 if (DebugShortcuts.Combo(Key.D, Key.P))

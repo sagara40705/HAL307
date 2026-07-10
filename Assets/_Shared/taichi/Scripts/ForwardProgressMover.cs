@@ -26,6 +26,8 @@ public class ForwardProgressMover : MonoBehaviour
     private bool _canMove;
     private bool _isStopped;
 
+    public Transform CameraTransform => _cameraTransform;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -59,6 +61,11 @@ public class ForwardProgressMover : MonoBehaviour
     void Update()
     {
         if (!_canMove || _isStopped)
+        {
+            return;
+        }
+
+        if (InGameFlowLock.IsPresentationPlaying)
         {
             return;
         }
@@ -237,7 +244,7 @@ public class ForwardProgressMover : MonoBehaviour
 
     private void StartMove()
     {
-        if (_canMove || _isStopped)
+        if (_canMove || _isStopped || InGameFlowLock.IsPresentationPlaying)
         {
             return;
         }
@@ -260,5 +267,20 @@ public class ForwardProgressMover : MonoBehaviour
     {
         _isStopped = false;
         _canMove = true;
+    }
+
+    public void RegisterMoveTarget(Transform target)
+    {
+        AddMoveTarget(target);
+    }
+
+    public void UnregisterMoveTarget(Transform target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        _moveTargets.Remove(target);
     }
 }

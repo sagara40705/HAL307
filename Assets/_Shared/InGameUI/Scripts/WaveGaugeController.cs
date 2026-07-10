@@ -5,10 +5,10 @@ using Cysharp.Threading.Tasks;
 public class WaveGaugeController : MonoBehaviour
 {
     [SerializeField] private Material waveMaterial;
-    [SerializeField] private float decreaseSpeed = 0.1f;
     [SerializeField] private string propertyName = "_BaseLine";
     [SerializeField] private float maxValue = 1.0f;
     [SerializeField] private float minValue = 0.0f;
+    [SerializeField] private StageEndJudge stageEndJudge;
 
     [Header("警告UI")]
     [SerializeField] private GameObject warningUI;
@@ -18,11 +18,9 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
 
     private float currentValue;
+    private bool isTransitionStarted;
 
-    // WaveGaugeが0になった時に何度も演出が出ないようにするフラグ
-    private bool isTransitionStarted = false;
-
-    void Start()
+    private void Start()
     {
         if (waveMaterial == null)
         {
@@ -40,41 +38,104 @@ public class WaveGaugeController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("WaveMaterialが見つかりません。");
+            Debug.LogError("WaveMaterial was not found.");
         }
 
         if (warningUI != null)
         {
             warningUI.SetActive(false);
         }
+
+        SetupStageEndJudge();
     }
 
-    void Update()
+    private void OnDestroy()
     {
-        if (waveMaterial != null && currentValue > minValue)
+        if (stageEndJudge == null)
         {
-            currentValue -= decreaseSpeed * Time.deltaTime;
-            currentValue = Mathf.Max(minValue, currentValue);
+            return;
+        }
 
-            waveMaterial.SetFloat(propertyName, currentValue);
+        stageEndJudge.OnStageEnd -= OnStageEnd;
+    }
 
-            // ゲージが少なくなったら警告UIを表示
-            if (warningUI != null)
+    private void Update()
+    {
+        if (stageEndJudge == null)
+        {
+            SetupStageEndJudge();
+        }
+    }
+
+    public void ResetWaveGauge()
+    {
+        TransitionManager.ResetImmediate();
+
+        isTransitionStarted = false;
+        currentValue = maxValue;
+
+        if (waveMaterial == null)
+        {
+            Image image = GetComponent<Image>();
+            if (image != null)
             {
-                warningUI.SetActive(currentValue <= warningThreshold);
-            }
-
-            // WaveGaugeが0になったらシーン遷移演出を開始
-            if (!isTransitionStarted && currentValue <= minValue)
-            {
-                isTransitionStarted = true;
-
-                // ここで他のUIを非表示
-                HideOtherUis();
-
-                PlayGaugeEmptyTransition().Forget();
+                waveMaterial = image.material;
             }
         }
+
+        if (waveMaterial != null)
+        {
+            waveMaterial.SetFloat(propertyName, currentValue);
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(false);
+        }
+
+        ShowOtherUis();
+    }
+
+    private void SetupStageEndJudge()
+    {
+        if (stageEndJudge != null)
+        {
+            return;
+        }
+
+        StageModelContext stageModelContext = FindFirstObjectByType<StageModelContext>();
+        stageEndJudge = stageModelContext != null ? stageModelContext.StageEndJudge : FindFirstObjectByType<StageEndJudge>();
+        if (stageEndJudge == null)
+        {
+            return;
+        }
+
+        stageEndJudge.OnStageEnd -= OnStageEnd;
+        stageEndJudge.OnStageEnd += OnStageEnd;
+    }
+
+    private void OnStageEnd()
+    {
+        if (isTransitionStarted)
+        {
+            return;
+        }
+
+        isTransitionStarted = true;
+        currentValue = minValue;
+
+        if (waveMaterial != null)
+        {
+            waveMaterial.SetFloat(propertyName, currentValue);
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(currentValue <= warningThreshold);
+        }
+
+        HideOtherUis();
+        PlayGaugeEmptyTransition().Forget();
     }
 
     private void HideOtherUis()
@@ -84,6 +145,17 @@ public class WaveGaugeController : MonoBehaviour
             if (ui != null)
             {
                 ui.SetActive(false);
+            }
+        }
+    }
+
+    private void ShowOtherUis()
+    {
+        foreach (GameObject ui in hideOnWaveEffectUis)
+        {
+            if (ui != null)
+            {
+                ui.SetActive(true);
             }
         }
     }

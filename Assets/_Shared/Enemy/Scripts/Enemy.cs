@@ -176,6 +176,11 @@ namespace Enemy
 
         public PoseID RandomPose()
         {
+            if (InGameFlowLock.IsPresentationPlaying)
+            {
+                return PoseID.None;
+            }
+
             if (_data == null || _data.PoseSet.Poses.Count == 0)
             {
                 return PoseID.None;
@@ -187,6 +192,11 @@ namespace Enemy
 
         public void Pause(EnemyPoseData poseData)
         {
+            if (InGameFlowLock.IsPresentationPlaying)
+            {
+                return;
+            }
+
             _currentPoseID = poseData.PreCommitPoseID;
             _isPaused = true;
             _poseTimer = poseData.Duration;

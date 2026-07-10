@@ -129,6 +129,14 @@ namespace AudienceRequest
         // 指定ポーズのUIを演出付きで消す
         public void PlayClearEffectAndRelease(PoseID pose, bool isPlayer)
         {
+            Debug.Log($"[TimeScale Check] Time.timeScale = {Time.timeScale}");
+            if (!IsValidPose(pose))
+            {
+
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return;
+            }
+
             if (!IsValidPose(pose))
             {
                 Debug.LogError($"Invalid audience request pose: {pose}");
@@ -213,12 +221,34 @@ namespace AudienceRequest
 
         private IEnumerator ReleaseAfterDelay(GameObject obj, PoseID pose, float delay)
         {
-            yield return new WaitForSeconds(delay);
+            Debug.Log($"[AudienceRequestUiPool] Release wait start : {pose}");
 
-            if (obj != null && IsValidPose(pose))
+            yield return new WaitForSecondsRealtime(delay);
+
+            Debug.Log($"[AudienceRequestUiPool] Release execute : {pose}");
+
+            if (obj == null)
             {
-                _uiPools[(int)pose].Release(obj);
+                yield break;
             }
+
+            // 念のため、Release前に強制的に非表示にする
+            obj.SetActive(false);
+
+            if (!IsValidPose(pose))
+            {
+                yield break;
+            }
+
+            int poseIndex = (int)pose;
+
+            if (poseIndex < 0 || poseIndex >= _uiPools.Count)
+            {
+                Debug.LogError($"[AudienceRequestUiPool] UI Pool is missing for pose : {pose}");
+                yield break;
+            }
+
+            _uiPools[poseIndex].Release(obj);
         }
 
 
@@ -354,8 +384,74 @@ namespace AudienceRequest
             int poseIndex = (int)pose;
             return poseIndex >= 0 && poseIndex < (int)PoseID.Pose_Count;
         }
+
+        public GameObject GenerateInArea(PoseID pose, Vector2 areaMin, Vector2 areaMax)
+        {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid audience request pose: {pose}");
+                return null;
+            }
+
+            if (!TryFindSpawnPositionInArea(areaMin, areaMax, out Vector2 spawnPos))
+            {
+                return null;
+            }
+
+            GameObject obj = _uiPools[(int)pose].Get();
+
+            obj.transform.SetParent(_uiParent.transform, false);
+            obj.transform.localScale = Vector3.one;
+
+            RectTransform rect = obj.GetComponent<RectTransform>();
+
+            if (rect != null)
+            {
+                rect.anchoredPosition = spawnPos;
+            }
+
+            Image img = obj.GetComponent<Image>();
+
+            if (img != null)
+            {
+                if (TryGetSpritePair(pose, out SpritePair spriteSetting))
+                {
+                    img.sprite = spriteSetting.originalSprite;
+                }
+            }
+
+            _activeUis[(int)pose].Add(obj);
+
+            return obj;
+        }
+
+        private bool TryFindSpawnPositionInArea(Vector2 areaMin, Vector2 areaMax, out Vector2 pos)
+        {
+            for (int i = 0; i < _maxAttempts; i++)
+            {
+                Vector2 candidate = new Vector2(
+                    Random.Range(areaMin.x, areaMax.x),
+                    Random.Range(areaMin.y, areaMax.y)
+                );
+
+                if (IsInsideForbiddenArea(candidate))
+                {
+                    continue;
+                }
+
+                if (IsOverlapping(candidate))
+                {
+                    continue;
+                }
+
+                pos = candidate;
+                return true;
+            }
+
+            pos = Vector2.zero;
+            return false;
+        }
+
     }
-
-
 }
 

@@ -8,8 +8,15 @@ namespace Enemy
     public sealed class EnemyWavePresentationBridge : MonoBehaviour
     {
         [SerializeField] private EnemyLineupManager _enemyLineupManager;
+
+        [Header("Default Events")]
         [SerializeField] private EnemyEvent _onRemovingEnemy;
         [SerializeField] private EnemyEvent _onIncomingEnemy;
+
+        [Header("Named Events")]
+        [SerializeField] private EnemyEventSet[] _removingEnemyEventSets;
+        [SerializeField] private EnemyEventSet[] _incomingEnemyEventSets;
+
         [SerializeField] private UnityEvent _onNoPendingReplacement;
 
         public bool HasPendingReplacement => Lineup != null && Lineup.HasPendingReplacement;
@@ -39,10 +46,22 @@ namespace Enemy
             InvokeEnemyEvent(RemovingEnemy, _onRemovingEnemy, "RemovingEnemy");
         }
 
+        // Invokes a named event set for the Enemy that will be removed.
+        public void InvokeRemovingEnemy(string eventSetName)
+        {
+            InvokeEnemyEventSet(RemovingEnemy, _removingEnemyEventSets, eventSetName, "RemovingEnemy");
+        }
+
         // Invokes events for the newly generated Enemy.
         public void InvokeIncomingEnemy()
         {
             InvokeEnemyEvent(IncomingEnemy, _onIncomingEnemy, "IncomingEnemy");
+        }
+
+        // Invokes a named event set for the newly generated Enemy.
+        public void InvokeIncomingEnemy(string eventSetName)
+        {
+            InvokeEnemyEventSet(IncomingEnemy, _incomingEnemyEventSets, eventSetName, "IncomingEnemy");
         }
 
         // Invokes removing and incoming Enemy events in order.
@@ -50,6 +69,13 @@ namespace Enemy
         {
             InvokeRemovingEnemy();
             InvokeIncomingEnemy();
+        }
+
+        // Invokes named event sets for removing and incoming Enemy instances in order.
+        public void InvokeReplacementEnemies(string eventSetName)
+        {
+            InvokeRemovingEnemy(eventSetName);
+            InvokeIncomingEnemy(eventSetName);
         }
 
         // Changes active state of the Enemy that will be removed.
@@ -62,6 +88,16 @@ namespace Enemy
         public void SetIncomingEnemyActive(bool isActive)
         {
             SetEnemyActive(IncomingEnemy, isActive, "IncomingEnemy");
+        }
+
+        // Empty sample for incoming Enemy presentation.
+        public void SampleIncomingEnemyAction(Enemy enemy)
+        {
+        }
+
+        // Empty sample for removing Enemy presentation.
+        public void SampleRemovingEnemyAction(Enemy enemy)
+        {
         }
 
         private void InvokeEnemyEvent(Enemy enemy, EnemyEvent targetEvent, string targetName)
@@ -80,6 +116,31 @@ namespace Enemy
             }
 
             targetEvent?.Invoke(enemy);
+        }
+
+        private void InvokeEnemyEventSet(Enemy enemy, EnemyEventSet[] eventSets, string eventSetName, string targetName)
+        {
+            if (!HasPendingReplacement)
+            {
+                Debug.LogWarning($"[EnemyWavePresentationBridge] No pending replacement. Target={targetName}, EventSet={eventSetName}");
+                _onNoPendingReplacement?.Invoke();
+                return;
+            }
+
+            if (enemy == null)
+            {
+                Debug.LogWarning($"[EnemyWavePresentationBridge] Enemy was not found. Target={targetName}, EventSet={eventSetName}");
+                return;
+            }
+
+            EnemyEventSet eventSet = FindEventSet(eventSets, eventSetName);
+            if (eventSet == null)
+            {
+                Debug.LogWarning($"[EnemyWavePresentationBridge] Event set was not found. Target={targetName}, EventSet={eventSetName}");
+                return;
+            }
+
+            eventSet.Invoke(enemy);
         }
 
         private void SetEnemyActive(Enemy enemy, bool isActive, string targetName)
@@ -103,9 +164,46 @@ namespace Enemy
             _enemyLineupManager = FindFirstObjectByType<EnemyLineupManager>();
         }
 
+        private EnemyEventSet FindEventSet(EnemyEventSet[] eventSets, string eventSetName)
+        {
+            if (string.IsNullOrWhiteSpace(eventSetName) || eventSets == null || eventSets.Length <= 0)
+            {
+                return null;
+            }
+
+            foreach (EnemyEventSet eventSet in eventSets)
+            {
+                if (eventSet == null || !eventSet.IsMatch(eventSetName))
+                {
+                    continue;
+                }
+
+                return eventSet;
+            }
+
+            return null;
+        }
+
         [Serializable]
         public sealed class EnemyEvent : UnityEvent<Enemy>
         {
+        }
+
+        [Serializable]
+        private sealed class EnemyEventSet
+        {
+            [SerializeField] private string eventSetName;
+            [SerializeField] private EnemyEvent onInvoke;
+
+            public bool IsMatch(string targetName)
+            {
+                return string.Equals(eventSetName, targetName, StringComparison.Ordinal);
+            }
+
+            public void Invoke(Enemy enemy)
+            {
+                onInvoke?.Invoke(enemy);
+            }
         }
     }
 }

@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d84e4f383bb5f4196a25fdeabad5c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleSceneMgr
-  _nextSceneName: Prototype
+  _nextSceneName: GameScene
   _key: 1
 --- !u!4 &896172638
 Transform:

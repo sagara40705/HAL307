@@ -181,8 +181,6 @@ MonoBehaviour:
   hideOnWaveEffectUis:
   - {fileID: 1718496973}
   - {fileID: 2119480822}
-  fadeInDelay: 2
-  fadeThreshold: 0.035
 --- !u!1 &36460463
 GameObject:
   m_ObjectHideFlags: 0

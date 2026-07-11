@@ -19,6 +19,7 @@ public sealed class InGameLoadAdditiveScenePresentationAction : InGamePresentati
         if (sceneLoader != null && sceneLoader.IsInitialized)
         {
             yield return sceneLoader.LoadAdditiveAsync(sceneName);
+            LogIfSceneWasNotLoaded();
             yield break;
         }
 
@@ -48,5 +49,17 @@ public sealed class InGameLoadAdditiveScenePresentationAction : InGamePresentati
         }
 
         yield return operation;
+        LogIfSceneWasNotLoaded();
+    }
+
+    private void LogIfSceneWasNotLoaded()
+    {
+        Scene loadedScene = SceneManager.GetSceneByName(sceneName);
+        if (loadedScene.IsValid() && loadedScene.isLoaded)
+        {
+            return;
+        }
+
+        Debug.LogError($"[InGameLoadAdditiveScenePresentationAction] Load failed. Reason=Scene is not loaded after operation. Scene='{sceneName}'");
     }
 }

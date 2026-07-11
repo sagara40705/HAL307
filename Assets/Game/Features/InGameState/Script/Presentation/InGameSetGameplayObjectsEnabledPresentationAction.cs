@@ -183,7 +183,7 @@ public sealed class InGameSetGameplayObjectsEnabledPresentationAction : InGamePr
             return;
         }
 
-        actorRoots.Add(enemy.gameObject);
+        AddActorRoot(enemy.gameObject, actorRoots);
     }
 
     private void AddPlayer(HashSet<GameObject> actorRoots)
@@ -195,7 +195,29 @@ public sealed class InGameSetGameplayObjectsEnabledPresentationAction : InGamePr
             return;
         }
 
-        actorRoots.Add(player.gameObject);
+        AddActorRoot(player.gameObject, actorRoots);
+
+        Transform moveTarget = player.MoveTargetTransform;
+        if (moveTarget != null)
+        {
+            AddActorRoot(moveTarget.gameObject, actorRoots);
+        }
+
+        GameObject taggedPlayer = GameObject.FindWithTag("Player");
+        if (taggedPlayer != null)
+        {
+            AddActorRoot(taggedPlayer, actorRoots);
+        }
+    }
+
+    private void AddActorRoot(GameObject actorRoot, HashSet<GameObject> actorRoots)
+    {
+        if (actorRoot == null)
+        {
+            return;
+        }
+
+        actorRoots.Add(actorRoot);
     }
 
     private void SetActorsEnabled(bool enabled)

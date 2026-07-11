@@ -104,4 +104,15 @@ public class ScoreManager : MonoBehaviour
 
         OnScoreChanged?.Invoke();
     }
+
+    public void ResetScoresForTutorial()
+    {
+        PlayerScore = 0;
+        Enemy1Score = 0;
+        Enemy2Score = 0;
+
+        OnScoreChanged?.Invoke();
+    }
+
+
 }

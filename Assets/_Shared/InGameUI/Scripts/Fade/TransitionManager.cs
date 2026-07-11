@@ -105,6 +105,16 @@ public class TransitionManager : MonoBehaviour
         await Instance.FadeInInternal(duration);
     }
 
+    public static void ResetImmediate()
+    {
+        if (Instance == null)
+        {
+            return;
+        }
+
+        Instance.ResetImmediateInternal();
+    }
+
     private async UniTask PlayDumbbellFadeOutInternal()
     {
         if (isFading) return;
@@ -332,5 +342,19 @@ public class TransitionManager : MonoBehaviour
         }
 
         activeDumbbells.Clear();
+    }
+
+    private void ResetImmediateInternal()
+    {
+        ClearDumbbellsImmediate();
+
+        if (backgroundPanel != null)
+        {
+            Color color = backgroundPanel.color;
+            backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
+            backgroundPanel.gameObject.SetActive(false);
+        }
+
+        isFading = false;
     }
 }

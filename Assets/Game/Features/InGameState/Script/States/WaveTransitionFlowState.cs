@@ -19,21 +19,6 @@ public sealed class WaveTransitionFlowState : InGameFlowStateBase
 
     public override IEnumerator Execute(InGameFlowContext context)
     {
-        bool hasReplacement = _nextWave != null && _nextWave.HasReplacementEnemy;
-        Enemy.EnemyLineupManager enemyLineup = context != null ? context.EnemyLineup : null;
-
-        if (hasReplacement)
-        {
-            if (enemyLineup == null)
-            {
-                UnityEngine.Debug.LogWarning("[WaveTransitionFlowState] Enemy replacement skipped. Reason=EnemyLineupManager is null.");
-            }
-            else
-            {
-                enemyLineup.BeginLowestScoreEnemyReplacement(_nextWave.ReplacementEnemyData, _nextWave.ReplacementEnemyPosition, _nextWave.ReplacementEnemyRotation);
-            }
-        }
-
         InGamePresentationAction action = _completedWave?.WaveTransitionAction;
         if (action != null)
         {
@@ -47,12 +32,5 @@ public sealed class WaveTransitionFlowState : InGameFlowStateBase
                 InGameFlowLock.EndPresentation();
             }
         }
-
-        if (!hasReplacement || enemyLineup == null)
-        {
-            yield break;
-        }
-
-        enemyLineup.CommitPendingReplacement();
     }
 }

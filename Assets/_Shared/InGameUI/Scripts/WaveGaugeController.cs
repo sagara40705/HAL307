@@ -51,12 +51,10 @@ public class WaveGaugeController : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (stageEndJudge == null)
+        if (stageEndJudge != null)
         {
-            return;
+            stageEndJudge.OnStageEnd -= OnStageEnd;
         }
-
-        stageEndJudge.OnStageEnd -= OnStageEnd;
     }
 
     private void Update()
@@ -65,6 +63,62 @@ public class WaveGaugeController : MonoBehaviour
         {
             SetupStageEndJudge();
         }
+
+        if (StageProgressProvider.Instance == null)
+        {
+            return;
+        }
+
+        currentValue =
+            Mathf.Lerp(
+                minValue,
+                maxValue,
+                StageProgressProvider.Instance.GaugeRate
+            );
+
+        if (waveMaterial != null)
+        {
+            waveMaterial.SetFloat(
+                propertyName,
+                currentValue
+            );
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(
+                currentValue <= warningThreshold
+            );
+        }
+    }
+
+    public void ResetWaveGauge()
+    {
+        TransitionManager.ResetImmediate();
+
+        isTransitionStarted = false;
+        currentValue = maxValue;
+
+        if (waveMaterial == null)
+        {
+            Image image = GetComponent<Image>();
+            if (image != null)
+            {
+                waveMaterial = image.material;
+            }
+        }
+
+        if (waveMaterial != null)
+        {
+            waveMaterial.SetFloat(propertyName, currentValue);
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(false);
+        }
+
+        ShowOtherUis();
     }
 
     private void SetupStageEndJudge()
@@ -116,6 +170,17 @@ public class WaveGaugeController : MonoBehaviour
             if (ui != null)
             {
                 ui.SetActive(false);
+            }
+        }
+    }
+
+    private void ShowOtherUis()
+    {
+        foreach (GameObject ui in hideOnWaveEffectUis)
+        {
+            if (ui != null)
+            {
+                ui.SetActive(true);
             }
         }
     }

@@ -26,7 +26,14 @@ namespace Prototype.Sandbox
                 if (!string.IsNullOrEmpty(sceneName))
                 {
                     yield return StartCoroutine(sceneLoader.LoadAdditiveAsync(sceneName));
-                    Debug.Log($"Loaded scene: {sceneName}");
+                    if (sceneLoader.IsSceneLoaded(sceneName))
+                    {
+                        Debug.Log($"Loaded scene: {sceneName}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[PrototypeSceneCore] Scene load did not complete. Scene='{sceneName}'");
+                    }
                 }
                 else
                 {

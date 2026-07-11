@@ -84,7 +84,7 @@ public sealed class InGameFlowController : MonoBehaviour
         while (stageData.HasWave(_currentWaveIndex))
         {
             WaveData currentWave = stageData.GetWaveOrNull(_currentWaveIndex);
-            yield return ChangeStateCoroutine(new PlayingFlowState(currentWave));
+            yield return ChangeStateCoroutine(new PlayingFlowState(stageData, currentWave));
 
             int currentScore = context != null ? context.CurrentPlayerScore : 0;
             bool hasNextWave = stageData.HasWave(_currentWaveIndex + 1);

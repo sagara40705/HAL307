@@ -45,9 +45,11 @@ public class MicSettingController : MonoBehaviour
     [SerializeField] private Key upKey = Key.UpArrow;
     [SerializeField] private Key downKey = Key.DownArrow;
     [SerializeField] private Key leftKey = Key.LeftArrow;
-    [SerializeField] private Key rightKey = Key.RightArrow;
+    [SerializeField] private Key rightKey = Key.RightArrow; 
     [SerializeField] private Key decideKey = Key.Enter;
     [SerializeField] private Key decideKey2 = Key.Space;
+
+    [SerializeField] private VoiceMainMenuController _voiceMainMenuController;
 
     private int currentIndex;
 
@@ -85,6 +87,11 @@ public class MicSettingController : MonoBehaviour
             micSettingPanel.SetActive(true);
         }
 
+        if(microphoneInput != null)
+        {
+            microphoneInput.SendMessage("RestartRecordingIfNeeded", SendMessageOptions.DontRequireReceiver);
+        }
+
         currentIndex = 0;
         UpdateCursor();
 
@@ -101,6 +108,11 @@ public class MicSettingController : MonoBehaviour
         if (mainMenuPanel != null)
         {
             mainMenuPanel.SetActive(true);
+        }
+
+        if(_voiceMainMenuController != null)
+        {
+            _voiceMainMenuController.RefreshSelection();
         }
 
         Debug.Log("マイク設定を閉じました");
@@ -241,26 +253,30 @@ public class MicSettingController : MonoBehaviour
             return;
         }
 
-        float[] samples = microphoneInput.GetLatestSamples();
-
-        if (samples == null || samples.Length == 0)
+        if(sensitivity <= 0)
         {
-            volumeMeterSlider.value = 0;
+            volumeMeterSlider.value = 0f;
             return;
         }
 
-        float max = 0f;
+        float volume = 0f;
 
-        for (int i = 0; i < samples.Length; i++)
+        try
         {
-            float abs = Mathf.Abs(samples[i]);
-            if (abs > max)
-            {
-                max = abs;
-            }
+            volume = (float)microphoneInput.GetType()
+                .GetMethod("GetCurrentVolume")
+                .Invoke(microphoneInput, null);
+        }
+        catch
+        {
+            volume = 0f;
         }
 
-        volumeMeterSlider.value = Mathf.Clamp01(max);
+        volumeMeterSlider.value = volume;
+
+
+        float sensitivityRate = sensitivity / 100f;
+        volumeMeterSlider.value = Mathf.Clamp01(volume * sensitivityRate);
     }
 
     private void UpdateCursor()

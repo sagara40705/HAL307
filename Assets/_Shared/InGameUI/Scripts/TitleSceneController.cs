@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class VoiceMenuController : MonoBehaviour
+public class VoiceTitleMenuController : MonoBehaviour
 {
     [Header("Menu")]
     [SerializeField] private GameObject menuPanel;

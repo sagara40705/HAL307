@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-public class VoiceMenuController : MonoBehaviour
+public class VoiceMainMenuController : MonoBehaviour
 {
     [Header("Menu")]
     [SerializeField] private GameObject menuPanel;
@@ -157,18 +157,22 @@ public class VoiceMenuController : MonoBehaviour
 
     public void OpenMenu()
     {
+        Debug.Log("OpenMenuが呼ばれました");
+
         if (menuPanel != null)
         {
             menuPanel.SetActive(true);
         }
 
         isMenuOpen = true;
+
         currentIndex = 0;
         UpdateSelection();
 
         if (pauseGameWhenOpen)
         {
             Time.timeScale = 0f;
+            Debug.Log("TimeScale = " + Time.timeScale);
         }
 
         Debug.Log("[VoiceMenuController] メニューを開きました");
@@ -328,6 +332,11 @@ public class VoiceMenuController : MonoBehaviour
     public void ResetCursor()
     {
         currentIndex = 0;
+        UpdateSelection();
+    }
+
+    public void RefreshSelection()
+    {
         UpdateSelection();
     }
 }

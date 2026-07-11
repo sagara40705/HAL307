@@ -176,12 +176,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'SETUMEI
-
-'
+  m_text: "\u8AAC\u660E"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
+  m_sharedMaterial: {fileID: -6182183161376190293, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -556,12 +554,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Setting
-
-'
+  m_text: "\u30DE\u30A4\u30AF\u8A2D\u5B9A"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
+  m_sharedMaterial: {fileID: -6182183161376190293, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -746,7 +742,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &303607549
 RectTransform:
   m_ObjectHideFlags: 0
@@ -768,7 +764,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8.18, y: 0.2}
+  m_AnchoredPosition: {x: 4.04, y: -4}
   m_SizeDelta: {x: 1188.7, y: 695.99}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &303607550
@@ -783,7 +779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c856e51ef97f0b4889eb28f45a3cf22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: asdfTest.Sandbox::HowToController
-  mainMenuPanel: {fileID: 2138444099}
+  mainMenuPanel: {fileID: 1796446392}
   howToPanel: {fileID: 303607548}
   howToImage: {fileID: 1238506505}
   pages:
@@ -801,6 +797,7 @@ MonoBehaviour:
   rightKey: 62
   decideKey: 2
   decideKey2: 1
+  _voiceMainMenuController: {fileID: 0}
 --- !u!114 &303607551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -871,8 +868,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1863601763}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.7, y: 0}
+  m_AnchorMax: {x: 0.7, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1007,7 +1004,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &471578822
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1030,7 +1027,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8, y: 0}
+  m_AnchoredPosition: {x: 4, y: 0}
   m_SizeDelta: {x: 1188.7, y: 695}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &471578823
@@ -1048,7 +1045,7 @@ MonoBehaviour:
   sensitivityStep: 1
   firstRepeatDelay: 0.35
   repeatInterval: 0.06
-  mainMenuPanel: {fileID: 2138444099}
+  mainMenuPanel: {fileID: 1796446392}
   micSettingPanel: {fileID: 471578821}
   microphoneInput: {fileID: 1796446401}
   voiceRunner: {fileID: 1796446400}
@@ -1069,6 +1066,7 @@ MonoBehaviour:
   rightKey: 62
   decideKey: 2
   decideKey2: 1
+  _voiceMainMenuController: {fileID: 0}
 --- !u!114 &471578824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1106,7 +1104,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 471578821}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!1 &473154764
 GameObject:
   m_ObjectHideFlags: 0
@@ -1275,10 +1273,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Retry
+  m_text: "\u30EA\u30BF\u30A4\u30A2\u3059\u308B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
+  m_sharedMaterial: {fileID: -6182183161376190293, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1388,7 +1386,7 @@ RectTransform:
   m_Father: {fileID: 864773149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1575,7 +1573,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 56, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &847481710
@@ -1598,10 +1596,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: GO BACK
+  m_text: "\u623B\u308B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
+  m_sharedMaterial: {fileID: -6182183161376190293, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2137,10 +2135,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Explanation
+  m_text: "\u64CD\u4F5C\u8AAC\u660E"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
+  m_sharedMaterial: {fileID: -6182183161376190293, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2387,7 +2385,7 @@ RectTransform:
   m_Father: {fileID: 768217462}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2994,12 +2992,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Return to Game
-
-'
+  m_text: "\u623B\u308B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
+  m_sharedMaterial: {fileID: -6182183161376190293, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3243,6 +3239,7 @@ GameObject:
   - component: {fileID: 1796446401}
   - component: {fileID: 1796446400}
   - component: {fileID: 1796446399}
+  - component: {fileID: 1796446403}
   m_Layer: 0
   m_Name: VOICE
   m_TagString: Untagged
@@ -3372,13 +3369,13 @@ MonoBehaviour:
   onDecideEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 0
+      - m_Target: {fileID: 1796446398}
+        m_TargetAssemblyTypeName: VoiceMenuController, asdfTest.Sandbox
+        m_MethodName: CloseMenu
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3386,13 +3383,13 @@ MonoBehaviour:
         m_CallState: 2
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 0
+      - m_Target: {fileID: 1796446403}
+        m_TargetAssemblyTypeName: RetireButtonAction, Assembly-CSharp
+        m_MethodName: OnClickRetire
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3428,7 +3425,7 @@ MonoBehaviour:
         m_CallState: 2
   enableDebugKeyInput: 1
   openMenuKey: 34
-  closeMenuKey: 60
+  closeMenuKey: 16
   upKey: 63
   upKey2: 37
   downKey: 64
@@ -3460,7 +3457,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1796446392}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2325b13f2f4fb0d4aa07d6adf6568982, type: 3}
   m_Name: 
@@ -3470,14 +3467,14 @@ MonoBehaviour:
   microphoneInput: {fileID: 1796446401}
   featureExtractor: {fileID: 1796446402}
   menuVoiceCommandAction: {fileID: 1796446399}
-  inferenceInterval: 0.2
-  minVolumeThreshold: 0.001
+  inferenceInterval: 0.7
+  minVolumeThreshold: 0.02
   requireHoldToTalk: 0
   holdToTalkKey: 36
-  logPrediction: 1
+  logPrediction: 0
   logScores: 0
-  ignoreNone: 1
-  commandCooldown: 0.6
+  ignoreNone: 0
+  commandCooldown: 0.8
 --- !u!114 &1796446401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3510,6 +3507,21 @@ MonoBehaviour:
   melFilterCount: 40
   preEmphasis: 0.97
   normalizePerFeature: 1
+--- !u!114 &1796446403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796446392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f2a7d07da13d547848e3e5ab83dc15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RetireButtonAction
+  onRetaire:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1808320849
 GameObject:
   m_ObjectHideFlags: 0
@@ -3642,12 +3654,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'BACk
-
-'
+  m_text: "\u623B\u308B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
+  m_sharedMaterial: {fileID: -6182183161376190293, guid: b6bd9f2dcba0b334db855a5508b220ff, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3906,7 +3916,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 165.7, y: 56}
+  m_AnchoredPosition: {x: -253.29999, y: 93}
   m_SizeDelta: {x: 502, y: 80.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2078449395
@@ -3946,7 +3956,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2078449393}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!1 &2080553597
 GameObject:
   m_ObjectHideFlags: 0
@@ -4034,7 +4044,7 @@ Transform:
   m_GameObject: {fileID: 2080553597}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.68, y: 1, z: -10}
+  m_LocalPosition: {x: -2110.56, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4117,7 +4127,7 @@ RectTransform:
   m_Father: {fileID: 515751856}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.7, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4197,7 +4207,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 1980, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2138444102

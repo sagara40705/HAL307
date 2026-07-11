@@ -25,6 +25,8 @@ public class HowToController : MonoBehaviour
     [SerializeField] private Key decideKey = Key.Enter;
     [SerializeField] private Key decideKey2 = Key.Space;
 
+    [SerializeField] private VoiceMainMenuController _voiceMainMenuController;
+
     private int currentIndex;
     private int pageIndex;
 
@@ -77,6 +79,11 @@ public class HowToController : MonoBehaviour
         if (mainMenuPanel != null)
         {
             mainMenuPanel.SetActive(true);
+        }
+
+        if(_voiceMainMenuController != null)
+        {
+            _voiceMainMenuController.RefreshSelection();
         }
 
         Debug.Log("操作説明を閉じました");

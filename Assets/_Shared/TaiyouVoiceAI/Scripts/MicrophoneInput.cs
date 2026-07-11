@@ -9,16 +9,20 @@ public class MicrophoneInput : MonoBehaviour
     private AudioClip microphoneClip;
     private string deviceName;
     private int sampleCount;
+    private float[] sampleBuffer;
 
     private void Start()
     {
         sampleCount = sampleRate * recordLengthSec;
+        sampleBuffer = new float[sampleCount];
+
         StartCoroutine(StartRecordingWithRetry());
     }
 
     private IEnumerator StartRecordingWithRetry()
     {
-        yield return new WaitForSeconds(1.0f);
+        // timeScale = 0 でも進むように Realtime を使う
+        yield return new WaitForSecondsRealtime(0.5f);
 
         for (int i = 0; i < 10; i++)
         {
@@ -31,7 +35,7 @@ public class MicrophoneInput : MonoBehaviour
                 yield break;
             }
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSecondsRealtime(0.5f);
         }
 
         Debug.LogError("マイクが見つかりません。");
@@ -39,6 +43,11 @@ public class MicrophoneInput : MonoBehaviour
 
     private void StartRecording()
     {
+        if (!string.IsNullOrEmpty(deviceName) && Microphone.IsRecording(deviceName))
+        {
+            return;
+        }
+
         Debug.Log("使用するマイク: " + deviceName);
 
         microphoneClip = Microphone.Start(
@@ -48,12 +57,50 @@ public class MicrophoneInput : MonoBehaviour
             sampleRate
         );
 
+        if (microphoneClip == null)
+        {
+            Debug.LogError("Microphone.Start に失敗しました");
+            return;
+        }
+
         Debug.Log("マイク録音開始");
+    }
+
+    public bool IsRecording()
+    {
+        if (string.IsNullOrEmpty(deviceName))
+        {
+            return false;
+        }
+
+        return Microphone.IsRecording(deviceName);
+    }
+
+    public void RestartRecordingIfNeeded()
+    {
+        if (Microphone.devices.Length == 0)
+        {
+            Debug.LogError("マイクが見つかりません。");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(deviceName))
+        {
+            deviceName = Microphone.devices[0];
+        }
+
+        if (!Microphone.IsRecording(deviceName))
+        {
+            Debug.LogWarning("マイクが停止していたので再開します。");
+            StartRecording();
+        }
     }
 
     public float[] GetLatestSamples()
     {
-        if (microphoneClip == null)
+        RestartRecordingIfNeeded();
+
+        if (microphoneClip == null || sampleBuffer == null)
         {
             return null;
         }
@@ -65,24 +112,50 @@ public class MicrophoneInput : MonoBehaviour
             return null;
         }
 
-        float[] samples = new float[sampleCount];
-
         int startPosition = micPosition - sampleCount;
+
         if (startPosition < 0)
         {
             startPosition += microphoneClip.samples;
         }
 
-        microphoneClip.GetData(samples, startPosition);
+        microphoneClip.GetData(sampleBuffer, startPosition);
 
-        return samples;
+        return sampleBuffer;
+    }
+
+    public float GetCurrentVolume()
+    {
+        float[] samples = GetLatestSamples();
+
+        if (samples == null || samples.Length == 0)
+        {
+            return 0f;
+        }
+
+        float max = 0f;
+
+        for (int i = 0; i < samples.Length; i++)
+        {
+            float abs = Mathf.Abs(samples[i]);
+
+            if (abs > max)
+            {
+                max = abs;
+            }
+        }
+
+        return Mathf.Clamp01(max);
     }
 
     private void OnDisable()
     {
+        Debug.LogWarning("MicrophoneInput が Disable されました");
+
         if (!string.IsNullOrEmpty(deviceName) && Microphone.IsRecording(deviceName))
         {
             Microphone.End(deviceName);
+            Debug.LogWarning("マイク録音終了");
         }
     }
 }

@@ -157,6 +157,11 @@ public class VoiceMainMenuController : MonoBehaviour
 
     public void OpenMenu()
     {
+        if (TryRouteOpenToPauseManager())
+        {
+            return;
+        }
+
         Debug.Log("OpenMenuが呼ばれました");
 
         if (menuPanel != null)
@@ -180,6 +185,11 @@ public class VoiceMainMenuController : MonoBehaviour
 
     public void CloseMenu()
     {
+        if (TryRouteCloseToPauseManager())
+        {
+            return;
+        }
+
         if (menuPanel != null)
         {
             menuPanel.SetActive(false);
@@ -200,6 +210,30 @@ public class VoiceMainMenuController : MonoBehaviour
         }
 
         Debug.Log("[VoiceMenuController] メニューを閉じました");
+    }
+
+    private bool TryRouteOpenToPauseManager()
+    {
+        PauseManager pauseManager = PauseManager.Instance;
+        if (pauseManager == null || !pauseManager.IsInitialized || pauseManager.IsApplyingPauseView || pauseManager.IsPaused)
+        {
+            return false;
+        }
+
+        pauseManager.OpenPause();
+        return true;
+    }
+
+    private bool TryRouteCloseToPauseManager()
+    {
+        PauseManager pauseManager = PauseManager.Instance;
+        if (pauseManager == null || !pauseManager.IsInitialized || pauseManager.IsApplyingPauseView || !pauseManager.IsPaused)
+        {
+            return false;
+        }
+
+        pauseManager.ClosePause();
+        return true;
     }
 
     public void MoveUp()

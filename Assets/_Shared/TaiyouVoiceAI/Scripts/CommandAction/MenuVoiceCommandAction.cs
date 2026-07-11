@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class MenuVoiceCommandAction : MonoBehaviour
 {
+    private const string DebugWindowName = "Voice Command";
+
     [Header("Title")]
     [SerializeField] private TitleSceneMgr titleSceneMgr;
 
@@ -28,6 +30,18 @@ public class MenuVoiceCommandAction : MonoBehaviour
         {
             titleSceneMgr = FindFirstObjectByType<TitleSceneMgr>();
         }
+
+        if (menuController == null)
+        {
+            menuController = GetComponent<VoiceMainMenuController>();
+        }
+
+        CreateDebugMenu();
+    }
+
+    private void OnDestroy()
+    {
+        RuntimeDebug.DebugMenu.DestroyWindow(DebugWindowName);
     }
 
     private void Update()
@@ -96,6 +110,26 @@ public class MenuVoiceCommandAction : MonoBehaviour
         }
     }
 
+    public void DebugExecuteTimeCommand()
+    {
+        ExecuteCommand("time", 0f);
+    }
+
+    public void DebugExecuteUpCommand()
+    {
+        ExecuteCommand("ue", 0f);
+    }
+
+    public void DebugExecuteDownCommand()
+    {
+        ExecuteCommand("sita", 0f);
+    }
+
+    public void DebugExecuteDecisionCommand()
+    {
+        ExecuteCommand("kettei", 0f);
+    }
+
     private void EnableMenuControl()
     {
         menuControlEnabled = true;
@@ -103,10 +137,14 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
         Debug.Log("[Menu Voice] time認識。メニュー操作を有効にしました。");
 
-        if (PauseManager.Instance != null)
+        PauseManager pauseManager = PauseManager.Instance;
+        if (pauseManager != null && pauseManager.IsInitialized)
         {
-            PauseManager.Instance.OpenPause();
+            pauseManager.OpenPause();
+            return;
         }
+
+        SendCommandTo(menuController, "time");
     }
 
     private void OnUp()
@@ -127,7 +165,8 @@ public class MenuVoiceCommandAction : MonoBehaviour
     {
         Debug.Log("[Menu Voice] 決定");
 
-        if (titleSceneMgr != null)
+        PauseManager pauseManager = PauseManager.Instance;
+        if (titleSceneMgr != null && (pauseManager == null || !pauseManager.IsPaused))
         {
             titleSceneMgr.OnVoiceCommand("kettei");
         }
@@ -144,5 +183,14 @@ public class MenuVoiceCommandAction : MonoBehaviour
         }
 
         target.SendMessage("OnVoiceCommand", command, SendMessageOptions.DontRequireReceiver);
+    }
+
+    private void CreateDebugMenu()
+    {
+        RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
+        window.CreateButton("\u30bf\u30a4\u30e0", DebugExecuteTimeCommand);
+        window.CreateButton("\u4e0a", DebugExecuteUpCommand);
+        window.CreateButton("\u4e0b", DebugExecuteDownCommand);
+        window.CreateButton("\u6c7a\u5b9a", DebugExecuteDecisionCommand);
     }
 }

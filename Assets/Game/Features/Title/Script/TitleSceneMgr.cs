@@ -16,15 +16,26 @@ public class TitleSceneMgr : MonoBehaviour
         // デバッグ用のスペースキーで次のシーンに遷移
         if (DebugShortcuts.Pressed(_key))
         {
-            PauseManager.Instance.OpenPause();
-            //SceneLoader.Load(_nextSceneName);
+            SceneLoader.Load(_nextSceneName);
         }
-
-        if (DebugShortcuts.Pressed(UnityEngine.InputSystem.Key.LeftCtrl))
-        {
-            PauseManager.Instance.ClosePause();
-            //SceneLoader.Load(_nextSceneName);
-        }
-
     }
+
+    public void OnVoiceCommand(string command)
+    {
+        if (string.IsNullOrWhiteSpace(command))
+        {
+            return;
+        }
+        command = command.Trim().ToLowerInvariant();
+        if (command == "kettei")
+        {
+            StartLoad();
+        }
+    }
+
+    private void StartLoad()
+    {
+        SceneLoader.Load(_nextSceneName);
+    }
+
 }

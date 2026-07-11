@@ -67,10 +67,10 @@ namespace RuntimeDebug
 
         public static void Draw()
         {
-            //if (!IsVisible)
-            //{
-            //    return;
-            //}
+            if (!IsVisible)
+            {
+                return;
+            }
 
             //DrawContents();
         }

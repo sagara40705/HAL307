@@ -53,6 +53,7 @@ namespace Enemy
 
         public EnemyPoseState PoseState => _poseState;
         public float PoseStateElapsedTime => _poseStateElapsedTime;
+        public bool IsPosing => _isPaused;
 
         private Animator animator;
         public Animator GetAnimator => animator;

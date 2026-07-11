@@ -90,6 +90,15 @@ public sealed class AppBootstrapper : MonoBehaviour
             yield break;
         }
 
+        // GamePhaseManager
+        yield return BootManager(
+            nameof(GamePhaseManager),
+            () => GamePhaseManager.CreateFromBootIfNeeded());
+        if (HasFailed)
+        {
+            yield break;
+        }
+
         // SceneProfileManager
         yield return BootManager(
             nameof(SceneProfileManager),

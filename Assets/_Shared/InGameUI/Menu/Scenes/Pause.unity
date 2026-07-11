@@ -3445,7 +3445,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb284adafa9eb7045baea8feb51844c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuVoiceCommandAction
-  titleSceneMgr: {fileID: 0}
   menuController: {fileID: 0}
   stageSelectController: {fileID: 0}
   requireTimeBeforeMenuControl: 1

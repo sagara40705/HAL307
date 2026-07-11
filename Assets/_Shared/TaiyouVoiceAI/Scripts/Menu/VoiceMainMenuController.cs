@@ -215,6 +215,18 @@ public class VoiceMainMenuController : MonoBehaviour
     private bool TryRouteOpenToPauseManager()
     {
         PauseManager pauseManager = PauseManager.Instance;
+        if (pauseManager != null && pauseManager.IsApplyingPauseView)
+        {
+            return false;
+        }
+
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        if (gamePhaseManager != null && gamePhaseManager.IsInitialized && !gamePhaseManager.IsChangingPhase && gamePhaseManager.CurrentPhase != GamePhase.Pause)
+        {
+            gamePhaseManager.ChangePhase(GamePhase.Pause);
+            return true;
+        }
+
         if (pauseManager == null || !pauseManager.IsInitialized || pauseManager.IsApplyingPauseView || pauseManager.IsPaused)
         {
             return false;
@@ -227,6 +239,18 @@ public class VoiceMainMenuController : MonoBehaviour
     private bool TryRouteCloseToPauseManager()
     {
         PauseManager pauseManager = PauseManager.Instance;
+        if (pauseManager != null && pauseManager.IsApplyingPauseView)
+        {
+            return false;
+        }
+
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        if (gamePhaseManager != null && gamePhaseManager.IsInitialized && !gamePhaseManager.IsChangingPhase && gamePhaseManager.CurrentPhase == GamePhase.Pause)
+        {
+            gamePhaseManager.ResumePreviousPhase();
+            return true;
+        }
+
         if (pauseManager == null || !pauseManager.IsInitialized || pauseManager.IsApplyingPauseView || !pauseManager.IsPaused)
         {
             return false;

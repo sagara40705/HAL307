@@ -55,6 +55,21 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
         StartCoroutine(OpenPauseCoroutine());
     }
 
+    public IEnumerator OpenPauseAsync()
+    {
+        if (!CanStartPauseOperation())
+        {
+            yield break;
+        }
+
+        if (_isPaused)
+        {
+            yield break;
+        }
+
+        yield return OpenPauseCoroutine();
+    }
+
     public void ClosePause()
     {
         if (!CanStartPauseOperation())
@@ -68,6 +83,21 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
         }
 
         StartCoroutine(ClosePauseCoroutine());
+    }
+
+    public IEnumerator ClosePauseAsync()
+    {
+        if (!CanStartPauseOperation())
+        {
+            yield break;
+        }
+
+        if (!_isPaused)
+        {
+            yield break;
+        }
+
+        yield return ClosePauseCoroutine();
     }
 
     protected override void OnDestroy()

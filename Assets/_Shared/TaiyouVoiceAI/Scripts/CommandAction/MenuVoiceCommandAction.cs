@@ -3,34 +3,29 @@ using UnityEngine;
 public class MenuVoiceCommandAction : MonoBehaviour
 {
     private const string DebugWindowName = "Voice Command";
-
-    [Header("Title")]
-    [SerializeField] private TitleSceneMgr titleSceneMgr;
+    private const string CommandTime = "time";
+    private const string CommandUp = "ue";
+    private const string CommandDown = "sita";
+    private const string CommandDecision = "kettei";
+    private const string CommandNone = "none";
 
     [Header("Pause Menu / Menu Controller")]
-    [Tooltip("VoiceMenuControllerなど、OnVoiceCommand(string command) を持つスクリプトを入れてください。")]
+    [Tooltip("Assign a component that has OnVoiceCommand(string command).")]
     [SerializeField] private MonoBehaviour menuController;
 
     [Header("Stage Select")]
-    [Tooltip("StageSelectControllerなど、OnVoiceCommand(string command) を持つスクリプトを入れてください。")]
+    [Tooltip("Legacy fallback target that has OnVoiceCommand(string command).")]
     [SerializeField] private MonoBehaviour stageSelectController;
 
     [Header("Time Command")]
     [SerializeField] private bool requireTimeBeforeMenuControl = true;
     [SerializeField] private float menuControlEnableTime = 5.0f;
 
-
-
     private bool menuControlEnabled;
     private float menuControlTimer;
 
     private void Start()
     {
-        if (titleSceneMgr == null)
-        {
-            titleSceneMgr = FindFirstObjectByType<TitleSceneMgr>();
-        }
-
         if (menuController == null)
         {
             menuController = GetComponent<VoiceMainMenuController>();
@@ -60,7 +55,7 @@ public class MenuVoiceCommandAction : MonoBehaviour
         if (menuControlTimer <= 0f)
         {
             menuControlEnabled = false;
-            Debug.Log("[Menu Voice] time有効時間が終了しました。");
+            Debug.Log("[Menu Voice] Time command window expired.");
         }
     }
 
@@ -73,12 +68,12 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
         command = command.Trim().ToLowerInvariant();
 
-        if (command == "none")
+        if (command == CommandNone)
         {
             return;
         }
 
-        if (command == "time")
+        if (command == CommandTime)
         {
             EnableMenuControl();
             return;
@@ -86,48 +81,31 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
         if (requireTimeBeforeMenuControl && !menuControlEnabled)
         {
-            Debug.Log($"[Menu Voice] {command} は time の後だけ有効です。");
+            Debug.Log($"[Menu Voice] Command skipped. Reason=Time command is required first. Command={command}");
             return;
         }
 
-        switch (command)
-        {
-            case "ue":
-                OnUp();
-                break;
-
-            case "sita":
-                OnDown();
-                break;
-
-            case "kettei":
-                OnDecision();
-                break;
-
-            default:
-                Debug.Log($"[Menu Voice] 未対応コマンド: {command}");
-                break;
-        }
+        ExecuteCommandByPhase(command);
     }
 
     public void DebugExecuteTimeCommand()
     {
-        ExecuteCommand("time", 0f);
+        ExecuteCommand(CommandTime, 0f);
     }
 
     public void DebugExecuteUpCommand()
     {
-        ExecuteCommand("ue", 0f);
+        ExecuteCommand(CommandUp, 0f);
     }
 
     public void DebugExecuteDownCommand()
     {
-        ExecuteCommand("sita", 0f);
+        ExecuteCommand(CommandDown, 0f);
     }
 
     public void DebugExecuteDecisionCommand()
     {
-        ExecuteCommand("kettei", 0f);
+        ExecuteCommand(CommandDecision, 0f);
     }
 
     private void EnableMenuControl()
@@ -135,8 +113,133 @@ public class MenuVoiceCommandAction : MonoBehaviour
         menuControlEnabled = true;
         menuControlTimer = menuControlEnableTime;
 
-        Debug.Log("[Menu Voice] time認識。メニュー操作を有効にしました。");
+        GamePhase currentPhase = GetCurrentPhase();
+        Debug.Log($"[Menu Voice] Time command accepted. Phase={currentPhase}");
 
+        if (currentPhase == GamePhase.InGame)
+        {
+            TryChangePhase(GamePhase.Pause);
+            return;
+        }
+
+        if (currentPhase == GamePhase.Pause)
+        {
+            return;
+        }
+
+        if (currentPhase == GamePhase.None)
+        {
+            OpenPauseFallback();
+        }
+    }
+
+    private void ExecuteCommandByPhase(string command)
+    {
+        GamePhase currentPhase = GetCurrentPhase();
+
+        switch (currentPhase)
+        {
+            case GamePhase.Title:
+                ExecuteTitleCommand(command);
+                break;
+
+            case GamePhase.Pause:
+                ExecutePauseCommand(command);
+                break;
+
+            case GamePhase.InGame:
+                Debug.Log($"[Menu Voice] Command skipped. Reason=InGame phase does not use menu commands. Command={command}");
+                break;
+
+            case GamePhase.Result:
+                Debug.Log($"[Menu Voice] Command skipped. Reason=Result phase does not use menu commands. Command={command}");
+                break;
+
+            case GamePhase.Boot:
+                Debug.Log($"[Menu Voice] Command skipped. Reason=Boot phase does not use menu commands. Command={command}");
+                break;
+
+            default:
+                ExecuteFallbackCommand(command);
+                break;
+        }
+    }
+
+    private void ExecuteTitleCommand(string command)
+    {
+        if (command == CommandDecision)
+        {
+            TryChangePhase(GamePhase.InGame);
+            return;
+        }
+
+        Debug.Log($"[Menu Voice] Command skipped. Reason=Title phase only supports decision. Command={command}");
+    }
+
+    private void ExecutePauseCommand(string command)
+    {
+        switch (command)
+        {
+            case CommandUp:
+            case CommandDown:
+            case CommandDecision:
+                SendCommandTo(menuController, command);
+                break;
+
+            default:
+                Debug.Log($"[Menu Voice] Command skipped. Reason=Pause phase unsupported command. Command={command}");
+                break;
+        }
+    }
+
+    private void ExecuteFallbackCommand(string command)
+    {
+        switch (command)
+        {
+            case CommandUp:
+            case CommandDown:
+            case CommandDecision:
+                SendCommandTo(menuController, command);
+                SendCommandTo(stageSelectController, command);
+                break;
+
+            default:
+                Debug.Log($"[Menu Voice] Unsupported command. Command={command}");
+                break;
+        }
+    }
+
+    private bool TryChangePhase(GamePhase nextPhase)
+    {
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        if (gamePhaseManager == null || !gamePhaseManager.IsInitialized)
+        {
+            Debug.LogWarning($"[Menu Voice] Phase change skipped. Reason=GamePhaseManager is not ready. NextPhase={nextPhase}");
+            return false;
+        }
+
+        return gamePhaseManager.ChangePhase(nextPhase);
+    }
+
+    private GamePhase GetCurrentPhase()
+    {
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        if (gamePhaseManager != null && gamePhaseManager.IsInitialized)
+        {
+            return gamePhaseManager.CurrentPhase;
+        }
+
+        PauseManager pauseManager = PauseManager.Instance;
+        if (pauseManager != null && pauseManager.IsPaused)
+        {
+            return GamePhase.Pause;
+        }
+
+        return GamePhase.None;
+    }
+
+    private void OpenPauseFallback()
+    {
         PauseManager pauseManager = PauseManager.Instance;
         if (pauseManager != null && pauseManager.IsInitialized)
         {
@@ -144,41 +247,14 @@ public class MenuVoiceCommandAction : MonoBehaviour
             return;
         }
 
-        SendCommandTo(menuController, "time");
-    }
-
-    private void OnUp()
-    {
-        Debug.Log("[Menu Voice] 上");
-        SendCommandTo(menuController, "ue");
-        SendCommandTo(stageSelectController, "ue");
-    }
-
-    private void OnDown()
-    {
-        Debug.Log("[Menu Voice] 下");
-        SendCommandTo(menuController, "sita");
-        SendCommandTo(stageSelectController, "sita");
-    }
-
-    private void OnDecision()
-    {
-        Debug.Log("[Menu Voice] 決定");
-
-        PauseManager pauseManager = PauseManager.Instance;
-        if (titleSceneMgr != null && (pauseManager == null || !pauseManager.IsPaused))
-        {
-            titleSceneMgr.OnVoiceCommand("kettei");
-        }
-
-        SendCommandTo(menuController, "kettei");
-        SendCommandTo(stageSelectController, "kettei");
+        SendCommandTo(menuController, CommandTime);
     }
 
     private void SendCommandTo(MonoBehaviour target, string command)
     {
         if (target == null)
         {
+            Debug.Log($"[Menu Voice] Command target is empty. Command={command}");
             return;
         }
 

@@ -577,8 +577,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneTimelineController
   _director: {fileID: 1136887389}
+  _contentRoot: {fileID: 1025865141}
   _stopOnAwake: 1
   _evaluateOnStop: 1
+  _hideContentOnAwake: 1
+  _hideContentOnStop: 1
 --- !u!114 &1136887392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -783,7 +786,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1929706304}
   - component: {fileID: 1929706303}
-  - component: {fileID: 1929706302}
   - component: {fileID: 1929706305}
   - component: {fileID: 1929706306}
   m_Layer: 0
@@ -793,14 +795,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &1929706302
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1929706301}
-  m_Enabled: 1
 --- !u!20 &1929706303
 Camera:
   m_ObjectHideFlags: 0

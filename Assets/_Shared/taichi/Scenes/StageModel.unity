@@ -1278,8 +1278,8 @@ MonoBehaviour:
   reflectionMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  clipPlaneOffset: 0.0001
-  planeOffset: 0
+  clipPlaneOffset: -4.61
+  planeOffset: 0.07
   reflectionTextureProperty: _ReflectionTex
   reflectionVpProperty: _ReflectionVP
 --- !u!4 &1837928961 stripped

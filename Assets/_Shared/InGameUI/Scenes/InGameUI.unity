@@ -4510,7 +4510,7 @@ MonoBehaviour:
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
     enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
   - poseID: 0
-    originalSprite: {fileID: 21300000, guid: 29a551116f49b0043b51787e5eec818d, type: 3}
+    originalSprite: {fileID: 21300000, guid: 52dd5631e16fa584cad264009640c51e, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
     enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
 --- !u!4 &2063627354

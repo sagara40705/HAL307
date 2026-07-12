@@ -2781,6 +2781,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3047166a6f2176479c0b23e0c5ecb34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntroSmoke
+  _particleSystem: {fileID: 1253439021}
+  _storng: {fileID: 584965666}
 --- !u!4 &1903229666
 Transform:
   m_ObjectHideFlags: 0

@@ -5,7 +5,6 @@ using UnityEngine;
 public enum GamePhase
 {
     None = 0,
-    Boot = 1,
     Title = 2,
     InGame = 3,
     Result = 4,

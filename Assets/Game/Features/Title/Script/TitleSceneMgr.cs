@@ -3,7 +3,7 @@ using UnityEngine;
 public class TitleSceneMgr : MonoBehaviour
 {
     [SerializeField] private GamePhase _nextPhase = GamePhase.InGame;
-    [SerializeField] private string _nextSceneName = "GameScene";
+    [SerializeField] private string _nextSceneName = "Prototype";
     [SerializeField] private UnityEngine.InputSystem.Key _key = UnityEngine.InputSystem.Key.None;
 
     private void Update()
@@ -20,10 +20,32 @@ public class TitleSceneMgr : MonoBehaviour
         GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
         if (gamePhaseManager != null && gamePhaseManager.IsInitialized)
         {
-            gamePhaseManager.ChangePhase(_nextPhase);
+            if (!gamePhaseManager.ChangePhase(_nextPhase))
+            {
+                Debug.LogWarning($"[TitleSceneMgr] Phase change was skipped. Phase={_nextPhase}");
+            }
+
             return;
         }
 
-        SceneLoader.Load(_nextSceneName);
+        string sceneName = ResolveFallbackSceneName();
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogError($"[TitleSceneMgr] Scene load failed. Reason=Scene name is empty. Phase={_nextPhase}");
+            return;
+        }
+
+        SceneLoader.Load(sceneName);
+    }
+
+    private string ResolveFallbackSceneName()
+    {
+        GamePhaseSceneSettings settings = GamePhaseSceneSettings.Load();
+        if (settings != null && settings.TryGetSceneName(_nextPhase, out string sceneName))
+        {
+            return sceneName;
+        }
+
+        return _nextSceneName;
     }
 }

@@ -42,33 +42,25 @@ public sealed class BootSceneRouter : MonoBehaviour
             yield break;
         }
 
-        yield return gamePhaseManager.ChangePhaseAsync(defaultFirstPhase);
+        if (!gamePhaseManager.ChangePhase(defaultFirstPhase))
+        {
+            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=Phase change could not start. Phase={defaultFirstPhase}");
+        }
     }
 
     private IEnumerator LoadEditorTargetScene(string sceneName)
     {
         GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
-        if (gamePhaseManager != null && gamePhaseManager.IsInitialized &&
-            gamePhaseManager.TryGetPhaseForSceneName(sceneName, out GamePhase phase))
+        if (gamePhaseManager == null || !gamePhaseManager.IsInitialized)
         {
-            yield return gamePhaseManager.ChangePhaseAsync(phase);
+            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=GamePhaseManager is not ready. Scene='{sceneName}'");
             yield break;
         }
 
-        if (!Application.CanStreamedLevelBeLoaded(sceneName))
+        if (!gamePhaseManager.LoadSceneAndSyncPhase(sceneName))
         {
-            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=Scene cannot be loaded. Scene='{sceneName}'. Check Build Settings scene list or Build Profile scene list.");
-            yield break;
+            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=Scene load could not start. Scene='{sceneName}'");
         }
-
-        SceneLoader sceneLoader = SceneLoader.Instance;
-        if (sceneLoader == null || !sceneLoader.IsInitialized)
-        {
-            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=SceneLoader is not ready. Scene='{sceneName}'");
-            yield break;
-        }
-
-        yield return sceneLoader.LoadAsync(sceneName);
     }
 
     private string GetEditorTargetSceneName()

@@ -155,10 +155,6 @@ public class MenuVoiceCommandAction : MonoBehaviour
                 Debug.Log($"[Menu Voice] Command skipped. Reason=Result phase does not use menu commands. Command={command}");
                 break;
 
-            case GamePhase.Boot:
-                Debug.Log($"[Menu Voice] Command skipped. Reason=Boot phase does not use menu commands. Command={command}");
-                break;
-
             default:
                 ExecuteFallbackCommand(command);
                 break;

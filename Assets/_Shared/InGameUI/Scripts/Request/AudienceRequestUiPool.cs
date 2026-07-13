@@ -31,6 +31,12 @@ namespace AudienceRequest
 
         [SerializeField] private GameObject _explosionPrefab;
 
+        [Header("黒リクエストUI")]
+        [SerializeField] private List<GameObject> _blackUiPrefabs = new();
+
+        private List<ObjectPool<GameObject>> _blackUiPools = new();
+        private List<List<GameObject>> _activeBlackUis = new();
+
         [System.Serializable]
 
         public class SpritePair
@@ -81,6 +87,36 @@ namespace AudienceRequest
                 _uiPools.Add(pool);
                 _activeUis.Add(new List<GameObject>());
             }
+
+            // 黒リクエストUI用プール作成
+if (_blackUiPrefabs.Count != (int)PoseID.Pose_Count)
+{
+    Debug.LogError("Black UI Prefabs count does not match PoseID count.");
+    return;
+}
+
+for (int i = 0; i < _blackUiPrefabs.Count; ++i)
+{
+    int idx = i;
+
+    ObjectPool<GameObject> blackPool = new ObjectPool<GameObject>(
+        () => Instantiate(_blackUiPrefabs[idx]),
+        obj => obj.SetActive(true),
+        obj =>
+        {
+            obj.SetActive(false);
+            obj.transform.SetParent(_uiParent.transform, false);
+            obj.transform.localScale = Vector3.one;
+        },
+        obj => Destroy(obj),
+        false,
+        1
+    );
+
+    _blackUiPools.Add(blackPool);
+    _activeBlackUis.Add(new List<GameObject>());
+}
+
         }
 
         private void Start()
@@ -292,8 +328,26 @@ namespace AudienceRequest
                     }
                 }
             }
+
+            foreach (var list in _activeBlackUis)
+            {
+                foreach (var obj in list)
+                {
+                    if (obj == null || !obj.activeInHierarchy) continue;
+
+                    RectTransform rect = obj.GetComponent<RectTransform>();
+                    if (rect == null) continue;
+
+                    if (Vector2.Distance(rect.anchoredPosition, pos) < _minDistance)
+                    {
+                        return true;
+                    }
+                }
+            }
+
             return false;
         }
+
         private bool IsInsideForbiddenArea(Vector2 localPos)
         {
             foreach (var area in _forbiddenAreas)
@@ -451,6 +505,114 @@ namespace AudienceRequest
             pos = Vector2.zero;
             return false;
         }
+
+
+        public GameObject GenerateBlack(PoseID pose)
+        {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid black audience request pose: {pose}");
+                return null;
+            }
+
+            if (!TryFindSpawnPosition(out Vector2 spawnPos))
+            {
+                return null;
+            }
+
+            GameObject obj = _blackUiPools[(int)pose].Get();
+
+            obj.transform.SetParent(_uiParent.transform, false);
+            obj.transform.localScale = Vector3.one;
+
+            RectTransform rect = obj.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.anchoredPosition = spawnPos;
+            }
+
+            _activeBlackUis[(int)pose].Add(obj);
+
+            return obj;
+        }
+
+        public void PlayBlackClearEffectAndRelease(PoseID pose)
+        {
+            if (!IsValidPose(pose))
+            {
+                Debug.LogError($"Invalid black audience request pose: {pose}");
+                return;
+            }
+
+            List<GameObject> targetList = new List<GameObject>(_activeBlackUis[(int)pose]);
+            _activeBlackUis[(int)pose].Clear();
+
+            foreach (GameObject obj in targetList)
+            {
+                if (obj == null)
+                {
+                    continue;
+                }
+
+                // 通常リクエストと同じ爆発演出を出す
+                if (_explosionPrefab != null)
+                {
+                    GameObject effect = Instantiate(_explosionPrefab, _uiParent);
+
+                    RectTransform effectRect = effect.GetComponent<RectTransform>();
+                    RectTransform targetRect = obj.GetComponent<RectTransform>();
+
+                    if (effectRect != null && targetRect != null)
+                    {
+                        effectRect.anchoredPosition = targetRect.anchoredPosition;
+                        effectRect.localScale = Vector3.one;
+                    }
+                }
+
+                StartCoroutine(ReleaseBlackAfterDelay(obj, pose, _clearDelay));
+            }
+        }
+
+        private IEnumerator ReleaseBlackAfterDelay(GameObject obj, PoseID pose, float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+
+            if (obj == null)
+            {
+                yield break;
+            }
+
+            obj.SetActive(false);
+
+            if (!IsValidPose(pose))
+            {
+                yield break;
+            }
+
+            _blackUiPools[(int)pose].Release(obj);
+        }
+
+        public void ClearAllBlackUiPools()
+        {
+            for (int i = 0; i < _activeBlackUis.Count; i++)
+            {
+                List<GameObject> activeList = _activeBlackUis[i];
+                ObjectPool<GameObject> pool = _blackUiPools[i];
+
+                foreach (GameObject obj in activeList)
+                {
+                    if (obj == null)
+                    {
+                        continue;
+                    }
+
+                    pool.Release(obj);
+                }
+
+                activeList.Clear();
+            }
+        }
+
 
     }
 }

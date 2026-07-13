@@ -175,18 +175,31 @@ namespace Enemy
             RuntimeDebug.DebugMenu.DestroyWindow(name);
         }
 
-        public PoseID RandomPose()
+        public bool HasPoseOfType(EnemyPoseType poseType)
+        {
+            return _data != null &&
+                   _data.PoseSet != null &&
+                   _data.PoseSet.ContainsPoseType(poseType);
+        }
+
+        public PoseID RandomPose(EnemyPoseType poseType = EnemyPoseType.Normal)
         {
             if (InGameFlowLock.IsPresentationPlaying)
             {
                 return PoseID.None;
             }
 
-            if (_data == null || _data.PoseSet.Poses.Count == 0)
+            if (_data == null || _data.PoseSet == null)
             {
                 return PoseID.None;
             }
-            EnemyPoseData randomPoseData = _data.PoseSet.GetRandomPose();
+
+            EnemyPoseData randomPoseData = _data.PoseSet.GetRandomPose(poseType);
+            if (randomPoseData == null)
+            {
+                return PoseID.None;
+            }
+
             Pause(randomPoseData);
             return randomPoseData.ID;
         }

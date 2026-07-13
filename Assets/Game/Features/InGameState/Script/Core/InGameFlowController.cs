@@ -73,6 +73,7 @@ public sealed class InGameFlowController : MonoBehaviour
     private IEnumerator FlowCoroutine()
     {
         _currentWaveIndex = 0;
+        GameResultManager.Instance?.BeginRun();
 
         var gameStartState = new GameStartFlowState(stageData);
         yield return ChangeStateCoroutine(gameStartState);
@@ -90,6 +91,11 @@ public sealed class InGameFlowController : MonoBehaviour
             bool hasNextWave = stageData.HasWave(_currentWaveIndex + 1);
             var resultCheckState = new WaveResultCheckFlowState(currentWave, currentScore, hasNextWave);
             yield return ChangeStateCoroutine(resultCheckState);
+
+            if (resultCheckState.IsTargetScoreReached)
+            {
+                GameResultManager.Instance?.RecordWaveCleared(_currentWaveIndex + 1);
+            }
 
             if (resultCheckState.Result != WaveResultCheckResult.NextWave)
             {

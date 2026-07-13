@@ -8,6 +8,7 @@ namespace Enemy
     public class EnemyContext : ContextBase
     {
         [SerializeField] private EnemyManager _enemyManager;
+        [SerializeField] private EnemyPoseController _enemyPoseController;
 
         public event Action<Enemy, PoseID> OnEnemyPoseStart;
 
@@ -28,6 +29,16 @@ namespace Enemy
         {
             ResolveExternalContexts();
             return _poseContext;
+        }
+
+        public EnemyPoseController GetEnemyPoseController()
+        {
+            if (_enemyPoseController == null)
+            {
+                _enemyPoseController = FindFirstObjectByType<EnemyPoseController>();
+            }
+
+            return _enemyPoseController;
         }
 
         private void ResolveExternalContexts()

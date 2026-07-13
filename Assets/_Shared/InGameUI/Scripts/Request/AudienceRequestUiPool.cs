@@ -311,6 +311,7 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
             return false;
         }
 
+        // 指定された座標が既存のUIオブジェクトと重なっているかどうかを判定する
         private bool IsOverlapping(Vector2 pos)
         {
             foreach (var list in _activeUis)
@@ -348,6 +349,7 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
             return false;
         }
 
+        // 指定された座標が禁止エリア内にあるかどうかを判定する
         private bool IsInsideForbiddenArea(Vector2 localPos)
         {
             foreach (var area in _forbiddenAreas)

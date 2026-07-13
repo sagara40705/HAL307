@@ -229,5 +229,37 @@ public class FeverGaugeController : MonoBehaviour
         window.CreateMessage("Is Fever", () => IsFever.ToString());
         window.CreateMessage("Fever Time", () => FeverRemainingTime.ToString("0.00"));
     }
+
+    public void SetFillForTutorial(float fill)
+    {
+        if (_isFever)
+        {
+            return;
+        }
+
+        SetFill(fill);
+    }
+
+    public void ForceFeverForTutorial()
+    {
+        if (_isFever)
+        {
+            return;
+        }
+
+        StartFever();
+    }
+
+    public void ResetForTutorial()
+    {
+        if (_isFever)
+        {
+            EndFever();
+            return;
+        }
+
+        ResetFill();
+    }
+
 }
 

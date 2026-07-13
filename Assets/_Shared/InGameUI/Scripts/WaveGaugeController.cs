@@ -51,12 +51,10 @@ public class WaveGaugeController : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (stageEndJudge == null)
+        if (stageEndJudge != null)
         {
-            return;
+            stageEndJudge.OnStageEnd -= OnStageEnd;
         }
-
-        stageEndJudge.OnStageEnd -= OnStageEnd;
     }
 
     private void Update()
@@ -64,6 +62,33 @@ public class WaveGaugeController : MonoBehaviour
         if (stageEndJudge == null)
         {
             SetupStageEndJudge();
+        }
+
+        if (StageProgressProvider.Instance == null)
+        {
+            return;
+        }
+
+        currentValue =
+            Mathf.Lerp(
+                minValue,
+                maxValue,
+                StageProgressProvider.Instance.GaugeRate
+            );
+
+        if (waveMaterial != null)
+        {
+            waveMaterial.SetFloat(
+                propertyName,
+                currentValue
+            );
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(
+                currentValue <= warningThreshold
+            );
         }
     }
 

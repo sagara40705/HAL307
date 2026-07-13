@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -56,15 +57,20 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
 
     public IEnumerator LoadAsync(string sceneName)
     {
-        yield return LoadCoroutine(sceneName, LoadSceneMode.Single);
+        yield return RunManagedOperation(LoadCoroutine(sceneName, LoadSceneMode.Single));
     }
 
     public IEnumerator LoadAdditiveAsync(string sceneName)
     {
-        yield return LoadCoroutine(sceneName, LoadSceneMode.Additive);
+        yield return RunManagedOperation(LoadCoroutine(sceneName, LoadSceneMode.Additive));
     }
 
     public IEnumerator UnloadAsync(string sceneName)
+    {
+        yield return RunManagedOperation(UnloadCoroutine(sceneName));
+    }
+
+    private IEnumerator UnloadCoroutine(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
         {
@@ -78,11 +84,7 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
             yield break;
         }
 
-        if (IsBusy)
-        {
-            Debug.LogWarning($"[SceneLoader] Unload skipped. Reason=Loader is busy. Scene='{sceneName}', ActiveScene='{ActiveSceneName}'");
-            yield break;
-        }
+        yield return WaitUntilIdle("Unload", sceneName, null);
 
         if (!IsSceneLoaded(sceneName))
         {
@@ -117,6 +119,23 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
         IsBusy = false;
     }
 
+    private IEnumerator RunManagedOperation(IEnumerator operation)
+    {
+        bool isDone = false;
+        StartCoroutine(RunOperation(operation, () => isDone = true));
+
+        while (!isDone)
+        {
+            yield return null;
+        }
+    }
+
+    private IEnumerator RunOperation(IEnumerator operation, Action onCompleted)
+    {
+        yield return operation;
+        onCompleted?.Invoke();
+    }
+
     private IEnumerator LoadCoroutine(string sceneName, LoadSceneMode mode)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -131,11 +150,7 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
             yield break;
         }
 
-        if (IsBusy)
-        {
-            Debug.LogWarning($"[SceneLoader] Load skipped. Reason=Loader is busy. Scene='{sceneName}', Mode={mode}, ActiveScene='{ActiveSceneName}'");
-            yield break;
-        }
+        yield return WaitUntilIdle("Load", sceneName, mode);
 
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {
@@ -192,10 +207,26 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
         IsBusy = false;
     }
 
-    private bool IsSceneLoaded(string sceneName)
+    public bool IsSceneLoaded(string sceneName)
     {
         Scene scene = UnitySceneManager.GetSceneByName(sceneName);
         return scene.IsValid() && scene.isLoaded;
+    }
+
+    private IEnumerator WaitUntilIdle(string actionName, string sceneName, LoadSceneMode? mode)
+    {
+        if (!IsBusy)
+        {
+            yield break;
+        }
+
+        string modeText = mode.HasValue ? $", Mode={mode.Value}" : string.Empty;
+        Debug.Log($"[SceneLoader] {actionName} waiting. Reason=Loader is busy. Scene='{sceneName}'{modeText}, ActiveScene='{ActiveSceneName}'");
+
+        while (IsBusy)
+        {
+            yield return null;
+        }
     }
 
     private string GetLoadedSceneNames()

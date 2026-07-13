@@ -446,6 +446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6e4d66f4069fdd40b6e12fb122c27e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageSceneMgr
+  _nextPhase: 4
   _nextSceneName: Result
 --- !u!4 &195996832
 Transform:
@@ -2877,8 +2878,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3047166a6f2176479c0b23e0c5ecb34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntroSmoke
-  _particleSystem: {fileID: 1253439021}
-  _storng: {fileID: 584965666}
+  _normalsmoke: {fileID: 1253439021}
+  _storngsmoke: {fileID: 584965666}
 --- !u!4 &1903229666
 Transform:
   m_ObjectHideFlags: 0

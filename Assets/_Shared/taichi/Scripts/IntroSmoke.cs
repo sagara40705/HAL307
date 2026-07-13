@@ -2,20 +2,20 @@ using UnityEngine;
 
 public class IntroSmoke : MonoBehaviour
 {
-    [SerializeField] GameObject _particleSystem;
-    [SerializeField] GameObject _storng;
+    [SerializeField] GameObject _normalsmoke;
+    [SerializeField] GameObject _storngsmoke;
 
     public void InstanceSmoke()
     {
         Debug.Log("Instance Smoke");
-        _particleSystem.SetActive(true);
-        _particleSystem.SetActive(true);
+        _normalsmoke.SetActive(true);
+        _storngsmoke.SetActive(true);
     }
 
     public void ClearSmoke()
     {
         Debug.Log("Clear Smoke");
-        _particleSystem.SetActive(false);
-        _storng.SetActive(false);
+        _normalsmoke.SetActive(false);
+        _storngsmoke.SetActive(false);
     }
 }

@@ -17,11 +17,20 @@ public class SubmonitorMove : MonoBehaviour
     private Transform player;
     private Transform enemyL;
     private Transform enemyR;
+    private Enemy.Enemy enemyLController;
+    private Enemy.Enemy enemyRController;
     private Enemy.EnemyLineupManager enemyLineupManager;
     private Enemy.EnemyRegistry enemyRegistry;
 
     //現在見ているターゲット
     private Transform currentTarget;
+    private Transform poseFocusTarget;
+
+    //ポーズ開始を検出するための前フレーム状態
+    private bool wasPlayerPosing;
+    private bool wasEnemyLPosing;
+    private bool wasEnemyRPosing;
+    private bool isPoseFocusActive;
 
     //移動の始点を格納する変数
     private Vector3 startPosition;
@@ -54,6 +63,7 @@ public class SubmonitorMove : MonoBehaviour
     {
         ResolvePlayer();
         ResolveEnemies();
+        UpdatePoseFocus();
 
         if (!isCameraInitialized)
         {
@@ -208,11 +218,13 @@ public class SubmonitorMove : MonoBehaviour
 
         if (enemy1 != null)
         {
+            enemyLController = enemy1;
             enemyL = enemy1.transform;
         }
 
         if (enemy2 != null)
         {
+            enemyRController = enemy2;
             enemyR = enemy2.transform;
         }
     }
@@ -238,13 +250,118 @@ public class SubmonitorMove : MonoBehaviour
 
             if (enemy.name == Enemy.EnemySlotId.Enemy1.ToString())
             {
+                enemyLController = enemy;
                 enemyL = enemy.transform;
             }
             else if (enemy.name == Enemy.EnemySlotId.Enemy2.ToString())
             {
+                enemyRController = enemy;
                 enemyR = enemy.transform;
             }
         }
+    }
+
+    private void UpdatePoseFocus()
+    {
+        bool isPlayerPosing = playerPoseController != null && playerPoseController.IsPosing;
+        bool isEnemyLPosing = enemyLController != null && enemyLController.IsPosing;
+        bool isEnemyRPosing = enemyRController != null && enemyRController.IsPosing;
+
+        //同フレームではPlayer、EnemyR、EnemyLの順で優先する
+        Transform startedPoseTarget = null;
+        if (isEnemyLPosing && !wasEnemyLPosing)
+        {
+            startedPoseTarget = enemyL;
+        }
+        if (isEnemyRPosing && !wasEnemyRPosing)
+        {
+            startedPoseTarget = enemyR;
+        }
+        if (isPlayerPosing && !wasPlayerPosing)
+        {
+            startedPoseTarget = player;
+        }
+
+        if (startedPoseTarget != null)
+        {
+            FocusPosingActor(startedPoseTarget);
+        }
+        else if (!isPoseFocusActive)
+        {
+            Transform posingTarget = GetPosingTarget(isPlayerPosing, isEnemyLPosing, isEnemyRPosing);
+            if (posingTarget != null)
+            {
+                FocusPosingActor(posingTarget);
+            }
+        }
+        else if (!IsTargetPosing(poseFocusTarget, isPlayerPosing, isEnemyLPosing, isEnemyRPosing))
+        {
+            Transform posingTarget = GetPosingTarget(isPlayerPosing, isEnemyLPosing, isEnemyRPosing);
+            if (posingTarget != null)
+            {
+                FocusPosingActor(posingTarget);
+            }
+            else
+            {
+                isPoseFocusActive = false;
+                poseFocusTarget = null;
+                ResumeOrbit();
+            }
+        }
+        else if (currentTarget != poseFocusTarget || !isStopFront)
+        {
+            MoveToFront(poseFocusTarget, false);
+        }
+
+        wasPlayerPosing = isPlayerPosing;
+        wasEnemyLPosing = isEnemyLPosing;
+        wasEnemyRPosing = isEnemyRPosing;
+    }
+
+    private void FocusPosingActor(Transform target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        isPoseFocusActive = true;
+        poseFocusTarget = target;
+        MoveToFront(target, false);
+    }
+
+    private Transform GetPosingTarget(bool isPlayerPosing, bool isEnemyLPosing, bool isEnemyRPosing)
+    {
+        if (isPlayerPosing && player != null)
+        {
+            return player;
+        }
+        if (isEnemyLPosing && enemyL != null)
+        {
+            return enemyL;
+        }
+        if (isEnemyRPosing && enemyR != null)
+        {
+            return enemyR;
+        }
+
+        return null;
+    }
+
+    private bool IsTargetPosing(
+        Transform target,
+        bool isPlayerPosing,
+        bool isEnemyLPosing,
+        bool isEnemyRPosing)
+    {
+        if (target == null)
+        {
+            return false;
+        }
+
+        return (target == player && isPlayerPosing) ||
+               (target == enemyL && isEnemyLPosing) ||
+               (target == enemyR && isEnemyRPosing);
     }
 
     private void SetupCamera()

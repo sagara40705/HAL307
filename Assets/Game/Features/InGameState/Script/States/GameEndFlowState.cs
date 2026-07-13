@@ -33,6 +33,14 @@ public sealed class GameEndFlowState : InGameFlowStateBase
             Debug.Log($"[GameEndFlowState] Game end action finished. Action={action.name}");
         }
 
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        if (gamePhaseManager != null && gamePhaseManager.IsInitialized)
+        {
+            Debug.Log("[GameEndFlowState] Changing phase to Result.");
+            yield return gamePhaseManager.ChangePhaseAsync(GamePhase.Result);
+            yield break;
+        }
+
         string resultSceneName = _stageData != null ? _stageData.ResultSceneName : string.Empty;
         if (string.IsNullOrWhiteSpace(resultSceneName))
         {

@@ -5,8 +5,8 @@ public sealed class BootSceneRouter : MonoBehaviour
 {
     [SerializeField] private AppBootstrapper appBootstrapper;
 
-    [Header("Build時の遷移先。Scene名")]
-    [SerializeField] private string defaultFirstSceneName = "Prototype";
+    [Header("First Phase")]
+    [SerializeField] private GamePhase defaultFirstPhase = GamePhase.InGame;
 
 #if UNITY_EDITOR
     private const string TargetSceneKey = "PlayFromBoot.TargetScenePath";
@@ -28,30 +28,42 @@ public sealed class BootSceneRouter : MonoBehaviour
             yield break;
         }
 
-        string nextSceneName = GetNextSceneName();
-        if (string.IsNullOrEmpty(nextSceneName))
+        string editorTargetSceneName = GetEditorTargetSceneName();
+        if (!string.IsNullOrEmpty(editorTargetSceneName))
         {
-            Debug.LogError("[BootSceneRouter] Next scene name is empty.");
+            yield return LoadEditorTargetScene(editorTargetSceneName);
             yield break;
         }
 
-        if (!Application.CanStreamedLevelBeLoaded(nextSceneName))
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        if (gamePhaseManager == null || !gamePhaseManager.IsInitialized)
         {
-            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=Scene cannot be loaded. Scene='{nextSceneName}'. Check Build Settings scene list or Build Profile scene list.");
+            Debug.LogError("[BootSceneRouter] Scene transition failed. Reason=GamePhaseManager is not ready.");
             yield break;
         }
 
-        SceneLoader sceneLoader = SceneLoader.Instance;
-        if (sceneLoader == null || !sceneLoader.IsInitialized)
+        if (!gamePhaseManager.ChangePhase(defaultFirstPhase))
         {
-            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=SceneLoader is not ready. Scene='{nextSceneName}'");
-            yield break;
+            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=Phase change could not start. Phase={defaultFirstPhase}");
         }
-
-        yield return sceneLoader.LoadAsync(nextSceneName);
     }
 
-    private string GetNextSceneName()
+    private IEnumerator LoadEditorTargetScene(string sceneName)
+    {
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        if (gamePhaseManager == null || !gamePhaseManager.IsInitialized)
+        {
+            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=GamePhaseManager is not ready. Scene='{sceneName}'");
+            yield break;
+        }
+
+        if (!gamePhaseManager.LoadSceneAndSyncPhase(sceneName))
+        {
+            Debug.LogError($"[BootSceneRouter] Scene transition failed. Reason=Scene load could not start. Scene='{sceneName}'");
+        }
+    }
+
+    private string GetEditorTargetSceneName()
     {
 #if UNITY_EDITOR
         string editorTarget = UnityEditor.SessionState.GetString(TargetSceneKey, string.Empty);
@@ -62,6 +74,6 @@ public sealed class BootSceneRouter : MonoBehaviour
             return editorTarget;
         }
 #endif
-        return defaultFirstSceneName;
+        return string.Empty;
     }
 }

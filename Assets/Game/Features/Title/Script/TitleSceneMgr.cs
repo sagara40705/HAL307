@@ -2,29 +2,50 @@ using UnityEngine;
 
 public class TitleSceneMgr : MonoBehaviour
 {
-    [SerializeField] private string _nextSceneName = "GameScene";
+    [SerializeField] private GamePhase _nextPhase = GamePhase.InGame;
+    [SerializeField] private string _nextSceneName = "Prototype";
     [SerializeField] private UnityEngine.InputSystem.Key _key = UnityEngine.InputSystem.Key.None;
 
-    //Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Update()
     {
-    }
-
-    //// Update is called once per frame
-    void Update()
-    {
-        // デバッグ用のスペースキーで次のシーンに遷移
         if (DebugShortcuts.Pressed(_key))
         {
-            PauseManager.Instance.OpenPause();
-            //SceneLoader.Load(_nextSceneName);
+            StartLoad();
         }
+    }
 
-        if (DebugShortcuts.Pressed(UnityEngine.InputSystem.Key.LeftCtrl))
+
+    private void StartLoad()
+    {
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        if (gamePhaseManager != null && gamePhaseManager.IsInitialized)
         {
-            PauseManager.Instance.ClosePause();
-            //SceneLoader.Load(_nextSceneName);
+            if (!gamePhaseManager.ChangePhase(_nextPhase))
+            {
+                Debug.LogWarning($"[TitleSceneMgr] Phase change was skipped. Phase={_nextPhase}");
+            }
+
+            return;
         }
 
+        string sceneName = ResolveFallbackSceneName();
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogError($"[TitleSceneMgr] Scene load failed. Reason=Scene name is empty. Phase={_nextPhase}");
+            return;
+        }
+
+        SceneLoader.Load(sceneName);
+    }
+
+    private string ResolveFallbackSceneName()
+    {
+        GamePhaseSceneSettings settings = GamePhaseSceneSettings.Load();
+        if (settings != null && settings.TryGetSceneName(_nextPhase, out string sceneName))
+        {
+            return sceneName;
+        }
+
+        return _nextSceneName;
     }
 }

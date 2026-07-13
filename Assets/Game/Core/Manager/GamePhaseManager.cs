@@ -88,7 +88,21 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             yield break;
         }
 
+        bool isCompleted = false;
+
+        // Scene遷移で呼び出し元が破棄されてもManager側でPhase同期まで継続する
+        StartCoroutine(RunPhaseChange(nextPhase, () => isCompleted = true));
+
+        while (!isCompleted)
+        {
+            yield return null;
+        }
+    }
+
+    private IEnumerator RunPhaseChange(GamePhase nextPhase, Action onCompleted)
+    {
         yield return ChangePhaseRoutine(nextPhase);
+        onCompleted?.Invoke();
     }
 
     public bool ResumePreviousPhase()

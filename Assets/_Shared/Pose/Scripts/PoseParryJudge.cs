@@ -55,8 +55,8 @@ namespace Pose
             {
                 Debug.Log("Parry Successful!");
                 // パリイ成功時の処理
-                OnParrySuccess?.Invoke();
-                _confettiEffect.Play();
+                NotifyParrySuccess();
+                _confettiEffect?.Play();
             }
             else
             {
@@ -76,6 +76,12 @@ namespace Pose
         public void DebugOnParry()
         {
             Debug.Log("Debug: Parry triggered.");
+            NotifyParrySuccess();
+        }
+
+        private void NotifyParrySuccess()
+        {
+            GameResultManager.Instance?.RecordParrySuccess();
             OnParrySuccess?.Invoke();
         }
     }

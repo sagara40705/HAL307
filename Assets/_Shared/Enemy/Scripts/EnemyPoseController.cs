@@ -7,6 +7,8 @@ namespace Enemy
 {
     public class EnemyPoseController : MonoBehaviour
     {
+        private const string DebugWindowName = "Enemy Pose";
+
         // 参照
         [SerializeField] private EnemyRegistry _enemyRegistry;
         [SerializeField] private EnemyContext _enemyContext;
@@ -20,6 +22,11 @@ namespace Enemy
 
         // ポーズ中のEnemy
         private Enemy _pausedEnemy;
+
+        [Header("Pose Selection")]
+        [SerializeField] private bool _useFakePoseForNextPose;
+
+        public bool IsFakePoseRequested => _useFakePoseForNextPose;
 
         // AI
         private float _timer;
@@ -35,6 +42,17 @@ namespace Enemy
             //Debug.Log("EnemyPoseController Start. _poseParryJudge = " + _poseParryJudge);
 
             _timer = 0f;
+            CreateDebugMenu();
+        }
+
+        private void OnDestroy()
+        {
+            if (_poseParryJudge)
+            {
+                _poseParryJudge.OnParrySuccess -= OnParrySuccess;
+            }
+
+            RuntimeDebug.DebugMenu.DestroyWindow(DebugWindowName);
         }
 
         // Update is called once per frame
@@ -63,22 +81,32 @@ namespace Enemy
 
                 if (UpdatePoseTimer())
                 {
-                    _pausedEnemy = _enemyRegistry.GetRandomEnemy();
-                    if (_pausedEnemy == null) { return; }
-                    _isPaused = true;
-                    _timer = 0f;
-                    _pausedEnemy.RandomPose();
+                    TryStartNextPose();
                 }
 
                 if (DebugShortcuts.Combo(Key.E, Key.P))
                 {
-                    _pausedEnemy = _enemyRegistry.GetRandomEnemy();
-                    if (_pausedEnemy == null) { return; }
-                    _isPaused = true;
-                    _timer = 0f;
-                    _pausedEnemy.RandomPose();
+                    TryStartNextPose();
                 }
             }
+        }
+
+        // 次に開始するPoseをFakeにする
+        public void RequestFakePoseForNextPose()
+        {
+            _useFakePoseForNextPose = true;
+        }
+
+        public void ClearFakePoseRequest()
+        {
+            _useFakePoseForNextPose = false;
+        }
+
+        private void CreateDebugMenu()
+        {
+            RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
+            window.CreateButton("Request Fake Pose", RequestFakePoseForNextPose);
+            window.CreateMessage("Fake Requested", () => _useFakePoseForNextPose.ToString());
         }
 
         // ポーズ状態を解除する
@@ -107,6 +135,43 @@ namespace Enemy
             }
 
             return false;
+        }
+
+        private bool TryStartNextPose()
+        {
+            if (_isPaused)
+            {
+                return false;
+            }
+
+            EnemyPoseType poseType = _useFakePoseForNextPose
+                ? EnemyPoseType.Fake
+                : EnemyPoseType.Normal;
+
+            Enemy targetEnemy = _enemyRegistry?.GetRandomEnemy(poseType);
+            if (targetEnemy == null)
+            {
+                _timer = 0f;
+                return false;
+            }
+
+            PoseID poseID = targetEnemy.RandomPose(poseType);
+            if (poseID == PoseID.None)
+            {
+                _timer = 0f;
+                return false;
+            }
+
+            _pausedEnemy = targetEnemy;
+            _isPaused = true;
+            _timer = 0f;
+
+            if (poseType == EnemyPoseType.Fake)
+            {
+                _useFakePoseForNextPose = false;
+            }
+
+            return true;
         }
 
         private bool IsFeverActive()

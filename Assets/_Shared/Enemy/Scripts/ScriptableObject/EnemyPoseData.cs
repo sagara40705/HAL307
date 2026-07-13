@@ -4,6 +4,12 @@ using UnityEngine.Serialization;
 
 namespace Enemy
 {
+    public enum EnemyPoseType
+    {
+        Normal,
+        Fake
+    }
+
     [CreateAssetMenu(fileName = "EnemyPoseData", menuName = "Game/Enemy/Enemy Pose Data")]
     public class EnemyPoseData : ScriptableObject
     {
@@ -26,5 +32,7 @@ namespace Enemy
         public float CommitDelay => Mathf.Min(_commitDelay, _duration);
         public float ParryGraceDuration => Mathf.Min(_parryGraceDuration, Mathf.Max(0f, _duration - CommitDelay));
         public EnemyPoseAction PoseAction => _poseAction;
+        public bool IsFake => PreCommitPoseID != CommittedPoseID;
+        public EnemyPoseType PoseType => IsFake ? EnemyPoseType.Fake : EnemyPoseType.Normal;
     }
 }

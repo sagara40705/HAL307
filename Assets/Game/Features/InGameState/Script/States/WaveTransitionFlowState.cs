@@ -20,17 +20,20 @@ public sealed class WaveTransitionFlowState : InGameFlowStateBase
     public override IEnumerator Execute(InGameFlowContext context)
     {
         InGamePresentationAction action = _completedWave?.WaveTransitionAction;
-        if (action != null)
+        InGameFlowLock.BeginPresentation();
+        try
         {
-            InGameFlowLock.BeginPresentation();
-            try
+            if (action != null)
             {
                 yield return action.Play(context);
             }
-            finally
-            {
-                InGameFlowLock.EndPresentation();
-            }
+
+            // 固定時間ではなくダンベルの落下完了を待って次Waveへ進む
+            yield return TransitionManager.WaitForTransitionCompletion();
+        }
+        finally
+        {
+            InGameFlowLock.EndPresentation();
         }
     }
 }

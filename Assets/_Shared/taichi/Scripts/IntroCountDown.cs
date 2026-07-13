@@ -5,16 +5,16 @@ using UnityEngine.UI;
 
 public class IntroCoutDown : MonoBehaviour
 {
-    [SerializeField] private Image[] _imageCountdown;
-    private int pCountDownNumber = 3;
-    private float CountDownTimer = 1.0f;
-    private bool finishCountDown = false;
+    [SerializeField] private Image[] _imageCountdown;  // カウントダウンの画像
+    private int pCountDownNumber = 3;       // カウント数
+    private float CountDownTimer = 1.0f;    // カウントダウン更新時間
     private float timer = 0.0f;
-    private bool isFinished = false;
+    private bool CountDownStart = false;    // カウントダウンスタート
+    private bool isFinished = false;        // カウントダウン終了処理
 
     public void StartCountDown()
     {
-        finishCountDown = true;
+        CountDownStart = true;
         _imageCountdown[pCountDownNumber].gameObject.SetActive(true);
     }
 
@@ -25,7 +25,7 @@ public class IntroCoutDown : MonoBehaviour
             return;
         }
 
-        if (!finishCountDown)
+        if (!CountDownStart)
         {
             return;
         }

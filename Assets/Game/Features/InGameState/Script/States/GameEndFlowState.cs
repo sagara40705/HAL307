@@ -16,21 +16,23 @@ public sealed class GameEndFlowState : InGameFlowStateBase
     {
         Debug.Log("[GameEndFlowState] Game end started.");
 
-        InGamePresentationAction action = _stageData != null ? _stageData.GameEndAction : null;
-        if (action != null)
+        InGameFlowLock.BeginPresentation();
+        try
         {
-            Debug.Log($"[GameEndFlowState] Game end action started. Action={action.name}");
-            InGameFlowLock.BeginPresentation();
-            try
+            InGamePresentationAction action = _stageData != null ? _stageData.GameEndAction : null;
+            if (action != null)
             {
+                Debug.Log($"[GameEndFlowState] Game end action started. Action={action.name}");
                 yield return action.Play(context);
-            }
-            finally
-            {
-                InGameFlowLock.EndPresentation();
+                Debug.Log($"[GameEndFlowState] Game end action finished. Action={action.name}");
             }
 
-            Debug.Log($"[GameEndFlowState] Game end action finished. Action={action.name}");
+            // 固定時間ではなくダンベルの落下完了を待ってResultへ進む
+            yield return TransitionManager.WaitForTransitionCompletion();
+        }
+        finally
+        {
+            InGameFlowLock.EndPresentation();
         }
 
         GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;

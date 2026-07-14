@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Pool;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -43,6 +44,7 @@ public class TransitionManager : MonoBehaviour
     private readonly List<GameObject> activeDumbbells = new List<GameObject>();
 
     private bool isFading = false;
+    private int transitionVersion;
 
     private void Awake()
     {
@@ -51,6 +53,7 @@ public class TransitionManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             InitPool();
+            SceneManager.sceneLoaded += OnSceneLoaded;
 
             if (backgroundPanel != null)
             {
@@ -63,6 +66,17 @@ public class TransitionManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != this)
+        {
+            return;
+        }
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        Instance = null;
     }
 
     private void InitPool()
@@ -102,6 +116,7 @@ public class TransitionManager : MonoBehaviour
             return;
         }
 
+        await Instance.WaitForCurrentTransition();
         await Instance.FadeInInternal(duration);
     }
 
@@ -115,6 +130,15 @@ public class TransitionManager : MonoBehaviour
         Instance.ResetImmediateInternal();
     }
 
+    // 進行中のダンベル遷移が実際に完了するまで待機する
+    public static IEnumerator WaitForTransitionCompletion()
+    {
+        while (Instance != null && Instance.isFading)
+        {
+            yield return null;
+        }
+    }
+
     private async UniTask PlayDumbbellFadeOutInternal()
     {
         if (isFading) return;
@@ -126,6 +150,7 @@ public class TransitionManager : MonoBehaviour
         }
 
         isFading = true;
+        int operationVersion = ++transitionVersion;
 
         CancellationToken token = this.GetCancellationTokenOnDestroy();
 
@@ -160,6 +185,11 @@ public class TransitionManager : MonoBehaviour
 
             for (int col = 0; col < columns; col++)
             {
+                if (operationVersion != transitionVersion)
+                {
+                    return;
+                }
+
                 GameObject d = dumbbellPool.Get();
                 d.transform.SetParent(dumbbellCanvasRoot, false);
                 d.transform.SetAsLastSibling();
@@ -219,14 +249,20 @@ public class TransitionManager : MonoBehaviour
         }
 
         // ダンベルが落ち切るまで少し待つ
-        await UniTask.Delay(700, cancellationToken: token);
+        if (!await WaitForDumbbellsToStop(operationVersion, token))
+        {
+            return;
+        }
 
         backgroundPanel.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
 
         // シーン切り替え
         //SceneManager.LoadScene(nextSceneName);
 
-        isFading = false;
+        if (operationVersion == transitionVersion)
+        {
+            isFading = false;
+        }
     }
 
     private async UniTask FadeInInternal(float duration)
@@ -235,6 +271,7 @@ public class TransitionManager : MonoBehaviour
         if (backgroundPanel == null) return;
 
         isFading = true;
+        int operationVersion = ++transitionVersion;
 
         backgroundPanel.gameObject.SetActive(true);
         backgroundPanel.transform.SetAsFirstSibling();
@@ -265,6 +302,11 @@ public class TransitionManager : MonoBehaviour
 
             for (int i = 0; i < activeDumbbells.Count; i++)
             {
+                if (operationVersion != transitionVersion)
+                {
+                    return;
+                }
+
                 GameObject d = activeDumbbells[i];
                 if (d == null) continue;
 
@@ -290,6 +332,11 @@ public class TransitionManager : MonoBehaviour
 
             while (time < duration)
             {
+                if (operationVersion != transitionVersion)
+                {
+                    return;
+                }
+
                 time += Time.deltaTime;
 
                 float alpha = Mathf.Lerp(1f, 0f, time / duration);
@@ -299,14 +346,20 @@ public class TransitionManager : MonoBehaviour
             }
 
             // 全ダンベルが下に落ちるまで少し待つ
-            await UniTask.Delay(400, cancellationToken: token);
+            if (!await WaitForDumbbellsToStop(operationVersion, token))
+            {
+                return;
+            }
 
             ClearDumbbellsImmediate();
 
             backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
             backgroundPanel.gameObject.SetActive(false);
 
-            isFading = false;
+            if (operationVersion == transitionVersion)
+            {
+                isFading = false;
+            }
             return;
         }
 
@@ -315,6 +368,11 @@ public class TransitionManager : MonoBehaviour
 
         while (fadeTime < duration)
         {
+            if (operationVersion != transitionVersion)
+            {
+                return;
+            }
+
             fadeTime += Time.deltaTime;
 
             float alpha = Mathf.Lerp(1f, 0f, fadeTime / duration);
@@ -326,7 +384,78 @@ public class TransitionManager : MonoBehaviour
         backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
         backgroundPanel.gameObject.SetActive(false);
 
-        isFading = false;
+        if (operationVersion == transitionVersion)
+        {
+            isFading = false;
+        }
+    }
+
+    private async UniTask WaitForCurrentTransition()
+    {
+        CancellationToken token = this.GetCancellationTokenOnDestroy();
+        while (isFading)
+        {
+            await UniTask.Yield(token);
+        }
+    }
+
+    private async UniTask<bool> WaitForDumbbellsToStop(int operationVersion, CancellationToken token)
+    {
+        while (operationVersion == transitionVersion && HasMovingDumbbell())
+        {
+            await UniTask.Yield(token);
+        }
+
+        return operationVersion == transitionVersion;
+    }
+
+    private bool HasMovingDumbbell()
+    {
+        for (int i = 0; i < activeDumbbells.Count; i++)
+        {
+            GameObject dumbbell = activeDumbbells[i];
+            if (dumbbell == null)
+            {
+                continue;
+            }
+
+            UIDumbbellFall fall = dumbbell.GetComponent<UIDumbbellFall>();
+            if (fall != null && fall.IsMoving)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (mode != LoadSceneMode.Single || !HasVisibleTransition())
+        {
+            return;
+        }
+
+        FadeInAfterSceneLoad().Forget();
+    }
+
+    private async UniTaskVoid FadeInAfterSceneLoad()
+    {
+        while (this != null && isFading)
+        {
+            await UniTask.Yield();
+        }
+
+        if (this != null && HasVisibleTransition())
+        {
+            await FadeInInternal(0.5f);
+        }
+    }
+
+    private bool HasVisibleTransition()
+    {
+        return activeDumbbells.Count > 0 ||
+               (backgroundPanel != null && backgroundPanel.gameObject.activeSelf);
     }
 
     private void ClearDumbbellsImmediate()
@@ -346,6 +475,8 @@ public class TransitionManager : MonoBehaviour
 
     private void ResetImmediateInternal()
     {
+        transitionVersion++;
+        isFading = false;
         ClearDumbbellsImmediate();
 
         if (backgroundPanel != null)
@@ -354,7 +485,5 @@ public class TransitionManager : MonoBehaviour
             backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
             backgroundPanel.gameObject.SetActive(false);
         }
-
-        isFading = false;
     }
 }

@@ -5,17 +5,39 @@ using UnityEngine.SceneManagement;
 public sealed class PauseManager : AppManagerBase<PauseManager>
 {
     [SerializeField] private string pauseSceneName = "Pause";
+    [SerializeField] private bool preloadPauseSceneOnInitialize = true;
 
+    private VoiceMainMenuController _pauseMenuController;
     private float _previousTimeScale = 1f;
     private bool _isPaused;
     private bool _isTransitioning;
+    private bool _isApplyingPauseView;
+    private bool _isPreloading;
+
+    public bool IsPaused => _isPaused;
+    public bool IsApplyingPauseView => _isApplyingPauseView;
 
     protected override IEnumerator OnInitialize()
     {
         Time.timeScale = 1f;
+        _previousTimeScale = 1f;
         _isPaused = false;
         _isTransitioning = false;
-        yield break;
+        _isApplyingPauseView = false;
+        _isPreloading = false;
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        if (preloadPauseSceneOnInitialize)
+        {
+            yield return EnsurePauseSceneLoaded("Initialize");
+
+            if (IsPauseSceneLoaded())
+            {
+                SetPauseViewActive(false);
+            }
+        }
     }
 
     public void OpenPause()
@@ -33,6 +55,21 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
         StartCoroutine(OpenPauseCoroutine());
     }
 
+    public IEnumerator OpenPauseAsync()
+    {
+        if (!CanStartPauseOperation())
+        {
+            yield break;
+        }
+
+        if (_isPaused)
+        {
+            yield break;
+        }
+
+        yield return OpenPauseCoroutine();
+    }
+
     public void ClosePause()
     {
         if (!CanStartPauseOperation())
@@ -48,8 +85,25 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
         StartCoroutine(ClosePauseCoroutine());
     }
 
+    public IEnumerator ClosePauseAsync()
+    {
+        if (!CanStartPauseOperation())
+        {
+            yield break;
+        }
+
+        if (!_isPaused)
+        {
+            yield break;
+        }
+
+        yield return ClosePauseCoroutine();
+    }
+
     protected override void OnDestroy()
     {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+
         if (ReferenceEquals(Instance, this))
         {
             Time.timeScale = 1f;
@@ -58,29 +112,50 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
         base.OnDestroy();
     }
 
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (!preloadPauseSceneOnInitialize || !IsInitialized)
+        {
+            return;
+        }
+
+        if (scene.name == pauseSceneName)
+        {
+            return;
+        }
+
+        if (mode == LoadSceneMode.Single)
+        {
+            _pauseMenuController = null;
+            _isPaused = false;
+            _isTransitioning = false;
+            RestoreTimeScale();
+        }
+
+        if (!IsPauseSceneLoaded())
+        {
+            StartCoroutine(PreloadPauseSceneAfterSceneLoad());
+        }
+    }
+
     private IEnumerator OpenPauseCoroutine()
     {
         _isTransitioning = true;
-        _previousTimeScale = Time.timeScale;
-        Time.timeScale = 0f;
 
-        SceneLoader sceneLoader = SceneLoader.Instance;
-        if (sceneLoader == null || !sceneLoader.IsInitialized)
+        yield return EnsurePauseSceneLoaded("OpenPause");
+
+        if (!IsPauseSceneLoaded())
         {
-            Debug.LogError($"[PauseManager] OpenPause failed. Reason=SceneLoader is not ready. Scene='{pauseSceneName}'");
-            RestoreTimeScale();
+            Debug.LogError($"[PauseManager] OpenPause failed. Reason=Pause scene is not loaded. Scene='{pauseSceneName}'");
             _isTransitioning = false;
             yield break;
         }
 
-        if (!IsPauseSceneLoaded())
-        {
-            yield return StartCoroutine(sceneLoader.LoadAdditiveAsync(pauseSceneName));
-        }
+        _previousTimeScale = Time.timeScale;
+        Time.timeScale = 0f;
 
-        if (!IsPauseSceneLoaded())
+        if (!SetPauseViewActive(true))
         {
-            Debug.LogError($"[PauseManager] OpenPause failed. Reason=Pause scene was not loaded. Scene='{pauseSceneName}'");
             RestoreTimeScale();
             _isTransitioning = false;
             yield break;
@@ -94,32 +169,112 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
     {
         _isTransitioning = true;
 
+        SetPauseViewActive(false);
+        RestoreTimeScale();
+
+        _isPaused = false;
+        _isTransitioning = false;
+        yield break;
+    }
+
+    private IEnumerator EnsurePauseSceneLoaded(string operationName)
+    {
+        if (IsPauseSceneLoaded())
+        {
+            yield break;
+        }
+
         SceneLoader sceneLoader = SceneLoader.Instance;
         if (sceneLoader == null || !sceneLoader.IsInitialized)
         {
-            Debug.LogError($"[PauseManager] ClosePause failed. Reason=SceneLoader is not ready. Scene='{pauseSceneName}'");
-            RestoreTimeScale();
-            _isPaused = false;
-            _isTransitioning = false;
+            Debug.LogError($"[PauseManager] {operationName} failed. Reason=SceneLoader is not ready. Scene='{pauseSceneName}'");
             yield break;
         }
 
-        if (IsPauseSceneLoaded())
-        {
-            yield return StartCoroutine(sceneLoader.UnloadAsync(pauseSceneName));
-        }
+        yield return StartCoroutine(sceneLoader.LoadAdditiveAsync(pauseSceneName));
 
-        if (IsPauseSceneLoaded())
+        if (!IsPauseSceneLoaded())
         {
-            Debug.LogError($"[PauseManager] ClosePause failed. Reason=Pause scene is still loaded. Scene='{pauseSceneName}'");
-            Time.timeScale = 0f;
-            _isTransitioning = false;
+            Debug.LogError($"[PauseManager] {operationName} failed. Reason=Pause scene was not loaded. Scene='{pauseSceneName}'");
+        }
+    }
+
+    private IEnumerator PreloadPauseSceneAfterSceneLoad()
+    {
+        if (_isPreloading)
+        {
             yield break;
         }
 
-        RestoreTimeScale();
-        _isPaused = false;
-        _isTransitioning = false;
+        _isPreloading = true;
+
+        yield return EnsurePauseSceneLoaded("Preload");
+
+        if (IsPauseSceneLoaded())
+        {
+            SetPauseViewActive(false);
+        }
+
+        _isPreloading = false;
+    }
+
+    private bool SetPauseViewActive(bool active)
+    {
+        if (!TryResolvePauseMenuController(out VoiceMainMenuController controller))
+        {
+            return false;
+        }
+
+        _isApplyingPauseView = true;
+
+        try
+        {
+            if (active)
+            {
+                controller.OpenMenu();
+            }
+            else
+            {
+                controller.CloseMenu();
+            }
+        }
+        finally
+        {
+            _isApplyingPauseView = false;
+        }
+
+        return true;
+    }
+
+    private bool TryResolvePauseMenuController(out VoiceMainMenuController controller)
+    {
+        if (_pauseMenuController != null)
+        {
+            controller = _pauseMenuController;
+            return true;
+        }
+
+        Scene pauseScene = SceneManager.GetSceneByName(pauseSceneName);
+        if (!pauseScene.IsValid() || !pauseScene.isLoaded)
+        {
+            Debug.LogError($"[PauseManager] Pause view operation failed. Reason=Pause scene is not loaded. Scene='{pauseSceneName}'");
+            controller = null;
+            return false;
+        }
+
+        foreach (GameObject root in pauseScene.GetRootGameObjects())
+        {
+            controller = root.GetComponentInChildren<VoiceMainMenuController>(true);
+            if (controller != null)
+            {
+                _pauseMenuController = controller;
+                return true;
+            }
+        }
+
+        Debug.LogError($"[PauseManager] Pause view operation failed. Reason=VoiceMainMenuController was not found. Scene='{pauseSceneName}'");
+        controller = null;
+        return false;
     }
 
     private bool CanStartPauseOperation()

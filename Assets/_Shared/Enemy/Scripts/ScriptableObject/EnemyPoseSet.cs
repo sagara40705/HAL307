@@ -19,6 +19,84 @@ namespace Enemy
             return _poses[index];
         }
 
+        // 指定種類のPoseからランダムに1つ取得する
+        public EnemyPoseData GetRandomPose(EnemyPoseType poseType)
+        {
+            int poseCount = GetPoseCount(poseType);
+            if (poseCount == 0) { return null; }
+
+            int targetIndex = Random.Range(0, poseCount);
+            foreach (EnemyPoseData pose in _poses)
+            {
+                if (pose == null || pose.PoseType != poseType) { continue; }
+                if (targetIndex == 0) { return pose; }
+
+                targetIndex--;
+            }
+
+            return null;
+        }
+
+        // 指定Poseが確定IDになるFakePoseからランダムに1つ取得する
+        public EnemyPoseData GetRandomFakePose(PoseID committedPoseID)
+        {
+            int poseCount = GetFakePoseCount(committedPoseID);
+            if (poseCount == 0) { return null; }
+
+            int targetIndex = Random.Range(0, poseCount);
+            foreach (EnemyPoseData pose in _poses)
+            {
+                if (pose == null || !pose.IsFake || pose.CommittedPoseID != committedPoseID) { continue; }
+                if (targetIndex == 0) { return pose; }
+
+                targetIndex--;
+            }
+
+            return null;
+        }
+
+        public bool ContainsPoseType(EnemyPoseType poseType)
+        {
+            return GetPoseCount(poseType) > 0;
+        }
+
+        public bool ContainsFakePose(PoseID committedPoseID)
+        {
+            return GetFakePoseCount(committedPoseID) > 0;
+        }
+
+        private int GetPoseCount(EnemyPoseType poseType)
+        {
+            if (_poses == null) { return 0; }
+
+            int count = 0;
+            foreach (EnemyPoseData pose in _poses)
+            {
+                if (pose != null && pose.PoseType == poseType)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private int GetFakePoseCount(PoseID committedPoseID)
+        {
+            if (_poses == null) { return 0; }
+
+            int count = 0;
+            foreach (EnemyPoseData pose in _poses)
+            {
+                if (pose != null && pose.IsFake && pose.CommittedPoseID == committedPoseID)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
         // Setの中に特定のPoseIDが含まれているかどうか
         public bool Contains(PoseID poseID)
         {

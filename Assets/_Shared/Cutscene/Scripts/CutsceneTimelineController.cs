@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 
 public sealed class CutsceneTimelineController : MonoBehaviour
 {
@@ -10,6 +12,7 @@ public sealed class CutsceneTimelineController : MonoBehaviour
     [SerializeField] private bool _hideContentOnAwake = true;
     [SerializeField] private bool _hideContentOnStop = true;
 
+    private bool _isEnding;
     private bool _isStopping;
 
     public PlayableDirector Director => _director;
@@ -62,6 +65,7 @@ public sealed class CutsceneTimelineController : MonoBehaviour
         }
 
         SetContentActive(true);
+        _isEnding = false;
         _director.Play();
     }
 
@@ -75,6 +79,7 @@ public sealed class CutsceneTimelineController : MonoBehaviour
         }
 
         SetContentActive(true);
+        _isEnding = false;
         _director.time = 0d;
         _director.Evaluate();
         _director.Play();
@@ -94,6 +99,19 @@ public sealed class CutsceneTimelineController : MonoBehaviour
     public void Resume()
     {
         Play();
+    }
+
+    public void EndCutScene()
+    {
+        if (_isEnding)
+        {
+            return;
+        }
+
+        _isEnding = true;
+        Stop();
+        SetContentActive(false);
+        UnloadOwnerScene();
     }
 
     public void Stop()
@@ -128,6 +146,47 @@ public sealed class CutsceneTimelineController : MonoBehaviour
         }
 
         _director = GetComponent<PlayableDirector>();
+    }
+
+    private void UnloadOwnerScene()
+    {
+        Scene ownerScene = gameObject.scene;
+        if (!ownerScene.IsValid() || !ownerScene.isLoaded)
+        {
+            Debug.LogWarning("[CutsceneTimelineController] EndCutScene skipped unload. Reason=Owner scene is invalid or unloaded.");
+            return;
+        }
+
+        SceneLoader sceneLoader = SceneLoader.Instance;
+        if (sceneLoader != null && sceneLoader.IsInitialized && SceneLoader.Unload(ownerScene.name))
+        {
+            return;
+        }
+
+        StartCoroutine(UnloadOwnerSceneWithoutSceneLoader(ownerScene));
+    }
+
+    private IEnumerator UnloadOwnerSceneWithoutSceneLoader(Scene ownerScene)
+    {
+        if (!ownerScene.IsValid() || !ownerScene.isLoaded)
+        {
+            yield break;
+        }
+
+        if (SceneManager.sceneCount <= 1)
+        {
+            Debug.LogWarning($"[CutsceneTimelineController] EndCutScene skipped unload. Reason=Cannot unload the last scene. Scene='{ownerScene.name}'");
+            yield break;
+        }
+
+        AsyncOperation operation = SceneManager.UnloadSceneAsync(ownerScene);
+        if (operation == null)
+        {
+            Debug.LogWarning($"[CutsceneTimelineController] EndCutScene failed unload. Reason=UnloadSceneAsync returned null. Scene='{ownerScene.name}'");
+            yield break;
+        }
+
+        yield return operation;
     }
 
     private void OnDirectorStopped(PlayableDirector director)

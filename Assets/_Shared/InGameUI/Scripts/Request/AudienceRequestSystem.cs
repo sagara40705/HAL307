@@ -19,6 +19,7 @@ namespace AudienceRequest
 
         [SerializeField] private AudienceRequests _audienceRequests; // リクエストのデータベース
         [SerializeField] private AudienceRequestUiPool _uiPool; // UIプールの参照
+        [SerializeField] private AudienceRequestContext _context;
 
         // フィーバーゲージ
         [SerializeField] private FeverGaugeController _feverGaugeController;
@@ -37,6 +38,11 @@ namespace AudienceRequest
             if (_feverGaugeController == null)
             {
                 _feverGaugeController = FindFirstObjectByType<FeverGaugeController>();
+            }
+
+            if (_context == null)
+            {
+                _context = FindFirstObjectByType<AudienceRequestContext>();
             }
         }
 
@@ -67,6 +73,25 @@ namespace AudienceRequest
         public int GetRequestCount(PoseID poseID)
         {
             return _audienceRequests.GetCount(poseID);
+        }
+
+        // 指定Poseが確定IDになるFakePoseをEnemyへ要求する
+        public void RequestFakePoseForNextPose(PoseID committedPoseID)
+        {
+            if (_context == null)
+            {
+                _context = FindFirstObjectByType<AudienceRequestContext>();
+            }
+
+            Enemy.EnemyContext enemyContext = _context?.GetEnemyContext();
+            Enemy.EnemyPoseController poseController = enemyContext?.GetEnemyPoseController();
+            if (poseController == null)
+            {
+                Debug.LogWarning($"[AudienceRequestSystem] Fake pose request skipped. Reason=EnemyPoseController was not found. Pose={committedPoseID}");
+                return;
+            }
+
+            poseController.RequestFakePoseForNextPose(committedPoseID);
         }
 
         // リクエストをクリアする関数

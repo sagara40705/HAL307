@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 467bbb5e34a1f834fa51766e760bba8d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - modelAsset: {fileID: 5022602860645237092, guid: a33416011209da1468935a76ae9cfecd, type: 3}
+  - microphoneInput: {instanceID: 0}
+  - featureExtractor: {instanceID: 0}
+  - voiceCommandAction: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

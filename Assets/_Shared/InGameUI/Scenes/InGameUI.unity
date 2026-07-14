@@ -176,7 +176,7 @@ MonoBehaviour:
   minValue: 0
   stageEndJudge: {fileID: 0}
   warningUI: {fileID: 811645271}
-  warningThreshold: 0.5
+  warningThreshold: 0.05
   hideOnWaveEffectUis:
   - {fileID: 1327939597}
   - {fileID: 794517802}
@@ -2950,7 +2950,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 918885603}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -3282,7 +3282,7 @@ MonoBehaviour:
   backgroundPanel: {fileID: 1703384834}
   dumbbellCanvasRoot: {fileID: 1162309330}
   dumbbellPrefab: {fileID: 538094209684891605, guid: f044afaf720143a4e89dd5210938c0d8, type: 3}
-  nextSceneName: GameScene
+  nextSceneName: 
   cellWidth: 130
   cellHeight: 80
   extraRows: 3
@@ -3967,11 +3967,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1327939598}
-  - {fileID: 794517803}
   - {fileID: 409311061}
   - {fileID: 1764858}
-  - {fileID: 918885604}
   - {fileID: 811645272}
+  - {fileID: 918885604}
+  - {fileID: 794517803}
   m_Father: {fileID: 1162309330}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

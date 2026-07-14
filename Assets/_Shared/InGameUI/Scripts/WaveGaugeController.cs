@@ -186,7 +186,7 @@ public class WaveGaugeController : MonoBehaviour
         if (warningUI != null)
         {
             warningUI.SetActive(currentValue <= warningThreshold);
-            HideOtherUis();
+            //HideOtherUis();
         }
 
         PlayGaugeEmptyTransition().Forget();
@@ -194,7 +194,7 @@ public class WaveGaugeController : MonoBehaviour
 
     private void HideOtherUis()
     {
-        // Wave演出時に非表示にするUIを非表示にする
+        // Wave演出時に非表示にするUIを非表示設定にする
         foreach (GameObject ui in hideOnWaveEffectUis)
         {
             if (ui != null)

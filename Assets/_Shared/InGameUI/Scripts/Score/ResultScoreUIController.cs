@@ -4,8 +4,8 @@ public class ResultScoreUIController : MonoBehaviour
 {
     [Header("リザルトスコア表示")]
     [SerializeField] private ScoreSpriteDisplay playerScoreDisplay;
-    [SerializeField] private ScoreSpriteDisplay enemy1ScoreDisplay;
-    [SerializeField] private ScoreSpriteDisplay enemy2ScoreDisplay;
+    //[SerializeField] private ScoreSpriteDisplay enemy1ScoreDisplay;
+    //[SerializeField] private ScoreSpriteDisplay enemy2ScoreDisplay;
 
     // リザルトスコア表示用
     private void Start()
@@ -17,7 +17,7 @@ public class ResultScoreUIController : MonoBehaviour
         }
 
         playerScoreDisplay?.SetScore(ScoreManager.Instance.PlayerScore, false);
-        enemy1ScoreDisplay?.SetScore(ScoreManager.Instance.Enemy1Score, false);
-        enemy2ScoreDisplay?.SetScore(ScoreManager.Instance.Enemy2Score, false);
+        //enemy1ScoreDisplay?.SetScore(ScoreManager.Instance.Enemy1Score, false);
+        //enemy2ScoreDisplay?.SetScore(ScoreManager.Instance.Enemy2Score, false);
     }
 }

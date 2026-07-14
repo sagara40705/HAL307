@@ -101,7 +101,7 @@ namespace Player
         private void OnPose(PoseID poseID)
         {
             _isPose = true;
-            _poseTimer = 3f; // ポーズ状態の持続時間を設定
+            _poseTimer = 7f; // ポーズ状態の持続時間を設定
             _poseStateTracker?.BeginPose();
             _poseParryJudge?.StartPlayerPose(poseID);
             ChangeColor(poseID);

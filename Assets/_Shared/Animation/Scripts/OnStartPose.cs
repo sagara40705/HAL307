@@ -10,6 +10,12 @@ public class OnStartPose : MonoBehaviour
         Animator.StringToHash("Power"),
         Animator.StringToHash("Muscle")
     };
+    private static readonly int[] PoseTriggerHashes =
+    {
+        Animator.StringToHash("Yaa"),
+        Animator.StringToHash("Power"),
+        Animator.StringToHash("Muscle")
+    };
 
     private Animator _animator;
 
@@ -42,12 +48,28 @@ public class OnStartPose : MonoBehaviour
             return;
         }
 
+        ResetAnimationTriggers();
+        _animator.Play(IdleStateHash, 0, 0f);
+    }
+
+    public void PlayRandomPoseAnimation()
+    {
+        if (!TryResolveAnimator())
+        {
+            return;
+        }
+
+        ResetAnimationTriggers();
+        int randomIndex = Random.Range(0, PoseTriggerHashes.Length);
+        _animator.SetTrigger(PoseTriggerHashes[randomIndex]);
+    }
+
+    private void ResetAnimationTriggers()
+    {
         foreach (int triggerHash in TriggerHashes)
         {
             _animator.ResetTrigger(triggerHash);
         }
-
-        _animator.Play(IdleStateHash, 0, 0f);
     }
 
     private bool TryResolveAnimator()

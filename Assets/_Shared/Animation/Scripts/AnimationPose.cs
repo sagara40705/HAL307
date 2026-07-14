@@ -1,39 +1,59 @@
+using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class AnimationTest : MonoBehaviour
 {
     private Animator animator;
 
+    private readonly string[] poses =
+    {
+        "Idle",
+        "Power",
+        "Yaa",
+        "Muscle"
+    };
+
+    private int lastPose = -1;
+
     private void Start()
     {
         animator = GetComponent<Animator>();
+        StartCoroutine(RandomPoseLoop());
     }
 
-    private void Update()
+    private IEnumerator RandomPoseLoop()
     {
-        if (Keyboard.current.aKey.wasPressedThisFrame)
+        while (true)
         {
-            Debug.Log("IDLE");
-            animator.SetTrigger("Idle");
-        }
+            // Pick a random pose that isn't the same as the last one
+            int index;
+            do
+            {
+                index = Random.Range(0, poses.Length);
+            }
+            while (index == lastPose);
 
-        if (Keyboard.current.sKey.wasPressedThisFrame)
-        {
-            Debug.Log("POWER");
-            animator.SetTrigger("Power");
-        }
+            lastPose = index;
 
-        if (Keyboard.current.dKey.wasPressedThisFrame)
-        {
-            Debug.Log("YAA");
-            animator.SetTrigger("Yaa");
-        }
+            string pose = poses[index];
+            Debug.Log("Playing: " + pose);
 
-        if (Keyboard.current.fKey.wasPressedThisFrame)
-        {
-            Debug.Log("MUSCLE");
-            animator.SetTrigger("Muscle");
+            animator.SetTrigger(pose);
+
+            // Wait one frame for the Animator to change states
+            yield return null;
+
+            // Wait until the transition is finished
+            while (animator.IsInTransition(0))
+            {
+                yield return null;
+            }
+
+            // Wait until the current animation has finished
+            while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f)
+            {
+                yield return null;
+            }
         }
     }
 }

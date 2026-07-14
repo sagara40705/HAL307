@@ -444,6 +444,7 @@ MonoBehaviour:
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
   _uiPool: {fileID: 2063627353}
+  _context: {fileID: 377689422}
   _feverGaugeController: {fileID: 551905174}
   _requestInterval: 2
 --- !u!4 &267513514

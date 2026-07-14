@@ -4,16 +4,17 @@ using UnityEngine;
 // GameResultManagerの集計値をResult UIへ反映するView
 public sealed class ResultSummaryView : MonoBehaviour
 {
+    [SerializeField] private ResultSceneContext resultContext;
     [SerializeField] private TMP_Text clearedWaveCountText;
     [SerializeField] private TMP_Text parrySuccessCountText;
     [SerializeField] private TMP_Text scoreText;
 
     private void OnEnable()
     {
-        GameResultManager manager = GameResultManager.Instance;
-        if (manager != null)
+        ResolveContext();
+        if (resultContext != null)
         {
-            manager.ResultChanged += Refresh;
+            resultContext.ResultCaptured += Refresh;
         }
 
         Refresh();
@@ -21,24 +22,31 @@ public sealed class ResultSummaryView : MonoBehaviour
 
     private void OnDisable()
     {
-        GameResultManager manager = GameResultManager.Instance;
-        if (manager != null)
+        if (resultContext != null)
         {
-            manager.ResultChanged -= Refresh;
+            resultContext.ResultCaptured -= Refresh;
         }
     }
 
     // 現在保持されている集計値をTextへ反映
     public void Refresh()
     {
-        GameResultManager manager = GameResultManager.Instance;
-        int clearedWaveCount = manager != null ? manager.ClearedWaveCount : 0;
-        int parrySuccessCount = manager != null ? manager.ParrySuccessCount : 0;
-        int score = manager != null ? manager.Score : 0;
+        ResolveContext();
+        int clearedWaveCount = resultContext != null ? resultContext.ClearedWaveCount : 0;
+        int parrySuccessCount = resultContext != null ? resultContext.ParrySuccessCount : 0;
+        int score = resultContext != null ? resultContext.Score : 0;
 
         SetText(clearedWaveCountText, clearedWaveCount);
         SetText(parrySuccessCountText, parrySuccessCount);
         SetText(scoreText, score);
+    }
+
+    private void ResolveContext()
+    {
+        if (resultContext == null)
+        {
+            resultContext = FindFirstObjectByType<ResultSceneContext>();
+        }
     }
 
     private static void SetText(TMP_Text target, int value)

@@ -76,9 +76,18 @@ PrefabInstance:
       addedObject: {fileID: 8637342027072991743}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
       insertIndex: -1
+<<<<<<< Updated upstream
       addedObject: {fileID: 5141107174043854698}
   m_SourcePrefab: {fileID: 100100000, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
 --- !u!1 &1333020132457753605 stripped
+=======
+      addedObject: {fileID: 1201492084549920756}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a0da9e18c5b5ceb43923460309f71640, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4854088916663391646}
+  m_SourcePrefab: {fileID: 100100000, guid: a0da9e18c5b5ceb43923460309f71640, type: 3}
+--- !u!1 &8666660506582020115 stripped
+>>>>>>> Stashed changes
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e780b9e59625604c9d18f6c8d67f2cc, type: 3}
   m_PrefabInstance: {fileID: 2215418548390170964}
@@ -120,3 +129,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy.Proto_EnemyChangeColor
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &-4854088916663391646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8666660506582020115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3b537007386aae4fb16a089469d580d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Animation.Sandbox::Enemy.EnemyStartPose
+  _startPoseTriggers:
+  - 
+  - 
+  - 
+  - 
+  - 

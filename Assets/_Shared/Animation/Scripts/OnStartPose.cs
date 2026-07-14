@@ -13,6 +13,11 @@ namespace Enemy
 
         private void Start()      
         {
+            RandomPose();
+        }
+
+        public void RandomPose()
+        {
             int randomPose = Random.Range(0, 4);
 
             _animator.SetInteger("StartPoseIndex", randomPose);

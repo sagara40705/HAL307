@@ -10,6 +10,15 @@ namespace Player
 
     public class PlayerPoseContoroller : MonoBehaviour
     {
+        private static readonly int IdleStateHash = Animator.StringToHash("Idle");
+        private static readonly int[] AnimationTriggerHashes =
+        {
+            Animator.StringToHash("Idle"),
+            Animator.StringToHash("Yaa"),
+            Animator.StringToHash("Power"),
+            Animator.StringToHash("Muscle")
+        };
+
         [SerializeField] private PlayerContext _playerContext;
         [SerializeField] private PoseParryJudge _poseParryJudge;
         [SerializeField] private PoseStateTracker _poseStateTracker;
@@ -119,6 +128,8 @@ namespace Player
             if (_animator == null)
                 return;
 
+            ResetAnimationTriggers();
+
             switch (poseID)
             {
                 case PoseID.Pose_Yaa:
@@ -148,10 +159,19 @@ namespace Player
             _colorChanger?.ResetColor();
             if (_animator != null)
             {
-                _animator.SetTrigger("Idle");
+                ResetAnimationTriggers();
+                _animator.Play(IdleStateHash, 0, 0f);
             }
             _currentPoseName = "None";
             Debug.Log("Player pose ended.");
+        }
+
+        private void ResetAnimationTriggers()
+        {
+            foreach (int triggerHash in AnimationTriggerHashes)
+            {
+                _animator.ResetTrigger(triggerHash);
+            }
         }
     }
 }

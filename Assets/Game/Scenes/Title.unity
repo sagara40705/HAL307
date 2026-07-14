@@ -235,6 +235,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1510528538214424341, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 942380fc9d9db934b866346d75720818, type: 2}
     - target: {fileID: 1532065536586114408, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
       propertyPath: m_Layer
       value: 3
@@ -699,10 +703,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4809755130273449312, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7610510377095665487, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1198233960}
   m_SourcePrefab: {fileID: 100100000, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
 --- !u!1001 &647773646
 PrefabInstance:
@@ -897,6 +905,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1198233959 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7610510377095665487, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+  m_PrefabInstance: {fileID: 522567166}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1198233960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198233959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c63cb1a767ce4e4ebe285e892b7dd7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Animation.Sandbox::AnimationTest
 --- !u!1 &1281746985
 GameObject:
   m_ObjectHideFlags: 0

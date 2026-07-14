@@ -25,8 +25,10 @@ namespace Enemy
 
         [Header("Pose Selection")]
         [SerializeField] private bool _useFakePoseForNextPose;
+        [SerializeField] private PoseID _requestedFakeCommittedPoseID = PoseID.None;
 
         public bool IsFakePoseRequested => _useFakePoseForNextPose;
+        public PoseID RequestedFakeCommittedPoseID => _requestedFakeCommittedPoseID;
 
         // AI
         private float _timer;
@@ -95,18 +97,51 @@ namespace Enemy
         public void RequestFakePoseForNextPose()
         {
             _useFakePoseForNextPose = true;
+            _requestedFakeCommittedPoseID = PoseID.None;
+        }
+
+        // 指定Poseが確定IDになるFakePoseを次回に要求する
+        public void RequestFakePoseForNextPose(PoseID committedPoseID)
+        {
+            if (!IsRequestablePose(committedPoseID))
+            {
+                Debug.LogWarning($"[EnemyPoseController] Fake pose request skipped. Reason=Unsupported committed pose. Pose={committedPoseID}");
+                return;
+            }
+
+            _useFakePoseForNextPose = true;
+            _requestedFakeCommittedPoseID = committedPoseID;
+        }
+
+        public void RequestFakeYaaForNextPose()
+        {
+            RequestFakePoseForNextPose(PoseID.Pose_Yaa);
+        }
+
+        public void RequestFakePowerForNextPose()
+        {
+            RequestFakePoseForNextPose(PoseID.Pose_Power);
+        }
+
+        public void RequestFakeMuscleForNextPose()
+        {
+            RequestFakePoseForNextPose(PoseID.Pose_Muscle);
         }
 
         public void ClearFakePoseRequest()
         {
             _useFakePoseForNextPose = false;
+            _requestedFakeCommittedPoseID = PoseID.None;
         }
 
         private void CreateDebugMenu()
         {
             RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
-            window.CreateButton("Request Fake Pose", RequestFakePoseForNextPose);
+            window.CreateButton("Request Fake Yaa", RequestFakeYaaForNextPose);
+            window.CreateButton("Request Fake Power", RequestFakePowerForNextPose);
+            window.CreateButton("Request Fake Muscle", RequestFakeMuscleForNextPose);
             window.CreateMessage("Fake Requested", () => _useFakePoseForNextPose.ToString());
+            window.CreateMessage("Fake Committed Pose", () => _requestedFakeCommittedPoseID.ToString());
         }
 
         // ポーズ状態を解除する
@@ -147,15 +182,18 @@ namespace Enemy
             EnemyPoseType poseType = _useFakePoseForNextPose
                 ? EnemyPoseType.Fake
                 : EnemyPoseType.Normal;
+            PoseID committedPoseID = poseType == EnemyPoseType.Fake
+                ? _requestedFakeCommittedPoseID
+                : PoseID.None;
 
-            Enemy targetEnemy = _enemyRegistry?.GetRandomEnemy(poseType);
+            Enemy targetEnemy = _enemyRegistry?.GetRandomEnemy(poseType, committedPoseID);
             if (targetEnemy == null)
             {
                 _timer = 0f;
                 return false;
             }
 
-            PoseID poseID = targetEnemy.RandomPose(poseType);
+            PoseID poseID = targetEnemy.RandomPose(poseType, committedPoseID);
             if (poseID == PoseID.None)
             {
                 _timer = 0f;
@@ -168,10 +206,17 @@ namespace Enemy
 
             if (poseType == EnemyPoseType.Fake)
             {
-                _useFakePoseForNextPose = false;
+                ClearFakePoseRequest();
             }
 
             return true;
+        }
+
+        private static bool IsRequestablePose(PoseID poseID)
+        {
+            return poseID == PoseID.Pose_Yaa ||
+                   poseID == PoseID.Pose_Power ||
+                   poseID == PoseID.Pose_Muscle;
         }
 
         private bool IsFeverActive()

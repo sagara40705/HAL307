@@ -35,6 +35,9 @@ public sealed class GameEndFlowState : InGameFlowStateBase
             InGameFlowLock.EndPresentation();
         }
 
+        int finalScore = context != null ? context.CurrentPlayerScore : 0;
+        GameResultManager.Instance?.CompleteRun(finalScore);
+
         GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
         if (gamePhaseManager != null && gamePhaseManager.IsInitialized)
         {

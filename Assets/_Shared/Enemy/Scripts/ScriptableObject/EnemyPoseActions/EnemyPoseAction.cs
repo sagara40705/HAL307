@@ -5,6 +5,14 @@ namespace Enemy
     [CreateAssetMenu(fileName = "EnemyPoseAction", menuName = "Game/Enemy/Pose Action")]
     public class EnemyPoseAction : ScriptableObject
     {
+        private static readonly int[] AnimatorTriggerHashes =
+        {
+            Animator.StringToHash("Idle"),
+            Animator.StringToHash("Yaa"),
+            Animator.StringToHash("Power"),
+            Animator.StringToHash("Muscle")
+        };
+
         [Header("Visual")]
         [SerializeField] private Color _preCommitColor = Color.white;
         [SerializeField] private Color _committedColor = Color.white;
@@ -73,7 +81,6 @@ namespace Enemy
             if (visual != null)
             {
                 visual.ResetColor();
-                ApplyAnimatorTrigger(enemy, "Idle");
             }
 
             ApplyAnimatorTrigger(enemy, "Idle");
@@ -105,7 +112,18 @@ namespace Enemy
             if (!string.IsNullOrEmpty(animatorTriggerName))
             {
                 Animator animator = enemy?.GetAnimator;
-                animator?.SetTrigger(animatorTriggerName);
+                if (animator == null)
+                {
+                    Debug.LogWarning($"EnemyPoseAction could not set trigger '{animatorTriggerName}' because Animator was not found.", enemy);
+                    return;
+                }
+
+                foreach (int triggerHash in AnimatorTriggerHashes)
+                {
+                    animator.ResetTrigger(triggerHash);
+                }
+
+                animator.SetTrigger(animatorTriggerName);
                 Debug.Log("-----------------");
                 Debug.Log(animatorTriggerName);
                 Debug.Log("-----------------");

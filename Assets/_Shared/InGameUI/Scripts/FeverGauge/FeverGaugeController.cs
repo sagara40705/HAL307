@@ -17,6 +17,9 @@ public class FeverGaugeController : MonoBehaviour
     [SerializeField] private GameObject _cutInObject;
     [SerializeField] private float _cutInDisplayTime = 3f;
 
+    //feverの枠
+    [SerializeField] private GameObject uiPanel;
+
     private float _feverTimer;
     private bool _isFever;
     private Coroutine _cutInCoroutine;
@@ -41,6 +44,11 @@ public class FeverGaugeController : MonoBehaviour
         if (_cutInObject != null)
         {
             _cutInObject.SetActive(false);
+        }
+
+        if (uiPanel != null)
+        {
+            uiPanel.SetActive(false);
         }
 
         CreateDebugMenu();
@@ -130,6 +138,11 @@ public class FeverGaugeController : MonoBehaviour
             _fireAnimObject.SetActive(true);
         }
 
+        if (uiPanel != null)
+        {
+            uiPanel.SetActive(true);
+        }
+
         PlayCutIn();
 
         OnFeverStarted?.Invoke();
@@ -166,6 +179,11 @@ public class FeverGaugeController : MonoBehaviour
         if (_resetFillOnFeverEnd)
         {
             ResetFill();
+        }
+
+        if (uiPanel != null)
+        {
+            uiPanel.SetActive(true);
         }
 
         OnFeverEnded?.Invoke();

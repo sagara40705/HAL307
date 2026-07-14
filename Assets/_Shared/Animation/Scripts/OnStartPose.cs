@@ -1,27 +1,28 @@
 using UnityEngine;
 
-namespace Enemy
+public class OnStartPose : MonoBehaviour
 {
-    public class EnemyStartPose : MonoBehaviour
+    private Animator _animator;
+
+    private void Awake()
     {
-        private Animator _animator;
+        _animator = GetComponent<Animator>();
+    }
 
-        private void Awake()
-        {
-            _animator = GetComponent<Animator>();
-        }
+    private void Start()
+    {
+        RandomPose();
+    }
 
-        private void Start()      
-        {
-            int randomPose = Random.Range(0, 4);
+    public void RandomPose()
+    {
+        int randomPose = Random.Range(0, 4);
 
-            _animator.SetInteger("StartPoseIndex", randomPose);
-        }
+        _animator.SetInteger("StartPoseIndex", randomPose);
+    }
 
-        public void SetTriggerIdle()
-        {
-            _animator.SetTrigger("Idle");
-        }
+    public void SetTriggerIdle()
+    {
+        _animator.SetTrigger("Idle");
     }
 }
-

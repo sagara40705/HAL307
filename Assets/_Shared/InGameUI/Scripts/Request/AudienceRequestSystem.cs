@@ -34,8 +34,12 @@ namespace AudienceRequest
         [SerializeField] private float _blackRequestInterval = 15f;
         [SerializeField, Range(0f, 1f)] private float _blackRequestChance = 0.35f;
 
+        // 黒リクエストのタイマーと状態
         private float _blackRequestTimer = 0f;
         private PoseID _activeBlackRequestPoseID = PoseID.None;
+
+        // 黒リクエストがアクティブかどうかを判定するプロパティ
+        public bool HasActiveBlackRequest => _activeBlackRequestPoseID != PoseID.None;
 
         // 初期化
         private void Start()

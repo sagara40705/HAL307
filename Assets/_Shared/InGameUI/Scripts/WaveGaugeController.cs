@@ -14,6 +14,7 @@ public class WaveGaugeController : MonoBehaviour
     [Header("警告UI")]
     [SerializeField] private GameObject warningUI;
     [SerializeField] private float warningThreshold = 0.2f;
+    private bool isWarningVisible;
 
     [Header("Wave演出時に非表示にするUI")]
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
@@ -48,6 +49,8 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         // 警告UIを非表示にする
+        isWarningVisible = false;
+
         if (warningUI != null)
         {
             warningUI.SetActive(false);
@@ -99,11 +102,26 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         // 警告UIの表示状態を更新
-        if (warningUI != null)
+        bool shouldShowWarning = currentValue <= warningThreshold;
+
+        // 状態が変わった時だけ処理する
+        if (isWarningVisible != shouldShowWarning)
         {
-            warningUI.SetActive(
-                currentValue <= warningThreshold
-            );
+            isWarningVisible = shouldShowWarning;
+
+            if (warningUI != null)
+            {
+                warningUI.SetActive(isWarningVisible);
+            }
+
+            if (isWarningVisible)
+            {
+                HideOtherUis();
+            }
+            else
+            {
+                ShowOtherUis();
+            }
         }
     }
 
@@ -133,10 +151,14 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         // 警告UIを非表示にする
+        isWarningVisible = false;
+
         if (warningUI != null)
         {
             warningUI.SetActive(false);
         }
+
+        ShowOtherUis();
 
 
         ShowOtherUis();

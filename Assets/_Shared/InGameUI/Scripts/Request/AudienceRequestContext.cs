@@ -16,6 +16,8 @@ namespace AudienceRequest
 
         [SerializeField] private FeverGaugeController _feverGaugeController;
 
+        [SerializeField] private AudienceRequestSystem _audienceRequestSystem;
+
         private void Start()
         {
             ResolveExternalContexts();
@@ -42,6 +44,16 @@ namespace AudienceRequest
 
             return _feverGaugeController;
         }
+
+        public AudienceRequestSystem GetAudienceRequestSystem()
+        {
+            if (_audienceRequestSystem == null)
+            {
+                _audienceRequestSystem = FindFirstObjectByType<AudienceRequestSystem>();
+            }
+            return _audienceRequestSystem;
+        }
+
 
         private void ResolveExternalContexts()
         {

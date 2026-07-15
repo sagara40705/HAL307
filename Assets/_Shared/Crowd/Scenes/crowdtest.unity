@@ -2528,7 +2528,7 @@ MonoBehaviour:
   chunkRows: 4
   chunkCols: 4
   animationIndex: 0
-  showChunkBounds: 1
+  showChunkBounds: 0
   renderCameras:
   - {fileID: 376511007}
   - {fileID: 1058486204}

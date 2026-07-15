@@ -518,6 +518,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1510528538214424341, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 942380fc9d9db934b866346d75720818, type: 2}
     - target: {fileID: 7121922128454503925, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.05
@@ -566,11 +570,32 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4809755130273449312, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7610510377095665487, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1633925371}
   m_SourcePrefab: {fileID: 100100000, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+--- !u!1 &1633925370 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7610510377095665487, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+  m_PrefabInstance: {fileID: 448667439}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1633925371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633925370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c63cb1a767ce4e4ebe285e892b7dd7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Animation.Sandbox::AnimationTest
 --- !u!1001 &2019468801
 PrefabInstance:
   m_ObjectHideFlags: 0

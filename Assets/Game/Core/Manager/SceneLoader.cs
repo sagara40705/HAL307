@@ -191,7 +191,7 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
 
         if (mode == LoadSceneMode.Additive)
         {
-            var loadedScene = UnitySceneManager.GetSceneByName(sceneName);
+            Scene loadedScene = GetLoadedScene(sceneName);
             foreach (var root in loadedScene.GetRootGameObjects())
             {
                 var disabler = root.GetComponentInChildren<AdditiveSceneObjectDisabler>(true);
@@ -209,8 +209,39 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
 
     public bool IsSceneLoaded(string sceneName)
     {
-        Scene scene = UnitySceneManager.GetSceneByName(sceneName);
+        Scene scene = GetLoadedScene(sceneName);
         return scene.IsValid() && scene.isLoaded;
+    }
+
+    private static Scene GetLoadedScene(string sceneName)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            return default;
+        }
+
+        string normalizedScenePath = sceneName.Replace('\\', '/');
+        Scene scene = UnitySceneManager.GetSceneByPath(normalizedScenePath);
+        if (scene.IsValid())
+        {
+            return scene;
+        }
+
+        return UnitySceneManager.GetSceneByName(GetSceneNameWithoutPath(normalizedScenePath));
+    }
+
+    private static string GetSceneNameWithoutPath(string sceneName)
+    {
+        int slashIndex = sceneName.LastIndexOf('/');
+        string name = slashIndex >= 0 ? sceneName.Substring(slashIndex + 1) : sceneName;
+
+        const string unityExtension = ".unity";
+        if (name.EndsWith(unityExtension, StringComparison.OrdinalIgnoreCase))
+        {
+            name = name.Substring(0, name.Length - unityExtension.Length);
+        }
+
+        return name;
     }
 
     private IEnumerator WaitUntilIdle(string actionName, string sceneName, LoadSceneMode? mode)

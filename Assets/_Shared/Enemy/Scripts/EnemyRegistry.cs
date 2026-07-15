@@ -53,5 +53,35 @@ namespace Enemy
             //Debug.Log($"Randomly selected enemy: {randomEnemy.name}");
             return randomEnemy;
         }
+
+        // 指定種類のPoseを持つEnemyからランダムに1体取得する
+        public Enemy GetRandomEnemy(EnemyPoseType poseType, Pose.PoseID committedPoseID = Pose.PoseID.None)
+        {
+            int enemyCount = 0;
+            foreach (Enemy enemy in _enemies)
+            {
+                if (enemy != null && enemy.HasPoseOfType(poseType, committedPoseID))
+                {
+                    enemyCount++;
+                }
+            }
+
+            if (enemyCount == 0)
+            {
+                Debug.LogWarning($"No enemies have a {poseType} pose. CommittedPose={committedPoseID}");
+                return null;
+            }
+
+            int targetIndex = Random.Range(0, enemyCount);
+            foreach (Enemy enemy in _enemies)
+            {
+                if (enemy == null || !enemy.HasPoseOfType(poseType, committedPoseID)) { continue; }
+                if (targetIndex == 0) { return enemy; }
+
+                targetIndex--;
+            }
+
+            return null;
+        }
     }
 }

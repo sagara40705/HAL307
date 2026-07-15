@@ -5,6 +5,8 @@ using UnityEngine;
 // Result Scene内でゲーム結果のスナップショットを保持するContext
 public sealed class ResultSceneContext : ContextBase
 {
+   
+
     [SerializeField] private int clearedWaveCount;
     [SerializeField] private int parrySuccessCount;
     [SerializeField] private int score;
@@ -37,6 +39,7 @@ public sealed class ResultSceneContext : ContextBase
             ResultCaptured?.Invoke();
             return;
         }
+
 
         clearedWaveCount = manager.ClearedWaveCount;
         parrySuccessCount = manager.ParrySuccessCount;

@@ -7,7 +7,7 @@ public class TutorialModelController : MonoBehaviour
     [SerializeField] private Animator enemyAnimator;
 
     [Header("アニメーション名")]
-    [SerializeField] private string idleStateName = "Idle";
+    [SerializeField] private string idleStateName = "StartPose";
     [SerializeField] private string playerPoseStateName = "power";
     [SerializeField] private string enemyPoseStateName = "power";
 

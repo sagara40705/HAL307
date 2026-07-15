@@ -44,6 +44,18 @@ public class StageEndJudge : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        TryNotifyStageEnd(other);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (!_isOnce) { return; }
+
+        TryNotifyStageEnd(other);
+    }
+
+    private void TryNotifyStageEnd(Collider other)
+    {
         if (_isOnce && _isJudged) { return; }
         if (!IsTargetObject(other)) { return; }
 

@@ -760,8 +760,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 240, y: 300}
-  m_SizeDelta: {x: 83.1451, y: 100}
+  m_AnchoredPosition: {x: 300, y: 300}
+  m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &98733794
 MonoBehaviour:
@@ -783,7 +783,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 22799e848bb5b2f479bf34eba68f7084, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 551a0fe49ea8c93428dd45be0fc5a24f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1973,7 +1973,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 240, y: 300}
-  m_SizeDelta: {x: 82.4873, y: 100}
+  m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &606031488
 MonoBehaviour:
@@ -1995,7 +1995,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 3de435a47a15b6143a9110bf222e27a3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b01b5aef9c129e4a84acadfdd6df5a2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2233,8 +2233,11 @@ MonoBehaviour:
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
   _uiPool: {fileID: 1356105677}
+  _context: {fileID: 0}
   _feverGaugeController: {fileID: 0}
   _requestInterval: 2
+  _blackRequestInterval: 15
+  _blackRequestChance: 0.35
 --- !u!4 &831621220
 Transform:
   m_ObjectHideFlags: 0
@@ -2583,10 +2586,10 @@ RectTransform:
   - {fileID: 107551274}
   - {fileID: 52825031}
   - {fileID: 522147647}
-  - {fileID: 2096593844}
   - {fileID: 95222518}
   - {fileID: 1231444758}
   - {fileID: 1882684509}
+  - {fileID: 2096593844}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2861,6 +2864,7 @@ MonoBehaviour:
   _clearScale: 1.5
   _clearDelay: 1
   _explosionPrefab: {fileID: 600055896250882990, guid: 92ccf096cc0f2914fbb703c7101ad5ae, type: 3}
+  _blackUiPrefabs: []
   _spriteTable:
   - poseID: 2
     originalSprite: {fileID: 21300000, guid: 3f4a2c1059842df44970ee191d35e6a8, type: 3}
@@ -3045,6 +3049,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1510528538214424341, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: ba2d66da51af5cf43aafb9f7aa61a919, type: 2}
     - target: {fileID: 7121922128454503925, guid: debacb2b8fa95024e9032ec0ee2725a6, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
@@ -3915,7 +3923,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 240, y: 300}
-  m_SizeDelta: {x: 82.4995, y: 100}
+  m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1973075984
 MonoBehaviour:
@@ -3937,7 +3945,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 623e0137bdd103f40bca195495e71391, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 398d62b44eb19344e9581aab82cb3306, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4182,6 +4190,7 @@ MonoBehaviour:
   _fireAnimObject: {fileID: 53334294}
   _cutInObject: {fileID: 1882684508}
   _cutInDisplayTime: 3
+  uiPanel: {fileID: 0}
 --- !u!4 &2045098881
 Transform:
   m_ObjectHideFlags: 0

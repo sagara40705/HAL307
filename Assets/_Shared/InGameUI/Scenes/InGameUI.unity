@@ -151,7 +151,6 @@ RectTransform:
   - {fileID: 879821589}
   - {fileID: 882149048}
   - {fileID: 525183847}
-  - {fileID: 811645272}
   m_Father: {fileID: 1718496974}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -171,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4f3fdc53c597c54287aca051578a63f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveGaugeController
-  waveMaterial: {fileID: 2100000, guid: 343ab00e3639d9246b71ddd9a09ead13, type: 2}
+  waveMaterial: {fileID: 2100000, guid: bc9df0b15d884da409f57fb62cd6bb8a, type: 2}
   propertyName: _BaseLine
   maxValue: 0.7
   minValue: 0
@@ -179,7 +178,11 @@ MonoBehaviour:
   warningUI: {fileID: 811645271}
   warningThreshold: 0.1
   hideOnWaveEffectUis:
-  - {fileID: 1718496973}
+  - {fileID: 1327939597}
+  - {fileID: 794517802}
+  - {fileID: 409311060}
+  - {fileID: 1764857}
+  - {fileID: 918885603}
   - {fileID: 2119480822}
 --- !u!1 &36460463
 GameObject:
@@ -447,6 +450,8 @@ MonoBehaviour:
   _context: {fileID: 377689422}
   _feverGaugeController: {fileID: 551905174}
   _requestInterval: 2
+  _blackRequestInterval: 15
+  _blackRequestChance: 1
 --- !u!4 &267513514
 Transform:
   m_ObjectHideFlags: 0
@@ -2373,16 +2378,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 811645271}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1764858}
+  m_Father: {fileID: 1718496974}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -222.5, y: -62.6}
+  m_AnchoredPosition: {x: 1.5000153, y: -414.8}
   m_SizeDelta: {x: 304.5045, y: 97.9079}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &811645273
@@ -2759,7 +2764,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 2100000, guid: 343ab00e3639d9246b71ddd9a09ead13, type: 2}
+  m_Material: {fileID: 2100000, guid: bc9df0b15d884da409f57fb62cd6bb8a, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -2946,7 +2951,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 918885603}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -3193,7 +3198,6 @@ RectTransform:
   m_Children:
   - {fileID: 1703384836}
   - {fileID: 1718496974}
-  - {fileID: 1673124963}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3279,7 +3283,7 @@ MonoBehaviour:
   backgroundPanel: {fileID: 1703384834}
   dumbbellCanvasRoot: {fileID: 1162309330}
   dumbbellPrefab: {fileID: 538094209684891605, guid: f044afaf720143a4e89dd5210938c0d8, type: 3}
-  nextSceneName: GameScene
+  nextSceneName: 
   cellWidth: 130
   cellHeight: 80
   extraRows: 3
@@ -3883,7 +3887,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1673124960}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -3921,12 +3925,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1673124960}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 19.121965, y: 10.724, z: 10.724}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1162309330}
+  m_Father: {fileID: 1718496974}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4039,10 +4043,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1327939598}
-  - {fileID: 794517803}
   - {fileID: 409311061}
   - {fileID: 1764858}
+  - {fileID: 811645272}
   - {fileID: 918885604}
+  - {fileID: 1673124963}
+  - {fileID: 794517803}
   m_Father: {fileID: 1162309330}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4578,6 +4584,10 @@ MonoBehaviour:
   _clearScale: 1.5
   _clearDelay: 1
   _explosionPrefab: {fileID: 600055896250882990, guid: 92ccf096cc0f2914fbb703c7101ad5ae, type: 3}
+  _blackUiPrefabs:
+  - {fileID: 4044294870427922061, guid: d9b4807c68f233540937699f8f49e2cb, type: 3}
+  - {fileID: 2624760887686886189, guid: 368805649722a2d4cadfa8ae44d83873, type: 3}
+  - {fileID: 6308965949122286310, guid: 6eb49e0942f258e4da7a3fb3e7373164, type: 3}
   _spriteTable:
   - poseID: 2
     originalSprite: {fileID: 21300000, guid: 3f4a2c1059842df44970ee191d35e6a8, type: 3}

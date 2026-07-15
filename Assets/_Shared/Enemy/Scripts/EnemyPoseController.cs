@@ -15,6 +15,7 @@ namespace Enemy
         [SerializeField] private PoseParryJudge _poseParryJudge;
         [SerializeField] private string _audienceRequestContextName = "AudienceRequestContext";
         [SerializeField] private AudienceRequestContext _audienceRequestContext;
+        [SerializeField] private AudienceRequestSystem _audienceRequestSystem;
         [SerializeField] private FeverGaugeController _feverGaugeController;
 
         // ポーズ中かどうか
@@ -42,6 +43,8 @@ namespace Enemy
             _poseParryJudge = _enemyContext?.GetPoseContext()?.GetPoseParryJudge;
             if (_poseParryJudge) { _poseParryJudge.OnParrySuccess += OnParrySuccess; }
             //Debug.Log("EnemyPoseController Start. _poseParryJudge = " + _poseParryJudge);
+
+            SetAudienceRequestSystem();
 
             _timer = 0f;
             CreateDebugMenu();
@@ -179,6 +182,15 @@ namespace Enemy
                 return false;
             }
 
+            SetAudienceRequestSystem();
+
+            if (_audienceRequestSystem != null && _audienceRequestSystem.HasActiveBlackRequest)
+
+            {
+
+                _audienceRequestSystem.ClearBlackRequestAndRequestFakePose();
+            }
+
             EnemyPoseType poseType = _useFakePoseForNextPose
                 ? EnemyPoseType.Fake
                 : EnemyPoseType.Normal;
@@ -255,5 +267,33 @@ namespace Enemy
 
             _feverGaugeController = _audienceRequestContext?.GetFeverGaugeController();
         }
+
+        // AudienceRequestSystemをセットアップする
+        private void SetAudienceRequestSystem()
+        {
+            // すでにセットアップ済みの場合は何もしない
+            if (_audienceRequestSystem != null)
+            {
+                return;
+            }
+
+            // AudienceRequestContextがセットされていない場合は、ContextManagerから取得する
+            if (_audienceRequestContext == null)
+            {
+                // AudienceRequestContextをContextManagerから取得する
+                ContextManager contextManager = ContextManager.Instance;
+                if (contextManager != null && !string.IsNullOrWhiteSpace(_audienceRequestContextName))
+                {
+                    _audienceRequestContext = contextManager.Get<AudienceRequestContext>(_audienceRequestContextName);
+                }
+                if (_audienceRequestContext == null)
+                {
+                    _audienceRequestContext = FindFirstObjectByType<AudienceRequestContext>();
+                }
+            }
+            // AudienceRequestContextが取得できた場合は、AudienceRequestSystemを取得する
+            _audienceRequestSystem = _audienceRequestContext?.GetAudienceRequestSystem();
+        }
+
     }
 }

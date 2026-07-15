@@ -124,6 +124,12 @@ public sealed class InGameFlowContext : MonoBehaviour
         cameraTransform.position = stageData.CameraInitialPosition;
     }
 
+    public void ResetProgressFollowerPositions(StageData stageData)
+    {
+        ResetCameraPosition(stageData);
+        ForwardProgressMover?.ResetStageEndJudgePosition();
+    }
+
     private void Awake()
     {
         ResolveStageModelContext();

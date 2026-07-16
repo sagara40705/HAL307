@@ -177,6 +177,7 @@ MonoBehaviour:
   stageEndJudge: {fileID: 0}
   warningUI: {fileID: 811645271}
   warningThreshold: 0.1
+  warningAnimator: {fileID: 0}
   hideOnWaveEffectUis:
   - {fileID: 1327939597}
   - {fileID: 794517802}
@@ -2509,7 +2510,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &811645272
 RectTransform:
   m_ObjectHideFlags: 0

@@ -509,7 +509,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BootSceneRouter
   appBootstrapper: {fileID: 903886853}
-  defaultFirstPhase: 3
+  defaultFirstPhase: 2
 --- !u!4 &1567818133
 Transform:
   m_ObjectHideFlags: 0
@@ -688,11 +688,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f529aa944b914449d62b8c40f188fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CriMw.CriWare.Runtime::CriWare.CriAtom
-  acfFile: HAL307
+  acfFile: 
   cueSheets:
-  - name: InGameCueSheet
-    acbFile: InGameCueSheet.acb
-    awbFile: InGameCueSheet.awb
+  - name: CueSheet_0
+    acbFile: CueSheet_0.acb
+    awbFile: 
     loaderStatus: 0
   dspBusSetting: 
   dontDestroyOnLoad: 1

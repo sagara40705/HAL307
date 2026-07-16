@@ -16,10 +16,9 @@ public sealed class PlayingFlowState : InGameFlowStateBase
     // Wave開始演出の実行
     public override IEnumerator Enter(InGameFlowContext context)
     {
-        context?.StageEndJudge?.ResetJudge();
         context?.WaveGauge?.ResetWaveGauge();
         context?.AudienceRequest?.ResetRequests();
-        context?.ResetCameraPosition(_stageData);
+        context?.ResetProgressFollowerPositions(_stageData);
         BeginWaveEnemyReplacement(context);
 
         InGamePresentationAction action = _waveData?.WaveStartAction;
@@ -65,12 +64,18 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         }
 
         stageEndJudge.OnStageEnd += OnStageEnd;
-        while (!isStageEnd)
+        stageEndJudge.ResetJudge();
+        try
         {
-            yield return null;
+            while (!isStageEnd)
+            {
+                yield return null;
+            }
         }
-
-        stageEndJudge.OnStageEnd -= OnStageEnd;
+        finally
+        {
+            stageEndJudge.OnStageEnd -= OnStageEnd;
+        }
     }
 
     private void BeginWaveEnemyReplacement(InGameFlowContext context)

@@ -549,6 +549,7 @@ MonoBehaviour:
   _initalize: 0
   _contextName: 
   _enemyManager: {fileID: 529276126}
+  _enemyPoseController: {fileID: 535028703}
   _poseContextName: PoseContext
   _poseContext: {fileID: 0}
 --- !u!4 &770144275

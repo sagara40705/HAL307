@@ -19,12 +19,25 @@ public class ForwardProgressMover : MonoBehaviour
     private bool _isStopped;
     private bool _hasLeaderFollowPosition;
     private float _lastLeaderForwardPosition;
+    private Vector3 _stageEndJudgeInitialPosition;
+    private bool _hasStageEndJudgeInitialPosition;
 
     public Transform CameraTransform => _cameraTransform;
 
     private float EnemyMoveSpeed => _moveSettings != null ? _moveSettings.EnemyMoveSpeed : _fallbackEnemyMoveSpeed;
     private float PlayerMoveSpeed => _moveSettings != null ? _moveSettings.PlayerMoveSpeed : _fallbackPlayerMoveSpeed;
     private float LeaderSpeedMultiplier => _moveSettings != null ? _moveSettings.LeaderSpeedMultiplier : _fallbackLeaderSpeedMultiplier;
+
+    private void Awake()
+    {
+        if (_stageEndJudgeTransform == null)
+        {
+            return;
+        }
+
+        _stageEndJudgeInitialPosition = _stageEndJudgeTransform.position;
+        _hasStageEndJudgeInitialPosition = true;
+    }
 
     private void Start()
     {
@@ -349,6 +362,18 @@ public class ForwardProgressMover : MonoBehaviour
     {
         _isStopped = false;
         _canMove = true;
+        ResetLeaderFollowPosition();
+    }
+
+    public void ResetStageEndJudgePosition()
+    {
+        if (_stageEndJudgeTransform == null || !_hasStageEndJudgeInitialPosition)
+        {
+            Debug.LogWarning("[ForwardProgressMover] StageEndJudge initial position was not captured.");
+            return;
+        }
+
+        _stageEndJudgeTransform.position = _stageEndJudgeInitialPosition;
         ResetLeaderFollowPosition();
     }
 

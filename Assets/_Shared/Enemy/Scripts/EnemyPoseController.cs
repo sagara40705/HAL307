@@ -15,6 +15,7 @@ namespace Enemy
         [SerializeField] private PoseParryJudge _poseParryJudge;
         [SerializeField] private string _audienceRequestContextName = "AudienceRequestContext";
         [SerializeField] private AudienceRequestContext _audienceRequestContext;
+        [SerializeField] private AudienceRequestSystem _audienceRequestSystem;
         [SerializeField] private FeverGaugeController _feverGaugeController;
 
         // ポーズ中かどうか
@@ -25,8 +26,10 @@ namespace Enemy
 
         [Header("Pose Selection")]
         [SerializeField] private bool _useFakePoseForNextPose;
+        [SerializeField] private PoseID _requestedFakeCommittedPoseID = PoseID.None;
 
         public bool IsFakePoseRequested => _useFakePoseForNextPose;
+        public PoseID RequestedFakeCommittedPoseID => _requestedFakeCommittedPoseID;
 
         // AI
         private float _timer;
@@ -40,6 +43,8 @@ namespace Enemy
             _poseParryJudge = _enemyContext?.GetPoseContext()?.GetPoseParryJudge;
             if (_poseParryJudge) { _poseParryJudge.OnParrySuccess += OnParrySuccess; }
             //Debug.Log("EnemyPoseController Start. _poseParryJudge = " + _poseParryJudge);
+
+            SetAudienceRequestSystem();
 
             _timer = 0f;
             CreateDebugMenu();
@@ -95,18 +100,51 @@ namespace Enemy
         public void RequestFakePoseForNextPose()
         {
             _useFakePoseForNextPose = true;
+            _requestedFakeCommittedPoseID = PoseID.None;
+        }
+
+        // 指定Poseが確定IDになるFakePoseを次回に要求する
+        public void RequestFakePoseForNextPose(PoseID committedPoseID)
+        {
+            if (!IsRequestablePose(committedPoseID))
+            {
+                Debug.LogWarning($"[EnemyPoseController] Fake pose request skipped. Reason=Unsupported committed pose. Pose={committedPoseID}");
+                return;
+            }
+
+            _useFakePoseForNextPose = true;
+            _requestedFakeCommittedPoseID = committedPoseID;
+        }
+
+        public void RequestFakeYaaForNextPose()
+        {
+            RequestFakePoseForNextPose(PoseID.Pose_Yaa);
+        }
+
+        public void RequestFakePowerForNextPose()
+        {
+            RequestFakePoseForNextPose(PoseID.Pose_Power);
+        }
+
+        public void RequestFakeMuscleForNextPose()
+        {
+            RequestFakePoseForNextPose(PoseID.Pose_Muscle);
         }
 
         public void ClearFakePoseRequest()
         {
             _useFakePoseForNextPose = false;
+            _requestedFakeCommittedPoseID = PoseID.None;
         }
 
         private void CreateDebugMenu()
         {
             RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
-            window.CreateButton("Request Fake Pose", RequestFakePoseForNextPose);
+            window.CreateButton("Request Fake Yaa", RequestFakeYaaForNextPose);
+            window.CreateButton("Request Fake Power", RequestFakePowerForNextPose);
+            window.CreateButton("Request Fake Muscle", RequestFakeMuscleForNextPose);
             window.CreateMessage("Fake Requested", () => _useFakePoseForNextPose.ToString());
+            window.CreateMessage("Fake Committed Pose", () => _requestedFakeCommittedPoseID.ToString());
         }
 
         // ポーズ状態を解除する
@@ -144,18 +182,30 @@ namespace Enemy
                 return false;
             }
 
+            SetAudienceRequestSystem();
+
+            if (_audienceRequestSystem != null && _audienceRequestSystem.HasActiveBlackRequest)
+
+            {
+
+                _audienceRequestSystem.ClearBlackRequestAndRequestFakePose();
+            }
+
             EnemyPoseType poseType = _useFakePoseForNextPose
                 ? EnemyPoseType.Fake
                 : EnemyPoseType.Normal;
+            PoseID committedPoseID = poseType == EnemyPoseType.Fake
+                ? _requestedFakeCommittedPoseID
+                : PoseID.None;
 
-            Enemy targetEnemy = _enemyRegistry?.GetRandomEnemy(poseType);
+            Enemy targetEnemy = _enemyRegistry?.GetRandomEnemy(poseType, committedPoseID);
             if (targetEnemy == null)
             {
                 _timer = 0f;
                 return false;
             }
 
-            PoseID poseID = targetEnemy.RandomPose(poseType);
+            PoseID poseID = targetEnemy.RandomPose(poseType, committedPoseID);
             if (poseID == PoseID.None)
             {
                 _timer = 0f;
@@ -168,10 +218,17 @@ namespace Enemy
 
             if (poseType == EnemyPoseType.Fake)
             {
-                _useFakePoseForNextPose = false;
+                ClearFakePoseRequest();
             }
 
             return true;
+        }
+
+        private static bool IsRequestablePose(PoseID poseID)
+        {
+            return poseID == PoseID.Pose_Yaa ||
+                   poseID == PoseID.Pose_Power ||
+                   poseID == PoseID.Pose_Muscle;
         }
 
         private bool IsFeverActive()
@@ -210,5 +267,33 @@ namespace Enemy
 
             _feverGaugeController = _audienceRequestContext?.GetFeverGaugeController();
         }
+
+        // AudienceRequestSystemをセットアップする
+        private void SetAudienceRequestSystem()
+        {
+            // すでにセットアップ済みの場合は何もしない
+            if (_audienceRequestSystem != null)
+            {
+                return;
+            }
+
+            // AudienceRequestContextがセットされていない場合は、ContextManagerから取得する
+            if (_audienceRequestContext == null)
+            {
+                // AudienceRequestContextをContextManagerから取得する
+                ContextManager contextManager = ContextManager.Instance;
+                if (contextManager != null && !string.IsNullOrWhiteSpace(_audienceRequestContextName))
+                {
+                    _audienceRequestContext = contextManager.Get<AudienceRequestContext>(_audienceRequestContextName);
+                }
+                if (_audienceRequestContext == null)
+                {
+                    _audienceRequestContext = FindFirstObjectByType<AudienceRequestContext>();
+                }
+            }
+            // AudienceRequestContextが取得できた場合は、AudienceRequestSystemを取得する
+            _audienceRequestSystem = _audienceRequestContext?.GetAudienceRequestSystem();
+        }
+
     }
 }

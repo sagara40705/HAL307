@@ -175,14 +175,23 @@ namespace Enemy
             RuntimeDebug.DebugMenu.DestroyWindow(name);
         }
 
-        public bool HasPoseOfType(EnemyPoseType poseType)
+        public bool HasPoseOfType(EnemyPoseType poseType, PoseID committedPoseID = PoseID.None)
         {
+            if (poseType == EnemyPoseType.Fake && committedPoseID != PoseID.None)
+            {
+                return _data != null &&
+                       _data.PoseSet != null &&
+                       _data.PoseSet.ContainsFakePose(committedPoseID);
+            }
+
             return _data != null &&
                    _data.PoseSet != null &&
                    _data.PoseSet.ContainsPoseType(poseType);
         }
 
-        public PoseID RandomPose(EnemyPoseType poseType = EnemyPoseType.Normal)
+        public PoseID RandomPose(
+            EnemyPoseType poseType = EnemyPoseType.Normal,
+            PoseID committedPoseID = PoseID.None)
         {
             if (InGameFlowLock.IsPresentationPlaying)
             {
@@ -194,7 +203,9 @@ namespace Enemy
                 return PoseID.None;
             }
 
-            EnemyPoseData randomPoseData = _data.PoseSet.GetRandomPose(poseType);
+            EnemyPoseData randomPoseData = poseType == EnemyPoseType.Fake && committedPoseID != PoseID.None
+                ? _data.PoseSet.GetRandomFakePose(committedPoseID)
+                : _data.PoseSet.GetRandomPose(poseType);
             if (randomPoseData == null)
             {
                 return PoseID.None;

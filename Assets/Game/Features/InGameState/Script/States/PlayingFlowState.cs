@@ -20,9 +20,9 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.WaveGauge?.ResetWaveGauge();
         context?.AudienceRequest?.ResetRequests();
         context?.ResetProgressFollowerPositions(_stageData);
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.Handclap);
         BeginWaveEnemyReplacement(context);
 
-        Sound.Manager.SoundManager.Play((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.Handclap);
 
         InGamePresentationAction action = _waveData?.WaveStartAction;
         if (action == null)

@@ -33,10 +33,32 @@ public class FeverGaugeController : MonoBehaviour
     public event Action OnFeverStarted;
     public event Action OnFeverEnded;
 
+    private void Awake()
+    {
+        Debug.Log($"[FeverGaugeController] Awake前 CutIn activeSelf = {_cutInObject?.activeSelf}", this);
+
+        HideFeverObjects();
+
+        Debug.Log($"[FeverGaugeController] Awake後 CutIn activeSelf = {_cutInObject?.activeSelf}", this);
+    }
+
     private void Start()
     {
         ResetFill();
+        CreateDebugMenu();
 
+        Debug.Log($"[FeverGaugeController] Start後 CutIn activeSelf = {_cutInObject?.activeSelf}", this);
+
+        if (!_isFever)
+        {
+            HideFeverObjects();
+            Debug.Log($"[FeverGaugeController] Startで再非表示 CutIn activeSelf = {_cutInObject?.activeSelf}", this);
+        }
+
+    }
+
+    private void HideFeverObjects()
+    {
         if (_fireAnimObject != null)
         {
             _fireAnimObject.SetActive(false);
@@ -51,8 +73,6 @@ public class FeverGaugeController : MonoBehaviour
         {
             uiPanel.SetActive(false);
         }
-
-        CreateDebugMenu();
     }
 
     private void OnDestroy()
@@ -187,7 +207,7 @@ public class FeverGaugeController : MonoBehaviour
 
         if (uiPanel != null)
         {
-            uiPanel.SetActive(true);
+            uiPanel.SetActive(false);
         }
 
         Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.FeverBGM);

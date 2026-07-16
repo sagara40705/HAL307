@@ -783,7 +783,6 @@ MonoBehaviour:
   howToPanel: {fileID: 303607548}
   howToImage: {fileID: 1238506505}
   pages:
-  - {fileID: 21300000, guid: 21a3ca9320fbf0347bb0f8973f6375d5, type: 3}
   - {fileID: 21300000, guid: ab2a204eba741474784895a2116793b2, type: 3}
   - {fileID: 21300000, guid: ef02f290143454146a421e93c5f8aec8, type: 3}
   - {fileID: 21300000, guid: 1c6300f7947a57744905c7fed615fca2, type: 3}

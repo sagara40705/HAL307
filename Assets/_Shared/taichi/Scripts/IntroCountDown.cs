@@ -13,7 +13,6 @@ public class IntroCoutDown : MonoBehaviour
     private float timer = 0.0f;
     private bool CountDownStart = false;    // カウントダウンスタート
     private bool isFinished = false;        // カウントダウン終了処理
-    private Sound.Manager.SoundManager _soundManager;
 
     public void StartCountDown()
     {
@@ -52,6 +51,7 @@ public class IntroCoutDown : MonoBehaviour
             {
                 isFinished = true;
                 _imageCountdown[0].gameObject.SetActive(false);
+                Sound.Manager.SoundManager.Stop((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.Handclap);
             }
         }
     }

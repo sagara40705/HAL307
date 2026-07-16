@@ -183,7 +183,7 @@ public class FeverGaugeController : MonoBehaviour
 
         if (uiPanel != null)
         {
-            uiPanel.SetActive(true);
+            uiPanel.SetActive(false);
         }
 
         OnFeverEnded?.Invoke();

@@ -177,7 +177,7 @@ MonoBehaviour:
   stageEndJudge: {fileID: 0}
   warningUI: {fileID: 811645271}
   warningThreshold: 0.1
-  warningAnimator: {fileID: 0}
+  warningAnimator: {fileID: 811645275}
   hideOnWaveEffectUis:
   - {fileID: 1327939597}
   - {fileID: 794517802}
@@ -4755,15 +4755,15 @@ MonoBehaviour:
   - poseID: 2
     originalSprite: {fileID: 21300000, guid: 3f4a2c1059842df44970ee191d35e6a8, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
-    enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
+    enemyChangeSprite: {fileID: 21300000, guid: dfeff70a0dc52114b9c0338debc0436c, type: 3}
   - poseID: 1
     originalSprite: {fileID: 21300000, guid: 01eaf42a0821aee47abc45e736d10ceb, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
-    enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
+    enemyChangeSprite: {fileID: 21300000, guid: dfeff70a0dc52114b9c0338debc0436c, type: 3}
   - poseID: 0
     originalSprite: {fileID: 21300000, guid: 52dd5631e16fa584cad264009640c51e, type: 3}
     changeSprite: {fileID: 21300000, guid: ce6eb92e049912b4ca50fa620ffa99be, type: 3}
-    enemyChangeSprite: {fileID: 21300000, guid: 0d4a53e6510c35f47a590538ab9d1071, type: 3}
+    enemyChangeSprite: {fileID: 21300000, guid: dfeff70a0dc52114b9c0338debc0436c, type: 3}
 --- !u!4 &2063627354
 Transform:
   m_ObjectHideFlags: 0

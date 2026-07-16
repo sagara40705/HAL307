@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 public enum WaveResultCheckResult
 {
@@ -43,6 +44,7 @@ public sealed class WaveResultCheckFlowState : InGameFlowStateBase
             yield break;
         }
 
+        Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
         Result = _hasNextWave ? WaveResultCheckResult.NextWave : WaveResultCheckResult.GameEnd;
         Debug.Log($"[WaveResultCheckFlowState] Target score reached. Score={_currentScore}, Target={_waveData.TargetScore}, Result={Result}");
         yield break;

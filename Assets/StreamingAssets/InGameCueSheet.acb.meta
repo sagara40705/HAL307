@@ -1,13 +1,7 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/StreamingAssets/InGameCueSheet.acb.meta
 guid: 8bb717c7cbe666b4bb99711df6362518
 DefaultImporter:
-========
-guid: 47b4264192f4d714fadcdedd0e11a943
-NativeFormatImporter:
->>>>>>>> main:Assets/_Shared/InGameUI/UI/UIAnimation/WaveFinal.controller.meta
   externalObjects: {}
-  mainObjectFileID: 9100000
   userData: 
   assetBundleName: 
   assetBundleVariant: 

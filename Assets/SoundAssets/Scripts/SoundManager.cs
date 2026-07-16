@@ -41,7 +41,8 @@ namespace Sound.Manager
             CheersSE,
             PoseSE,
             ParrySE,
-            InGameBGM
+            InGameBGM,
+            FeverBGM,
         }
 
         public enum ResultSoundTag

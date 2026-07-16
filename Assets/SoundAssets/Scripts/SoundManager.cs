@@ -23,7 +23,7 @@ namespace Sound.Manager
             atomExPlayer = new CriAtomExPlayer();
 
             /* Cue情報の取得 */
-            atomExAcb = CriAtom.GetAcb("CueSheet_0");
+            atomExAcb = CriAtom.GetAcb("InGameCueSheet");
             cueInfoList = atomExAcb.GetCueInfoList();
         }
 

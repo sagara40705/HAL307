@@ -1,4 +1,5 @@
 using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 public class TitleSceneMgr : MonoBehaviour
 {
@@ -36,6 +37,7 @@ public class TitleSceneMgr : MonoBehaviour
         }
 
         SceneLoader.Load(sceneName);
+        Sound.Manager.SoundManager.Stop((int)SceneSoundTag.TitleSound, (int)TitleSoundTag.TitleBGM);
     }
 
     private string ResolveFallbackSceneName()

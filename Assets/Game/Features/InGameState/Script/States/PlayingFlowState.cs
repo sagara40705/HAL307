@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using static Sound.Manager.SoundManager;
 
 // StageEndJudgeを待つ通常プレイState
 public sealed class PlayingFlowState : InGameFlowStateBase
@@ -20,7 +19,6 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.WaveGauge?.ResetWaveGauge();
         context?.AudienceRequest?.ResetRequests();
         context?.ResetProgressFollowerPositions(_stageData);
-        Sound.Manager.SoundManager.Play((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.Handclap);
         BeginWaveEnemyReplacement(context);
 
 

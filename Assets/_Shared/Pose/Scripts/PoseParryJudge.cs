@@ -1,5 +1,6 @@
-using UnityEngine;
 using System;
+using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 namespace Pose
 {
@@ -57,11 +58,14 @@ namespace Pose
                 // パリイ成功時の処理
                 NotifyParrySuccess();
                 _confettiEffect?.Play();
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.ParrySE);
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.CheersSE);
             }
             else
             {
                 Debug.Log("Parry Failed!");
                 // パリイ失敗時の処理をここに追加
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.PoseSE);
             }
         }
 

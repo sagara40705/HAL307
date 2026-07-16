@@ -52,6 +52,7 @@ public class IntroCoutDown : MonoBehaviour
                 isFinished = true;
                 _imageCountdown[0].gameObject.SetActive(false);
                 Sound.Manager.SoundManager.Stop((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.Handclap);
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
             }
         }
     }

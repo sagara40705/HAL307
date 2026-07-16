@@ -32,6 +32,8 @@ public sealed class WaveResultCheckFlowState : InGameFlowStateBase
         if (_waveData == null)
         {
             Result = WaveResultCheckResult.GameEnd;
+            Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
+            Sound.Manager.SoundManager.Play((int)SceneSoundTag.ResultSound, (int)ResultSoundTag.ResultSE);
             yield break;
         }
 
@@ -44,7 +46,6 @@ public sealed class WaveResultCheckFlowState : InGameFlowStateBase
             yield break;
         }
 
-        Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
         Result = _hasNextWave ? WaveResultCheckResult.NextWave : WaveResultCheckResult.GameEnd;
         Debug.Log($"[WaveResultCheckFlowState] Target score reached. Score={_currentScore}, Target={_waveData.TargetScore}, Result={Result}");
         yield break;

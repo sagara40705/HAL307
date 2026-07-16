@@ -11,6 +11,7 @@ public class TitleSceneMgr : MonoBehaviour
     {
         if (DebugShortcuts.Pressed(_key))
         {
+            Sound.Manager.SoundManager.Stop((int)SceneSoundTag.TitleSound, (int)TitleSoundTag.TitleBGM);
             StartLoad();
         }
     }
@@ -35,7 +36,6 @@ public class TitleSceneMgr : MonoBehaviour
             Debug.LogError($"[TitleSceneMgr] Scene load failed. Reason=Scene name is empty. Phase={_nextPhase}");
             return;
         }
-        Sound.Manager.SoundManager.Stop((int)SceneSoundTag.TitleSound, (int)TitleSoundTag.TitleBGM);
 
         SceneLoader.Load(sceneName);
     }

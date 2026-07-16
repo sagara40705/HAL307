@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using Sound.Manager;
 using UnityEngine;
 using UnityEngine.UI;
+using static Sound.Manager.SoundManager;
 
 public class IntroCoutDown : MonoBehaviour
 {
@@ -11,11 +13,13 @@ public class IntroCoutDown : MonoBehaviour
     private float timer = 0.0f;
     private bool CountDownStart = false;    // カウントダウンスタート
     private bool isFinished = false;        // カウントダウン終了処理
+    private Sound.Manager.SoundManager _soundManager;
 
     public void StartCountDown()
     {
         CountDownStart = true;
         _imageCountdown[pCountDownNumber].gameObject.SetActive(true);
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.CountDown);
     }
 
     private void Update()

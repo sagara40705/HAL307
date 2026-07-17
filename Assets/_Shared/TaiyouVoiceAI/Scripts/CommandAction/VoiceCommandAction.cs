@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class VoiceCommandAction : MonoBehaviour
@@ -13,11 +14,12 @@ public class VoiceCommandAction : MonoBehaviour
     [Header("Voice Gate")]
     [SerializeField] private float minimumDb = -20f;
     [SerializeField] private bool onlyHide = true;
+    [SerializeField] private float hideTime = 5f;
     [SerializeField] private bool logCommand = true;
 
     private void Awake()
     {
-       
+
     }
 
     public void ExecuteCommand(string command, float volume)
@@ -53,9 +55,11 @@ public class VoiceCommandAction : MonoBehaviour
             case "power":
                 HideOrDestroy(powerObject, "power");
                 break;
+
             case "yaa":
                 HideOrDestroy(yaaObject, "yaa");
                 break;
+
             case "muscle":
                 HideOrDestroy(muscleObject, "muscle");
                 break;
@@ -64,7 +68,10 @@ public class VoiceCommandAction : MonoBehaviour
 
     private static bool IsMenuCommand(string command)
     {
-        return command == "ue" || command == "sita" || command == "kettei" || command == "time";
+        return command == "ue" ||
+               command == "sita" ||
+               command == "kettei" ||
+               command == "time";
     }
 
     private void HideOrDestroy(GameObject obj, string label)
@@ -77,13 +84,42 @@ public class VoiceCommandAction : MonoBehaviour
 
         if (onlyHide)
         {
+            if (!obj.activeSelf)
+            {
+                return;
+            }
+
             obj.SetActive(false);
-            Debug.Log(label + " hidden.");
+            StartCoroutine(ShowAfterDelay(obj));
+
+            if (logCommand)
+            {
+                Debug.Log(label + " hidden.");
+            }
         }
         else
         {
             Destroy(obj);
-            Debug.Log(label + " destroyed.");
+
+            if (logCommand)
+            {
+                Debug.Log(label + " destroyed.");
+            }
+        }
+    }
+
+    private IEnumerator ShowAfterDelay(GameObject obj)
+    {
+        yield return new WaitForSeconds(hideTime);
+
+        if (obj != null)
+        {
+            obj.SetActive(true);
+
+            if (logCommand)
+            {
+                Debug.Log(obj.name + " shown.");
+            }
         }
     }
 

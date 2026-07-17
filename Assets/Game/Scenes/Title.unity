@@ -1167,7 +1167,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TitleSceneMgr
   _nextPhase: 3
   _nextSceneName: Prototype
-  _key: 1
+  _key: 2
 --- !u!4 &896172638
 Transform:
   m_ObjectHideFlags: 0

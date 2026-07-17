@@ -1,6 +1,7 @@
 using AudienceRequest;
 using Enemy;
 using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 // インゲーム進行Stateから参照するシーン要素
 public sealed class InGameFlowContext : MonoBehaviour
@@ -128,6 +129,7 @@ public sealed class InGameFlowContext : MonoBehaviour
     {
         ResetCameraPosition(stageData);
         ForwardProgressMover?.ResetStageEndJudgePosition();
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
     }
 
     private void Awake()

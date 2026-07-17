@@ -16,6 +16,7 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private float warningThreshold = 0.2f;
     [SerializeField] private Animator warningAnimator;
     private bool isWarningVisible;
+    private bool isWaveFinalSuppressed;
 
     [Header("Wave演出時に非表示にするUI")]
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
@@ -106,7 +107,7 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         // 警告UIの表示状態を更新
-        bool shouldShowWarning = currentValue <= warningThreshold;
+        bool shouldShowWarning = !isWaveFinalSuppressed && currentValue <= warningThreshold;
 
         // 状態が変わった時だけ処理する
         if (isWarningVisible != shouldShowWarning)
@@ -141,6 +142,7 @@ public class WaveGaugeController : MonoBehaviour
 
         // WaveGaugeControllerの状態をリセット
         isTransitionStarted = false;
+        isWaveFinalSuppressed = false;
         currentValue = maxValue;
 
         // マテリアルが設定されていない場合はImageコンポーネントから取得
@@ -160,17 +162,15 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         // 警告UIを非表示にする
-        isWarningVisible = false;
-
-        if (warningUI != null)
-        {
-            warningUI.SetActive(false);
-        }
+        SetWaveFinalVisible(false);
 
         ShowOtherUis();
+    }
 
-
-        ShowOtherUis();
+    public void HideWaveFinalForGameEnd()
+    {
+        isWaveFinalSuppressed = true;
+        SetWaveFinalVisible(false);
     }
 
     private void SetupStageEndJudge()
@@ -244,6 +244,21 @@ public class WaveGaugeController : MonoBehaviour
             {
                 ui.SetActive(true);
             }
+        }
+    }
+
+    private void SetWaveFinalVisible(bool isVisible)
+    {
+        isWarningVisible = isVisible;
+
+        if (warningAnimator != null)
+        {
+            warningAnimator.SetBool("IsWarning", isVisible);
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(isVisible);
         }
     }
 

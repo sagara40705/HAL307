@@ -49,7 +49,11 @@ namespace Pose
         {
             Debug.Log($"PoseParryJudge CheckParry() Player pose: {_playerPoseID}");
             Debug.Log($"PoseParryJudge CheckParry() Enemy pose: {_enemyPoseID}");
-            if (_enemyPoseID == PoseID.None) { return; }
+            if (_enemyPoseID == PoseID.None)
+            {
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.PoseSE);
+                return;
+            }
             if (_playerPoseID == PoseID.None) { return; }
 
             if (IsParrySuccessful())

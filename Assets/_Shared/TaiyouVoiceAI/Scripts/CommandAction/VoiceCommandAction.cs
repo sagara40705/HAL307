@@ -1,4 +1,7 @@
 using System.Collections;
+using Player;
+using Pose;
+using TaiyouVoiceAI;
 using UnityEngine;
 
 public class VoiceCommandAction : MonoBehaviour
@@ -17,9 +20,21 @@ public class VoiceCommandAction : MonoBehaviour
     [SerializeField] private float hideTime = 5f;
     [SerializeField] private bool logCommand = true;
 
+    [Header("Player")]
+    [SerializeField] private VoiceAiContext _voiceAiContext;
+    [SerializeField] private PlayerPoseContoroller _playerPoseController;
+
     private void Awake()
     {
+        ResolvePlayerPoseController();
+    }
 
+    private void Start()
+    {
+        if (!ResolvePlayerPoseController())
+        {
+            Debug.LogError("[VoiceCommandAction] PlayerPoseContoroller was not found through VoiceAiContext.");
+        }
     }
 
     public void ExecuteCommand(string command, float volume)
@@ -28,6 +43,8 @@ public class VoiceCommandAction : MonoBehaviour
         {
             return;
         }
+
+        command = command.Trim().ToLowerInvariant();
 
         float db = VolumeToDb(volume);
         if (db < minimumDb)
@@ -54,16 +71,67 @@ public class VoiceCommandAction : MonoBehaviour
         {
             case "power":
                 HideOrDestroy(powerObject, "power");
+                TryStartPlayerPose(PoseID.Pose_Power, command);
                 break;
 
             case "yaa":
                 HideOrDestroy(yaaObject, "yaa");
+                TryStartPlayerPose(PoseID.Pose_Yaa, command);
                 break;
 
             case "muscle":
                 HideOrDestroy(muscleObject, "muscle");
+                TryStartPlayerPose(PoseID.Pose_Muscle, command);
                 break;
         }
+    }
+
+    private bool TryStartPlayerPose(PoseID poseID, string command)
+    {
+        if (!ResolvePlayerPoseController())
+        {
+            Debug.LogWarning($"[VoiceCommandAction] Player pose skipped. Reason=PlayerPoseContoroller not found. Command={command}");
+            return false;
+        }
+
+        if (InGameFlowLock.IsPresentationPlaying)
+        {
+            Debug.Log($"[VoiceCommandAction] Player pose skipped. Reason=Presentation is playing. Command={command}");
+            return false;
+        }
+
+        if (_playerPoseController.IsPosing)
+        {
+            Debug.Log($"[VoiceCommandAction] Player pose skipped. Reason=Player is already posing. Command={command}");
+            return false;
+        }
+
+        _playerPoseController.TryOnPose(poseID);
+        Debug.Log($"[VoiceCommandAction] Player pose started. Command={command}, Pose={poseID}");
+        return true;
+    }
+
+    private bool ResolvePlayerPoseController()
+    {
+        if (_playerPoseController != null)
+        {
+            return true;
+        }
+
+        if (_voiceAiContext == null)
+        {
+            _voiceAiContext = FindFirstObjectByType<VoiceAiContext>();
+        }
+
+        PlayerContext playerContext = _voiceAiContext?.GetPlayerContext();
+        _playerPoseController = playerContext?.GetPlayerPoseContoroller;
+
+        if (_playerPoseController == null)
+        {
+            _playerPoseController = FindFirstObjectByType<PlayerPoseContoroller>();
+        }
+
+        return _playerPoseController != null;
     }
 
     private static bool IsMenuCommand(string command)

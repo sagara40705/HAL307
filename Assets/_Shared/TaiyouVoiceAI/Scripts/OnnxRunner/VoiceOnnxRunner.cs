@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class VoiceOnnxRunner : MonoBehaviour
 {
+    private const string DebugWindowName = "Voice ONNX";
+
     [Header("ONNXモデル")]
     [SerializeField] private ModelAsset modelAsset;
 
@@ -28,32 +30,45 @@ public class VoiceOnnxRunner : MonoBehaviour
     private Worker worker;
     private Model runtimeModel;
     private float timer = 0f;
+    private readonly float[] latestScores = new float[4];
+    private string initializationStatus = "Not initialized";
+    private string latestLabel = "-";
+    private float latestInputVolume;
+    private int inferenceCount;
+    private bool hasInferenceResult;
 
     // Python側の labels 順に合わせる
     private readonly string[] labels = { "muscle", "none", "power", "yaa" };
 
     private void Start()
     {
+        CreateDebugMenu();
+        initializationStatus = "Initializing";
+
         if (modelAsset == null)
         {
+            initializationStatus = "ModelAsset is missing";
             Debug.LogError("Model Asset が設定されていません");
             return;
         }
 
         if (microphoneInput == null)
         {
+            initializationStatus = "MicrophoneInput is missing";
             Debug.LogError("MicrophoneInput が設定されていません");
             return;
         }
 
         if (featureExtractor == null)
         {
+            initializationStatus = "MfccFeatureExtractor is missing";
             Debug.LogError("MfccFeatureExtractor が設定されていません");
             return;
         }
 
         runtimeModel = ModelLoader.Load(modelAsset);
         worker = new Worker(runtimeModel, BackendType.CPU);
+        initializationStatus = "Ready";
 
         Debug.Log("ONNXモデル読み込み成功");
     }
@@ -149,11 +164,13 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         if (cachedSamples == null || cachedSamples.Length == 0)
         {
+            latestInputVolume = 0f;
             state = VoiceProcessState.Idle;
             return;
         }
 
         cachedVolume = GetMaxAbs(cachedSamples);
+        latestInputVolume = cachedVolume;
 
         if (cachedVolume < minVolumeThreshold)
         {
@@ -202,6 +219,7 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         int predictedIndex = ArgMax(cachedOutput);
         cachedLabel = labels[predictedIndex];
+        StoreInferenceDebugSnapshot(cachedOutput, cachedLabel, cachedVolume);
 
         state = VoiceProcessState.HandleResult;
     }
@@ -285,6 +303,7 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         int predictedIndex = ArgMax(readable);
         string predictedLabel = labels[predictedIndex];
+        StoreInferenceDebugSnapshot(readable, predictedLabel, volume);
 
         Debug.Log("[AI] " + predictedLabel);
 
@@ -352,8 +371,63 @@ public class VoiceOnnxRunner : MonoBehaviour
         return sb.ToString();
     }
 
+    private void CreateDebugMenu()
+    {
+        RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
+        window.CreateMessage("Status", () => initializationStatus);
+        window.CreateMessage("Process State", () => state.ToString());
+        window.CreateMessage("Input Volume", () => latestInputVolume.ToString("F6"));
+        window.CreateMessage("Prediction", () => hasInferenceResult ? latestLabel : "-");
+        window.CreateMessage("Inference Count", () => inferenceCount.ToString());
+
+        for (int i = 0; i < labels.Length; i++)
+        {
+            int scoreIndex = i;
+            window.CreateMessage($"Score {labels[scoreIndex]}", () => GetLatestScoreText(scoreIndex));
+        }
+    }
+
+    private void StoreInferenceDebugSnapshot(Tensor<float> output, string predictedLabel, float inputVolume)
+    {
+        if (output == null)
+        {
+            return;
+        }
+
+        latestLabel = string.IsNullOrEmpty(predictedLabel) ? "-" : predictedLabel;
+        latestInputVolume = inputVolume;
+
+        int scoreCount = Mathf.Min(latestScores.Length, output.shape.length);
+        for (int i = 0; i < latestScores.Length; i++)
+        {
+            latestScores[i] = i < scoreCount ? output[i] : 0f;
+        }
+
+        inferenceCount++;
+        hasInferenceResult = true;
+    }
+
+    private string GetLatestScoreText(int index)
+    {
+        if (!hasInferenceResult || index < 0 || index >= latestScores.Length)
+        {
+            return "-";
+        }
+
+        return latestScores[index].ToString("F4");
+    }
+
     private void OnDisable()
     {
         worker?.Dispose();
+        worker = null;
+        cachedOutput?.Dispose();
+        cachedOutput = null;
+        initializationStatus = "Disabled";
+    }
+
+    private void OnDestroy()
+    {
+        RuntimeDebug.DebugMenu.DestroyWindow(DebugWindowName);
     }
 }

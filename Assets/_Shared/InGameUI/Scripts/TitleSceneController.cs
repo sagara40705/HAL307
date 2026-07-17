@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using static Sound.Manager.SoundManager;
 
 public class VoiceTitleMenuController : MonoBehaviour
 {
@@ -42,6 +43,7 @@ public class VoiceTitleMenuController : MonoBehaviour
 
         currentIndex = 0;
         UpdateSelectLight();
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.TitleSound, (int)TitleSoundTag.TitleBGM);
     }
 
     private void Update()
@@ -122,6 +124,9 @@ public class VoiceTitleMenuController : MonoBehaviour
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
                     Decide();
+
+                    GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+                    gamePhaseManager.ChangePhase(GamePhase.InGame);
                 }
                 break;
         }

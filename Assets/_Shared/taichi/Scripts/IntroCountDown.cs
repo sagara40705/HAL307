@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using Sound.Manager;
 using UnityEngine;
 using UnityEngine.UI;
+using static Sound.Manager.SoundManager;
 
 public class IntroCoutDown : MonoBehaviour
 {
@@ -16,6 +18,7 @@ public class IntroCoutDown : MonoBehaviour
     {
         CountDownStart = true;
         _imageCountdown[pCountDownNumber].gameObject.SetActive(true);
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.CountDown);
     }
 
     private void Update()
@@ -48,6 +51,8 @@ public class IntroCoutDown : MonoBehaviour
             {
                 isFinished = true;
                 _imageCountdown[0].gameObject.SetActive(false);
+                Sound.Manager.SoundManager.Stop((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.Handclap);
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
             }
         }
     }

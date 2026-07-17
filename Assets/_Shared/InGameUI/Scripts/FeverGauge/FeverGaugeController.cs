@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 public class FeverGaugeController : MonoBehaviour
 {
@@ -163,7 +164,11 @@ public class FeverGaugeController : MonoBehaviour
             uiPanel.SetActive(true);
         }
 
+        Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.FeverBGM);
+
         PlayCutIn();
+
 
         OnFeverStarted?.Invoke();
 
@@ -206,6 +211,8 @@ public class FeverGaugeController : MonoBehaviour
             uiPanel.SetActive(false);
         }
 
+        Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.FeverBGM);
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
         OnFeverEnded?.Invoke();
 
         Debug.Log("[FeverGaugeController] Fever ended.");

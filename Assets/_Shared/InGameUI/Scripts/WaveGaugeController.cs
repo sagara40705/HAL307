@@ -1,6 +1,7 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using Cysharp.Threading.Tasks;
+using static Sound.Manager.SoundManager;
 
 public class WaveGaugeController : MonoBehaviour
 {

@@ -21,6 +21,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.ResetProgressFollowerPositions(_stageData);
         BeginWaveEnemyReplacement(context);
 
+
         InGamePresentationAction action = _waveData?.WaveStartAction;
         if (action == null)
         {

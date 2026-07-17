@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 // インゲーム進行とWave進行の制御
 public sealed class InGameFlowController : MonoBehaviour
@@ -38,6 +39,7 @@ public sealed class InGameFlowController : MonoBehaviour
         }
 
         StartFlow();
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.Handclap);
     }
 
     // インゲーム進行の開始

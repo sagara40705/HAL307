@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 public enum WaveResultCheckResult
 {
@@ -31,6 +32,8 @@ public sealed class WaveResultCheckFlowState : InGameFlowStateBase
         if (_waveData == null)
         {
             Result = WaveResultCheckResult.GameEnd;
+            Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
+            Sound.Manager.SoundManager.Play((int)SceneSoundTag.ResultSound, (int)ResultSoundTag.ResultSE);
             yield break;
         }
 

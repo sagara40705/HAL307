@@ -122,6 +122,9 @@ public class VoiceTitleMenuController : MonoBehaviour
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
                     Decide();
+
+                    GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+                    gamePhaseManager.ChangePhase(GamePhase.InGame);
                 }
                 break;
         }

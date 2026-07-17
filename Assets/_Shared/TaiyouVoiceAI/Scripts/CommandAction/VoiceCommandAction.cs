@@ -12,46 +12,58 @@ public class VoiceCommandAction : MonoBehaviour
     [SerializeField] private GameObject muscleObject;
 
     [Header("Voice Gate")]
-    [SerializeField] private float minimumDb = -20f;
+    [SerializeField] private float minimumDb = -50f;
     [SerializeField] private bool onlyHide = true;
     [SerializeField] private float hideTime = 5f;
     [SerializeField] private bool logCommand = true;
 
-    private void Awake()
-    {
-
-    }
-
     public void ExecuteCommand(string command, float volume)
     {
-        if (string.IsNullOrWhiteSpace(command) || command == "none")
+        // 空文字だけ無視する
+        // noneは下のswitchで処理するため、ここでは止めない
+        if (string.IsNullOrWhiteSpace(command))
         {
             return;
         }
 
         float db = VolumeToDb(volume);
-        if (db < minimumDb)
-        {
-            if (logCommand)
-            {
-                Debug.Log($"[Voice] ignored small input command={command} db={db:F1}");
-            }
-            return;
-        }
+
+        // 音量が小さすぎる場合は無視
+        //if (db < minimumDb)
+        //{
+        //    if (logCommand)
+        //    {
+        //        Debug.Log(
+        //            $"[Voice] ignored small input command={command} " +
+        //            $"volume={volume:F4} db={db:F1}"
+        //        );
+        //    }
+
+        //    return;
+        //}
 
         if (logCommand)
         {
-            Debug.Log($"[Voice] command={command} volume={volume:F4} db={db:F1}");
+            Debug.Log(
+                $"[Voice] command={command} " +
+                $"volume={volume:F4} db={db:F1}"
+            );
         }
 
+        // メニュー用コマンド
         if (IsMenuCommand(command))
         {
-            //menuController.ExecuteVoiceCommand(command);
+            // menuController.ExecuteVoiceCommand(command);
             return;
         }
 
         switch (command)
         {
+            // noneはyaaと同じオブジェクトを処理
+            case "none":
+                HideOrDestroy(yaaObject, "yaa");
+                break;
+
             case "power":
                 HideOrDestroy(powerObject, "power");
                 break;
@@ -62,6 +74,15 @@ public class VoiceCommandAction : MonoBehaviour
 
             case "muscle":
                 HideOrDestroy(muscleObject, "muscle");
+                break;
+
+            default:
+                if (logCommand)
+                {
+                    Debug.LogWarning(
+                        "[Voice] Unknown command: " + command
+                    );
+                }
                 break;
         }
     }
@@ -78,24 +99,28 @@ public class VoiceCommandAction : MonoBehaviour
     {
         if (obj == null)
         {
-            Debug.LogWarning(label + " target is not assigned.");
+            Debug.LogWarning(
+                label + " target is not assigned."
+            );
             return;
         }
 
         if (onlyHide)
         {
+            // すでに非表示なら重複処理しない
             if (!obj.activeSelf)
             {
+                if (logCommand)
+                {
+                    Debug.Log(
+                        label + " is already hidden."
+                    );
+                }
+
                 return;
             }
 
-            obj.SetActive(false);
-            StartCoroutine(ShowAfterDelay(obj));
-
-            if (logCommand)
-            {
-                Debug.Log(label + " hidden.");
-            }
+            StartCoroutine(HideTemporarily(obj, label));
         }
         else
         {
@@ -108,9 +133,23 @@ public class VoiceCommandAction : MonoBehaviour
         }
     }
 
-    private IEnumerator ShowAfterDelay(GameObject obj)
+    private IEnumerator HideTemporarily(
+        GameObject obj,
+        string label
+    )
     {
-        yield return new WaitForSeconds(hideTime);
+        obj.SetActive(false);
+
+        if (logCommand)
+        {
+            Debug.Log(
+                $"{label} hidden. Show after {hideTime:F1} seconds."
+            );
+        }
+
+        // ゲーム停止中でも時間を進めたい場合は
+        // WaitForSecondsRealtimeを使用
+        yield return new WaitForSecondsRealtime(hideTime);
 
         if (obj != null)
         {
@@ -118,13 +157,15 @@ public class VoiceCommandAction : MonoBehaviour
 
             if (logCommand)
             {
-                Debug.Log(obj.name + " shown.");
+                Debug.Log(label + " shown.");
             }
         }
     }
 
     private float VolumeToDb(float volume)
     {
-        return 20f * Mathf.Log10(Mathf.Max(volume, 0.000001f));
+        return 20f * Mathf.Log10(
+            Mathf.Max(volume, 0.000001f)
+        );
     }
 }

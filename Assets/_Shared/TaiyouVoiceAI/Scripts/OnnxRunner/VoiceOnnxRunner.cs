@@ -249,11 +249,9 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         if (voiceCommandAction != null)
         {
-            string commandToExecute =
-                cachedLabel == "none" ? "yaa" : cachedLabel;
-
+            // noneもそのまま渡す
             voiceCommandAction.ExecuteCommand(
-                commandToExecute,
+                cachedLabel,
                 cachedVolume
             );
         }

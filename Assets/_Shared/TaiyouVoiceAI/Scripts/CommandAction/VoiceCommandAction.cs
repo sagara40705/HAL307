@@ -39,7 +39,7 @@ public class VoiceCommandAction : MonoBehaviour
 
     public void ExecuteCommand(string command, float volume)
     {
-        if (string.IsNullOrWhiteSpace(command) || command == "none")
+        if (string.IsNullOrWhiteSpace(command))
         {
             return;
         }
@@ -47,28 +47,64 @@ public class VoiceCommandAction : MonoBehaviour
         command = command.Trim().ToLowerInvariant();
 
         float db = VolumeToDb(volume);
+
         if (db < minimumDb)
         {
             if (logCommand)
             {
-                Debug.Log($"[Voice] ignored small input command={command} db={db:F1}");
+                Debug.Log(
+                    $"[Voice] ignored small input command={command} db={db:F1}"
+                );
             }
+
             return;
         }
 
         if (logCommand)
         {
-            Debug.Log($"[Voice] command={command} volume={volume:F4} db={db:F1}");
+            Debug.Log(
+                $"[Voice] command={command} volume={volume:F4} db={db:F1}"
+            );
         }
 
         if (IsMenuCommand(command))
         {
-            //menuController.ExecuteVoiceCommand(command);
+            // menuController.ExecuteVoiceCommand(command);
             return;
         }
 
         switch (command)
         {
+            case "none":
+                {
+                    int random = Random.Range(0, 3);
+
+                    if (logCommand)
+                    {
+                        Debug.Log("[Voice] none random index = " + random);
+                    }
+
+                    switch (random)
+                    {
+                        case 0:
+                            HideOrDestroy(powerObject, "power");
+                            TryStartPlayerPose(PoseID.Pose_Power, "power");
+                            break;
+
+                        case 1:
+                            HideOrDestroy(yaaObject, "yaa");
+                            TryStartPlayerPose(PoseID.Pose_Yaa, "yaa");
+                            break;
+
+                        case 2:
+                            HideOrDestroy(muscleObject, "muscle");
+                            TryStartPlayerPose(PoseID.Pose_Muscle, "muscle");
+                            break;
+                    }
+
+                    break;
+                }
+
             case "power":
                 HideOrDestroy(powerObject, "power");
                 TryStartPlayerPose(PoseID.Pose_Power, command);
@@ -82,6 +118,15 @@ public class VoiceCommandAction : MonoBehaviour
             case "muscle":
                 HideOrDestroy(muscleObject, "muscle");
                 TryStartPlayerPose(PoseID.Pose_Muscle, command);
+                break;
+
+            default:
+                if (logCommand)
+                {
+                    Debug.LogWarning(
+                        "[Voice] Unknown command: " + command
+                    );
+                }
                 break;
         }
     }

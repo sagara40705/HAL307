@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 public class VoiceOnnxRunner : MonoBehaviour
 {
     private const string DebugWindowName = "Voice ONNX";
+    private const int ModelMfccCount = 20;
+    private const int ModelTargetWidth = 32;
 
     [Header("ONNXモデル")]
     [SerializeField] private ModelAsset modelAsset;
@@ -32,6 +34,7 @@ public class VoiceOnnxRunner : MonoBehaviour
     private float timer = 0f;
     private readonly float[] latestScores = new float[4];
     private string initializationStatus = "Not initialized";
+    private string inferenceStatus = "Waiting for initialization";
     private string latestLabel = "-";
     private float latestInputVolume;
     private int inferenceCount;
@@ -69,6 +72,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         runtimeModel = ModelLoader.Load(modelAsset);
         worker = new Worker(runtimeModel, BackendType.CPU);
         initializationStatus = "Ready";
+        inferenceStatus = "Waiting for microphone input";
 
         Debug.Log("ONNXモデル読み込み成功");
     }
@@ -165,6 +169,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         if (cachedSamples == null || cachedSamples.Length == 0)
         {
             latestInputVolume = 0f;
+            inferenceStatus = "Waiting for microphone samples";
             state = VoiceProcessState.Idle;
             return;
         }
@@ -174,27 +179,30 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         if (cachedVolume < minVolumeThreshold)
         {
+            inferenceStatus = $"Volume below threshold ({cachedVolume:F6} < {minVolumeThreshold:F6})";
             state = VoiceProcessState.Idle;
             return;
         }
 
+        inferenceStatus = "Creating MFCC";
         state = VoiceProcessState.MakeFeature;
     }
 
     private void MakeFeatureStep()
     {
-        cachedMfcc = featureExtractor.ExtractDummyMfcc(cachedSamples);
+        cachedMfcc = featureExtractor.ExtractMfcc(cachedSamples, ModelMfccCount, ModelTargetWidth);
+        inferenceStatus = "Running ONNX";
         state = VoiceProcessState.RunOnnx;
     }
 
     private void RunOnnxStep()
     {
         using Tensor<float> inputTensor =
-            new Tensor<float>(new TensorShape(1, 1, 20, 32));
+            new Tensor<float>(new TensorShape(1, 1, ModelMfccCount, ModelTargetWidth));
 
-        for (int m = 0; m < 20; m++)
+        for (int m = 0; m < ModelMfccCount; m++)
         {
-            for (int t = 0; t < 32; t++)
+            for (int t = 0; t < ModelTargetWidth; t++)
             {
                 inputTensor[0, 0, m, t] = cachedMfcc[m, t];
             }
@@ -205,6 +213,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         Tensor<float> output = worker.PeekOutput() as Tensor<float>;
         if (output == null)
         {
+            inferenceStatus = "ONNX output is unavailable";
             state = VoiceProcessState.Idle;
             return;
         }
@@ -213,6 +222,7 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         if (cachedOutput == null)
         {
+            inferenceStatus = "ONNX output readback failed";
             state = VoiceProcessState.Idle;
             return;
         }
@@ -220,6 +230,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         int predictedIndex = ArgMax(cachedOutput);
         cachedLabel = labels[predictedIndex];
         StoreInferenceDebugSnapshot(cachedOutput, cachedLabel, cachedVolume);
+        inferenceStatus = $"Completed: {cachedLabel}";
 
         state = VoiceProcessState.HandleResult;
     }
@@ -271,14 +282,14 @@ public class VoiceOnnxRunner : MonoBehaviour
 
     private void RunInferenceWithSamples(float[] samples, float volume)
     {
-        float[,] mfcc = featureExtractor.ExtractDummyMfcc(samples);
+        float[,] mfcc = featureExtractor.ExtractMfcc(samples, ModelMfccCount, ModelTargetWidth);
 
         using Tensor<float> inputTensor =
-            new Tensor<float>(new TensorShape(1, 1, 20, 32));
+            new Tensor<float>(new TensorShape(1, 1, ModelMfccCount, ModelTargetWidth));
 
-        for (int m = 0; m < 20; m++)
+        for (int m = 0; m < ModelMfccCount; m++)
         {
-            for (int t = 0; t < 32; t++)
+            for (int t = 0; t < ModelTargetWidth; t++)
             {
                 inputTensor[0, 0, m, t] = mfcc[m, t];
             }
@@ -375,6 +386,7 @@ public class VoiceOnnxRunner : MonoBehaviour
     {
         RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
         window.CreateMessage("Status", () => initializationStatus);
+        window.CreateMessage("Inference Status", () => inferenceStatus);
         window.CreateMessage("Process State", () => state.ToString());
         window.CreateMessage("Input Volume", () => latestInputVolume.ToString("F6"));
         window.CreateMessage("Prediction", () => hasInferenceResult ? latestLabel : "-");
@@ -424,6 +436,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         cachedOutput?.Dispose();
         cachedOutput = null;
         initializationStatus = "Disabled";
+        inferenceStatus = "Disabled";
     }
 
     private void OnDestroy()

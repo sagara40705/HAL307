@@ -18,6 +18,8 @@ public class OnStartPose : MonoBehaviour
     };
 
     private Animator _animator;
+    [Header("Animation")]
+    [SerializeField] private float animationSpeed = 1.0f;
 
     private void Awake()
     {
@@ -86,5 +88,13 @@ public class OnStartPose : MonoBehaviour
 
         Debug.LogWarning("[OnStartPose] Animator was not found.", this);
         return false;
+    }
+
+    private void Update()
+    {
+        if (_animator != null)
+        {
+            _animator.speed = animationSpeed;
+        }
     }
 }

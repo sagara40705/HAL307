@@ -172,6 +172,7 @@ public class WaveGaugeController : MonoBehaviour
     {
         isWaveFinalSuppressed = true;
         SetWaveFinalVisible(false);
+        ShowOtherUis();
     }
 
     private void SetupStageEndJudge()
@@ -217,9 +218,15 @@ public class WaveGaugeController : MonoBehaviour
         // 警告UIの表示状態を更新
         if (warningUI != null)
         {
-            warningUI.SetActive(currentValue <= warningThreshold);
-            //HideOtherUis();
+            warningUI.SetActive(true);
         }
+
+        if (warningAnimator != null)
+        {
+            warningAnimator.SetBool("IsWarning", true);
+        }
+
+        PlayGaugeEmptyTransition().Forget();
 
         PlayGaugeEmptyTransition().Forget();
     }

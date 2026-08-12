@@ -184,6 +184,7 @@ MonoBehaviour:
   - {fileID: 409311060}
   - {fileID: 1764857}
   - {fileID: 2119480822}
+  warningPresenter: {fileID: 0}
 --- !u!1 &36460463
 GameObject:
   m_ObjectHideFlags: 0
@@ -1677,6 +1678,9 @@ MonoBehaviour:
   _fireAnimObject: {fileID: 1491470896}
   _cutInObject: {fileID: 918885603}
   _cutInDisplayTime: 3
+  _firePresenter: {fileID: 0}
+  _cutInPresenter: {fileID: 0}
+  _uiPanelPresenter: {fileID: 0}
   uiPanel: {fileID: 1673124960}
 --- !u!4 &551905175
 Transform:
@@ -3247,6 +3251,9 @@ MonoBehaviour:
   enemy1ScoreDisplay: {fileID: 143103181}
   enemy2ScoreDisplay: {fileID: 810082269}
   feverGaugeController: {fileID: 551905174}
+  scoreUiPresenter: {fileID: 0}
+  showScoreUiOnStart: 1
+  playScoreUiOnScoreChanged: 0
 --- !u!224 &1041751640 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4762224450925470405, guid: 037d35f4770bcba43b0cbed74e127e45, type: 3}

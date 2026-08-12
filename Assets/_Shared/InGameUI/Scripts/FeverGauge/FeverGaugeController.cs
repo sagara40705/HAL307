@@ -18,6 +18,11 @@ public class FeverGaugeController : MonoBehaviour
     [SerializeField] private GameObject _cutInObject;
     [SerializeField] private float _cutInDisplayTime = 3f;
 
+    [Header("フィーバーUI出方調整")]
+    [SerializeField] private AdjustableUiPresenter _firePresenter;
+    [SerializeField] private AdjustableUiPresenter _cutInPresenter;
+    [SerializeField] private AdjustableUiPresenter _uiPanelPresenter;
+
     //feverの枠
     [SerializeField] private GameObject uiPanel;
 
@@ -44,6 +49,8 @@ public class FeverGaugeController : MonoBehaviour
 
     private void Start()
     {
+        CachePresenters();
+
         ResetFill();
         CreateDebugMenu();
 
@@ -59,19 +66,45 @@ public class FeverGaugeController : MonoBehaviour
 
     private void HideFeverObjects()
     {
-        if (_fireAnimObject != null)
+        HideUi(_fireAnimObject, _firePresenter, true);
+        HideUi(_cutInObject, _cutInPresenter, true);
+        HideUi(uiPanel, _uiPanelPresenter, true);
+    }
+
+    private void ShowUi(GameObject obj, AdjustableUiPresenter presenter)
+    {
+        if (presenter != null)
         {
-            _fireAnimObject.SetActive(false);
+            presenter.CaptureCurrentAsBase();
+            presenter.Show();
+            return;
         }
 
-        if (_cutInObject != null)
+        if (obj != null)
         {
-            _cutInObject.SetActive(false);
+            obj.SetActive(true);
+        }
+    }
+
+    private void HideUi(GameObject obj, AdjustableUiPresenter presenter, bool immediate = false)
+    {
+        if (presenter != null)
+        {
+            if (immediate)
+            {
+                presenter.HideImmediate();
+            }
+            else
+            {
+                presenter.Hide();
+            }
+
+            return;
         }
 
-        if (uiPanel != null)
+        if (obj != null)
         {
-            uiPanel.SetActive(false);
+            obj.SetActive(false);
         }
     }
 
@@ -154,15 +187,9 @@ public class FeverGaugeController : MonoBehaviour
 
         SetFill(1f);
 
-        if (_fireAnimObject != null)
-        {
-            _fireAnimObject.SetActive(true);
-        }
+        ShowUi(_fireAnimObject, _firePresenter);
+        ShowUi(uiPanel, _uiPanelPresenter);
 
-        if (uiPanel != null)
-        {
-            uiPanel.SetActive(true);
-        }
 
         Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
         Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.FeverBGM);
@@ -185,10 +212,7 @@ public class FeverGaugeController : MonoBehaviour
         _isFever = false;
         _feverTimer = 0f;
 
-        if (_fireAnimObject != null)
-        {
-            _fireAnimObject.SetActive(false);
-        }
+        HideUi(_fireAnimObject, _firePresenter);
 
         if (_cutInCoroutine != null)
         {
@@ -196,20 +220,15 @@ public class FeverGaugeController : MonoBehaviour
             _cutInCoroutine = null;
         }
 
-        if (_cutInObject != null)
-        {
-            _cutInObject.SetActive(false);
-        }
+        HideUi(_cutInObject, _cutInPresenter);
+
 
         if (_resetFillOnFeverEnd)
         {
             ResetFill();
         }
 
-        if (uiPanel != null)
-        {
-            uiPanel.SetActive(false);
-        }
+        HideUi(uiPanel, _uiPanelPresenter);
 
         Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.FeverBGM);
         Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
@@ -235,11 +254,12 @@ public class FeverGaugeController : MonoBehaviour
 
     private IEnumerator PlayCutInCoroutine()
     {
-        _cutInObject.SetActive(true);
+        ShowUi(_cutInObject, _cutInPresenter);
 
-        yield return new WaitForSeconds(_cutInDisplayTime);
+        yield return new WaitForSecondsRealtime(_cutInDisplayTime);
 
-        _cutInObject.SetActive(false);
+        HideUi(_cutInObject, _cutInPresenter);
+
         _cutInCoroutine = null;
     }
 
@@ -305,6 +325,25 @@ public class FeverGaugeController : MonoBehaviour
 
         ResetFill();
     }
+
+    private void CachePresenters()
+    {
+        if (_firePresenter == null && _fireAnimObject != null)
+        {
+            _firePresenter = _fireAnimObject.GetComponent<AdjustableUiPresenter>();
+        }
+
+        if (_cutInPresenter == null && _cutInObject != null)
+        {
+            _cutInPresenter = _cutInObject.GetComponent<AdjustableUiPresenter>();
+        }
+
+        if (_uiPanelPresenter == null && uiPanel != null)
+        {
+            _uiPanelPresenter = uiPanel.GetComponent<AdjustableUiPresenter>();
+        }
+    }
+
 
 }
 

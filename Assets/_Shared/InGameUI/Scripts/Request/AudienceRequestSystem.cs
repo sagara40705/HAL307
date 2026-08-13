@@ -12,13 +12,26 @@ namespace AudienceRequest
         [SerializeField] private bool _isTutorialMode = false;
 
         [SerializeField] private int _maxRequestCount = 3;
-        public int MaxRequestCount => _maxRequestCount;
+
+        public int MaxRequestCount
+        {
+            get
+            {
+                if (_levelDesignSettings != null)
+                {
+                    return _levelDesignSettings.MaxRequestCount;
+                }
+
+                return _maxRequestCount;
+            }
+        }
 
         [SerializeField] private int _currentRequestCount = 0;
         public int CurrentRequestCount => _currentRequestCount;
 
         [SerializeField] private AudienceRequests _audienceRequests; // リクエストのデータベース
         [SerializeField] private AudienceRequestUiPool _uiPool; // UIプールの参照
+        [SerializeField] private AudienceRequestLevelDesignSettings _levelDesignSettings;
         [SerializeField] private AudienceRequestContext _context;
 
         // フィーバーゲージ
@@ -73,12 +86,14 @@ namespace AudienceRequest
             {
                 _requestTimer += Time.deltaTime;
 
-                if (_requestTimer >= _requestInterval)
+                float interval = _levelDesignSettings != null
+                    ? _levelDesignSettings.NormalRequestInterval
+                    : _requestInterval;
+
+                if (_requestTimer >= interval)
                 {
                     _requestTimer = 0f;
                     GenerateRequest();
-
-                    Debug.Log("New request received! Current request count: " + _currentRequestCount);
                 }
             }
 
@@ -165,7 +180,11 @@ namespace AudienceRequest
 
             if (FullRequest()) { return; }
             // 生成できるリクエストの数を計算
-            int canSpawnCount = Mathf.Min(3, _maxRequestCount - _currentRequestCount);
+            int spawnCountPerWave = _levelDesignSettings != null
+                 ? _levelDesignSettings.SpawnCountPerWave
+                 : 3;
+
+            int canSpawnCount = Mathf.Min(spawnCountPerWave, MaxRequestCount - _currentRequestCount);
             if (canSpawnCount <= 0) { return; }
 
             // ランダムにリクエストを生成
@@ -179,15 +198,21 @@ namespace AudienceRequest
                 if (availableRequests.Count == 0) { break; }
 
                 // ランダムにリクエストを選ぶ
-                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
-                AudienceRequestEntry requestEntry = availableRequests[randomIndex];
-                availableRequests.RemoveAt(randomIndex);
+                PoseID poseID = GetRandomNormalRequestPose(availableRequests);
 
-                // もしリクエストがnullならスキップ
-                if (requestEntry == null) { continue; }
+                if (poseID == PoseID.None)
+                {
+                    continue;
+                }
 
-                // 
-                PoseID poseID = requestEntry.poseID;
+                AudienceRequestEntry requestEntry = availableRequests.Find(r => r.poseID == poseID);
+
+                if (requestEntry == null)
+                {
+                    continue;
+                }
+
+                availableRequests.Remove(requestEntry);
 
                 // 先にUI生成を試す
                 GameObject ui = _uiPool.Generate(poseID);
@@ -208,7 +233,7 @@ namespace AudienceRequest
         // リクエストが満杯かどうかをチェックする関数
         private bool FullRequest()
         {
-            return _currentRequestCount >= _maxRequestCount;
+            return _currentRequestCount >= MaxRequestCount;
         }
 
         // チュートリアルモードの設定
@@ -335,15 +360,22 @@ namespace AudienceRequest
 
             _blackRequestTimer += Time.deltaTime;
 
-            if (_blackRequestTimer < _blackRequestInterval)
+            float blackInterval = _levelDesignSettings != null
+              ? _levelDesignSettings.BlackRequestInterval
+              : _blackRequestInterval;
+
+            float blackChance = _levelDesignSettings != null
+                ? _levelDesignSettings.BlackRequestChance
+                : _blackRequestChance;
+
+            if (_blackRequestTimer < blackInterval)
             {
                 return;
             }
 
             _blackRequestTimer = 0f;
 
-            // 確率で黒リクエストを出す
-            if (UnityEngine.Random.value > _blackRequestChance)
+            if (UnityEngine.Random.value > blackChance)
             {
                 return;
             }
@@ -382,8 +414,12 @@ namespace AudienceRequest
                 return;
             }
 
-            int index = UnityEngine.Random.Range(0, candidates.Count);
-            PoseID selectedPoseID = candidates[index];
+            PoseID selectedPoseID = GetRandomBlackRequestPose(candidates);
+
+            if (selectedPoseID == PoseID.None)
+            {
+                return;
+            }
 
             GameObject blackUi = _uiPool.GenerateBlack(selectedPoseID);
 
@@ -426,5 +462,99 @@ namespace AudienceRequest
             Debug.Log("[AudienceRequestSystem] Black request cleared. Fake pose committed ID = " + committedPoseID);
         }
 
+        private PoseID GetRandomNormalRequestPose(List<AudienceRequestEntry> availableRequests)
+        {
+            if (_levelDesignSettings == null)
+            {
+                if (availableRequests == null || availableRequests.Count == 0)
+                {
+                    return PoseID.None;
+                }
+
+                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
+                return availableRequests[randomIndex].poseID;
+            }
+
+            List<RequestSpawnWeight> filteredWeights = new();
+
+            foreach (RequestSpawnWeight weight in _levelDesignSettings.NormalRequestWeights)
+            {
+                if (weight == null)
+                {
+                    continue;
+                }
+
+                if (!weight.IsEnabled)
+                {
+                    continue;
+                }
+
+                if (weight.Weight <= 0)
+                {
+                    continue;
+                }
+
+                bool exists = availableRequests.Exists(r => r.poseID == weight.PoseID);
+
+                if (!exists)
+                {
+                    continue;
+                }
+
+                filteredWeights.Add(weight);
+            }
+
+            if (filteredWeights.Count == 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
+                return availableRequests[randomIndex].poseID;
+            }
+
+            int totalWeight = 0;
+
+            foreach (RequestSpawnWeight weight in filteredWeights)
+            {
+                totalWeight += weight.Weight;
+            }
+
+            int randomValue = UnityEngine.Random.Range(0, totalWeight);
+            int current = 0;
+
+            foreach (RequestSpawnWeight weight in filteredWeights)
+            {
+                current += weight.Weight;
+
+                if (randomValue < current)
+                {
+                    return weight.PoseID;
+                }
+            }
+
+            return PoseID.None;
+        }
+
+        private PoseID GetRandomBlackRequestPose(List<PoseID> candidates)
+        {
+            if (candidates == null || candidates.Count == 0)
+            {
+                return PoseID.None;
+            }
+
+            if (_levelDesignSettings == null)
+            {
+                int index = UnityEngine.Random.Range(0, candidates.Count);
+                return candidates[index];
+            }
+
+            PoseID poseID = _levelDesignSettings.GetRandomBlackPoseFromCandidates(candidates);
+
+            if (poseID == PoseID.None)
+            {
+                int index = UnityEngine.Random.Range(0, candidates.Count);
+                return candidates[index];
+            }
+
+            return poseID;
+        }
     }
 }

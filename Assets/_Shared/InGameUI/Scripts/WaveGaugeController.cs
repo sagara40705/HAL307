@@ -22,6 +22,8 @@ public class WaveGaugeController : MonoBehaviour
     [Header("Wave演出時に非表示にするUI")]
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
 
+    [SerializeField] private AdjustableUiPresenter warningPresenter;
+
     private float currentValue;
     private bool isTransitionStarted;
 
@@ -56,11 +58,14 @@ public class WaveGaugeController : MonoBehaviour
         {
             warningAnimator = warningUI.GetComponent<Animator>();
         }
-        isWarningVisible = false;
-        if (warningUI != null)
+
+        if (warningPresenter == null && warningUI != null)
         {
-            warningUI.SetActive(false);
+            warningPresenter = warningUI.GetComponent<AdjustableUiPresenter>();
         }
+
+        isWarningVisible = false;
+        HideWarningUi(true);
 
         // StageEndJudgeの設定
         SetupStageEndJudge();
@@ -113,19 +118,9 @@ public class WaveGaugeController : MonoBehaviour
         // 状態が変わった時だけ処理する
         if (isWarningVisible != shouldShowWarning)
         {
-            isWarningVisible = shouldShowWarning;
+            SetWaveFinalVisible(shouldShowWarning);
 
-            if (warningUI != null)
-            {
-                warningUI.SetActive(isWarningVisible);
-            }
-
-            if (warningAnimator != null)
-            {
-                warningAnimator.SetBool("IsWarning", isWarningVisible);
-            }
-
-            if (isWarningVisible)
+            if (shouldShowWarning)
             {
                 HideOtherUis();
             }
@@ -172,6 +167,7 @@ public class WaveGaugeController : MonoBehaviour
     {
         isWaveFinalSuppressed = true;
         SetWaveFinalVisible(false);
+        ShowOtherUis();
     }
 
     private void SetupStageEndJudge()
@@ -215,11 +211,9 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         // 警告UIの表示状態を更新
-        if (warningUI != null)
-        {
-            warningUI.SetActive(currentValue <= warningThreshold);
-            //HideOtherUis();
-        }
+        SetWaveFinalVisible(true);
+
+        HideOtherUis();
 
         PlayGaugeEmptyTransition().Forget();
     }
@@ -248,7 +242,7 @@ public class WaveGaugeController : MonoBehaviour
         }
     }
 
-    private void SetWaveFinalVisible(bool isVisible)
+    private void SetWaveFinalVisible(bool isVisible, bool immediateHide = false)
     {
         isWarningVisible = isVisible;
 
@@ -257,9 +251,13 @@ public class WaveGaugeController : MonoBehaviour
             warningAnimator.SetBool("IsWarning", isVisible);
         }
 
-        if (warningUI != null)
+        if (isVisible)
         {
-            warningUI.SetActive(isVisible);
+            ShowWarningUi();
+        }
+        else
+        {
+            HideWarningUi(immediateHide);
         }
     }
 
@@ -267,5 +265,42 @@ public class WaveGaugeController : MonoBehaviour
     private async UniTaskVoid PlayGaugeEmptyTransition()
     {
         await TransitionManager.PlayDumbbellFadeOut();
+    }
+
+    private void ShowWarningUi()
+    {
+        if (warningPresenter != null)
+        {
+            warningPresenter.CaptureCurrentAsBase();
+            warningPresenter.Show();
+            return;
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(true);
+        }
+    }
+
+    private void HideWarningUi(bool immediate = false)
+    {
+        if (warningPresenter != null)
+        {
+            if (immediate)
+            {
+                warningPresenter.HideImmediate();
+            }
+            else
+            {
+                warningPresenter.Hide();
+            }
+
+            return;
+        }
+
+        if (warningUI != null)
+        {
+            warningUI.SetActive(false);
+        }
     }
 }

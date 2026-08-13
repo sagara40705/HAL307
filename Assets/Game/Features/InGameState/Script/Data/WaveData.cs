@@ -1,18 +1,17 @@
-using System;
 using Enemy;
 using UnityEngine;
 
-[Serializable]
-public sealed class WaveData
+[CreateAssetMenu(fileName = "WaveData", menuName = "Game/InGame/Wave Data")]
+public sealed class WaveData : ScriptableObject
 {
-    [SerializeField, Min(0)] private int targetScore;
+    [SerializeField] private InGamePresentationAction wavePrevAction;
     [SerializeField] private InGamePresentationAction waveStartAction;
     [SerializeField] private InGamePresentationAction waveTransitionAction;
     [SerializeField] private EnemyData replacementEnemyData;
     [SerializeField] private Vector3 replacementEnemyPosition;
     [SerializeField] private Vector3 replacementEnemyRotationEuler;
 
-    public int TargetScore => targetScore;
+    public InGamePresentationAction WavePrevAction => wavePrevAction;
     public InGamePresentationAction WaveStartAction => waveStartAction;
     public InGamePresentationAction WaveTransitionAction => waveTransitionAction;
     public EnemyData ReplacementEnemyData => replacementEnemyData;

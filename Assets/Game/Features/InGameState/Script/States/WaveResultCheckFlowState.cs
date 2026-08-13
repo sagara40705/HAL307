@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using static Sound.Manager.SoundManager;
 
 public enum WaveResultCheckResult
 {
@@ -12,16 +11,16 @@ public enum WaveResultCheckResult
 // StageEndJudge後のスコア判定State
 public sealed class WaveResultCheckFlowState : InGameFlowStateBase
 {
-    private readonly WaveData _waveData;
+    private readonly int _targetScore;
     private readonly int _currentScore;
     private readonly bool _hasNextWave;
 
     public WaveResultCheckResult Result { get; private set; }
     public bool IsTargetScoreReached { get; private set; }
 
-    public WaveResultCheckFlowState(WaveData waveData, int currentScore, bool hasNextWave)
+    public WaveResultCheckFlowState(int targetScore, int currentScore, bool hasNextWave)
     {
-        _waveData = waveData;
+        _targetScore = Mathf.Max(0, targetScore);
         _currentScore = currentScore;
         _hasNextWave = hasNextWave;
     }
@@ -29,25 +28,17 @@ public sealed class WaveResultCheckFlowState : InGameFlowStateBase
     // スコアと残りWave数による次の分岐判定
     public override IEnumerator Execute(InGameFlowContext context)
     {
-        if (_waveData == null)
-        {
-            Result = WaveResultCheckResult.GameEnd;
-            Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
-            Sound.Manager.SoundManager.Play((int)SceneSoundTag.ResultSound, (int)ResultSoundTag.ResultSE);
-            yield break;
-        }
-
-        IsTargetScoreReached = _currentScore >= _waveData.TargetScore;
+        IsTargetScoreReached = _currentScore >= _targetScore;
 
         if (!IsTargetScoreReached)
         {
-            Debug.Log($"[WaveResultCheckFlowState] Target score failed. Score={_currentScore}, Target={_waveData.TargetScore}");
+            Debug.Log($"[WaveResultCheckFlowState] Target score failed. Score={_currentScore}, Target={_targetScore}");
             Result = WaveResultCheckResult.GameEnd;
             yield break;
         }
 
         Result = _hasNextWave ? WaveResultCheckResult.NextWave : WaveResultCheckResult.GameEnd;
-        Debug.Log($"[WaveResultCheckFlowState] Target score reached. Score={_currentScore}, Target={_waveData.TargetScore}, Result={Result}");
+        Debug.Log($"[WaveResultCheckFlowState] Target score reached. Score={_currentScore}, Target={_targetScore}, Result={Result}");
         yield break;
     }
 }

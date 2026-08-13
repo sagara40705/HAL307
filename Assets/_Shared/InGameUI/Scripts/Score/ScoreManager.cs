@@ -8,6 +8,8 @@ public class ScoreManager : MonoBehaviour
     public int PlayerScore { get; private set; }
     public int Enemy1Score { get; private set; }
     public int Enemy2Score { get; private set; }
+    public int Enemy3Score { get; private set; }
+    public int Enemy4Score { get; private set; }
 
     [SerializeField] private int AddScore = 10;
 
@@ -73,6 +75,14 @@ public class ScoreManager : MonoBehaviour
         {
             Enemy2Score += score * AddScore;
         }
+        else if (slot == Enemy.EnemySlotId.Enemy3)
+        {
+            Enemy3Score += score * AddScore;
+        }
+        else if (slot == Enemy.EnemySlotId.Enemy4)
+        {
+            Enemy4Score += score * AddScore;
+        }
 
         OnScoreChanged?.Invoke();
     }
@@ -84,7 +94,17 @@ public class ScoreManager : MonoBehaviour
             return Enemy1Score;
         }
 
-        return Enemy2Score;
+        if (slot == Enemy.EnemySlotId.Enemy2)
+        {
+            return Enemy2Score;
+        }
+
+        if (slot == Enemy.EnemySlotId.Enemy3)
+        {
+            return Enemy3Score;
+        }
+
+        return slot == Enemy.EnemySlotId.Enemy4 ? Enemy4Score : 0;
     }
 
     public Enemy.EnemySlotId GetLowestEnemySlot()
@@ -102,6 +122,14 @@ public class ScoreManager : MonoBehaviour
         {
             Enemy2Score = 0;
         }
+        else if (slot == Enemy.EnemySlotId.Enemy3)
+        {
+            Enemy3Score = 0;
+        }
+        else if (slot == Enemy.EnemySlotId.Enemy4)
+        {
+            Enemy4Score = 0;
+        }
 
         OnScoreChanged?.Invoke();
     }
@@ -111,6 +139,8 @@ public class ScoreManager : MonoBehaviour
         PlayerScore = 0;
         Enemy1Score = 0;
         Enemy2Score = 0;
+        Enemy3Score = 0;
+        Enemy4Score = 0;
 
         OnScoreChanged?.Invoke();
     }

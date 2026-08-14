@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using static Sound.Manager.SoundManager;
 
 public class VoiceMainMenuController : MonoBehaviour
 {
@@ -136,6 +137,7 @@ public class VoiceMainMenuController : MonoBehaviour
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
                     MoveUp();
+//                    Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.MoveCursorSE);
                 }
                 break;
 
@@ -143,6 +145,7 @@ public class VoiceMainMenuController : MonoBehaviour
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
                     MoveDown();
+//                    Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.MoveCursorSE);
                 }
                 break;
 
@@ -150,6 +153,7 @@ public class VoiceMainMenuController : MonoBehaviour
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
                     Decide();
+//                    Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.DecideSE);
                 }
                 break;
         }
@@ -276,6 +280,8 @@ public class VoiceMainMenuController : MonoBehaviour
 
         UpdateSelection();
         Debug.Log("[VoiceMenuController] 上へ移動: " + currentIndex);
+
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.MoveCursorSE);
     }
 
     public void MoveDown()
@@ -294,6 +300,8 @@ public class VoiceMainMenuController : MonoBehaviour
 
         UpdateSelection();
         Debug.Log("[VoiceMenuController] 下へ移動: " + currentIndex);
+
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.MoveCursorSE);
     }
 
     public void Decide()
@@ -321,6 +329,8 @@ public class VoiceMainMenuController : MonoBehaviour
         }
 
         onDecideEvents[currentIndex]?.Invoke();
+
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.DecideSE);
     }
 
     private void UpdateSelection()

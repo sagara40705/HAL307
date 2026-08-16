@@ -93,7 +93,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
             return;
         }
 
-        enemyLineup.BeginLowestScoreEnemyReplacement(_waveData.ReplacementEnemyData, _waveData.ReplacementEnemyPosition, _waveData.ReplacementEnemyRotation);
+        enemyLineup.BeginWaveEnemyChange(_waveData.ReplacementEnemyData, _waveData.ReplacementEnemyPosition, _waveData.ReplacementEnemyRotation);
     }
 
     private void CommitPendingEnemyReplacement(InGameFlowContext context)

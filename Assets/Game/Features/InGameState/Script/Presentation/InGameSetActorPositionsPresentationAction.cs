@@ -7,6 +7,8 @@ public sealed class InGameSetActorPositionsPresentationAction : InGamePresentati
 {
     [SerializeField] private Vector3 enemy1Position;
     [SerializeField] private Vector3 enemy2Position;
+    [SerializeField] private Vector3 enemy3Position;
+    [SerializeField] private Vector3 enemy4Position;
     [SerializeField] private Vector3 playerPosition;
 
     public override IEnumerator Play(InGameFlowContext context)
@@ -14,14 +16,16 @@ public sealed class InGameSetActorPositionsPresentationAction : InGamePresentati
         EnemyLineupManager lineup = context != null ? context.EnemyLineup : null;
         Player.PlayerPoseContoroller player = Object.FindFirstObjectByType<Player.PlayerPoseContoroller>();
 
-        SetEnemyPosition(lineup, EnemySlotId.Enemy1, enemy1Position);
-        SetEnemyPosition(lineup, EnemySlotId.Enemy2, enemy2Position);
+        SetEnemyPosition(lineup, EnemySlotId.Enemy1, enemy1Position, true);
+        SetEnemyPosition(lineup, EnemySlotId.Enemy2, enemy2Position, true);
+        SetEnemyPosition(lineup, EnemySlotId.Enemy3, enemy3Position, false);
+        SetEnemyPosition(lineup, EnemySlotId.Enemy4, enemy4Position, false);
         SetPlayerPosition(player, playerPosition);
 
         yield break;
     }
 
-    private void SetEnemyPosition(EnemyLineupManager lineup, EnemySlotId slot, Vector3 position)
+    private void SetEnemyPosition(EnemyLineupManager lineup, EnemySlotId slot, Vector3 position, bool isRequired)
     {
         if (lineup == null)
         {
@@ -32,7 +36,11 @@ public sealed class InGameSetActorPositionsPresentationAction : InGamePresentati
         global::Enemy.Enemy enemy = lineup.GetEnemy(slot);
         if (enemy == null)
         {
-            Debug.LogWarning($"[InGameSetActorPositionsPresentationAction] Enemy was not found. Slot={slot}");
+            if (isRequired)
+            {
+                Debug.LogWarning($"[InGameSetActorPositionsPresentationAction] Enemy was not found. Slot={slot}");
+            }
+
             return;
         }
 

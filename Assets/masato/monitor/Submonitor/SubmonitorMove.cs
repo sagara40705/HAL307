@@ -17,8 +17,12 @@ public class SubmonitorMove : MonoBehaviour
     private Transform player;
     private Transform enemyL;
     private Transform enemyR;
+    private Transform enemy3;
+    private Transform enemy4;
     private Enemy.Enemy enemyLController;
     private Enemy.Enemy enemyRController;
+    private Enemy.Enemy enemy3Controller;
+    private Enemy.Enemy enemy4Controller;
     private Enemy.EnemyLineupManager enemyLineupManager;
     private Enemy.EnemyRegistry enemyRegistry;
 
@@ -30,6 +34,8 @@ public class SubmonitorMove : MonoBehaviour
     private bool wasPlayerPosing;
     private bool wasEnemyLPosing;
     private bool wasEnemyRPosing;
+    private bool wasEnemy3Posing;
+    private bool wasEnemy4Posing;
     private bool isPoseFocusActive;
 
     //移動の始点を格納する変数
@@ -215,6 +221,8 @@ public class SubmonitorMove : MonoBehaviour
 
         Enemy.Enemy enemy1 = enemyLineupManager.Enemy1;
         Enemy.Enemy enemy2 = enemyLineupManager.Enemy2;
+        Enemy.Enemy lineupEnemy3 = enemyLineupManager.Enemy3;
+        Enemy.Enemy lineupEnemy4 = enemyLineupManager.Enemy4;
 
         if (enemy1 != null)
         {
@@ -226,6 +234,18 @@ public class SubmonitorMove : MonoBehaviour
         {
             enemyRController = enemy2;
             enemyR = enemy2.transform;
+        }
+
+        if (lineupEnemy3 != null)
+        {
+            enemy3Controller = lineupEnemy3;
+            enemy3 = lineupEnemy3.transform;
+        }
+
+        if (lineupEnemy4 != null)
+        {
+            enemy4Controller = lineupEnemy4;
+            enemy4 = lineupEnemy4.transform;
         }
     }
 
@@ -258,6 +278,16 @@ public class SubmonitorMove : MonoBehaviour
                 enemyRController = enemy;
                 enemyR = enemy.transform;
             }
+            else if (enemy.name == Enemy.EnemySlotId.Enemy3.ToString())
+            {
+                enemy3Controller = enemy;
+                enemy3 = enemy.transform;
+            }
+            else if (enemy.name == Enemy.EnemySlotId.Enemy4.ToString())
+            {
+                enemy4Controller = enemy;
+                enemy4 = enemy.transform;
+            }
         }
     }
 
@@ -266,8 +296,10 @@ public class SubmonitorMove : MonoBehaviour
         bool isPlayerPosing = playerPoseController != null && playerPoseController.IsPosing;
         bool isEnemyLPosing = enemyLController != null && enemyLController.IsPosing;
         bool isEnemyRPosing = enemyRController != null && enemyRController.IsPosing;
+        bool isEnemy3Posing = enemy3Controller != null && enemy3Controller.IsPosing;
+        bool isEnemy4Posing = enemy4Controller != null && enemy4Controller.IsPosing;
 
-        //同フレームではPlayer、EnemyR、EnemyLの順で優先する
+        // 同フレームではPlayerを最優先し、番号が大きいEnemyを次に優先する
         Transform startedPoseTarget = null;
         if (isEnemyLPosing && !wasEnemyLPosing)
         {
@@ -276,6 +308,14 @@ public class SubmonitorMove : MonoBehaviour
         if (isEnemyRPosing && !wasEnemyRPosing)
         {
             startedPoseTarget = enemyR;
+        }
+        if (isEnemy3Posing && !wasEnemy3Posing)
+        {
+            startedPoseTarget = enemy3;
+        }
+        if (isEnemy4Posing && !wasEnemy4Posing)
+        {
+            startedPoseTarget = enemy4;
         }
         if (isPlayerPosing && !wasPlayerPosing)
         {
@@ -288,15 +328,15 @@ public class SubmonitorMove : MonoBehaviour
         }
         else if (!isPoseFocusActive)
         {
-            Transform posingTarget = GetPosingTarget(isPlayerPosing, isEnemyLPosing, isEnemyRPosing);
+            Transform posingTarget = GetPosingTarget(isPlayerPosing, isEnemyLPosing, isEnemyRPosing, isEnemy3Posing, isEnemy4Posing);
             if (posingTarget != null)
             {
                 FocusPosingActor(posingTarget);
             }
         }
-        else if (!IsTargetPosing(poseFocusTarget, isPlayerPosing, isEnemyLPosing, isEnemyRPosing))
+        else if (!IsTargetPosing(poseFocusTarget, isPlayerPosing, isEnemyLPosing, isEnemyRPosing, isEnemy3Posing, isEnemy4Posing))
         {
-            Transform posingTarget = GetPosingTarget(isPlayerPosing, isEnemyLPosing, isEnemyRPosing);
+            Transform posingTarget = GetPosingTarget(isPlayerPosing, isEnemyLPosing, isEnemyRPosing, isEnemy3Posing, isEnemy4Posing);
             if (posingTarget != null)
             {
                 FocusPosingActor(posingTarget);
@@ -316,6 +356,8 @@ public class SubmonitorMove : MonoBehaviour
         wasPlayerPosing = isPlayerPosing;
         wasEnemyLPosing = isEnemyLPosing;
         wasEnemyRPosing = isEnemyRPosing;
+        wasEnemy3Posing = isEnemy3Posing;
+        wasEnemy4Posing = isEnemy4Posing;
     }
 
     private void FocusPosingActor(Transform target)
@@ -330,7 +372,12 @@ public class SubmonitorMove : MonoBehaviour
         MoveToFront(target, false);
     }
 
-    private Transform GetPosingTarget(bool isPlayerPosing, bool isEnemyLPosing, bool isEnemyRPosing)
+    private Transform GetPosingTarget(
+        bool isPlayerPosing,
+        bool isEnemyLPosing,
+        bool isEnemyRPosing,
+        bool isEnemy3Posing,
+        bool isEnemy4Posing)
     {
         if (isPlayerPosing && player != null)
         {
@@ -344,6 +391,14 @@ public class SubmonitorMove : MonoBehaviour
         {
             return enemyR;
         }
+        if (isEnemy3Posing && enemy3 != null)
+        {
+            return enemy3;
+        }
+        if (isEnemy4Posing && enemy4 != null)
+        {
+            return enemy4;
+        }
 
         return null;
     }
@@ -352,7 +407,9 @@ public class SubmonitorMove : MonoBehaviour
         Transform target,
         bool isPlayerPosing,
         bool isEnemyLPosing,
-        bool isEnemyRPosing)
+        bool isEnemyRPosing,
+        bool isEnemy3Posing,
+        bool isEnemy4Posing)
     {
         if (target == null)
         {
@@ -361,7 +418,9 @@ public class SubmonitorMove : MonoBehaviour
 
         return (target == player && isPlayerPosing) ||
                (target == enemyL && isEnemyLPosing) ||
-               (target == enemyR && isEnemyRPosing);
+               (target == enemyR && isEnemyRPosing) ||
+               (target == enemy3 && isEnemy3Posing) ||
+               (target == enemy4 && isEnemy4Posing);
     }
 
     private void SetupCamera()

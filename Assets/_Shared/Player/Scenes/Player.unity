@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7270897789143926846, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8047012967296307844, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_LocalPosition.x
@@ -259,7 +259,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7270897789143926846, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8047012967296307844, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_LocalPosition.x
@@ -503,7 +503,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7270897789143926846, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8047012967296307844, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_LocalPosition.x
@@ -712,6 +712,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffc9b1100ef0698429ba30c897ad42dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Animation.Sandbox::OnStartPose
+  animationSpeed: 1
 --- !u!1 &1023944906
 GameObject:
   m_ObjectHideFlags: 0
@@ -1144,7 +1145,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7270897789143926846, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8047012967296307844, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1270,7 +1271,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7270897789143926846, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8047012967296307844, guid: 858490dd6596eb64c8c0e0d7e1f27453, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1388,15 +1389,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5374908690098615953, guid: 216512ff2becbe04986be23882ba2e7a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.3332834
+      value: 3.1
       objectReference: {fileID: 0}
     - target: {fileID: 5374908690098615953, guid: 216512ff2becbe04986be23882ba2e7a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.000000070491296
+      value: 1.733
       objectReference: {fileID: 0}
     - target: {fileID: 5374908690098615953, guid: 216512ff2becbe04986be23882ba2e7a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 17.006916
+      value: -18.829
       objectReference: {fileID: 0}
     - target: {fileID: 5374908690098615953, guid: 216512ff2becbe04986be23882ba2e7a, type: 3}
       propertyPath: m_LocalRotation.w

@@ -18,6 +18,7 @@ public class OnStartPose : MonoBehaviour
     };
 
     private Animator _animator;
+
     [Header("Animation")]
     [SerializeField] private float animationSpeed = 1.0f;
 
@@ -96,5 +97,15 @@ public class OnStartPose : MonoBehaviour
         {
             _animator.speed = animationSpeed;
         }
+    }
+
+    public void SetAnimationSpeed(float speed)
+    {
+        animationSpeed = speed;
+    }
+
+    public float GetAnimationSpeed()
+    {
+        return animationSpeed;
     }
 }

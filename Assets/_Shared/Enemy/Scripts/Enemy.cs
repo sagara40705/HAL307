@@ -88,11 +88,12 @@ namespace Enemy
         {
             if (_isPaused)
             {
-                float deltaTime = Time.deltaTime;
+                float animationSpeed = _data != null ? _data.AnimationSpeed : 1.0f;
+                float poseDeltaTime = Time.deltaTime * animationSpeed;
 
-                _poseElapsedTime += deltaTime;
-                _poseStateElapsedTime += deltaTime;
-                _currentPoseData?.PoseAction?.OnUpdate(this, deltaTime);
+                _poseElapsedTime += poseDeltaTime;
+                _poseStateElapsedTime += poseDeltaTime;
+                _currentPoseData?.PoseAction?.OnUpdate(this, poseDeltaTime);
 
                 if (!_isPoseCommitted && _currentPoseData != null && _poseElapsedTime >= _currentPoseData.CommitDelay)
                 {
@@ -103,14 +104,14 @@ namespace Enemy
 
                 if (_isPoseCommitted && !_hasEnemyRequestNotified)
                 {
-                    _parryGraceTimer -= deltaTime;
+                    _parryGraceTimer -= poseDeltaTime;
                     if (_parryGraceTimer <= 0f)
                     {
                         CompleteParryGrace();
                     }
                 }
 
-                _poseTimer -= deltaTime;
+                _poseTimer -= poseDeltaTime;
                 if (_poseTimer <= 0f)
                 {
                     OnUnpause();

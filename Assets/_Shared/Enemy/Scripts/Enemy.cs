@@ -141,8 +141,27 @@ namespace Enemy
 
             // EnemyDataを受け取る
             _data = data;
+            ApplyAnimationSpeed();
 
             _poseParryJudge = poseParryJudge;
+        }
+
+        // EnemyDataのアニメーション速度をAnimator管理コンポーネントへ反映
+        private void ApplyAnimationSpeed()
+        {
+            if (_data == null)
+            {
+                return;
+            }
+
+            OnStartPose animationController = GetComponentInChildren<OnStartPose>(true);
+            if (animationController == null)
+            {
+                Debug.LogWarning($"[Enemy] Animation speed was not applied. Reason=OnStartPose was not found. Enemy={name}", this);
+                return;
+            }
+
+            animationController.SetAnimationSpeed(_data.AnimationSpeed);
         }
 
         // Pose終了時の共通処理

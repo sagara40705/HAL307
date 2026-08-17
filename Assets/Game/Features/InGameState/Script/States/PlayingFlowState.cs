@@ -19,10 +19,11 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.WaveGauge?.ResetWaveGauge();
         context?.AudienceRequest?.ResetRequests();
         context?.ResetProgressFollowerPositions(_stageData);
+        int currentEnemyCount = context?.EnemyLineup?.CurrentEnemyCount ?? 0;
         BeginWaveEnemyReplacement(context);
 
 
-        InGamePresentationAction action = _waveData?.WaveStartAction;
+        InGamePresentationAction action = _waveData?.GetWaveStartAction(currentEnemyCount);
         if (action == null)
         {
             CommitPendingEnemyReplacement(context);

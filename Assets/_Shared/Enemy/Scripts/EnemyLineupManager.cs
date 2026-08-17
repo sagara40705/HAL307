@@ -37,6 +37,7 @@ namespace Enemy
         public Enemy Enemy3 => GetEnemy(EnemySlotId.Enemy3);
         public Enemy Enemy4 => GetEnemy(EnemySlotId.Enemy4);
         public int MaxEnemyCount => (int)_maxEnemyCount;
+        public int CurrentEnemyCount => CountCurrentEnemies();
         public bool HasPendingReplacement => _hasPendingReplacement;
         public EnemySlotId PendingReplacementSlot => _pendingReplacementSlot;
         public Enemy PendingOldEnemy => _pendingOldEnemy;
@@ -108,6 +109,21 @@ namespace Enemy
             _maxEnemyCount = maxEnemyCount == EnemyMaxCount.Four
                 ? EnemyMaxCount.Four
                 : EnemyMaxCount.Two;
+        }
+
+        // 確定済みのEnemy枠数を取得
+        private int CountCurrentEnemies()
+        {
+            int enemyCount = 0;
+            for (int slotNumber = 1; slotNumber <= MaxEnemyCount; slotNumber++)
+            {
+                if (GetEnemy((EnemySlotId)slotNumber) != null)
+                {
+                    enemyCount++;
+                }
+            }
+
+            return enemyCount;
         }
 
         // スコアが低い敵枠を取得

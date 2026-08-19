@@ -162,6 +162,9 @@ MonoBehaviour:
   MasssuruColor: {r: 0, g: 0, b: 0, a: 1}
   ParryColor: {r: 0, g: 0, b: 1, a: 1}
   moveDirection: {x: 1, y: 0, z: 0}
+  PowerPoint: 0
+  MassuruPont: 0
+  YaaPoint: 0
 --- !u!65 &524425866
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -685,6 +688,9 @@ MonoBehaviour:
   dir: {x: 1, y: 0, z: 0}
   timer: 0
   movetime: 5
+  enemyPrefab: {fileID: 0}
+  stopColor2: {r: 0.85660374, g: 0.050103195, b: 0.050103195, a: 1}
+  moveDirection: {x: 0, y: 0, z: 1}
 --- !u!1 &1941876884
 GameObject:
   m_ObjectHideFlags: 0

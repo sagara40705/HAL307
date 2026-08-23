@@ -56,45 +56,53 @@ public class VoiceMainMenuController : MonoBehaviour
 
     private void Update()
     {
-        if (!enableDebugKeyInput)
-        {
-            return;
-        }
-
         if (Keyboard.current == null)
         {
             return;
         }
 
-        if (WasPressed(openMenuKey))
+        if (enableDebugKeyInput && WasPressed(openMenuKey))
         {
             OpenMenu();
         }
 
-        if (WasPressed(closeMenuKey))
+        if (enableDebugKeyInput && WasPressed(closeMenuKey))
         {
             CloseMenu();
         }
 
-        if (requireOpenBeforeControl && !isMenuOpen)
+        if (requireOpenBeforeControl && !IsMenuControlAvailable())
         {
             return;
         }
 
-        if (WasPressed(upKey) || WasPressed(upKey2))
+        bool moveUp = Keyboard.current.upArrowKey.wasPressedThisFrame;
+        bool moveDown = Keyboard.current.downArrowKey.wasPressedThisFrame;
+
+        if (enableDebugKeyInput)
+        {
+            moveUp |= WasPressed(upKey) || WasPressed(upKey2);
+            moveDown |= WasPressed(downKey) || WasPressed(downKey2);
+        }
+
+        if (moveUp)
         {
             MoveUp();
         }
-
-        if (WasPressed(downKey) || WasPressed(downKey2))
+        else if (moveDown)
         {
             MoveDown();
         }
 
-        if (WasPressed(decideKey) || WasPressed(decideKey2))
+        if (enableDebugKeyInput && (WasPressed(decideKey) || WasPressed(decideKey2)))
         {
             Decide();
         }
+    }
+
+    private bool IsMenuControlAvailable()
+    {
+        return menuPanel != null ? menuPanel.activeInHierarchy : isMenuOpen;
     }
 
     private bool WasPressed(Key key)

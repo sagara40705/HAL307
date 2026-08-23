@@ -136,10 +136,9 @@ public class StageEndJudge : MonoBehaviour
     private void GiveCurrentWaveTargetScore()
     {
         InGameFlowController flowController = FindFirstObjectByType<InGameFlowController>();
-        WaveData currentWave = flowController != null ? flowController.CurrentWaveData : null;
-        if (currentWave == null)
+        if (flowController == null || flowController.CurrentWaveData == null)
         {
-            Debug.LogWarning("[StageEndJudge] Target score was not added. Reason=CurrentWaveData is null.");
+            Debug.LogWarning("[StageEndJudge] Target score was not added. Reason=Current wave is unavailable.");
             return;
         }
 
@@ -150,8 +149,9 @@ public class StageEndJudge : MonoBehaviour
             return;
         }
 
-        scoreManager.SetPlayerScoreAtLeast(currentWave.TargetScore);
-        Debug.Log($"[StageEndJudge] Player score forced to target. TargetScore={currentWave.TargetScore}");
+        int targetScore = flowController.CurrentTargetScore;
+        scoreManager.SetPlayerScoreAtLeast(targetScore);
+        Debug.Log($"[StageEndJudge] Player score forced to target. TargetScore={targetScore}");
     }
 
     private void CreateDebugMenu()

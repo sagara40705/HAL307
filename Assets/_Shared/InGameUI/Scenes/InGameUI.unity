@@ -183,8 +183,8 @@ MonoBehaviour:
   - {fileID: 794517802}
   - {fileID: 409311060}
   - {fileID: 1764857}
-  - {fileID: 918885603}
   - {fileID: 2119480822}
+  warningPresenter: {fileID: 0}
 --- !u!1 &36460463
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,6 +448,7 @@ MonoBehaviour:
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
   _uiPool: {fileID: 2063627353}
+  _levelDesignSettings: {fileID: 11400000, guid: 5822cca20e025cc45a8803150c9b5450, type: 2}
   _context: {fileID: 377689422}
   _feverGaugeController: {fileID: 551905174}
   _requestInterval: 2
@@ -1678,6 +1679,9 @@ MonoBehaviour:
   _fireAnimObject: {fileID: 1491470896}
   _cutInObject: {fileID: 918885603}
   _cutInDisplayTime: 3
+  _firePresenter: {fileID: 0}
+  _cutInPresenter: {fileID: 0}
+  _uiPanelPresenter: {fileID: 0}
   uiPanel: {fileID: 1673124960}
 --- !u!4 &551905175
 Transform:
@@ -2281,6 +2285,8 @@ RectTransform:
   m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 918885604}
+  - {fileID: 1673124963}
   - {fileID: 328744064}
   - {fileID: 773276577}
   - {fileID: 1088096276}
@@ -2578,7 +2584,7 @@ Animator:
   m_GameObject: {fileID: 811645271}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 47b4264192f4d714fadcdedd0e11a943, type: 2}
+  m_Controller: {fileID: 9100000, guid: 323543cd2de8b3640b34b359b53a48f8, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -3094,16 +3100,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 918885603}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.39999998, y: 0.39999998, z: 0.39999998}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1718496974}
+  m_Father: {fileID: 794517803}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -276, y: -104.80002}
   m_SizeDelta: {x: 1980, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &918885606
@@ -3246,6 +3252,9 @@ MonoBehaviour:
   enemy1ScoreDisplay: {fileID: 143103181}
   enemy2ScoreDisplay: {fileID: 810082269}
   feverGaugeController: {fileID: 551905174}
+  scoreUiPresenter: {fileID: 0}
+  showScoreUiOnStart: 1
+  playScoreUiOnScoreChanged: 0
 --- !u!224 &1041751640 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4762224450925470405, guid: 037d35f4770bcba43b0cbed74e127e45, type: 3}
@@ -4090,14 +4099,14 @@ RectTransform:
   m_GameObject: {fileID: 1673124960}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 19.121965, y: 10.724, z: 10.724}
+  m_LocalScale: {x: 7.648786, y: 4.2896, z: 4.2896}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1718496974}
+  m_Father: {fileID: 794517803}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -276, y: -104.80002}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1703384833
@@ -4209,8 +4218,6 @@ RectTransform:
   - {fileID: 409311061}
   - {fileID: 1764858}
   - {fileID: 811645272}
-  - {fileID: 918885604}
-  - {fileID: 1673124963}
   - {fileID: 794517803}
   m_Father: {fileID: 1162309330}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

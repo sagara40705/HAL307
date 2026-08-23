@@ -1,3 +1,7 @@
+using System.Collections;
+using Player;
+using Pose;
+using TaiyouVoiceAI;
 using UnityEngine;
 
 public class VoiceCommandAction : MonoBehaviour
@@ -13,58 +17,174 @@ public class VoiceCommandAction : MonoBehaviour
     [Header("Voice Gate")]
     [SerializeField] private float minimumDb = -20f;
     [SerializeField] private bool onlyHide = true;
+    [SerializeField] private float hideTime = 5f;
     [SerializeField] private bool logCommand = true;
+
+    [Header("Player")]
+    [SerializeField] private VoiceAiContext _voiceAiContext;
+    [SerializeField] private PlayerPoseContoroller _playerPoseController;
 
     private void Awake()
     {
-       
+        ResolvePlayerPoseController();
+    }
+
+    private void Start()
+    {
+        if (!ResolvePlayerPoseController())
+        {
+            Debug.LogError("[VoiceCommandAction] PlayerPoseContoroller was not found through VoiceAiContext.");
+        }
     }
 
     public void ExecuteCommand(string command, float volume)
     {
-        if (string.IsNullOrWhiteSpace(command) || command == "none")
+        if (string.IsNullOrWhiteSpace(command))
         {
             return;
         }
 
+        command = command.Trim().ToLowerInvariant();
+
         float db = VolumeToDb(volume);
+
         if (db < minimumDb)
         {
             if (logCommand)
             {
-                Debug.Log($"[Voice] ignored small input command={command} db={db:F1}");
+                Debug.Log(
+                    $"[Voice] ignored small input command={command} db={db:F1}"
+                );
             }
+
             return;
         }
 
         if (logCommand)
         {
-            Debug.Log($"[Voice] command={command} volume={volume:F4} db={db:F1}");
+            Debug.Log(
+                $"[Voice] command={command} volume={volume:F4} db={db:F1}"
+            );
         }
 
         if (IsMenuCommand(command))
         {
-            //menuController.ExecuteVoiceCommand(command);
+            // menuController.ExecuteVoiceCommand(command);
             return;
         }
 
         switch (command)
         {
+            case "none":
+                {
+                    int random = Random.Range(0, 3);
+
+                    if (logCommand)
+                    {
+                        Debug.Log("[Voice] none random index = " + random);
+                    }
+
+                    switch (random)
+                    {
+                        case 0:
+                            HideOrDestroy(powerObject, "power");
+                            TryStartPlayerPose(PoseID.Pose_Power, "power");
+                            break;
+
+                        case 1:
+                            HideOrDestroy(yaaObject, "yaa");
+                            TryStartPlayerPose(PoseID.Pose_Yaa, "yaa");
+                            break;
+
+                        case 2:
+                            HideOrDestroy(muscleObject, "muscle");
+                            TryStartPlayerPose(PoseID.Pose_Muscle, "muscle");
+                            break;
+                    }
+
+                    break;
+                }
+
             case "power":
                 HideOrDestroy(powerObject, "power");
+                TryStartPlayerPose(PoseID.Pose_Power, command);
                 break;
+
             case "yaa":
                 HideOrDestroy(yaaObject, "yaa");
+                TryStartPlayerPose(PoseID.Pose_Yaa, command);
                 break;
+
             case "muscle":
                 HideOrDestroy(muscleObject, "muscle");
+                TryStartPlayerPose(PoseID.Pose_Muscle, command);
+                break;
+
+            default:
+                if (logCommand)
+                {
+                    Debug.LogWarning(
+                        "[Voice] Unknown command: " + command
+                    );
+                }
                 break;
         }
     }
 
+    private bool TryStartPlayerPose(PoseID poseID, string command)
+    {
+        if (!ResolvePlayerPoseController())
+        {
+            Debug.LogWarning($"[VoiceCommandAction] Player pose skipped. Reason=PlayerPoseContoroller not found. Command={command}");
+            return false;
+        }
+
+        if (InGameFlowLock.IsPresentationPlaying)
+        {
+            Debug.Log($"[VoiceCommandAction] Player pose skipped. Reason=Presentation is playing. Command={command}");
+            return false;
+        }
+
+        if (_playerPoseController.IsPosing)
+        {
+            Debug.Log($"[VoiceCommandAction] Player pose skipped. Reason=Player is already posing. Command={command}");
+            return false;
+        }
+
+        _playerPoseController.TryOnPose(poseID);
+        Debug.Log($"[VoiceCommandAction] Player pose started. Command={command}, Pose={poseID}");
+        return true;
+    }
+
+    private bool ResolvePlayerPoseController()
+    {
+        if (_playerPoseController != null)
+        {
+            return true;
+        }
+
+        if (_voiceAiContext == null)
+        {
+            _voiceAiContext = FindFirstObjectByType<VoiceAiContext>();
+        }
+
+        PlayerContext playerContext = _voiceAiContext?.GetPlayerContext();
+        _playerPoseController = playerContext?.GetPlayerPoseContoroller;
+
+        if (_playerPoseController == null)
+        {
+            _playerPoseController = FindFirstObjectByType<PlayerPoseContoroller>();
+        }
+
+        return _playerPoseController != null;
+    }
+
     private static bool IsMenuCommand(string command)
     {
-        return command == "ue" || command == "sita" || command == "kettei" || command == "time";
+        return command == "ue" ||
+               command == "sita" ||
+               command == "kettei" ||
+               command == "time";
     }
 
     private void HideOrDestroy(GameObject obj, string label)
@@ -77,13 +197,42 @@ public class VoiceCommandAction : MonoBehaviour
 
         if (onlyHide)
         {
+            if (!obj.activeSelf)
+            {
+                return;
+            }
+
             obj.SetActive(false);
-            Debug.Log(label + " hidden.");
+            StartCoroutine(ShowAfterDelay(obj));
+
+            if (logCommand)
+            {
+                Debug.Log(label + " hidden.");
+            }
         }
         else
         {
             Destroy(obj);
-            Debug.Log(label + " destroyed.");
+
+            if (logCommand)
+            {
+                Debug.Log(label + " destroyed.");
+            }
+        }
+    }
+
+    private IEnumerator ShowAfterDelay(GameObject obj)
+    {
+        yield return new WaitForSeconds(hideTime);
+
+        if (obj != null)
+        {
+            obj.SetActive(true);
+
+            if (logCommand)
+            {
+                Debug.Log(obj.name + " shown.");
+            }
         }
     }
 

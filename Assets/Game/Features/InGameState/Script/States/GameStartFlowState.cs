@@ -17,7 +17,7 @@ public sealed class GameStartFlowState : InGameFlowStateBase
     {
         IsPresentationFinished = false;
 
-        if (_stageData != null && _stageData.HasInitialEnemies)
+        if (_stageData != null)
         {
             if (context == null || context.EnemyLineup == null)
             {
@@ -25,7 +25,10 @@ public sealed class GameStartFlowState : InGameFlowStateBase
             }
             else
             {
-                context.EnemyLineup.SetupInitialEnemies(_stageData.InitialEnemies);
+                context.EnemyLineup.SetupInitialEnemies(
+                    _stageData.InitialEnemies,
+                    _stageData.InitialEnemyCount,
+                    _stageData.MaxEnemyCount);
             }
         }
 

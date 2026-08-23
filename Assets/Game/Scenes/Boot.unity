@@ -311,6 +311,7 @@ GameObject:
   m_Component:
   - component: {fileID: 909709787}
   - component: {fileID: 909709786}
+  - component: {fileID: 909709788}
   m_Layer: 0
   m_Name: SoundManagerObj
   m_TagString: Untagged
@@ -325,7 +326,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 909709785}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 185c727ac1f2ea64aba5a5d400fb8e03, type: 3}
   m_Name: 
@@ -352,6 +353,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &909709788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909709785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b47e1c5036d5d1a42a692261dc8f6716, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Sound.Manager.SoundManager
 --- !u!1 &1300418828
 GameObject:
   m_ObjectHideFlags: 0
@@ -688,10 +701,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f529aa944b914449d62b8c40f188fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CriMw.CriWare.Runtime::CriWare.CriAtom
-  acfFile: 
+  acfFile: HAL307.acf
   cueSheets:
-  - name: CueSheet_0
-    acbFile: CueSheet_0.acb
+  - name: InGameCueSheet
+    acbFile: InGameCueSheet.acb
+    awbFile: InGameCueSheet.awb
+    loaderStatus: 0
+  - name: IntroCueSheet
+    acbFile: IntroCueSheet.acb
+    awbFile: IntroCueSheet.awb
+    loaderStatus: 0
+  - name: TitleCueSheet
+    acbFile: TitleCueSheet.acb
+    awbFile: TitleCueSheet.awb
+    loaderStatus: 0
+  - name: ResultCueSheet
+    acbFile: ResultCueSheet.acb
     awbFile: 
     loaderStatus: 0
   dspBusSetting: 

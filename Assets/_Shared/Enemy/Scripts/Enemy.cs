@@ -88,11 +88,12 @@ namespace Enemy
         {
             if (_isPaused)
             {
-                float deltaTime = Time.deltaTime;
+                float animationSpeed = _data != null ? _data.AnimationSpeed : 1.0f;
+                float poseDeltaTime = Time.deltaTime * animationSpeed;
 
-                _poseElapsedTime += deltaTime;
-                _poseStateElapsedTime += deltaTime;
-                _currentPoseData?.PoseAction?.OnUpdate(this, deltaTime);
+                _poseElapsedTime += poseDeltaTime;
+                _poseStateElapsedTime += poseDeltaTime;
+                _currentPoseData?.PoseAction?.OnUpdate(this, poseDeltaTime);
 
                 if (!_isPoseCommitted && _currentPoseData != null && _poseElapsedTime >= _currentPoseData.CommitDelay)
                 {
@@ -103,14 +104,14 @@ namespace Enemy
 
                 if (_isPoseCommitted && !_hasEnemyRequestNotified)
                 {
-                    _parryGraceTimer -= deltaTime;
+                    _parryGraceTimer -= poseDeltaTime;
                     if (_parryGraceTimer <= 0f)
                     {
                         CompleteParryGrace();
                     }
                 }
 
-                _poseTimer -= deltaTime;
+                _poseTimer -= poseDeltaTime;
                 if (_poseTimer <= 0f)
                 {
                     OnUnpause();
@@ -141,8 +142,27 @@ namespace Enemy
 
             // EnemyDataを受け取る
             _data = data;
+            ApplyAnimationSpeed();
 
             _poseParryJudge = poseParryJudge;
+        }
+
+        // EnemyDataのアニメーション速度をAnimator管理コンポーネントへ反映
+        private void ApplyAnimationSpeed()
+        {
+            if (_data == null)
+            {
+                return;
+            }
+
+            OnStartPose animationController = GetComponentInChildren<OnStartPose>(true);
+            if (animationController == null)
+            {
+                Debug.LogWarning($"[Enemy] Animation speed was not applied. Reason=OnStartPose was not found. Enemy={name}", this);
+                return;
+            }
+
+            animationController.SetAnimationSpeed(_data.AnimationSpeed);
         }
 
         // Pose終了時の共通処理

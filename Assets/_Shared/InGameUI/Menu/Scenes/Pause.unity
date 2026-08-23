@@ -783,7 +783,6 @@ MonoBehaviour:
   howToPanel: {fileID: 303607548}
   howToImage: {fileID: 1238506505}
   pages:
-  - {fileID: 21300000, guid: 21a3ca9320fbf0347bb0f8973f6375d5, type: 3}
   - {fileID: 21300000, guid: ab2a204eba741474784895a2116793b2, type: 3}
   - {fileID: 21300000, guid: ef02f290143454146a421e93c5f8aec8, type: 3}
   - {fileID: 21300000, guid: 1c6300f7947a57744905c7fed615fca2, type: 3}
@@ -3580,8 +3579,8 @@ MonoBehaviour:
   minVolumeThreshold: 0.02
   requireHoldToTalk: 0
   holdToTalkKey: 36
-  logPrediction: 0
-  logScores: 0
+  logPrediction: 1
+  logScores: 1
   ignoreNone: 0
   commandCooldown: 0.8
 --- !u!114 &1796446401
@@ -4083,7 +4082,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!20 &2080553599
 Camera:
   m_ObjectHideFlags: 0

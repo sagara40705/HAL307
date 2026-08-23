@@ -1361,6 +1361,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2100000002}
   - component: {fileID: 2100000003}
+  - component: {fileID: 2100000004}
   m_Layer: 0
   m_Name: ResultSceneContext
   m_TagString: Untagged
@@ -1402,6 +1403,18 @@ MonoBehaviour:
   parrySuccessCount: 0
   score: 0
   hasCompletedResult: 0
+--- !u!114 &2100000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87b57ff6a3fa408296c2788d59a3e3b5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ResultPhaseInput
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

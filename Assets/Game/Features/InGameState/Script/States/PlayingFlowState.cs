@@ -6,11 +6,13 @@ public sealed class PlayingFlowState : InGameFlowStateBase
 {
     private readonly StageData _stageData;
     private readonly WaveData _waveData;
+    private readonly float _enemyAnimationSpeed;
 
-    public PlayingFlowState(StageData stageData, WaveData waveData)
+    public PlayingFlowState(StageData stageData, WaveData waveData, float enemyAnimationSpeed)
     {
         _stageData = stageData;
         _waveData = waveData;
+        _enemyAnimationSpeed = Mathf.Max(0f, enemyAnimationSpeed);
     }
 
     // Wave開始演出の実行
@@ -100,11 +102,6 @@ public sealed class PlayingFlowState : InGameFlowStateBase
 
     private void ApplyWaveAnimationSpeed(InGameFlowContext context)
     {
-        if (_waveData == null)
-        {
-            return;
-        }
-
         Enemy.EnemyLineupManager enemyLineup = context != null ? context.EnemyLineup : null;
         if (enemyLineup == null)
         {
@@ -112,7 +109,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
             return;
         }
 
-        enemyLineup.SetAllEnemyAnimationSpeed(_waveData.AnimationSpeed);
+        enemyLineup.SetAllEnemyAnimationSpeed(_enemyAnimationSpeed);
     }
 
     private void CommitPendingEnemyReplacement(InGameFlowContext context)

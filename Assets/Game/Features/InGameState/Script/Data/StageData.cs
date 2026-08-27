@@ -106,6 +106,20 @@ public sealed class StageData : ScriptableObject
         return entry != null ? entry.TargetScore : 0;
     }
 
+    // Wave番号に対応する全Enemy共通アニメーション速度を取得
+    public float GetEnemyAnimationSpeed(int waveIndex)
+    {
+        if (waveIndex < 0)
+        {
+            return 1f;
+        }
+
+        StageWaveEntry entry = endlessMode
+            ? endlessFirstWave
+            : GetWaveEntryOrNull(waveIndex);
+        return entry != null ? entry.EnemyAnimationSpeed : 1f;
+    }
+
     // Wave番号の存在確認
     public bool HasWave(int waveIndex)
     {

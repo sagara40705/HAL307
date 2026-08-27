@@ -10,6 +10,11 @@ public sealed class WaveData : ScriptableObject
     [InspectorName("Wave Start Action (4 Enemies)")]
     [SerializeField] private InGamePresentationAction waveStartActionWhenFourEnemies;
     [SerializeField] private InGamePresentationAction waveTransitionAction;
+
+    [Header("Animation")]
+    [SerializeField, Min(0f)] private float animationSpeed = 1.0f;
+
+    [Header("Enemy")]
     [SerializeField] private EnemyData replacementEnemyData;
     [SerializeField] private Vector3 replacementEnemyPosition;
     [SerializeField] private Vector3 replacementEnemyRotationEuler;
@@ -18,6 +23,7 @@ public sealed class WaveData : ScriptableObject
     public InGamePresentationAction WaveStartAction => waveStartAction;
     public InGamePresentationAction WaveStartActionWhenFourEnemies => waveStartActionWhenFourEnemies;
     public InGamePresentationAction WaveTransitionAction => waveTransitionAction;
+    public float AnimationSpeed => Mathf.Max(0f, animationSpeed);
     public EnemyData ReplacementEnemyData => replacementEnemyData;
     public Vector3 ReplacementEnemyPosition => replacementEnemyPosition;
     public Quaternion ReplacementEnemyRotation => Quaternion.Euler(replacementEnemyRotationEuler);

@@ -21,6 +21,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.ResetProgressFollowerPositions(_stageData);
         int currentEnemyCount = context?.EnemyLineup?.CurrentEnemyCount ?? 0;
         BeginWaveEnemyReplacement(context);
+        ApplyWaveAnimationSpeed(context);
 
 
         InGamePresentationAction action = _waveData?.GetWaveStartAction(currentEnemyCount);
@@ -95,6 +96,23 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         }
 
         enemyLineup.BeginWaveEnemyChange(_waveData.ReplacementEnemyData, _waveData.ReplacementEnemyPosition, _waveData.ReplacementEnemyRotation);
+    }
+
+    private void ApplyWaveAnimationSpeed(InGameFlowContext context)
+    {
+        if (_waveData == null)
+        {
+            return;
+        }
+
+        Enemy.EnemyLineupManager enemyLineup = context != null ? context.EnemyLineup : null;
+        if (enemyLineup == null)
+        {
+            Debug.LogWarning("[PlayingFlowState] Animation speed was not applied. Reason=EnemyLineupManager is null.");
+            return;
+        }
+
+        enemyLineup.SetAllEnemyAnimationSpeed(_waveData.AnimationSpeed);
     }
 
     private void CommitPendingEnemyReplacement(InGameFlowContext context)

@@ -40,6 +40,7 @@ namespace Enemy
         private bool _isPoseCommitted = false;
         private bool _hasEnemyRequestNotified = false;
         private bool _isPoseTracked = false;
+        private float _animationSpeed = 1.0f;
 
         // パリイ関連
         private bool _isParried = false;
@@ -54,6 +55,7 @@ namespace Enemy
         public EnemyPoseState PoseState => _poseState;
         public float PoseStateElapsedTime => _poseStateElapsedTime;
         public bool IsPosing => _isPaused;
+        public float AnimationSpeed => _animationSpeed;
 
         private Animator animator;
         public Animator GetAnimator => animator;
@@ -88,8 +90,7 @@ namespace Enemy
         {
             if (_isPaused)
             {
-                float animationSpeed = _data != null ? _data.AnimationSpeed : 1.0f;
-                float poseDeltaTime = Time.deltaTime * animationSpeed;
+                float poseDeltaTime = Time.deltaTime * _animationSpeed;
 
                 _poseElapsedTime += poseDeltaTime;
                 _poseStateElapsedTime += poseDeltaTime;
@@ -142,18 +143,14 @@ namespace Enemy
 
             // EnemyDataを受け取る
             _data = data;
-            ApplyAnimationSpeed();
 
             _poseParryJudge = poseParryJudge;
         }
 
-        // EnemyDataのアニメーション速度をAnimator管理コンポーネントへ反映
-        private void ApplyAnimationSpeed()
+        // Wave共通のアニメーション速度をAnimatorとPose進行へ反映
+        public void SetAnimationSpeed(float animationSpeed)
         {
-            if (_data == null)
-            {
-                return;
-            }
+            _animationSpeed = Mathf.Max(0f, animationSpeed);
 
             OnStartPose animationController = GetComponentInChildren<OnStartPose>(true);
             if (animationController == null)
@@ -162,7 +159,7 @@ namespace Enemy
                 return;
             }
 
-            animationController.SetAnimationSpeed(_data.AnimationSpeed);
+            animationController.SetAnimationSpeed(_animationSpeed);
         }
 
         // Pose終了時の共通処理

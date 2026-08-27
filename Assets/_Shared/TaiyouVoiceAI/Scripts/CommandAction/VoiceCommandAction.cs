@@ -1,9 +1,16 @@
 using UnityEngine;
+using Player;
+using Pose;
+using TaiyouVoiceAI;
 
 public class VoiceCommandAction : MonoBehaviour
 {
     [Header("Menu")]
     //[SerializeField] private VoiceMenuController menuController;
+
+    [Header("Player Pose")]
+    [SerializeField] private VoiceAiContext voiceAiContext;
+    [SerializeField] private PlayerPoseContoroller playerPoseController;
 
     [Header("Legacy Objects")]
     [SerializeField] private GameObject powerObject;
@@ -11,29 +18,34 @@ public class VoiceCommandAction : MonoBehaviour
     [SerializeField] private GameObject muscleObject;
 
     [Header("Voice Gate")]
-    [SerializeField] private float minimumDb = -20f;
+    [SerializeField] private float minimumDb = -60f;
     [SerializeField] private bool onlyHide = true;
     [SerializeField] private bool logCommand = true;
 
     private void Awake()
     {
-       
+        ResolvePlayerPoseController();
     }
 
     public void ExecuteCommand(string command, float volume)
     {
+        Debug.Log($"[ActionTrace] VoiceCommandAction.ExecuteCommand entered. command={command}, volume={volume:F8}, object={name}, scene={gameObject.scene.name}, activeSelf={gameObject.activeSelf}, activeInHierarchy={gameObject.activeInHierarchy}, enabled={enabled}");
+
         if (string.IsNullOrWhiteSpace(command) || command == "none")
         {
+            Debug.Log("[ActionTrace] VoiceCommandAction return. reason=empty command or none");
             return;
         }
 
         float db = VolumeToDb(volume);
+        Debug.Log($"[ActionTrace] VoiceCommandAction gate. command={command}, db={db:F2}, minimumDb={minimumDb:F2}, belowMinimum={db < minimumDb}");
         if (db < minimumDb)
         {
             if (logCommand)
             {
                 Debug.Log($"[Voice] ignored small input command={command} db={db:F1}");
             }
+            Debug.Log("[ActionTrace] VoiceCommandAction return. reason=db below minimumDb");
             return;
         }
 
@@ -44,6 +56,7 @@ public class VoiceCommandAction : MonoBehaviour
 
         if (IsMenuCommand(command))
         {
+            Debug.Log($"[ActionTrace] VoiceCommandAction return. reason=menu command command={command}");
             //menuController.ExecuteVoiceCommand(command);
             return;
         }
@@ -51,15 +64,54 @@ public class VoiceCommandAction : MonoBehaviour
         switch (command)
         {
             case "power":
+                Debug.Log("[ActionTrace] VoiceCommandAction branch=power");
+                TryExecutePose(PoseID.Pose_Power);
                 HideOrDestroy(powerObject, "power");
                 break;
             case "yaa":
+                Debug.Log("[ActionTrace] VoiceCommandAction branch=yaa");
+                TryExecutePose(PoseID.Pose_Yaa);
                 HideOrDestroy(yaaObject, "yaa");
                 break;
             case "muscle":
+                Debug.Log("[ActionTrace] VoiceCommandAction branch=muscle");
+                TryExecutePose(PoseID.Pose_Muscle);
                 HideOrDestroy(muscleObject, "muscle");
                 break;
+            default:
+                Debug.Log($"[ActionTrace] VoiceCommandAction switch default. command={command}");
+                break;
         }
+    }
+
+    private void TryExecutePose(PoseID poseID)
+    {
+        ResolvePlayerPoseController();
+
+        if (playerPoseController == null)
+        {
+            Debug.LogWarning($"[ActionTrace] PlayerPoseContoroller is not assigned. pose={poseID}");
+            return;
+        }
+
+        Debug.Log($"[ActionTrace] PlayerPoseContoroller.TryOnPose before. pose={poseID}, target={playerPoseController.name}, scene={playerPoseController.gameObject.scene.name}, activeSelf={playerPoseController.gameObject.activeSelf}, activeInHierarchy={playerPoseController.gameObject.activeInHierarchy}, enabled={playerPoseController.enabled}");
+        playerPoseController.TryOnPose(poseID);
+        Debug.Log($"[ActionTrace] PlayerPoseContoroller.TryOnPose after. pose={poseID}");
+    }
+
+    private void ResolvePlayerPoseController()
+    {
+        if (playerPoseController != null)
+        {
+            return;
+        }
+
+        if (voiceAiContext == null)
+        {
+            voiceAiContext = FindFirstObjectByType<VoiceAiContext>();
+        }
+
+        playerPoseController = voiceAiContext?.GetPlayerContext()?.GetPlayerPoseContoroller;
     }
 
     private static bool IsMenuCommand(string command)
@@ -72,18 +124,23 @@ public class VoiceCommandAction : MonoBehaviour
         if (obj == null)
         {
             Debug.LogWarning(label + " target is not assigned.");
+            Debug.LogWarning($"[ActionTrace] HideOrDestroy skipped. label={label}, target=null");
             return;
         }
+
+        Debug.Log($"[ActionTrace] HideOrDestroy target. label={label}, target={obj.name}, scene={obj.scene.name}, activeSelf={obj.activeSelf}, activeInHierarchy={obj.activeInHierarchy}, onlyHide={onlyHide}");
 
         if (onlyHide)
         {
             obj.SetActive(false);
             Debug.Log(label + " hidden.");
+            Debug.Log($"[ActionTrace] HideOrDestroy after hide. label={label}, target={obj.name}, activeSelf={obj.activeSelf}, activeInHierarchy={obj.activeInHierarchy}");
         }
         else
         {
             Destroy(obj);
             Debug.Log(label + " destroyed.");
+            Debug.Log($"[ActionTrace] HideOrDestroy after destroy requested. label={label}, target={obj.name}");
         }
     }
 

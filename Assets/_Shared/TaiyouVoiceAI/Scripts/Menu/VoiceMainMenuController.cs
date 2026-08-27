@@ -119,38 +119,62 @@ public class VoiceMainMenuController : MonoBehaviour
     /// </summary>
     public void OnVoiceCommand(string command)
     {
+        Debug.Log($"[MenuVoiceTrace] VoiceMainMenuController.OnVoiceCommand entered. command={command}, isMenuOpen={isMenuOpen}, requireOpenBeforeControl={requireOpenBeforeControl}, object={name}, scene={gameObject.scene.name}, activeSelf={gameObject.activeSelf}, activeInHierarchy={gameObject.activeInHierarchy}, enabled={enabled}");
+
         if (string.IsNullOrWhiteSpace(command))
         {
+            Debug.Log("[MenuVoiceTrace] VoiceMainMenuController.OnVoiceCommand return. reason=empty command");
             return;
         }
 
         command = command.Trim().ToLowerInvariant();
+        Debug.Log($"[MenuVoiceTrace] VoiceMainMenuController.OnVoiceCommand normalized command={command}");
 
         switch (command)
         {
             case "time":
+                Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=time -> OpenMenu");
                 OpenMenu();
                 break;
 
             case "ue":
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=ue -> MoveUp");
                     MoveUp();
+                }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=ue skipped. reason=menu not open");
                 }
                 break;
 
             case "sita":
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=sita -> MoveDown");
                     MoveDown();
+                }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=sita skipped. reason=menu not open");
                 }
                 break;
 
             case "kettei":
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=kettei -> Decide");
                     Decide();
                 }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=kettei skipped. reason=menu not open");
+                }
+                break;
+
+            default:
+                Debug.Log($"[MenuVoiceTrace] VoiceMainMenuController command unsupported. command={command}");
                 break;
         }
     }

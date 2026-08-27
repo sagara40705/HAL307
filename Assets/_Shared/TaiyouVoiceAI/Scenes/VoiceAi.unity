@@ -150,8 +150,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TaiyouVoiceAI.VoiceAiContext
   _onlyMyScene: 0
   _initalize: 0
-  _playerSceneName: Player
-  _playerConextName: PlayerContext
+  _contextName: 
+  _playerContextName: PlayerContext
   _playerContext: {fileID: 0}
 --- !u!4 &58132892
 Transform:
@@ -240,15 +240,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e436a8f5e84b93c438658f58999e665e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceCommandAction
+  voiceAiContext: {fileID: 58132891}
+  playerPoseController: {fileID: 0}
   powerObject: {fileID: 293995663}
   yaaObject: {fileID: 1173539856}
   muscleObject: {fileID: 1790491365}
-  minVoiceVolume: 0.08
+  minimumDb: -60
   onlyHide: 1
   logCommand: 1
-  hideTime: 5
-  _voiceAiContext: {fileID: 58132891}
-  _playerPoseController: {fileID: 0}
 --- !u!114 &62380394
 MonoBehaviour:
   m_ObjectHideFlags: 0

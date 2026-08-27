@@ -79,6 +79,11 @@ public class VoiceOnnxRunner : MonoBehaviour
     {
         if (worker == null) return;
 
+        if (Time.frameCount % 60 == 0)
+        {
+            Debug.Log($"[VoiceDebug] Update running. state={state}, timer={timer:F3}, interval={inferenceInterval}");
+        }
+
 
         if (state == VoiceProcessState.Idle)
         {
@@ -145,33 +150,82 @@ public class VoiceOnnxRunner : MonoBehaviour
 
     private void CheckVolumeStep()
     {
+        Debug.Log("[VoiceTrace] 1. CheckVolumeStep entered");
+        Debug.Log("[VoiceDebug] CheckVolumeStep reached.");
+
+        Debug.Log("[Voice] CheckVolumeStep");
+        Debug.Log($"[Voice] samples={(cachedSamples == null ? -1 : cachedSamples.Length)} volume={cachedVolume}");
+        Debug.Log("[Voice] MakeFeatureStep start");
+        Debug.Log("[Voice] MakeFeatureStep end");
+        Debug.Log("[Voice] RunOnnxStep start");
+        Debug.Log($"[Voice] readback null? {cachedOutput == null}");
+        Debug.Log($"[Voice] predicted={cachedLabel}");
+
+        Debug.Log($"[Voice] CheckVolume samples={(cachedSamples == null ? -1 : cachedSamples.Length)} recording={microphoneInput.IsRecording()}");
+
         cachedSamples = microphoneInput.GetLatestSamples();
+        Debug.Log($"[VoiceTrace] 2. cachedSamples.Length={(cachedSamples == null ? -1 : cachedSamples.Length)}");
 
         if (cachedSamples == null || cachedSamples.Length == 0)
         {
+            Debug.Log($"[VoiceDebug] CheckVolumeStep stopped. samples={(cachedSamples == null ? -1 : cachedSamples.Length)}");
             state = VoiceProcessState.Idle;
             return;
         }
 
         cachedVolume = GetMaxAbs(cachedSamples);
+        bool isBelowThreshold = cachedVolume < minVolumeThreshold;
+        Debug.Log($"[VoiceTrace] 3. cachedVolume={cachedVolume:F8}");
+        Debug.Log($"[VoiceTrace] 4. minVolumeThreshold={minVolumeThreshold:F8}");
+        Debug.Log($"[VoiceTrace] 5. cachedVolume < minVolumeThreshold = {isBelowThreshold}");
+        Debug.Log($"[VoiceDebug] CheckVolumeStep samples={cachedSamples.Length}, volume={cachedVolume:F6}, minVolumeThreshold={minVolumeThreshold:F6}, pass={cachedVolume >= minVolumeThreshold}");
 
-        if (cachedVolume < minVolumeThreshold)
+        if (isBelowThreshold)
         {
+            Debug.Log("[VoiceDebug] CheckVolumeStep stopped. reason=volume below threshold");
             state = VoiceProcessState.Idle;
             return;
         }
 
         state = VoiceProcessState.MakeFeature;
+
+
     }
 
     private void MakeFeatureStep()
     {
+        Debug.Log("[VoiceTrace] 6. MakeFeatureStep entered");
+        Debug.Log($"[VoiceDebug] MakeFeatureStep reached. cachedSamplesLength={(cachedSamples == null ? -1 : cachedSamples.Length)}");
+
+        Debug.Log("[Voice] CheckVolumeStep");
+        Debug.Log($"[Voice] samples={(cachedSamples == null ? -1 : cachedSamples.Length)} volume={cachedVolume}");
+        Debug.Log("[Voice] MakeFeatureStep start");
+        Debug.Log("[Voice] MakeFeatureStep end");
+        Debug.Log("[Voice] RunOnnxStep start");
+        Debug.Log($"[Voice] readback null? {cachedOutput == null}");
+        Debug.Log($"[Voice] predicted={cachedLabel}");
+
+        Debug.Log("[VoiceTrace] 7. ExtractDummyMfcc start");
         cachedMfcc = featureExtractor.ExtractDummyMfcc(cachedSamples);
+        Debug.Log("[VoiceTrace] 8. ExtractDummyMfcc end");
+        Debug.Log($"[VoiceTrace] 9. MFCC size rows={(cachedMfcc == null ? -1 : cachedMfcc.GetLength(0))}, cols={(cachedMfcc == null ? -1 : cachedMfcc.GetLength(1))}");
+        Debug.Log($"[VoiceTrace] 10. MFCC has NaN/Infinity = {HasInvalidMfccValue(cachedMfcc)}");
+        Debug.Log($"[VoiceDebug] MakeFeatureStep completed. mfccNull={cachedMfcc == null}, rows={(cachedMfcc == null ? -1 : cachedMfcc.GetLength(0))}, cols={(cachedMfcc == null ? -1 : cachedMfcc.GetLength(1))}");
         state = VoiceProcessState.RunOnnx;
     }
 
     private void RunOnnxStep()
     {
+        Debug.Log("[VoiceTrace] 11. RunOnnxStep entered");
+        Debug.Log("[VoiceDebug] RunOnnxStep reached.");
+
+        Debug.Log("[Voice] CheckVolumeStep");
+        Debug.Log($"[Voice] samples={(cachedSamples == null ? -1 : cachedSamples.Length)} volume={cachedVolume}");
+        Debug.Log("[Voice] MakeFeatureStep start");
+        Debug.Log("[Voice] MakeFeatureStep end");
+        Debug.Log("[Voice] RunOnnxStep start");
+        Debug.Log($"[Voice] readback null? {cachedOutput == null}");
+        Debug.Log($"[Voice] predicted={cachedLabel}");
         using Tensor<float> inputTensor =
             new Tensor<float>(new TensorShape(1, 1, 20, 32));
 
@@ -183,31 +237,44 @@ public class VoiceOnnxRunner : MonoBehaviour
             }
         }
 
+        Debug.Log("[VoiceTrace] 12. worker.Schedule before");
         worker.Schedule(inputTensor);
+        Debug.Log("[VoiceTrace] 13. worker.Schedule after");
 
         Tensor<float> output = worker.PeekOutput() as Tensor<float>;
         if (output == null)
         {
+            Debug.Log("[VoiceDebug] RunOnnxStep stopped. reason=output null");
             state = VoiceProcessState.Idle;
             return;
         }
 
         cachedOutput = output.ReadbackAndClone() as Tensor<float>;
+        Debug.Log($"[VoiceTrace] 14. ReadbackAndClone success = {cachedOutput != null}");
+        Debug.Log($"[VoiceDebug] RunOnnxStep readback. cachedOutputNull={cachedOutput == null}");
 
         if (cachedOutput == null)
         {
+            Debug.Log("[VoiceDebug] RunOnnxStep stopped. reason=readback null");
             state = VoiceProcessState.Idle;
             return;
         }
 
         int predictedIndex = ArgMax(cachedOutput);
+        Debug.Log($"[VoiceTrace] 15. predictedIndex={predictedIndex}");
         cachedLabel = labels[predictedIndex];
+        Debug.Log($"[VoiceTrace] 16. predictedLabel={cachedLabel}");
+        Debug.Log($"[VoiceDebug] RunOnnxStep predictedLabel={cachedLabel}, predictedIndex={predictedIndex}");
 
         state = VoiceProcessState.HandleResult;
     }
 
     private void HandleResultStep()
     {
+        Debug.Log("[VoiceTrace] 17. HandleResultStep entered");
+        Debug.Log($"[VoiceDebug] HandleResultStep reached. predictedLabel={cachedLabel}, volume={cachedVolume:F6}");
+        Debug.Log($"[ActionTrace] HandleResultStep label={cachedLabel}, volume={cachedVolume:F8}, voiceCommandActionNull={voiceCommandAction == null}");
+
         if (logPrediction)
         {
             Debug.Log($"[AI] result={cachedLabel} / volume={cachedVolume:F4}");
@@ -221,6 +288,7 @@ public class VoiceOnnxRunner : MonoBehaviour
         // none の場合は何もしない
         if (cachedLabel == "none")
         {
+            Debug.Log("[ActionTrace] HandleResultStep return. reason=predictedLabel is none");
             cachedOutput?.Dispose();
             cachedOutput = null;
 
@@ -235,7 +303,13 @@ public class VoiceOnnxRunner : MonoBehaviour
         // 認識結果を実行
         if (voiceCommandAction != null)
         {
+            Debug.Log($"[ActionTrace] ExecuteCommand before. target={voiceCommandAction.name}, scene={voiceCommandAction.gameObject.scene.name}, activeSelf={voiceCommandAction.gameObject.activeSelf}, activeInHierarchy={voiceCommandAction.gameObject.activeInHierarchy}, enabled={voiceCommandAction.enabled}");
             voiceCommandAction.ExecuteCommand(cachedLabel, cachedVolume);
+            Debug.Log("[ActionTrace] ExecuteCommand after");
+        }
+        else
+        {
+            Debug.LogWarning("[ActionTrace] ExecuteCommand skipped. voiceCommandAction is null");
         }
 
         // 後始末
@@ -328,6 +402,31 @@ public class VoiceOnnxRunner : MonoBehaviour
         }
 
         return maxIndex;
+    }
+
+    private bool HasInvalidMfccValue(float[,] mfcc)
+    {
+        if (mfcc == null)
+        {
+            return true;
+        }
+
+        int rows = mfcc.GetLength(0);
+        int cols = mfcc.GetLength(1);
+
+        for (int r = 0; r < rows; r++)
+        {
+            for (int c = 0; c < cols; c++)
+            {
+                float value = mfcc[r, c];
+                if (float.IsNaN(value) || float.IsInfinity(value))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private string BuildScoreLog(Tensor<float> tensor)

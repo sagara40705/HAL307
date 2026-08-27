@@ -127,22 +127,109 @@ public class MfccFeatureExtractor : MonoBehaviour
         int bins = fftSize / 2 + 1;
         float[] spectrum = new float[bins];
 
-        for (int k = 0; k < bins; k++)
+        if (!IsPowerOfTwo(fftSize))
         {
-            float real = 0f;
-            float imag = 0f;
-
-            for (int n = 0; n < fftSize; n++)
+            for (int k = 0; k < bins; k++)
             {
-                float angle = 2f * Mathf.PI * k * n / fftSize;
-                real += frame[n] * Mathf.Cos(angle);
-                imag -= frame[n] * Mathf.Sin(angle);
+                float real = 0f;
+                float imag = 0f;
+
+                for (int n = 0; n < fftSize; n++)
+                {
+                    float angle = 2f * Mathf.PI * k * n / fftSize;
+                    real += frame[n] * Mathf.Cos(angle);
+                    imag -= frame[n] * Mathf.Sin(angle);
+                }
+
+                spectrum[k] = real * real + imag * imag;
             }
 
+            return spectrum;
+        }
+
+        float[] realValues = new float[fftSize];
+        float[] imagValues = new float[fftSize];
+        for (int i = 0; i < fftSize; i++)
+        {
+            realValues[i] = frame[i];
+        }
+
+        ForwardFft(realValues, imagValues);
+
+        for (int k = 0; k < bins; k++)
+        {
+            float real = realValues[k];
+            float imag = imagValues[k];
             spectrum[k] = real * real + imag * imag;
         }
 
         return spectrum;
+    }
+
+    private bool IsPowerOfTwo(int value)
+    {
+        return value > 0 && (value & (value - 1)) == 0;
+    }
+
+    private void ForwardFft(float[] real, float[] imag)
+    {
+        int n = real.Length;
+
+        for (int i = 1, j = 0; i < n; i++)
+        {
+            int bit = n >> 1;
+            for (; (j & bit) != 0; bit >>= 1)
+            {
+                j ^= bit;
+            }
+            j ^= bit;
+
+            if (i < j)
+            {
+                float tempReal = real[i];
+                real[i] = real[j];
+                real[j] = tempReal;
+
+                float tempImag = imag[i];
+                imag[i] = imag[j];
+                imag[j] = tempImag;
+            }
+        }
+
+        for (int length = 2; length <= n; length <<= 1)
+        {
+            float angle = -2f * Mathf.PI / length;
+            float wLengthReal = Mathf.Cos(angle);
+            float wLengthImag = Mathf.Sin(angle);
+
+            for (int i = 0; i < n; i += length)
+            {
+                float wReal = 1f;
+                float wImag = 0f;
+                int halfLength = length >> 1;
+
+                for (int j = 0; j < halfLength; j++)
+                {
+                    int evenIndex = i + j;
+                    int oddIndex = evenIndex + halfLength;
+
+                    float oddReal = real[oddIndex] * wReal - imag[oddIndex] * wImag;
+                    float oddImag = real[oddIndex] * wImag + imag[oddIndex] * wReal;
+
+                    float evenReal = real[evenIndex];
+                    float evenImag = imag[evenIndex];
+
+                    real[evenIndex] = evenReal + oddReal;
+                    imag[evenIndex] = evenImag + oddImag;
+                    real[oddIndex] = evenReal - oddReal;
+                    imag[oddIndex] = evenImag - oddImag;
+
+                    float nextWReal = wReal * wLengthReal - wImag * wLengthImag;
+                    wImag = wReal * wLengthImag + wImag * wLengthReal;
+                    wReal = nextWReal;
+                }
+            }
+        }
     }
 
     private float[] ApplyMelFilterBank(float[] powerSpectrum)

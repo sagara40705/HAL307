@@ -111,15 +111,21 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
     private void RunInference()
     {
+        Debug.Log($"[MenuVoiceTrace] RunInference entered. object={name}, scene={gameObject.scene.name}, minVolumeThreshold={minVolumeThreshold:F8}, menuVoiceCommandActionNull={menuVoiceCommandAction == null}");
+
         float[] samples = microphoneInput.GetLatestSamples();
         if (samples == null || samples.Length == 0)
         {
+            Debug.Log($"[MenuVoiceTrace] RunInference return. reason=samples empty, samplesLength={(samples == null ? -1 : samples.Length)}");
             return;
         }
 
         float volume = GetMaxAbs(samples);
+        bool belowVolumeThreshold = volume < minVolumeThreshold;
+        Debug.Log($"[MenuVoiceTrace] Volume check. volume={volume:F8}, minVolumeThreshold={minVolumeThreshold:F8}, belowThreshold={belowVolumeThreshold}");
         if (volume < minVolumeThreshold)
         {
+            Debug.Log("[MenuVoiceTrace] RunInference return. reason=volume below minVolumeThreshold");
             return;
         }
 
@@ -137,17 +143,21 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
             }
         }
 
+        Debug.Log("[MenuVoiceTrace] worker.Schedule before");
         worker.Schedule(inputTensor);
+        Debug.Log("[MenuVoiceTrace] worker.Schedule after");
 
         Tensor<float> output = worker.PeekOutput() as Tensor<float>;
         if (output == null)
         {
+            Debug.Log("[MenuVoiceTrace] RunInference return. reason=output null");
             return;
         }
 
         using Tensor<float> readable = output.ReadbackAndClone() as Tensor<float>;
         if (readable == null)
         {
+            Debug.Log("[MenuVoiceTrace] RunInference return. reason=ReadbackAndClone failed");
             return;
         }
 
@@ -159,6 +169,8 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         }
 
         string predictedLabel = labels[predictedIndex].Trim().ToLowerInvariant();
+        Debug.Log($"[MenuVoiceTrace] Scores {BuildScoreLog(readable)}");
+        Debug.Log($"[MenuVoiceTrace] predictedIndex={predictedIndex}, predictedLabel={predictedLabel}, volume={volume:F8}");
 
         if (logPrediction)
         {
@@ -172,11 +184,15 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         if (ignoreNone && predictedLabel == "none")
         {
+            Debug.Log("[MenuVoiceTrace] RunInference return. reason=predictedLabel none and ignoreNone is true");
             return;
         }
 
-        if (IsCooldown(predictedLabel))
+        bool isCooldown = IsCooldown(predictedLabel);
+        Debug.Log($"[MenuVoiceTrace] Cooldown check. command={predictedLabel}, isCooldown={isCooldown}, lastCommand={lastCommand}, elapsed={Time.unscaledTime - lastCommandTime:F3}, commandCooldown={commandCooldown:F3}");
+        if (isCooldown)
         {
+            Debug.Log("[MenuVoiceTrace] RunInference return. reason=commandCooldown");
             return;
         }
 
@@ -185,7 +201,13 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         if (menuVoiceCommandAction != null)
         {
+            Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand before. command={predictedLabel}, volume={volume:F8}, target={menuVoiceCommandAction.name}, scene={menuVoiceCommandAction.gameObject.scene.name}, activeSelf={menuVoiceCommandAction.gameObject.activeSelf}, activeInHierarchy={menuVoiceCommandAction.gameObject.activeInHierarchy}, enabled={menuVoiceCommandAction.enabled}");
             menuVoiceCommandAction.ExecuteCommand(predictedLabel, volume);
+            Debug.Log("[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand after");
+        }
+        else
+        {
+            Debug.LogWarning("[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand skipped. menuVoiceCommandAction is null");
         }
     }
 

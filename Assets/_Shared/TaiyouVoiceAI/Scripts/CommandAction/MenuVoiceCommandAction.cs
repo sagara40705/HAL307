@@ -61,20 +61,26 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
     public void ExecuteCommand(string command, float volume)
     {
+        Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand entered. command={command}, volume={volume:F8}, menuControlEnabled={menuControlEnabled}, menuControlTimer={menuControlTimer:F3}, requireTimeBeforeMenuControl={requireTimeBeforeMenuControl}, menuControllerNull={menuController == null}");
+
         if (string.IsNullOrWhiteSpace(command))
         {
+            Debug.Log("[MenuVoiceTrace] MenuVoiceCommandAction return. reason=empty command");
             return;
         }
 
         command = command.Trim().ToLowerInvariant();
+        Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction normalized command={command}");
 
         if (command == CommandNone)
         {
+            Debug.Log("[MenuVoiceTrace] MenuVoiceCommandAction return. reason=none");
             return;
         }
 
         if (command == CommandTime)
         {
+            Debug.Log("[MenuVoiceTrace] MenuVoiceCommandAction time command received");
             EnableMenuControl();
             return;
         }
@@ -82,9 +88,11 @@ public class MenuVoiceCommandAction : MonoBehaviour
         if (requireTimeBeforeMenuControl && !menuControlEnabled)
         {
             Debug.Log($"[Menu Voice] Command skipped. Reason=Time command is required first. Command={command}");
+            Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction return. reason=time window disabled, command={command}, remaining={menuControlTimer:F3}");
             return;
         }
 
+        Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction passing to phase handler. command={command}, menuControlEnabled={menuControlEnabled}, remaining={menuControlTimer:F3}");
         ExecuteCommandByPhase(command);
     }
 
@@ -112,6 +120,7 @@ public class MenuVoiceCommandAction : MonoBehaviour
     {
         menuControlEnabled = true;
         menuControlTimer = menuControlEnableTime;
+        Debug.Log($"[MenuVoiceTrace] Time window enabled. duration={menuControlEnableTime:F3}, remaining={menuControlTimer:F3}");
 
         GamePhase currentPhase = GetCurrentPhase();
         Debug.Log($"[Menu Voice] Time command accepted. Phase={currentPhase}");
@@ -136,6 +145,7 @@ public class MenuVoiceCommandAction : MonoBehaviour
     private void ExecuteCommandByPhase(string command)
     {
         GamePhase currentPhase = GetCurrentPhase();
+        Debug.Log($"[MenuVoiceTrace] ExecuteCommandByPhase. command={command}, phase={currentPhase}, menuControlEnabled={menuControlEnabled}, remaining={menuControlTimer:F3}");
 
         switch (currentPhase)
         {
@@ -174,6 +184,8 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
     private void ExecutePauseCommand(string command)
     {
+        Debug.Log($"[MenuVoiceTrace] ExecutePauseCommand entered. command={command}, menuControllerNull={menuController == null}");
+
         switch (command)
         {
             case CommandUp:
@@ -251,10 +263,13 @@ public class MenuVoiceCommandAction : MonoBehaviour
         if (target == null)
         {
             Debug.Log($"[Menu Voice] Command target is empty. Command={command}");
+            Debug.Log($"[MenuVoiceTrace] SendCommandTo skipped. command={command}, target=null");
             return;
         }
 
+        Debug.Log($"[MenuVoiceTrace] SendCommandTo before. command={command}, target={target.name}, type={target.GetType().Name}, scene={target.gameObject.scene.name}, activeSelf={target.gameObject.activeSelf}, activeInHierarchy={target.gameObject.activeInHierarchy}, enabled={target.enabled}");
         target.SendMessage("OnVoiceCommand", command, SendMessageOptions.DontRequireReceiver);
+        Debug.Log($"[MenuVoiceTrace] SendCommandTo after. command={command}, target={target.name}");
     }
 
     private void CreateDebugMenu()

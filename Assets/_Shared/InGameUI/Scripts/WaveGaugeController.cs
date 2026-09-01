@@ -220,13 +220,27 @@ public class WaveGaugeController : MonoBehaviour
 
     private void HideOtherUis()
     {
-        // Wave演出時に非表示にするUIを非表示設定にする
+        Debug.Log(
+            $"[WaveGaugeController] HideOtherUis called. Count={hideOnWaveEffectUis?.Length ?? 0}"
+        );
+
+        if (hideOnWaveEffectUis == null)
+        {
+            return;
+        }
+
         foreach (GameObject ui in hideOnWaveEffectUis)
         {
-            if (ui != null)
+            if (ui == null)
             {
-                ui.SetActive(false);
+                continue;
             }
+
+            Debug.Log(
+                $"[WaveGaugeController] Hide UI: {ui.name}"
+            );
+
+            ui.SetActive(false);
         }
     }
 

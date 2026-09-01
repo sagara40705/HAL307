@@ -448,6 +448,7 @@ MonoBehaviour:
   _currentRequestCount: 0
   _audienceRequests: {fileID: 11400000, guid: de84ef50e0228154dbfd279d5a3a5884, type: 2}
   _uiPool: {fileID: 2063627353}
+  _levelDesignSettings: {fileID: 0}
   _context: {fileID: 377689422}
   _feverGaugeController: {fileID: 551905174}
   _requestInterval: 2
@@ -4753,6 +4754,9 @@ MonoBehaviour:
   _clearScale: 1.5
   _clearDelay: 1
   _explosionPrefab: {fileID: 600055896250882990, guid: 92ccf096cc0f2914fbb703c7101ad5ae, type: 3}
+  _heartChangeEffectPrefab: {fileID: 0}
+  _heartChangeEffectScale: {x: 1, y: 1, z: 1}
+  _heartDisplayDuration: 0.5
   _blackUiPrefabs:
   - {fileID: 4044294870427922061, guid: d9b4807c68f233540937699f8f49e2cb, type: 3}
   - {fileID: 2624760887686886189, guid: 368805649722a2d4cadfa8ae44d83873, type: 3}

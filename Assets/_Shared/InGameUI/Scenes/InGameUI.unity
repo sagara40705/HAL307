@@ -176,7 +176,7 @@ MonoBehaviour:
   minValue: 0
   stageEndJudge: {fileID: 0}
   warningUI: {fileID: 811645271}
-  warningThreshold: 0.1
+  warningThreshold: 0.2
   warningAnimator: {fileID: 811645275}
   hideOnWaveEffectUis:
   - {fileID: 1327939597}

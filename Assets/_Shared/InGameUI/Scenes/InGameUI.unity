@@ -536,8 +536,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -747.9106, y: -355.8951}
-  m_SizeDelta: {x: 158.6509, y: 125.0289}
+  m_AnchoredPosition: {x: -747.9106, y: -295.44055}
+  m_SizeDelta: {x: 158.6509, y: 185.4835}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &328744063
 GameObject:
@@ -4748,8 +4748,11 @@ MonoBehaviour:
   _minDistance: 50
   _maxAttempts: 150
   _clearScale: 1.5
-  _clearDelay: 1
-  _explosionPrefab: {fileID: 600055896250882990, guid: 92ccf096cc0f2914fbb703c7101ad5ae, type: 3}
+  _clearDelay: 2
+  _explosionPrefab: {fileID: 4028637399230757527, guid: 92ccf096cc0f2914fbb703c7101ad5ae, type: 3}
+  _heartChangeEffectPrefab: {fileID: 600055896250882990, guid: 33acfac56f85d9845adfde20b022ad0e, type: 3}
+  _heartChangeEffectScale: {x: 1, y: 1, z: 1}
+  _heartDisplayDuration: 0.5
   _blackUiPrefabs:
   - {fileID: 4044294870427922061, guid: d9b4807c68f233540937699f8f49e2cb, type: 3}
   - {fileID: 2624760887686886189, guid: 368805649722a2d4cadfa8ae44d83873, type: 3}

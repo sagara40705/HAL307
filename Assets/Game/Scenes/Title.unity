@@ -2106,6 +2106,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1973699793}
+  - component: {fileID: 1973699794}
   m_Layer: 0
   m_Name: TitleUiManager
   m_TagString: Untagged
@@ -2128,6 +2129,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 116965122}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1973699794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973699792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fa02f44c644ec246aa19a3cfda327f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TitleUiManager
+  mCursor: {fileID: 466992186}
+  mCursorInitialAnchoredPos: {x: -27, y: -25}
+  mMenuItemRects:
+  - {fileID: 1171654228}
+  - {fileID: 86276952}
 --- !u!4 &2104307999 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -3192710193078022586, guid: bd60e74136301c04aab7cd96d7e82d1e, type: 3}

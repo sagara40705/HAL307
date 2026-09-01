@@ -101,7 +101,7 @@ Shader "Custom/MonitorBreak"
         //
         //======================================
 
-         Blend SrcAlpha OneMinusSrcAlpha
+        Blend SrcAlpha OneMinusSrcAlpha
         ZWrite Off
         Cull Off
 
@@ -125,7 +125,7 @@ Shader "Custom/MonitorBreak"
 
             // URPの基本関数を使うための読み込み
             // TransformObjectToHClip などが使えるようになる
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+             #include "UnityCG.cginc"
 
             // モニター表現の本体
             // vert / frag / LED表現などは monitor.hlsl に書く
@@ -140,7 +140,7 @@ Shader "Custom/MonitorBreak"
             #pragma vertex BreakStageVertex
             #pragma fragment BreakStageFragment
 
-            #include "UnityCG.cginc"
+           
             #include "Assets/masato/breakstage/breakstage.hlsl"
 
             ENDHLSL

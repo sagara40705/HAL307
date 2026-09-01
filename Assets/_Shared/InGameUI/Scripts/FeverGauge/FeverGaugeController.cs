@@ -6,17 +6,18 @@ using static Sound.Manager.SoundManager;
 public class FeverGaugeController : MonoBehaviour
 {
     private const string DebugWindowName = "Fever Gauge";
+    private const float DefaultFillIncrease = 0.05f;
+    private const float DefaultFeverDuration = 10f;
+    private const float DefaultCutInDisplayTime = 3f;
+    private const bool DefaultResetFillOnFeverEnd = true;
 
     [SerializeField] private Material _flameMaterial;
     [SerializeField] private string _fillAmountProperty = "_FillAmount";
-    [SerializeField] private float _fillIncrease = 0.05f;
-    [SerializeField] private float _feverDuration = 10f;
-    [SerializeField] private bool _resetFillOnFeverEnd = true;
+    [SerializeField] private FeverSettings _settings;
 
     [Header("フィーバー演出")]
     [SerializeField] private GameObject _fireAnimObject;
     [SerializeField] private GameObject _cutInObject;
-    [SerializeField] private float _cutInDisplayTime = 3f;
 
     [Header("フィーバーUI出方調整")]
     [SerializeField] private AdjustableUiPresenter _firePresenter;
@@ -31,7 +32,9 @@ public class FeverGaugeController : MonoBehaviour
     private Coroutine _cutInCoroutine;
 
     public bool IsFever => _isFever;
-    public float FeverDuration => _feverDuration;
+    public float FeverDuration => _settings != null
+        ? _settings.FeverDuration
+        : DefaultFeverDuration;
     public float FeverRemainingTime => _feverTimer;
     public float CurrentFill => GetFill();
 
@@ -40,6 +43,11 @@ public class FeverGaugeController : MonoBehaviour
 
     private void Awake()
     {
+        if (_settings == null)
+        {
+            Debug.LogWarning("[FeverGaugeController] FeverSettings is not assigned. Default fever values are used.", this);
+        }
+
         Debug.Log($"[FeverGaugeController] Awake前 CutIn activeSelf = {_cutInObject?.activeSelf}", this);
 
         HideFeverObjects();
@@ -135,7 +143,7 @@ public class FeverGaugeController : MonoBehaviour
             return;
         }
 
-        float fill = Mathf.Clamp01(GetFill() + _fillIncrease);
+        float fill = Mathf.Clamp01(GetFill() + FillIncrease);
         SetFill(fill);
 
         if (fill >= 1f)
@@ -161,7 +169,7 @@ public class FeverGaugeController : MonoBehaviour
             return;
         }
 
-        SetFill(GetFill() - _fillIncrease);
+        SetFill(GetFill() - FillIncrease);
     }
 
     public void DebugResetFill()
@@ -183,7 +191,7 @@ public class FeverGaugeController : MonoBehaviour
         }
 
         _isFever = true;
-        _feverTimer = Mathf.Max(0f, _feverDuration);
+        _feverTimer = FeverDuration;
 
         SetFill(1f);
 
@@ -223,7 +231,7 @@ public class FeverGaugeController : MonoBehaviour
         HideUi(_cutInObject, _cutInPresenter);
 
 
-        if (_resetFillOnFeverEnd)
+        if (ResetFillOnFeverEnd)
         {
             ResetFill();
         }
@@ -256,7 +264,7 @@ public class FeverGaugeController : MonoBehaviour
     {
         ShowUi(_cutInObject, _cutInPresenter);
 
-        yield return new WaitForSecondsRealtime(_cutInDisplayTime);
+        yield return new WaitForSecondsRealtime(CutInDisplayTime);
 
         HideUi(_cutInObject, _cutInPresenter);
 
@@ -343,6 +351,18 @@ public class FeverGaugeController : MonoBehaviour
             _uiPanelPresenter = uiPanel.GetComponent<AdjustableUiPresenter>();
         }
     }
+
+    private float FillIncrease => _settings != null
+        ? _settings.FillIncrease
+        : DefaultFillIncrease;
+
+    private bool ResetFillOnFeverEnd => _settings != null
+        ? _settings.ResetFillOnFeverEnd
+        : DefaultResetFillOnFeverEnd;
+
+    private float CutInDisplayTime => _settings != null
+        ? _settings.CutInDisplayTime
+        : DefaultCutInDisplayTime;
 
 
 }

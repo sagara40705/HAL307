@@ -10,6 +10,8 @@ public sealed class WaveData : ScriptableObject
     [InspectorName("Wave Start Action (4 Enemies)")]
     [SerializeField] private InGamePresentationAction waveStartActionWhenFourEnemies;
     [SerializeField] private InGamePresentationAction waveTransitionAction;
+
+    [Header("Enemy")]
     [SerializeField] private EnemyData replacementEnemyData;
     [SerializeField] private Vector3 replacementEnemyPosition;
     [SerializeField] private Vector3 replacementEnemyRotationEuler;

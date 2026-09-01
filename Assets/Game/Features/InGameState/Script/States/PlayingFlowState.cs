@@ -6,11 +6,13 @@ public sealed class PlayingFlowState : InGameFlowStateBase
 {
     private readonly StageData _stageData;
     private readonly WaveData _waveData;
+    private readonly float _enemyAnimationSpeed;
 
-    public PlayingFlowState(StageData stageData, WaveData waveData)
+    public PlayingFlowState(StageData stageData, WaveData waveData, float enemyAnimationSpeed)
     {
         _stageData = stageData;
         _waveData = waveData;
+        _enemyAnimationSpeed = Mathf.Max(0f, enemyAnimationSpeed);
     }
 
     // Wave開始演出の実行
@@ -21,6 +23,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.ResetProgressFollowerPositions(_stageData);
         int currentEnemyCount = context?.EnemyLineup?.CurrentEnemyCount ?? 0;
         BeginWaveEnemyReplacement(context);
+        ApplyWaveAnimationSpeed(context);
 
 
         InGamePresentationAction action = _waveData?.GetWaveStartAction(currentEnemyCount);
@@ -95,6 +98,18 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         }
 
         enemyLineup.BeginWaveEnemyChange(_waveData.ReplacementEnemyData, _waveData.ReplacementEnemyPosition, _waveData.ReplacementEnemyRotation);
+    }
+
+    private void ApplyWaveAnimationSpeed(InGameFlowContext context)
+    {
+        Enemy.EnemyLineupManager enemyLineup = context != null ? context.EnemyLineup : null;
+        if (enemyLineup == null)
+        {
+            Debug.LogWarning("[PlayingFlowState] Animation speed was not applied. Reason=EnemyLineupManager is null.");
+            return;
+        }
+
+        enemyLineup.SetAllEnemyAnimationSpeed(_enemyAnimationSpeed);
     }
 
     private void CommitPendingEnemyReplacement(InGameFlowContext context)

@@ -15,6 +15,7 @@ public sealed class InGameFlowController : MonoBehaviour
     private int _currentWaveIndex;
     private WaveData _currentWaveData;
     private int _currentTargetScore;
+    private float _currentEnemyAnimationSpeed = 1f;
 
     public int CurrentWaveIndex => _currentWaveIndex;
     public WaveData CurrentWaveData => _currentWaveData;
@@ -22,6 +23,7 @@ public sealed class InGameFlowController : MonoBehaviour
     public bool IsFlowRunning => _flowCoroutine != null;
     public bool IsChangingState => _isChangingState;
     public int CurrentTargetScore => _currentTargetScore;
+    public float CurrentEnemyAnimationSpeed => _currentEnemyAnimationSpeed;
 
     // Context未設定時の同一GameObject検索
     private void Awake()
@@ -88,11 +90,12 @@ public sealed class InGameFlowController : MonoBehaviour
 
         _currentWaveData = stageData.GetWaveOrNull(_currentWaveIndex);
         _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
+        _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);
 
         while (_currentWaveData != null)
         {
             WaveData currentWave = _currentWaveData;
-            yield return ChangeStateCoroutine(new PlayingFlowState(stageData, currentWave));
+            yield return ChangeStateCoroutine(new PlayingFlowState(stageData, currentWave, _currentEnemyAnimationSpeed));
 
             int currentScore = context != null ? context.CurrentPlayerScore : 0;
             bool hasNextWave = stageData.HasWave(_currentWaveIndex + 1);
@@ -120,6 +123,7 @@ public sealed class InGameFlowController : MonoBehaviour
             _currentWaveIndex++;
             _currentWaveData = nextWave;
             _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
+            _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);
         }
 
         yield return ChangeStateCoroutine(new GameEndFlowState(stageData));

@@ -111,6 +111,22 @@ namespace Enemy
                 : EnemyMaxCount.Two;
         }
 
+        // 現在存在する全EnemyへWave共通のアニメーション速度を設定
+        public void SetAllEnemyAnimationSpeed(float animationSpeed)
+        {
+            ResolveReferences();
+            if (_enemyRegistry == null)
+            {
+                Debug.LogWarning("[EnemyLineupManager] Animation speed was not applied. Reason=EnemyRegistry is null.");
+                return;
+            }
+
+            foreach (Enemy enemy in _enemyRegistry.Enemies)
+            {
+                enemy?.SetAnimationSpeed(animationSpeed);
+            }
+        }
+
         // 確定済みのEnemy枠数を取得
         private int CountCurrentEnemies()
         {

@@ -7,7 +7,23 @@ public sealed class StageModelContext : ContextBase
     [SerializeField] private StageEndJudge stageEndJudge;
     [SerializeField] private Transform waveEndArea;
     [SerializeField] private InGamePresentationEventRegistry presentationEventRegistry;
+    [SerializeField] private StageModelModeSystem stageModelModeSystem = new StageModelModeSystem();
 
+    private void Start()
+    {
+        ApplySelectedGameMode();
+    }
+
+    // 現在選択中のゲームモードをStageModelへ反映
+    public bool ApplySelectedGameMode()
+    {
+        if (stageModelModeSystem == null)
+        {
+            stageModelModeSystem = new StageModelModeSystem();
+        }
+
+        return stageModelModeSystem.Apply(gameObject.scene);
+    }
 
     // ステージ終了判定のTransform
     // ステージ終了判定

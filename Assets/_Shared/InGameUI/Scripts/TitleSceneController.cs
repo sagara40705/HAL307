@@ -19,14 +19,14 @@ public class VoiceTitleMenuController : MonoBehaviour
 
     [Header("Debug Key Input")]
     [SerializeField] private bool enableDebugKeyInput = true;
-    [SerializeField] private KeyCode openMenuKey = KeyCode.T;
-    [SerializeField] private KeyCode closeMenuKey = KeyCode.Escape;
-    [SerializeField] private KeyCode upKey = KeyCode.UpArrow;
-    [SerializeField] private KeyCode upKey2 = KeyCode.W;
-    [SerializeField] private KeyCode downKey = KeyCode.DownArrow;
-    [SerializeField] private KeyCode downKey2 = KeyCode.S;
-    [SerializeField] private KeyCode decideKey = KeyCode.Return;
-    [SerializeField] private KeyCode decideKey2 = KeyCode.Space;
+    [SerializeField] private UnityEngine.InputSystem.Key openMenuKey = UnityEngine.InputSystem.Key.T;
+    [SerializeField] private UnityEngine.InputSystem.Key closeMenuKey = UnityEngine.InputSystem.Key.Escape;
+    [SerializeField] private UnityEngine.InputSystem.Key upKey = UnityEngine.InputSystem.Key.UpArrow;
+    [SerializeField] private UnityEngine.InputSystem.Key upKey2 = UnityEngine.InputSystem.Key.W;
+    [SerializeField] private UnityEngine.InputSystem.Key downKey = UnityEngine.InputSystem.Key.DownArrow;
+    [SerializeField] private UnityEngine.InputSystem.Key downKey2 = UnityEngine.InputSystem.Key.S;
+    [SerializeField] private UnityEngine.InputSystem.Key decideKey = UnityEngine.InputSystem.Key.R;
+    [SerializeField] private UnityEngine.InputSystem.Key decideKey2 = UnityEngine.InputSystem.Key.Space;
 
     [Header("Debug Time Rule")]
     [SerializeField] private bool requireOpenBeforeControl = true;
@@ -54,13 +54,13 @@ public class VoiceTitleMenuController : MonoBehaviour
         }
 
         // デバッグ用：Tで音声の「time」と同じ動き
-        if (Input.GetKeyDown(openMenuKey))
+        if (DebugShortcuts.Pressed(openMenuKey))
         {
             OpenMenu();
         }
 
         // デバッグ用：Escapeで閉じる
-        if (Input.GetKeyDown(closeMenuKey))
+        if (DebugShortcuts.Pressed(closeMenuKey))
         {
             CloseMenu();
         }
@@ -71,17 +71,17 @@ public class VoiceTitleMenuController : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(upKey) || Input.GetKeyDown(upKey2))
+        if (DebugShortcuts.Pressed(upKey) || DebugShortcuts.Pressed(upKey2))
         {
             MoveUp();
         }
 
-        if (Input.GetKeyDown(downKey) || Input.GetKeyDown(downKey2))
+        if (DebugShortcuts.Pressed(downKey) || DebugShortcuts.Pressed(downKey2))
         {
             MoveDown();
         }
 
-        if (Input.GetKeyDown(decideKey) || Input.GetKeyDown(decideKey2))
+        if (DebugShortcuts.Pressed(decideKey) || DebugShortcuts.Pressed(decideKey2))
         {
             Decide();
         }
@@ -124,6 +124,9 @@ public class VoiceTitleMenuController : MonoBehaviour
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
                     Decide();
+
+                    GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+                    gamePhaseManager.ChangePhase(GamePhase.InGame);
                 }
                 break;
         }

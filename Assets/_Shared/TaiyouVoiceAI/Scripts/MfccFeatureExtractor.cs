@@ -13,7 +13,7 @@ using UnityEngine;
 /// 6. DCT変換
 /// 7. MFCC生成
 /// 8. 正規化
-/// 9. 20×32サイズへ変換
+/// 9. 指定サイズへ変換
 ///
 /// 生成したMFCCはONNXモデルの入力として使用する。
 public class MfccFeatureExtractor : MonoBehaviour
@@ -53,11 +53,19 @@ public class MfccFeatureExtractor : MonoBehaviour
     /// MFCC特徴量を生成する
     public float[,] ExtractMfcc(float[] samples)
     {
+        return ExtractMfcc(samples, MfccCount, TargetWidth);
+    }
+
+    public float[,] ExtractMfcc(float[] samples, int mfccCount, int targetWidth)
+    {
         Initialize();
+
+        mfccCount = Mathf.Max(1, mfccCount);
+        targetWidth = Mathf.Max(1, targetWidth);
 
         if (samples == null || samples.Length == 0)
         {
-            return new float[MfccCount, TargetWidth];
+            return new float[mfccCount, targetWidth];
         }
 
         float[] processed = PreEmphasis(samples, preEmphasis);
@@ -92,14 +100,14 @@ public class MfccFeatureExtractor : MonoBehaviour
             }
         }
 
-        float[,] mfcc = ComputeDct(melSpectrogram, MfccCount);
+        float[,] mfcc = ComputeDct(melSpectrogram, mfccCount);
 
         if (normalizePerFeature)
         {
             NormalizeEachRow(mfcc);
         }
 
-        return ResizeToTargetWidth(mfcc, TargetWidth);
+        return ResizeToTargetWidth(mfcc, targetWidth);
     }
 
     // 互換用

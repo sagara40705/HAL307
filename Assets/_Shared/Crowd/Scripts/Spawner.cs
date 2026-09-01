@@ -460,4 +460,9 @@ public class CrowdSpawner : MonoBehaviour
             );
         }
     }
+
+    public  void SetAnimationIndex(int index)
+    {
+        animationIndex = index;
+    }
 }

@@ -12,6 +12,8 @@ namespace AudienceRequest
         [Header("参照")]
         [SerializeField] private AudienceRequestSystem _audienceRequestSystem; // AudienceRequestSystemの参照
 
+       
+
         [SerializeField] private RectTransform _uiParent; // UIの親オブジェクト
         [SerializeField] private List<GameObject> _uiPrefabs = new(); // UIプレハブのリスト
 
@@ -54,12 +56,16 @@ namespace AudienceRequest
         private List<ObjectPool<GameObject>> _uiPools = new(); // UIオブジェクトプールのリスト
         private List<List<GameObject>> _activeUis = new(); // アクティブなUIオブジェクトのリスト
 
+        // 
         private void Awake()
         {
+            // スプライト変換テーブルを構築
             BuildSpriteLookup();
 
+            // UIプールの初期化
             int capacity = _audienceRequestSystem.MaxRequestCount; // キャパはリクエストの最大合計
 
+            // UIプレハブの数とPoseIDの数が一致しているか確認
             int count = _uiPrefabs.Count;
             if (count != (int)PoseID.Pose_Count)
             {
@@ -67,6 +73,7 @@ namespace AudienceRequest
                 return;
             }
 
+            // UIプールの作成
             for (int i = 0; i < count; ++i)
             {
                 int idx = i;
@@ -89,33 +96,33 @@ namespace AudienceRequest
             }
 
             // 黒リクエストUI用プール作成
-if (_blackUiPrefabs.Count != (int)PoseID.Pose_Count)
-{
-    Debug.LogError("Black UI Prefabs count does not match PoseID count.");
-    return;
-}
+            if (_blackUiPrefabs.Count != (int)PoseID.Pose_Count)
+            {
+                Debug.LogError("Black UI Prefabs count does not match PoseID count.");
+                return;
+            }
 
-for (int i = 0; i < _blackUiPrefabs.Count; ++i)
-{
-    int idx = i;
+            for (int i = 0; i < _blackUiPrefabs.Count; ++i)
+            {
+                int idx = i;
 
-    ObjectPool<GameObject> blackPool = new ObjectPool<GameObject>(
-        () => Instantiate(_blackUiPrefabs[idx]),
-        obj => obj.SetActive(true),
-        obj =>
-        {
-            obj.SetActive(false);
-            obj.transform.SetParent(_uiParent.transform, false);
-            obj.transform.localScale = Vector3.one;
-        },
-        obj => Destroy(obj),
-        false,
-        1
-    );
+                ObjectPool<GameObject> blackPool = new ObjectPool<GameObject>(
+                    () => Instantiate(_blackUiPrefabs[idx]),
+                    obj => obj.SetActive(true),
+                    obj =>
+                    {
+                        obj.SetActive(false);
+                        obj.transform.SetParent(_uiParent.transform, false);
+                        obj.transform.localScale = Vector3.one;
+                    },
+                    obj => Destroy(obj),
+                    false,
+                    1
+                );
 
-    _blackUiPools.Add(blackPool);
-    _activeBlackUis.Add(new List<GameObject>());
-}
+                _blackUiPools.Add(blackPool);
+                _activeBlackUis.Add(new List<GameObject>());
+            }
 
         }
 
@@ -124,6 +131,7 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
             //_audienceRequestSystem.OnRequestReceived += Generate;
         }
 
+        // 指定ポーズのUIを生成する
         public GameObject Generate(PoseID pose)
         {
             if (!IsValidPose(pose))
@@ -156,6 +164,7 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                 }
             }
 
+            PlayShowPresentation(obj);
 
             _activeUis[(int)pose].Add(obj);
             return obj;
@@ -169,12 +178,6 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
             if (!IsValidPose(pose))
             {
 
-                Debug.LogError($"Invalid audience request pose: {pose}");
-                return;
-            }
-
-            if (!IsValidPose(pose))
-            {
                 Debug.LogError($"Invalid audience request pose: {pose}");
                 return;
             }
@@ -209,7 +212,7 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                     img.sprite = isPlayer ? spriteSetting.changeSprite : spriteSetting.enemyChangeSprite;
                 }
 
-                obj.transform.localScale = Vector3.one;
+                PlayHidePresentation(obj);
                 StartCoroutine(ReleaseAfterDelay(obj, pose, _clearDelay));
             }
         }
@@ -476,8 +479,9 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                 }
             }
 
-            _activeUis[(int)pose].Add(obj);
+            PlayShowPresentation(obj);
 
+            _activeUis[(int)pose].Add(obj);
             return obj;
         }
 
@@ -533,8 +537,9 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                 rect.anchoredPosition = spawnPos;
             }
 
-            _activeBlackUis[(int)pose].Add(obj);
+            PlayShowPresentation(obj);
 
+            _activeBlackUis[(int)pose].Add(obj);
             return obj;
         }
 
@@ -571,6 +576,7 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                     }
                 }
 
+                PlayHidePresentation(obj);
                 StartCoroutine(ReleaseBlackAfterDelay(obj, pose, _clearDelay));
             }
         }
@@ -615,6 +621,40 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
             }
         }
 
+        private void PlayShowPresentation(GameObject obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            AdjustableUiPresenter presenter = obj.GetComponent<AdjustableUiPresenter>();
+
+            if (presenter == null)
+            {
+                return;
+            }
+
+            presenter.CaptureCurrentAsBase();
+            presenter.Show();
+        }
+
+        private void PlayHidePresentation(GameObject obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            AdjustableUiPresenter presenter = obj.GetComponent<AdjustableUiPresenter>();
+
+            if (presenter == null)
+            {
+                return;
+            }
+
+            presenter.Hide();
+        }
 
     }
 }

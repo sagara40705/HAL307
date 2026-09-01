@@ -11,6 +11,11 @@ public class ScoreSpriteUIController : MonoBehaviour
     [Header("フィーバー判定")]
     [SerializeField] private FeverGaugeController feverGaugeController;
 
+    [Header("スコアUI出方調整")]
+    [SerializeField] private AdjustableUiPresenter scoreUiPresenter;
+    [SerializeField] private bool showScoreUiOnStart = true;
+    [SerializeField] private bool playScoreUiOnScoreChanged = false;
+
     private void Start()
     {
         if (ScoreManager.Instance != null)
@@ -18,8 +23,15 @@ public class ScoreSpriteUIController : MonoBehaviour
             ScoreManager.Instance.OnScoreChanged += UpdateScoreUI;
         }
 
+        if (showScoreUiOnStart && scoreUiPresenter != null)
+        {
+            scoreUiPresenter.CaptureCurrentAsBase();
+            scoreUiPresenter.Show();
+        }
+
         UpdateScoreUI();
     }
+
 
     private void OnDestroy()
     {
@@ -51,6 +63,12 @@ public class ScoreSpriteUIController : MonoBehaviour
         if (enemy2ScoreDisplay != null)
         {
             enemy2ScoreDisplay.SetScore(ScoreManager.Instance.Enemy2Score, false);
+        }
+
+        if (playScoreUiOnScoreChanged && scoreUiPresenter != null)
+        {
+            scoreUiPresenter.CaptureCurrentAsBase();
+            scoreUiPresenter.Show();
         }
     }
 }

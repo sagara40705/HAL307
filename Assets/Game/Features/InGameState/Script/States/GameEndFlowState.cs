@@ -15,6 +15,7 @@ public sealed class GameEndFlowState : InGameFlowStateBase
     public override IEnumerator Execute(InGameFlowContext context)
     {
         Debug.Log("[GameEndFlowState] Game end started.");
+        context?.WaveGauge?.HideWaveFinalForGameEnd();
 
         InGameFlowLock.BeginPresentation();
         try

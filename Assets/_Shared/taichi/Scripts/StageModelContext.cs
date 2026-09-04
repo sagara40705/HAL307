@@ -25,7 +25,22 @@ public sealed class StageModelContext : ContextBase
         return stageModelModeSystem.Apply(gameObject.scene);
     }
 
-    // ステージ終了判定のTransform
+    // Wave演出用の一時モデル切り替え
+    public bool BeginThreePlayerPresentation()
+    {
+        return stageModelModeSystem != null && stageModelModeSystem.BeginThreePlayerPresentation(gameObject.scene);
+    }
+
+    public void EndThreePlayerPresentation()
+    {
+        stageModelModeSystem?.EndThreePlayerPresentation();
+    }
+
+    private void OnDisable()
+    {
+        EndThreePlayerPresentation();
+    }
+
     // ステージ終了判定
     public StageEndJudge StageEndJudge => stageEndJudge;
 

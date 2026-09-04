@@ -1,4 +1,6 @@
 using AudienceRequest;
+using System.Collections;
+using System.Collections.Generic;
 using Enemy;
 using UnityEngine;
 using static Sound.Manager.SoundManager;
@@ -16,6 +18,7 @@ public sealed class InGameFlowContext : MonoBehaviour
     [SerializeField] private WaveGaugeController waveGaugeController;
     [SerializeField] private InGamePresentationAction resetPositionAction;
     [SerializeField] private AudienceRequestSystem audienceRequestSystem;
+    private StageModelContext _wavePresentationStage;
 
     // 前進制御
     public ForwardProgressMover ForwardProgressMover
@@ -106,6 +109,79 @@ public sealed class InGameFlowContext : MonoBehaviour
             ResolveAudienceRequestSystem();
             return audienceRequestSystem;
         }
+    }
+
+    // Wave演出中だけ3Pモデルを表示。入れ子の演出例外でも復元処理を実行
+    public IEnumerator PlayWavePresentation(IEnumerator presentation)
+    {
+        if (presentation == null)
+        {
+            yield break;
+        }
+
+        ResolveStageModelContext();
+        StageModelContext stage = stageModelContext;
+        bool ownsOverride = stage != null && stage.BeginThreePlayerPresentation();
+        if (ownsOverride)
+        {
+            _wavePresentationStage = stage;
+        }
+
+        var routines = new Stack<IEnumerator>();
+        routines.Push(presentation);
+        try
+        {
+            while (routines.Count > 0)
+            {
+                IEnumerator current = routines.Peek();
+                if (!current.MoveNext())
+                {
+                    routines.Pop();
+                    (current as System.IDisposable)?.Dispose();
+                }
+                else if (current.Current is IEnumerator nested)
+                {
+                    routines.Push(nested);
+                }
+                else
+                {
+                    yield return current.Current;
+                }
+            }
+        }
+        finally
+        {
+            try
+            {
+                while (routines.Count > 0)
+                {
+                    (routines.Pop() as System.IDisposable)?.Dispose();
+                }
+            }
+            finally
+            {
+                if (ownsOverride)
+                {
+                    RestoreWavePresentationStage();
+                }
+            }
+        }
+    }
+
+    // 演出終了・進行停止・シーン解放時のモデル復元
+    public void RestoreWavePresentationStage()
+    {
+        StageModelContext stage = _wavePresentationStage;
+        _wavePresentationStage = null;
+        if (stage != null)
+        {
+            stage.EndThreePlayerPresentation();
+        }
+    }
+
+    private void OnDisable()
+    {
+        RestoreWavePresentationStage();
     }
 
     public void ResetCameraPosition(StageData stageData)

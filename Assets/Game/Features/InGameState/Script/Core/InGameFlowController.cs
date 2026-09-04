@@ -34,6 +34,12 @@ public sealed class InGameFlowController : MonoBehaviour
         }
     }
 
+    // 進行オブジェクト停止時に演出用モデルを復元
+    private void OnDisable()
+    {
+        context?.RestoreWavePresentationStage();
+    }
+
     // 自動開始設定時の進行開始
     private void Start()
     {

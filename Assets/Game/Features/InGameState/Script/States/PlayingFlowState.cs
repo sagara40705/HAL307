@@ -41,7 +41,8 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         InGameFlowLock.BeginPresentation();
         try
         {
-            yield return action.Play(context);
+            IEnumerator presentation = action.Play(context);
+            yield return context != null ? context.PlayWavePresentation(presentation) : presentation;
         }
         finally
         {

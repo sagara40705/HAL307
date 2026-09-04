@@ -119,6 +119,9 @@ public sealed class InGameFlowContext : MonoBehaviour
             yield break;
         }
 
+        // ダンベルが落ち切って画面を覆うまで元のステージ表示を維持
+        yield return TransitionManager.WaitForTransitionCompletion();
+
         ResolveStageModelContext();
         StageModelContext stage = stageModelContext;
         bool ownsOverride = stage != null && stage.BeginThreePlayerPresentation();
@@ -148,6 +151,9 @@ public sealed class InGameFlowContext : MonoBehaviour
                     yield return current.Current;
                 }
             }
+
+            // 演出から開始したフェードも完了後にモデルを復元
+            yield return TransitionManager.WaitForTransitionCompletion();
         }
         finally
         {

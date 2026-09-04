@@ -41,7 +41,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+<<<<<<< HEAD
     - _BaseLine: 0.6724637
+=======
+    - _BaseLine: 0.572086
+>>>>>>> ab4cb4aba05e458f06be7a37584ae0a8f5d7236d
     - _BubblSpeed: 0.2
     - _BubbleDensity: 0.66
     - _BubbleScale: 1

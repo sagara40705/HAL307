@@ -3450,6 +3450,8 @@ MonoBehaviour:
   backgroundPanel: {fileID: 1703384834}
   dumbbellCanvasRoot: {fileID: 1162309330}
   dumbbellPrefab: {fileID: 538094209684891605, guid: f044afaf720143a4e89dd5210938c0d8, type: 3}
+  sceneUiRoots:
+  - {fileID: 1718496973}
   nextSceneName: 
   cellWidth: 130
   cellHeight: 80

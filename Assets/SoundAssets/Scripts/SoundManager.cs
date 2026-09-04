@@ -10,6 +10,7 @@ namespace Sound.Manager
         private static CriAtomEx.CueInfo[][] cueInfoList;
         private static CriAtomExPlayer atomExPlayer;
         private static CriAtomExAcb[] atomExAcb;
+        private static bool isSceneTransitioning;
 
         private void Awake()
         {
@@ -75,18 +76,46 @@ namespace Sound.Manager
         // Update is called once per frame
         private void OnDestroy()
         {
-            atomExPlayer.Dispose();
+            atomExPlayer?.Dispose();
+            atomExPlayer = null;
+        }
+
+        // 全Cueの停止。CRI未初期化時も呼び出し可能
+        public static void StopAll()
+        {
+            atomExPlayer?.Stop(true);
+        }
+
+        public static void BeginSceneTransition()
+        {
+            isSceneTransitioning = true;
+            StopAll();
+        }
+
+        public static void EndSceneTransition()
+        {
+            isSceneTransitioning = false;
         }
 
         public
          static void Play(int scenesoundtag, int soundtag)
         {
+            if (isSceneTransitioning || atomExPlayer == null)
+            {
+                return;
+            }
+
             atomExPlayer.SetCue(atomExAcb[scenesoundtag], cueInfoList[scenesoundtag][soundtag].name);
             atomExPlayer.Start();
         }
 
         public static void Stop(int scenesoundtag, int soundtag)
         {
+            if (atomExPlayer == null)
+            {
+                return;
+            }
+
             atomExPlayer.SetCue(atomExAcb[scenesoundtag], cueInfoList[scenesoundtag][soundtag].name);
             atomExPlayer.Stop();
         }

@@ -21,12 +21,15 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         context?.WaveGauge?.ResetWaveGauge();
         context?.AudienceRequest?.ResetRequests();
         context?.ResetProgressFollowerPositions(_stageData);
-        int currentEnemyCount = context?.EnemyLineup?.CurrentEnemyCount ?? 0;
+        // 追加演出中の仮Enemyを含めず、生成管理と同じ上限で判定
+        Enemy.EnemyLineupManager enemyLineup = context?.EnemyLineup;
+        int currentEnemyCount = enemyLineup?.CurrentEnemyCount ?? 0;
+        int maxEnemyCount = enemyLineup?.MaxEnemyCount ?? 0;
         BeginWaveEnemyReplacement(context);
         ApplyWaveAnimationSpeed(context);
 
 
-        InGamePresentationAction action = _waveData?.GetWaveStartAction(currentEnemyCount);
+        InGamePresentationAction action = _waveData?.GetWaveStartAction(currentEnemyCount, maxEnemyCount);
         if (action == null)
         {
             CommitPendingEnemyReplacement(context);

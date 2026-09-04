@@ -22,6 +22,8 @@ public sealed class GameModeManager : AppManagerBase<GameModeManager>
     private bool _isSelectionLocked;
 
     public GameMode CurrentGameMode => _currentGameMode;
+    // プレイヤー1人を除いたモード別の敵上限
+    public int MaxEnemyCount => _currentGameMode == GameMode.FivePlayer ? 4 : 2;
     public bool IsSelectionLocked => _isSelectionLocked;
 
     public event Action<GameMode, GameMode> GameModeChanged;
@@ -149,6 +151,7 @@ public sealed class GameModeManager : AppManagerBase<GameModeManager>
     {
         RuntimeDebug.DebugWindow window = RuntimeDebug.DebugMenu.CreateWindow(DebugWindowName);
         window.CreateMessage("Current Mode", () => _currentGameMode.ToString());
+        window.CreateMessage("Max Enemy Count", () => MaxEnemyCount.ToString());
         window.CreateMessage("Selection Locked", () => _isSelectionLocked.ToString());
         window.CreateButton("Select 3P", SelectThreePlayerMode);
         window.CreateButton("Select 5P", SelectFivePlayerMode);

@@ -230,6 +230,7 @@ GameObject:
   m_Component:
   - component: {fileID: 40763175}
   - component: {fileID: 40763176}
+  - component: {fileID: 40763177}
   m_Layer: 5
   m_Name: PlayerScore
   m_TagString: Untagged
@@ -302,6 +303,28 @@ MonoBehaviour:
   - {fileID: 1936833344, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
   - {fileID: -405588425, guid: ae38035bb1c13d44389d592f6849810f, type: 3}
   hideLeadingZero: 0
+--- !u!95 &40763177
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40763174}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 751774c368eafc84fa097cb28386ede6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!224 &68549861 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4762224450925470405, guid: 037d35f4770bcba43b0cbed74e127e45, type: 3}
@@ -317,6 +340,7 @@ GameObject:
   m_Component:
   - component: {fileID: 143103180}
   - component: {fileID: 143103181}
+  - component: {fileID: 143103182}
   m_Layer: 5
   m_Name: Enemy1Score
   m_TagString: Untagged
@@ -379,6 +403,28 @@ MonoBehaviour:
   - {fileID: 1493509100, guid: f8795669ae1ff0d4e85a282a6246a92a, type: 3}
   feverSprites: []
   hideLeadingZero: 0
+--- !u!95 &143103182
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 143103179}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 751774c368eafc84fa097cb28386ede6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &164823750
 GameObject:
   m_ObjectHideFlags: 0
@@ -2436,6 +2482,7 @@ GameObject:
   m_Component:
   - component: {fileID: 810082268}
   - component: {fileID: 810082269}
+  - component: {fileID: 810082270}
   m_Layer: 5
   m_Name: Enemy2Score
   m_TagString: Untagged
@@ -2498,6 +2545,28 @@ MonoBehaviour:
   - {fileID: 1493509100, guid: f8795669ae1ff0d4e85a282a6246a92a, type: 3}
   feverSprites: []
   hideLeadingZero: 0
+--- !u!95 &810082270
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810082267}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 751774c368eafc84fa097cb28386ede6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &811645271
 GameObject:
   m_ObjectHideFlags: 0
@@ -3255,6 +3324,10 @@ MonoBehaviour:
   scoreUiPresenter: {fileID: 0}
   showScoreUiOnStart: 1
   playScoreUiOnScoreChanged: 0
+  playerScoreAnimator: {fileID: 40763177}
+  enemy1ScoreAnimator: {fileID: 143103182}
+  enemy2ScoreAnimator: {fileID: 810082270}
+  scoreUpTriggerName: ScoreUp
 --- !u!224 &1041751640 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4762224450925470405, guid: 037d35f4770bcba43b0cbed74e127e45, type: 3}

@@ -16,10 +16,28 @@ public class ScoreSpriteUIController : MonoBehaviour
     [SerializeField] private bool showScoreUiOnStart = true;
     [SerializeField] private bool playScoreUiOnScoreChanged = false;
 
+    [Header("スコア全体の増加アニメーション")]
+    [SerializeField] private Animator playerScoreAnimator;
+    [SerializeField] private Animator enemy1ScoreAnimator;
+    [SerializeField] private Animator enemy2ScoreAnimator;
+
+    [SerializeField] private string scoreUpTriggerName = "ScoreUp";
+
+    private int previousPlayerScore;
+    private int previousEnemy1Score;
+    private int previousEnemy2Score;
+    private bool isScoreInitialized;
+
     private void Start()
     {
         if (ScoreManager.Instance != null)
         {
+            previousPlayerScore = ScoreManager.Instance.PlayerScore;
+            previousEnemy1Score = ScoreManager.Instance.Enemy1Score;
+            previousEnemy2Score = ScoreManager.Instance.Enemy2Score;
+
+            isScoreInitialized = true;
+
             ScoreManager.Instance.OnScoreChanged += UpdateScoreUI;
         }
 
@@ -48,21 +66,34 @@ public class ScoreSpriteUIController : MonoBehaviour
             return;
         }
 
-        bool isFever = feverGaugeController != null && feverGaugeController.IsFever;
+        int playerScore = ScoreManager.Instance.PlayerScore;
+        int enemy1Score = ScoreManager.Instance.Enemy1Score;
+        int enemy2Score = ScoreManager.Instance.Enemy2Score;
 
-        if (playerScoreDisplay != null)
-        {
-            playerScoreDisplay.SetScore(ScoreManager.Instance.PlayerScore, isFever);
-        }
+        bool isFever =
+            feverGaugeController != null &&
+            feverGaugeController.IsFever;
 
-        if (enemy1ScoreDisplay != null)
-        {
-            enemy1ScoreDisplay.SetScore(ScoreManager.Instance.Enemy1Score, false);
-        }
+        playerScoreDisplay?.SetScore(playerScore, isFever);
+        enemy1ScoreDisplay?.SetScore(enemy1Score, false);
+        enemy2ScoreDisplay?.SetScore(enemy2Score, false);
 
-        if (enemy2ScoreDisplay != null)
+        if (isScoreInitialized)
         {
-            enemy2ScoreDisplay.SetScore(ScoreManager.Instance.Enemy2Score, false);
+            if (playerScore > previousPlayerScore)
+            {
+                PlayScoreAnimation(playerScoreAnimator);
+            }
+
+            if (enemy1Score > previousEnemy1Score)
+            {
+                PlayScoreAnimation(enemy1ScoreAnimator);
+            }
+
+            if (enemy2Score > previousEnemy2Score)
+            {
+                PlayScoreAnimation(enemy2ScoreAnimator);
+            }
         }
 
         if (playScoreUiOnScoreChanged && scoreUiPresenter != null)
@@ -70,5 +101,22 @@ public class ScoreSpriteUIController : MonoBehaviour
             scoreUiPresenter.CaptureCurrentAsBase();
             scoreUiPresenter.Show();
         }
+
+        previousPlayerScore = playerScore;
+        previousEnemy1Score = enemy1Score;
+        previousEnemy2Score = enemy2Score;
+        isScoreInitialized = true;
     }
+
+    private void PlayScoreAnimation(Animator animator)
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        animator.ResetTrigger(scoreUpTriggerName);
+        animator.SetTrigger(scoreUpTriggerName);
+    }
+
 }

@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4f3fdc53c597c54287aca051578a63f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveGaugeController
-  waveMaterial: {fileID: 2100000, guid: bc9df0b15d884da409f57fb62cd6bb8a, type: 2}
+  waveMaterial: {fileID: 2100000, guid: f49efe179e8a863419244e51ec98c1a7, type: 2}
   propertyName: _BaseLine
   maxValue: 0.7
   minValue: 0
@@ -1720,6 +1720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.FeverGaugeController
   _flameMaterial: {fileID: 2100000, guid: 20381abbc77054941abb9cd752d95570, type: 2}
   _fillAmountProperty: _FillAmount
+  DefaultFillIncrease: 0.05
   _settings: {fileID: 11400000, guid: ea2bf89f412340769fbc91f7a7ac23f3, type: 2}
   _fireAnimObject: {fileID: 1491470896}
   _cutInObject: {fileID: 918885603}
@@ -3001,7 +3002,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 2100000, guid: bc9df0b15d884da409f57fb62cd6bb8a, type: 2}
+  m_Material: {fileID: 2100000, guid: f49efe179e8a863419244e51ec98c1a7, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -3591,7 +3592,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 34734335
+    rgba: 4278255607
   m_fontColor: {r: 0.9677062, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -4106,6 +4107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f4e11af4591a464fbeba8ca3c870833, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
+  _inGameSceneName: InGameUI
   scoreSettings: {fileID: 11400000, guid: 14a11d019d4b4b7ca4a16fdcd3b02f1f, type: 2}
 --- !u!224 &1376770249
 RectTransform:

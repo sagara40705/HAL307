@@ -18,6 +18,7 @@ public class ScoreManager : MonoBehaviour
 
     public event Action OnScoreChanged;
 
+    // 
     private void Awake()
     {
         if (Instance == null)
@@ -139,7 +140,7 @@ public class ScoreManager : MonoBehaviour
         OnScoreChanged?.Invoke();
     }
 
-    public void ResetScoresForTutorial()
+    public void ResetAllScores()
     {
         PlayerScore = 0;
         Enemy1Score = 0;
@@ -148,6 +149,12 @@ public class ScoreManager : MonoBehaviour
         Enemy4Score = 0;
 
         OnScoreChanged?.Invoke();
+
+    }
+
+    public void ResetScoresForTutorial()
+    {
+        ResetAllScores();
     }
 
     private int ScoreUnit => scoreSettings != null

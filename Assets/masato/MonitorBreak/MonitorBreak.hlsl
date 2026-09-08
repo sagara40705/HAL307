@@ -174,6 +174,7 @@ half4 ApplyBreakEffect(half4 baseColor, float2 uv)
         crackStart + _HoleSoftness,
         distanceFromCenter
     );
+    
     float crackEndMask = 1.0 - smoothstep(
         crackLength,
         crackLength + _HoleSoftness,

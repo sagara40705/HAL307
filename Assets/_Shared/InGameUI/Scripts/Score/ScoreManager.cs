@@ -4,9 +4,9 @@ using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
-    [Header("スコア初期化")]
-    [SerializeField]
-    private string _inGameSceneName = "InGameUI";
+    //[Header("スコア初期化")]
+    //[SerializeField]
+    //private string _inGameSceneName = "InGameUI";
 
     private const int DefaultScoreUnit = 10;
     private const int DefaultFeverScoreMultiplier = 2;
@@ -31,7 +31,7 @@ public class ScoreManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            SceneManager.sceneLoaded += OnSceneLoaded;
+            //SceneManager.sceneLoaded += OnSceneLoaded;
 
             if (scoreSettings == null)
             {
@@ -44,25 +44,25 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    private void OnSceneLoaded(Scene scene,LoadSceneMode loadSceneMode)
-    {
-        if (scene.name != _inGameSceneName)
-        {
-            return;
-        }
+    //private void OnSceneLoaded(Scene scene,LoadSceneMode loadSceneMode)
+    //{
+    //    if (scene.name != _inGameSceneName)
+    //    {
+    //        return;
+    //    }
 
-        ResetAllScores();
-    }
-    private void OnDestroy()
-    {
-        if (Instance != this)
-        {
-            return;
-        }
+    //    ResetAllScores();
+    //}
+    //private void OnDestroy()
+    //{
+    //    if (Instance != this)
+    //    {
+    //        return;
+    //    }
 
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-        Instance = null;
-    }
+    //    SceneManager.sceneLoaded -= OnSceneLoaded;
+    //    Instance = null;
+    //}
 
     // プレイヤースコア加算
     public void AddPlayerScore(int score, bool isFever = false)

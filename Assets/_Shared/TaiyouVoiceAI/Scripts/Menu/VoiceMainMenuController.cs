@@ -34,8 +34,14 @@ public class VoiceMainMenuController : MonoBehaviour
     [SerializeField] private Key upKey2 = Key.W;
     [SerializeField] private Key downKey = Key.DownArrow;
     [SerializeField] private Key downKey2 = Key.S;
+    [SerializeField] private Key leftKey = Key.LeftArrow;
+    [SerializeField] private Key rightKey = Key.RightArrow;
     [SerializeField] private Key decideKey = Key.Enter;
     [SerializeField] private Key decideKey2 = Key.Space;
+
+    [Header("Left / Right Actions")]
+    [SerializeField] private UnityEvent[] onLeftEvents;
+    [SerializeField] private UnityEvent[] onRightEvents;
 
     [Header("Debug Time Rule")]
     [SerializeField] private bool requireOpenBeforeControl = true;
@@ -89,6 +95,16 @@ public class VoiceMainMenuController : MonoBehaviour
         if (WasPressed(downKey) || WasPressed(downKey2))
         {
             MoveDown();
+        }
+
+        if (WasPressed(leftKey))
+        {
+            MoveLeft();
+        }
+
+        if (WasPressed(rightKey))
+        {
+            MoveRight();
         }
 
         if (WasPressed(decideKey) || WasPressed(decideKey2))
@@ -158,6 +174,32 @@ public class VoiceMainMenuController : MonoBehaviour
                 else
                 {
                     Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=sita skipped. reason=menu not open");
+                }
+                break;
+
+            case "hidari":
+                if (!requireOpenBeforeControl || isMenuOpen)
+                {
+                    Debug.Log("[Menu Voice] hidari -> MoveLeft");
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=hidari -> MoveLeft");
+                    MoveLeft();
+                }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=hidari skipped. reason=menu not open");
+                }
+                break;
+
+            case "migi":
+                if (!requireOpenBeforeControl || isMenuOpen)
+                {
+                    Debug.Log("[Menu Voice] migi -> MoveRight");
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=migi -> MoveRight");
+                    MoveRight();
+                }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=migi skipped. reason=menu not open");
                 }
                 break;
 
@@ -320,6 +362,22 @@ public class VoiceMainMenuController : MonoBehaviour
         Debug.Log("[VoiceMenuController] 下へ移動: " + currentIndex);
     }
 
+    public void MoveLeft()
+    {
+        if (!TryInvokeDirectionalEvent(onLeftEvents, "left"))
+        {
+            Debug.Log($"[VoiceMenuController] 左操作は現在の項目では未設定です: {currentIndex}");
+        }
+    }
+
+    public void MoveRight()
+    {
+        if (!TryInvokeDirectionalEvent(onRightEvents, "right"))
+        {
+            Debug.Log($"[VoiceMenuController] 右操作は現在の項目では未設定です: {currentIndex}");
+        }
+    }
+
     public void Decide()
     {
         string itemName = "None";
@@ -345,6 +403,19 @@ public class VoiceMainMenuController : MonoBehaviour
         }
 
         onDecideEvents[currentIndex]?.Invoke();
+    }
+
+    private bool TryInvokeDirectionalEvent(UnityEvent[] events, string direction)
+    {
+        if (events == null || currentIndex < 0 || currentIndex >= events.Length || events[currentIndex] == null)
+        {
+            Debug.Log($"[MenuVoiceTrace] Directional event skipped. direction={direction}, index={currentIndex}, reason=not assigned");
+            return false;
+        }
+
+        Debug.Log($"[MenuVoiceTrace] Directional event invoked. direction={direction}, index={currentIndex}");
+        events[currentIndex].Invoke();
+        return true;
     }
 
     private void UpdateSelection()

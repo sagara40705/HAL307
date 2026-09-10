@@ -1,5 +1,7 @@
 ue
 sita
+hidari
+migi
 kettei
 time
 none

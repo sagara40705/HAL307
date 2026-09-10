@@ -13,7 +13,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
     [Header("References")]
     [SerializeField] private TextAsset labelsAsset;
     [SerializeField] private MicrophoneInput microphoneInput;
-    [SerializeField] private MfccFeatureExtractor featureExtractor;
+    [SerializeField] private PythonCompatMfccFeatureExtractor featureExtractor;
     [SerializeField] private MenuVoiceCommandAction menuVoiceCommandAction;
 
     [Header("Inference")]
@@ -28,7 +28,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
     [SerializeField] private bool ignoreNone = true;
     [SerializeField] private float commandCooldown = 0.6f;
 
-    private readonly string[] fallbackLabels = { "ue", "sita", "kettei", "time", "none" };
+    private readonly string[] fallbackLabels = { "ue", "sita", "hidari", "migi", "kettei", "time", "none" };
 
     private Worker worker;
     private Model runtimeModel;
@@ -55,7 +55,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         if (featureExtractor == null)
         {
-            featureExtractor = GetComponent<MfccFeatureExtractor>();
+            featureExtractor = GetComponent<PythonCompatMfccFeatureExtractor>();
         }
 
         if (menuVoiceCommandAction == null)
@@ -65,7 +65,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         if (microphoneInput == null || featureExtractor == null)
         {
-            Debug.LogError("VoiceOnnxRunner_Menu: MicrophoneInput または MfccFeatureExtractor が見つかりません。");
+            Debug.LogError("VoiceOnnxRunner_Menu: MicrophoneInput または PythonCompatMfccFeatureExtractor が見つかりません。");
             enabled = false;
             return;
         }
@@ -132,12 +132,12 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         float[,] mfcc = featureExtractor.ExtractMfcc(samples);
 
         using Tensor<float> inputTensor = new Tensor<float>(
-            new TensorShape(1, 1, MfccFeatureExtractor.MfccCount, MfccFeatureExtractor.TargetWidth)
+            new TensorShape(1, 1, PythonCompatMfccFeatureExtractor.MfccCount, PythonCompatMfccFeatureExtractor.TargetWidth)
         );
 
-        for (int m = 0; m < MfccFeatureExtractor.MfccCount; m++)
+        for (int m = 0; m < PythonCompatMfccFeatureExtractor.MfccCount; m++)
         {
-            for (int t = 0; t < MfccFeatureExtractor.TargetWidth; t++)
+            for (int t = 0; t < PythonCompatMfccFeatureExtractor.TargetWidth; t++)
             {
                 inputTensor[0, 0, m, t] = mfcc[m, t];
             }
@@ -162,6 +162,11 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         }
 
         int predictedIndex = ArgMax(readable);
+        if (readable.shape.length != labels.Length)
+        {
+            Debug.LogWarning($"VoiceOnnxRunner_Menu: ONNX output class count and labels count do not match. output={readable.shape.length}, labels={labels.Length}. Check model and labels order.");
+        }
+
         if (predictedIndex < 0 || predictedIndex >= labels.Length)
         {
             Debug.LogWarning($"VoiceOnnxRunner_Menu: predicted index {predictedIndex} is outside labels length {labels.Length}.");

@@ -87,10 +87,24 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         if (state == VoiceProcessState.Idle)
         {
+            Debug.Log(
+                $"[GameVoiceTrace] Update " +
+                $"state={state}, " +
+                $"timer={timer:F3}, " +
+                $"deltaTime={Time.deltaTime:F6}, " +
+                $"unscaledDeltaTime={Time.unscaledDeltaTime:F6}, " +
+                $"timeScale={Time.timeScale:F2}"
+            );
+
             timer += Time.deltaTime;
 
             if (timer >= inferenceInterval)
             {
+                Debug.Log(
+                    $"[GameVoiceTrace] Idle -> CheckVolume " +
+                    $"timer={timer:F3}, interval={inferenceInterval:F3}"
+                );
+
                 timer = 0f;
 
                 Debug.Log("[Voice] 推論開始");
@@ -175,6 +189,11 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         cachedVolume = GetMaxAbs(cachedSamples);
         bool isBelowThreshold = cachedVolume < minVolumeThreshold;
+        Debug.Log(
+            $"[GameVoiceTrace] volume={cachedVolume:F8}, " +
+            $"threshold={minVolumeThreshold:F8}, " +
+            $"belowThreshold={cachedVolume < minVolumeThreshold}"
+        );
         Debug.Log($"[VoiceTrace] 3. cachedVolume={cachedVolume:F8}");
         Debug.Log($"[VoiceTrace] 4. minVolumeThreshold={minVolumeThreshold:F8}");
         Debug.Log($"[VoiceTrace] 5. cachedVolume < minVolumeThreshold = {isBelowThreshold}");

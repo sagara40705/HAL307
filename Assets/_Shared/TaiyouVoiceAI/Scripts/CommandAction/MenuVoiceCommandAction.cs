@@ -6,6 +6,8 @@ public class MenuVoiceCommandAction : MonoBehaviour
     private const string CommandTime = "time";
     private const string CommandUp = "ue";
     private const string CommandDown = "sita";
+    private const string CommandLeft = "hidari";
+    private const string CommandRight = "migi";
     private const string CommandDecision = "kettei";
     private const string CommandNone = "none";
 
@@ -19,9 +21,12 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
     [Header("Time Command")]
     [SerializeField] private bool requireTimeBeforeMenuControl = true;
+    [SerializeField] private float menuControlStartDelay = 1.0f;
     [SerializeField] private float menuControlEnableTime = 5.0f;
 
     private bool menuControlEnabled;
+    private bool menuControlWaiting;
+    private float menuControlStartDelayTimer;
     private float menuControlTimer;
 
     private void Start()
@@ -41,6 +46,21 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
     private void Update()
     {
+        if (menuControlWaiting)
+        {
+            menuControlStartDelayTimer -= Time.unscaledDeltaTime;
+            if (menuControlStartDelayTimer <= 0f)
+            {
+                menuControlWaiting = false;
+                menuControlEnabled = true;
+                menuControlTimer = menuControlEnableTime;
+                Debug.Log("[Menu Voice] メニュー音声操作受付開始");
+                Debug.Log($"[MenuVoiceTrace] Menu control started. duration={menuControlEnableTime:F3}, remaining={menuControlTimer:F3}");
+            }
+
+            return;
+        }
+
         if (!menuControlEnabled)
         {
             return;
@@ -55,13 +75,14 @@ public class MenuVoiceCommandAction : MonoBehaviour
         if (menuControlTimer <= 0f)
         {
             menuControlEnabled = false;
-            Debug.Log("[Menu Voice] Time command window expired.");
+            Debug.Log("[Menu Voice] メニュー音声操作受付終了");
+            Debug.Log("[MenuVoiceTrace] Time command window expired.");
         }
     }
 
     public void ExecuteCommand(string command, float volume)
     {
-        Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand entered. command={command}, volume={volume:F8}, menuControlEnabled={menuControlEnabled}, menuControlTimer={menuControlTimer:F3}, requireTimeBeforeMenuControl={requireTimeBeforeMenuControl}, menuControllerNull={menuController == null}");
+        Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand entered. command={command}, volume={volume:F8}, menuControlEnabled={menuControlEnabled}, menuControlWaiting={menuControlWaiting}, startDelayRemaining={menuControlStartDelayTimer:F3}, menuControlTimer={menuControlTimer:F3}, requireTimeBeforeMenuControl={requireTimeBeforeMenuControl}, menuControllerNull={menuController == null}");
 
         if (string.IsNullOrWhiteSpace(command))
         {
@@ -87,8 +108,17 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
         if (requireTimeBeforeMenuControl && !menuControlEnabled)
         {
-            Debug.Log($"[Menu Voice] Command skipped. Reason=Time command is required first. Command={command}");
-            Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction return. reason=time window disabled, command={command}, remaining={menuControlTimer:F3}");
+            if (menuControlWaiting)
+            {
+                Debug.Log($"[Menu Voice] Command skipped. Reason=Waiting after time command. Command={command}");
+                Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction return. reason=start delay active, command={command}, startDelayRemaining={menuControlStartDelayTimer:F3}");
+            }
+            else
+            {
+                Debug.Log($"[Menu Voice] Command skipped. Reason=Time command is required first. Command={command}");
+                Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction return. reason=time window disabled, command={command}, remaining={menuControlTimer:F3}");
+            }
+
             return;
         }
 
@@ -116,14 +146,36 @@ public class MenuVoiceCommandAction : MonoBehaviour
         ExecuteCommand(CommandDecision, 0f);
     }
 
+    public void DebugExecuteLeftCommand()
+    {
+        ExecuteCommand(CommandLeft, 0f);
+    }
+
+    public void DebugExecuteRightCommand()
+    {
+        ExecuteCommand(CommandRight, 0f);
+    }
+
     private void EnableMenuControl()
     {
-        menuControlEnabled = true;
-        menuControlTimer = menuControlEnableTime;
-        Debug.Log($"[MenuVoiceTrace] Time window enabled. duration={menuControlEnableTime:F3}, remaining={menuControlTimer:F3}");
+        menuControlEnabled = false;
+        menuControlWaiting = true;
+        menuControlStartDelayTimer = Mathf.Max(0f, menuControlStartDelay);
+        menuControlTimer = 0f;
+        Debug.Log("[Menu Voice] 1秒待機開始");
+        Debug.Log($"[MenuVoiceTrace] Time command accepted. startDelay={menuControlStartDelayTimer:F3}, controlDuration={menuControlEnableTime:F3}");
 
         GamePhase currentPhase = GetCurrentPhase();
         Debug.Log($"[Menu Voice] Time command accepted. Phase={currentPhase}");
+
+        if (menuControlStartDelayTimer <= 0f)
+        {
+            menuControlWaiting = false;
+            menuControlEnabled = true;
+            menuControlTimer = menuControlEnableTime;
+            Debug.Log("[Menu Voice] メニュー音声操作受付開始");
+            Debug.Log($"[MenuVoiceTrace] Menu control started immediately. duration={menuControlEnableTime:F3}, remaining={menuControlTimer:F3}");
+        }
 
         if (currentPhase == GamePhase.InGame)
         {
@@ -190,6 +242,8 @@ public class MenuVoiceCommandAction : MonoBehaviour
         {
             case CommandUp:
             case CommandDown:
+            case CommandLeft:
+            case CommandRight:
             case CommandDecision:
                 SendCommandTo(menuController, command);
                 break;
@@ -206,6 +260,8 @@ public class MenuVoiceCommandAction : MonoBehaviour
         {
             case CommandUp:
             case CommandDown:
+            case CommandLeft:
+            case CommandRight:
             case CommandDecision:
                 SendCommandTo(menuController, command);
                 SendCommandTo(stageSelectController, command);
@@ -278,6 +334,8 @@ public class MenuVoiceCommandAction : MonoBehaviour
         window.CreateButton("\u30bf\u30a4\u30e0", DebugExecuteTimeCommand);
         window.CreateButton("\u4e0a", DebugExecuteUpCommand);
         window.CreateButton("\u4e0b", DebugExecuteDownCommand);
+        window.CreateButton("\u5de6", DebugExecuteLeftCommand);
+        window.CreateButton("\u53f3", DebugExecuteRightCommand);
         window.CreateButton("\u6c7a\u5b9a", DebugExecuteDecisionCommand);
     }
 }

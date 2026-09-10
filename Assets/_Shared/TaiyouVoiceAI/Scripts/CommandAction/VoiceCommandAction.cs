@@ -38,6 +38,7 @@ public class VoiceCommandAction : MonoBehaviour
         }
 
         float db = VolumeToDb(volume);
+
         Debug.Log($"[ActionTrace] VoiceCommandAction gate. command={command}, db={db:F2}, minimumDb={minimumDb:F2}, belowMinimum={db < minimumDb}");
         if (db < minimumDb)
         {

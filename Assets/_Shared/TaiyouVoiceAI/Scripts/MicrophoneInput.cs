@@ -14,6 +14,7 @@ public class MicrophoneInput : MonoBehaviour
     private SharedRecording sharedRecording;
     private Coroutine recordingCoroutine;
     private bool isUsingSharedRecording;
+    private float nextSampleStatsLogTime;
 
     private sealed class SharedRecording
     {
@@ -184,8 +185,67 @@ public class MicrophoneInput : MonoBehaviour
 
         microphoneClip.GetData(sampleBuffer, startPosition);
 
+        LogSampleStatsIfNeeded(sampleBuffer);
+
         Debug.Log($"[MicDebug] GetLatestSamples returned. object={gameObject.name}, samples={sampleBuffer.Length}, startPosition={startPosition}");
         return sampleBuffer;
+    }
+
+    private void LogSampleStatsIfNeeded(float[] samples)
+    {
+        if (Time.unscaledTime < nextSampleStatsLogTime)
+        {
+            return;
+        }
+
+        nextSampleStatsLogTime = Time.unscaledTime + 1f;
+
+        if (samples == null || samples.Length == 0)
+        {
+            Debug.Log($"[MicSampleStats] object={gameObject.name}, scene={gameObject.scene.name}, samples=0");
+            return;
+        }
+
+        float min = samples[0];
+        float max = samples[0];
+        float maxAbs = Mathf.Abs(samples[0]);
+        double absSum = 0.0;
+        double squareSum = 0.0;
+        int clippedCount = 0;
+
+        for (int i = 0; i < samples.Length; i++)
+        {
+            float sample = samples[i];
+            float abs = Mathf.Abs(sample);
+
+            if (sample < min)
+            {
+                min = sample;
+            }
+
+            if (sample > max)
+            {
+                max = sample;
+            }
+
+            if (abs > maxAbs)
+            {
+                maxAbs = abs;
+            }
+
+            absSum += abs;
+            squareSum += sample * sample;
+
+            if (abs >= 0.99f)
+            {
+                clippedCount++;
+            }
+        }
+
+        float meanAbs = (float)(absSum / samples.Length);
+        float rms = Mathf.Sqrt((float)(squareSum / samples.Length));
+
+        Debug.Log($"[MicSampleStats] object={gameObject.name}, scene={gameObject.scene.name}, min={min:F6} max={max:F6} maxAbs={maxAbs:F6} meanAbs={meanAbs:F6} RMS={rms:F6} clipped={clippedCount}/{samples.Length}");
     }
 
     public float GetCurrentVolume()

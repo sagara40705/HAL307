@@ -779,7 +779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c856e51ef97f0b4889eb28f45a3cf22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: asdfTest.Sandbox::HowToController
-  mainMenuPanel: {fileID: 1796446392}
+  mainMenuPanel: {fileID: 2138444099}
   howToPanel: {fileID: 303607548}
   howToImage: {fileID: 1238506505}
   pages:
@@ -1045,7 +1045,7 @@ MonoBehaviour:
   sensitivityStep: 1
   firstRepeatDelay: 0.35
   repeatInterval: 0.06
-  mainMenuPanel: {fileID: 1796446392}
+  mainMenuPanel: {fileID: 2138444099}
   micSettingPanel: {fileID: 471578821}
   microphoneInput: {fileID: 1796446401}
   voiceRunner: {fileID: 1796446400}
@@ -1060,6 +1060,7 @@ MonoBehaviour:
   sensitivity: 70
   minThreshold: 0.005
   maxThreshold: 0.08
+  applyThresholdToVoiceRunner: 0
   upKey: 63
   downKey: 64
   leftKey: 61
@@ -3113,6 +3114,7 @@ GameObject:
   - component: {fileID: 1796446400}
   - component: {fileID: 1796446399}
   - component: {fileID: 1796446403}
+  - component: {fileID: 1796446404}
   m_Layer: 0
   m_Name: VOICE
   m_TagString: Untagged
@@ -3298,13 +3300,17 @@ MonoBehaviour:
         m_CallState: 2
   enableDebugKeyInput: 1
   openMenuKey: 34
-  closeMenuKey: 16
+  closeMenuKey: 30
   upKey: 63
   upKey2: 37
   downKey: 64
   downKey2: 33
+  leftKey: 61
+  rightKey: 62
   decideKey: 2
   decideKey2: 1
+  onLeftEvents: []
+  onRightEvents: []
   requireOpenBeforeControl: 1
 --- !u!114 &1796446399
 MonoBehaviour:
@@ -3321,6 +3327,7 @@ MonoBehaviour:
   menuController: {fileID: 0}
   stageSelectController: {fileID: 0}
   requireTimeBeforeMenuControl: 1
+  menuControlStartDelay: 1
   menuControlEnableTime: 5
 --- !u!114 &1796446400
 MonoBehaviour:
@@ -3334,17 +3341,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2325b13f2f4fb0d4aa07d6adf6568982, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceOnnxRunner_Menu
-  modelAsset: {fileID: 5022602860645237092, guid: dc2be32ced235f84da3121524ca181c6, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: a4e7059e7aea44d46957b7c16415f3f1, type: 3}
   labelsAsset: {fileID: 4900000, guid: dd5c08f4a1eda6c4bb73efbdbf86595c, type: 3}
   microphoneInput: {fileID: 1796446401}
-  featureExtractor: {fileID: 1796446402}
+  featureExtractor: {fileID: 1796446404}
   menuVoiceCommandAction: {fileID: 1796446399}
   inferenceInterval: 0.7
-  minVolumeThreshold: 0.02
+  minVolumeThreshold: 0.0001
   requireHoldToTalk: 0
   holdToTalkKey: 36
-  logPrediction: 0
-  logScores: 0
+  logPrediction: 1
+  logScores: 1
   ignoreNone: 0
   commandCooldown: 0.8
 --- !u!114 &1796446401
@@ -3379,6 +3386,21 @@ MonoBehaviour:
   melFilterCount: 40
   preEmphasis: 0.97
   normalizePerFeature: 1
+--- !u!114 &1796446404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796446392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7afed63fe97445228c7246b936eeb6b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PythonCompatMfccFeatureExtractor
+  logFeatureStats: 1
+  exportCsvOnNextExtraction: 0
+  csvFileName: python_compat_mfcc.csv
 --- !u!114 &1796446403
 MonoBehaviour:
   m_ObjectHideFlags: 0

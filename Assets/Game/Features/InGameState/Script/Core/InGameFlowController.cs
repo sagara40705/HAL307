@@ -127,6 +127,7 @@ public sealed class InGameFlowController : MonoBehaviour
 
             yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave, nextWave));
             _currentWaveIndex++;
+            ScoreManager.Instance?.ResetAllScores();
             _currentWaveData = nextWave;
             _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
             _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);

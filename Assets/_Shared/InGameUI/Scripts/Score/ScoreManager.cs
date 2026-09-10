@@ -26,21 +26,25 @@ public class ScoreManager : MonoBehaviour
     // 
     private void Awake()
     {
+        //  
         if (Instance != null && Instance != this)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            SceneManager.sceneLoaded += OnSceneLoaded;
-
-            if (scoreSettings == null)
-            {
-                Debug.LogWarning("[ScoreManager] ScoreSettings is not assigned. Default score values are used.");
-            }
-        }
-        else
-        {
             Destroy(gameObject);
+            return;
+        }
+
+        //  
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        if (scoreSettings == null)
+        {
+            Debug.LogWarning(
+                "[ScoreManager] ScoreSettings is not assigned. " +
+                "Default score values are used."
+            );
         }
     }
 

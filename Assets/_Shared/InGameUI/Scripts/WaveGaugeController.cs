@@ -17,6 +17,8 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private float warningThreshold = 0.2f;
     [SerializeField] private Animator warningAnimator;
     private bool isWarningVisible;
+    // FinalPose UIが表示中か
+    public bool IsFinalPoseVisible => isWarningVisible;
     private bool isWaveFinalSuppressed;
 
     [Header("Wave演出時に非表示にするUI")]
@@ -317,4 +319,36 @@ public class WaveGaugeController : MonoBehaviour
             warningUI.SetActive(false);
         }
     }
+    // FinalPose表示中にプレイヤーがリクエストを消した時に呼ぶ
+    public void CompleteWaveOnPlayerRequestClear()
+    {
+        // FinalPoseが表示されていなければ何もしない
+        if (!isWarningVisible)
+        {
+            return;
+        }
+
+        SetupStageEndJudge();
+
+        if (stageEndJudge == null)
+        {
+            Debug.LogWarning(
+                "[WaveGaugeController] " +
+                "Wave completion skipped. StageEndJudge was not found."
+            );
+
+            return;
+        }
+
+        Debug.Log(
+            "[WaveGaugeController] " +
+            "Player cleared a request during FinalPose. " +
+            "Forcing stage end."
+        );
+
+        // Wave終了イベントを発火
+        // FadeOutはOnStageEnd()から再生される
+        stageEndJudge.ForceStageEndWithoutScore();
+    }
+
 }

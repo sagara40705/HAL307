@@ -90,8 +90,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdjustableUiPresenter
   _targetRect: {fileID: 0}
   _canvasGroup: {fileID: 0}
-  _hideOnAwake: 1
-  _deactivateWhenHidden: 1
+  _hideOnAwake: 0
+  _deactivateWhenHidden: 0
   _positionOffset: {x: 0, y: 0}
   _showDelay: 0
   _fadeInDuration: 0.2

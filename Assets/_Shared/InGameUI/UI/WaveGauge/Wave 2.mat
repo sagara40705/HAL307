@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Wave 1
+  m_Name: Wave 2
   m_Shader: {fileID: -6465566751694194690, guid: 81d79d728ef9f954bace811567ac98a0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -41,11 +41,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-<<<<<<< HEAD
-    - _BaseLine: 0.6724637
-=======
-    - _BaseLine: 0.572086
->>>>>>> ab4cb4aba05e458f06be7a37584ae0a8f5d7236d
+    - _BaseLine: 0.19985199
     - _BubblSpeed: 0.2
     - _BubbleDensity: 0.66
     - _BubbleScale: 1

@@ -12,8 +12,6 @@ namespace AudienceRequest
         [Header("参照")]
         [SerializeField] private AudienceRequestSystem _audienceRequestSystem; // AudienceRequestSystemの参照
 
-       
-
         [SerializeField] private RectTransform _uiParent; // UIの親オブジェクト
         [SerializeField] private List<GameObject> _uiPrefabs = new(); // UIプレハブのリスト
 
@@ -143,6 +141,11 @@ namespace AudienceRequest
         // 指定ポーズのUIを生成する
         public GameObject Generate(PoseID pose)
         {
+            if (!CanGenerateUi())
+            {
+                return null;
+            }
+
             if (!IsValidPose(pose))
             {
                 Debug.LogError($"Invalid audience request pose: {pose}");
@@ -306,7 +309,6 @@ namespace AudienceRequest
                 yield break;
             }
 
-            obj.SetActive(false);
             _uiPools[poseIndex].Release(obj);
         }
 
@@ -340,8 +342,6 @@ namespace AudienceRequest
             {
                 yield break;
             }
-
-            obj.SetActive(false);
 
             _blackUiPools[(int)pose].Release(obj);
         }
@@ -695,7 +695,13 @@ namespace AudienceRequest
                 return;
             }
 
-            AdjustableUiPresenter presenter = obj.GetComponent<AdjustableUiPresenter>();
+            if (!obj.activeSelf)
+            {
+                obj.SetActive(true);
+            }
+
+            AdjustableUiPresenter presenter =
+                obj.GetComponent<AdjustableUiPresenter>();
 
             if (presenter == null)
             {
@@ -708,12 +714,13 @@ namespace AudienceRequest
 
         private void PlayHidePresentation(GameObject obj)
         {
-            if (obj == null)
+            if (obj == null || !obj.activeInHierarchy)
             {
                 return;
             }
 
-            AdjustableUiPresenter presenter = obj.GetComponent<AdjustableUiPresenter>();
+            AdjustableUiPresenter presenter =
+                obj.GetComponent<AdjustableUiPresenter>();
 
             if (presenter == null)
             {
@@ -723,6 +730,20 @@ namespace AudienceRequest
             presenter.Hide();
         }
 
+
+        private bool CanGenerateUi()
+        {
+            if (_uiParent == null)
+            {
+                Debug.LogWarning(
+                    "[AudienceRequestUiPool] UI generation skipped. UI Parent is null."
+                );
+
+                return false;
+            }
+
+            return _uiParent.gameObject.activeInHierarchy;
+        }
     }
 }
 

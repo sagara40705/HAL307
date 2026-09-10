@@ -13,9 +13,6 @@ public class UIManager : MonoBehaviour
     public GameObject resultPanel; // リザルトUI
 
 
-    //各UI要素の参照を追加
-    //[Header("タイトルUI")]
-
     [Header("ゲームUI")]
     public FeverGaugeController gauge;   // ゲージ
 

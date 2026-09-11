@@ -52,6 +52,7 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
     protected override IEnumerator OnInitialize()
     {
         IsBusy = false;
+        UnitySceneManager.sceneUnloaded += OnSceneUnloaded;
         yield break;
     }
 
@@ -138,6 +139,14 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
 
     private IEnumerator LoadCoroutine(string sceneName, LoadSceneMode mode)
     {
+        Debug.Log(
+            $"[SceneLoadTrace] " +
+            $"sceneName={sceneName}, " +
+            $"mode={mode}, " +
+            $"activeScene={UnitySceneManager.GetActiveScene().name}, " +
+            $"loadedScenes=[{GetLoadedSceneNames()}]"
+        );
+
         if (string.IsNullOrWhiteSpace(sceneName))
         {
             Debug.LogError($"[SceneLoader] Load failed. Reason=Scene name is empty. Mode={mode}");
@@ -274,6 +283,11 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
         }
 
         return string.Join(", ", sceneNames);
+    }
+
+    private void OnSceneUnloaded(Scene scene)
+    {
+        Debug.Log($"[SceneUnloadTrace] scene={scene.name}");
     }
 
     private static bool TryGetReadyInstance(string actionName, string sceneName, out SceneLoader sceneLoader)

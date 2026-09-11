@@ -15,6 +15,7 @@ public class MicrophoneInput : MonoBehaviour
     private Coroutine recordingCoroutine;
     private bool isUsingSharedRecording;
     private float nextSampleStatsLogTime;
+    private float nextMicCompareLogTime;
 
     private sealed class SharedRecording
     {
@@ -35,6 +36,7 @@ public class MicrophoneInput : MonoBehaviour
     private void OnEnable()
     {
         Debug.Log($"[MicDebug] OnEnable object={gameObject.name}, scene={gameObject.scene.name}, sampleBufferReady={sampleBuffer != null}, isUsingShared={isUsingSharedRecording}");
+        LogSharedMicTrace("OnEnable");
 
         if (sampleBuffer != null && !isUsingSharedRecording)
         {
@@ -66,13 +68,17 @@ public class MicrophoneInput : MonoBehaviour
 
     private void AcquireSharedRecording()
     {
+        LogSharedMicTrace("AcquireSharedRecording enter");
+
         if (isUsingSharedRecording)
         {
+            LogSharedMicTrace("AcquireSharedRecording skip already using shared");
             return;
         }
 
         if (string.IsNullOrEmpty(deviceName))
         {
+            LogSharedMicTrace("AcquireSharedRecording skip empty deviceName");
             return;
         }
 
@@ -103,16 +109,19 @@ public class MicrophoneInput : MonoBehaviour
             SharedRecordings[deviceName] = sharedRecording;
             Debug.Log("マイク録音開始");
             Debug.Log($"[MicDebug] Created shared recording. object={gameObject.name}, deviceName={deviceName}");
+            LogSharedMicTrace("AcquireSharedRecording created shared recording");
         }
         else
         {
             Debug.Log($"[MicDebug] Reusing shared recording. object={gameObject.name}, deviceName={deviceName}");
+            LogSharedMicTrace("AcquireSharedRecording reusing shared recording");
         }
 
         sharedRecording.UseCount++;
         microphoneClip = sharedRecording.Clip;
         isUsingSharedRecording = true;
         Debug.Log($"[MicDebug] Joined shared recording. object={gameObject.name}, deviceName={deviceName}, useCount={sharedRecording.UseCount}");
+        LogSharedMicTrace("AcquireSharedRecording joined shared recording");
     }
 
     public bool IsRecording()
@@ -127,20 +136,28 @@ public class MicrophoneInput : MonoBehaviour
 
     public void RestartRecordingIfNeeded()
     {
+        LogSharedMicTrace("RestartRecordingIfNeeded enter");
+
         if (Microphone.devices.Length == 0)
         {
             Debug.LogError("マイクが見つかりません。");
+            LogSharedMicTrace("RestartRecordingIfNeeded no devices");
             return;
         }
 
         if (string.IsNullOrEmpty(deviceName))
         {
             deviceName = Microphone.devices[0];
+            LogSharedMicTrace("RestartRecordingIfNeeded assigned deviceName");
         }
 
         if (!Microphone.IsRecording(deviceName))
         {
             Debug.LogWarning("マイクが停止していたので再開します。");
+            int oldLocalClipId = microphoneClip != null ? microphoneClip.GetInstanceID() : -1;
+            int oldSharedClipId = GetSharedClipId();
+            int oldUseCount = GetSharedUseCount();
+            Debug.LogWarning($"[SharedMicTrace] RestartRecordingIfNeeded recreating. object={gameObject.name}, scene={gameObject.scene.name}, device={deviceName}, oldLocalClipId={oldLocalClipId}, oldSharedClipId={oldSharedClipId}, oldUseCount={oldUseCount}");
 
             if (isUsingSharedRecording && sharedRecording != null)
             {
@@ -152,27 +169,34 @@ public class MicrophoneInput : MonoBehaviour
             sharedRecording = null;
             SharedRecordings.Remove(deviceName);
             AcquireSharedRecording();
+            Debug.LogWarning($"[SharedMicTrace] RestartRecordingIfNeeded recreated. object={gameObject.name}, scene={gameObject.scene.name}, device={deviceName}, newLocalClipId={(microphoneClip != null ? microphoneClip.GetInstanceID() : -1)}, newSharedClipId={GetSharedClipId()}, newUseCount={GetSharedUseCount()}");
+            LogSharedMicTrace("RestartRecordingIfNeeded after recreate");
         }
     }
 
     public float[] GetLatestSamples()
     {
         Debug.Log($"[MicDebug] GetLatestSamples called. object={gameObject.name}, deviceName={deviceName}, isUsingShared={isUsingSharedRecording}");
+        LogSharedMicTrace("GetLatestSamples enter");
 
         RestartRecordingIfNeeded();
+        LogSharedMicTrace("GetLatestSamples after RestartRecordingIfNeeded");
 
         if (microphoneClip == null || sampleBuffer == null)
         {
             Debug.Log($"[MicDebug] GetLatestSamples return null. object={gameObject.name}, clipNull={microphoneClip == null}, bufferNull={sampleBuffer == null}");
+            LogSharedMicTrace("GetLatestSamples return null clip or buffer");
             return null;
         }
 
         int micPosition = Microphone.GetPosition(deviceName);
         Debug.Log($"[MicDebug] Microphone.GetPosition. object={gameObject.name}, deviceName={deviceName}, position={micPosition}");
+        LogSharedMicTrace("GetLatestSamples after GetPosition");
 
         if (micPosition <= 0)
         {
             Debug.Log($"[MicDebug] GetLatestSamples return null. object={gameObject.name}, reason=micPosition<=0");
+            LogSharedMicTrace("GetLatestSamples return null position");
             return null;
         }
 
@@ -185,9 +209,11 @@ public class MicrophoneInput : MonoBehaviour
 
         microphoneClip.GetData(sampleBuffer, startPosition);
 
+        LogMicCompareIfNeeded(sampleBuffer, micPosition, startPosition);
         LogSampleStatsIfNeeded(sampleBuffer);
 
         Debug.Log($"[MicDebug] GetLatestSamples returned. object={gameObject.name}, samples={sampleBuffer.Length}, startPosition={startPosition}");
+        LogSharedMicTrace("GetLatestSamples returned samples");
         return sampleBuffer;
     }
 
@@ -248,6 +274,67 @@ public class MicrophoneInput : MonoBehaviour
         Debug.Log($"[MicSampleStats] object={gameObject.name}, scene={gameObject.scene.name}, min={min:F6} max={max:F6} maxAbs={maxAbs:F6} meanAbs={meanAbs:F6} RMS={rms:F6} clipped={clippedCount}/{samples.Length}");
     }
 
+    private void LogMicCompareIfNeeded(float[] samples, int currentPosition, int startPosition)
+    {
+        if (Time.unscaledTime < nextMicCompareLogTime)
+        {
+            return;
+        }
+
+        nextMicCompareLogTime = Time.unscaledTime + 1f;
+
+        if (samples == null || samples.Length == 0)
+        {
+            Debug.Log($"[MicCompare] object={gameObject.name} scene={gameObject.scene.name} device={deviceName} samples=0");
+            return;
+        }
+
+        float maxAbs = 0f;
+        double absSum = 0.0;
+        double squareSum = 0.0;
+
+        for (int i = 0; i < samples.Length; i++)
+        {
+            float abs = Mathf.Abs(samples[i]);
+            if (abs > maxAbs)
+            {
+                maxAbs = abs;
+            }
+
+            absSum += abs;
+            squareSum += samples[i] * samples[i];
+        }
+
+        float meanAbs = (float)(absSum / samples.Length);
+        float rms = Mathf.Sqrt((float)(squareSum / samples.Length));
+        int localClipId = microphoneClip != null ? microphoneClip.GetInstanceID() : -1;
+        int sharedClipId = GetSharedClipId();
+        int clipSamples = microphoneClip != null ? microphoneClip.samples : -1;
+        int frequency = microphoneClip != null ? microphoneClip.frequency : -1;
+        int channels = microphoneClip != null ? microphoneClip.channels : -1;
+
+        Debug.Log(
+            $"[MicCompare] " +
+            $"object={gameObject.name} " +
+            $"scene={gameObject.scene.name} " +
+            $"device={deviceName} " +
+            $"localClipId={localClipId} " +
+            $"sharedClipId={sharedClipId} " +
+            $"sameClip={localClipId != -1 && localClipId == sharedClipId} " +
+            $"position={currentPosition} " +
+            $"startPosition={startPosition} " +
+            $"clipSamples={clipSamples} " +
+            $"frequency={frequency} " +
+            $"channels={channels} " +
+            $"sampleBufferLength={sampleBuffer?.Length ?? -1} " +
+            $"maxAbs={maxAbs:F8} " +
+            $"meanAbs={meanAbs:F8} " +
+            $"RMS={rms:F8} " +
+            $"useCount={GetSharedUseCount()} " +
+            $"frame={Time.frameCount}"
+        );
+    }
+
     public float GetCurrentVolume()
     {
         float[] samples = GetLatestSamples();
@@ -275,6 +362,7 @@ public class MicrophoneInput : MonoBehaviour
     private void OnDisable()
     {
         Debug.LogWarning("MicrophoneInput が Disable されました");
+        LogSharedMicTrace("OnDisable before release");
 
         if (recordingCoroutine != null)
         {
@@ -283,20 +371,26 @@ public class MicrophoneInput : MonoBehaviour
         }
 
         ReleaseSharedRecording();
-        Debug.LogWarning($"MicrophoneInput disabled. object={gameObject.name}, scene={gameObject.scene.name}, activeSelf={gameObject.activeSelf}, activeInHierarchy={gameObject.activeInHierarchy}");
+        LogSharedMicTrace("OnDisable after release");
+        Debug.LogWarning($"MicrophoneInput disabled. object={gameObject.name}, scene={gameObject.scene.name}, sceneIsLoaded={gameObject.scene.isLoaded}, activeSelf={gameObject.activeSelf}, activeInHierarchy={gameObject.activeInHierarchy}, frame={Time.frameCount}");
     }
 
     private void ReleaseSharedRecording()
     {
+        LogSharedMicTrace("ReleaseSharedRecording enter");
+
         if (!isUsingSharedRecording || string.IsNullOrEmpty(deviceName) || sharedRecording == null)
         {
             microphoneClip = null;
             sharedRecording = null;
             isUsingSharedRecording = false;
+            LogSharedMicTrace("ReleaseSharedRecording skip not using shared");
             return;
         }
 
+        int beforeUseCount = sharedRecording.UseCount;
         sharedRecording.UseCount = Mathf.Max(0, sharedRecording.UseCount - 1);
+        Debug.LogWarning($"[SharedMicTrace] ReleaseSharedRecording decremented. object={gameObject.name}, scene={gameObject.scene.name}, device={deviceName}, beforeUseCount={beforeUseCount}, afterUseCount={sharedRecording.UseCount}, localClipId={(microphoneClip != null ? microphoneClip.GetInstanceID() : -1)}, sharedClipId={(sharedRecording.Clip != null ? sharedRecording.Clip.GetInstanceID() : -1)}");
 
         if (sharedRecording.UseCount == 0)
         {
@@ -304,13 +398,74 @@ public class MicrophoneInput : MonoBehaviour
             {
                 Microphone.End(deviceName);
                 Debug.LogWarning("マイク録音終了");
+                Debug.LogWarning($"[SharedMicTrace] ReleaseSharedRecording Microphone.End called. object={gameObject.name}, scene={gameObject.scene.name}, device={deviceName}");
             }
 
             SharedRecordings.Remove(deviceName);
+            Debug.LogWarning($"[SharedMicTrace] ReleaseSharedRecording removed shared recording. object={gameObject.name}, scene={gameObject.scene.name}, device={deviceName}");
         }
 
         microphoneClip = null;
         sharedRecording = null;
         isUsingSharedRecording = false;
+        LogSharedMicTrace("ReleaseSharedRecording exit");
+    }
+
+    private void LogSharedMicTrace(string point)
+    {
+        bool hasDevice = !string.IsNullOrEmpty(deviceName);
+        bool isRecording = hasDevice && Microphone.IsRecording(deviceName);
+        int position = hasDevice ? Microphone.GetPosition(deviceName) : -1;
+        int localClipId = microphoneClip != null ? microphoneClip.GetInstanceID() : -1;
+        int sharedClipId = GetSharedClipId();
+        int useCount = GetSharedUseCount();
+        bool sameClip = localClipId != -1 && localClipId == sharedClipId;
+
+        Debug.Log(
+            $"[SharedMicTrace] point={point} " +
+            $"object={gameObject.name} " +
+            $"scene={gameObject.scene.name} " +
+            $"sceneIsLoaded={gameObject.scene.isLoaded} " +
+            $"device={deviceName} " +
+            $"isUsingShared={isUsingSharedRecording} " +
+            $"isRecording={isRecording} " +
+            $"position={position} " +
+            $"localClipNull={microphoneClip == null} " +
+            $"localClipId={localClipId} " +
+            $"sharedClipId={sharedClipId} " +
+            $"sameClip={sameClip} " +
+            $"useCount={useCount} " +
+            $"frame={Time.frameCount}"
+        );
+    }
+
+    private int GetSharedClipId()
+    {
+        if (string.IsNullOrEmpty(deviceName))
+        {
+            return -1;
+        }
+
+        if (!SharedRecordings.TryGetValue(deviceName, out SharedRecording recording) || recording == null || recording.Clip == null)
+        {
+            return -1;
+        }
+
+        return recording.Clip.GetInstanceID();
+    }
+
+    private int GetSharedUseCount()
+    {
+        if (string.IsNullOrEmpty(deviceName))
+        {
+            return -1;
+        }
+
+        if (!SharedRecordings.TryGetValue(deviceName, out SharedRecording recording) || recording == null)
+        {
+            return -1;
+        }
+
+        return recording.UseCount;
     }
 }

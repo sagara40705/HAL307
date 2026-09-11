@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 58132892}
   - component: {fileID: 58132891}
+  - component: {fileID: 58132893}
   m_Layer: 0
   m_Name: VoiceAiContext
   m_TagString: Untagged
@@ -153,6 +154,20 @@ MonoBehaviour:
   _contextName: 
   _playerContextName: PlayerContext
   _playerContext: {fileID: 0}
+--- !u!114 &58132893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58132890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6f43ad397a44af5ab6f1d7e119fc5a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceAIManagerActiveTrace
+  target: {fileID: 62380389}
+  traceName: VoiceAIManager Watcher
 --- !u!4 &58132892
 Transform:
   m_ObjectHideFlags: 0
@@ -182,6 +197,7 @@ GameObject:
   - component: {fileID: 62380393}
   - component: {fileID: 62380392}
   - component: {fileID: 62380398}
+  - component: {fileID: 62380410}
   m_Layer: 0
   m_Name: VoiceAIManager
   m_TagString: Untagged
@@ -189,6 +205,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &62380410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62380389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6f43ad397a44af5ab6f1d7e119fc5a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceAIManagerActiveTrace
+  target: {fileID: 0}
+  traceName: VoiceAIManager Self
 --- !u!4 &62380391
 Transform:
   m_ObjectHideFlags: 0

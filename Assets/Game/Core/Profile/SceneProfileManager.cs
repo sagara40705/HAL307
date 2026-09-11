@@ -134,6 +134,17 @@ public sealed class SceneProfileManager : AppManagerBase<SceneProfileManager>
         for (int i = 0; i < targets.Count; i++)
         {
             SceneProfileTarget target = targets[i];
+            if (target != null && string.Equals(target.SceneName, "VoiceAi", StringComparison.Ordinal))
+            {
+                Debug.Log(
+                    $"[SceneProfileTrace] VoiceAi target evaluation. " +
+                    $"scene={target.SceneName}, " +
+                    $"path={target.ScenePath}, " +
+                    $"isEnabled={target.IsEnabled}, " +
+                    $"frame={Time.frameCount}"
+                );
+            }
+
             if (target == null || !target.IsEnabled)
             {
                 continue;
@@ -167,6 +178,7 @@ public sealed class SceneProfileManager : AppManagerBase<SceneProfileManager>
             float baselineMs = 0f;
             yield return CaptureAverageFrameMs(settings.SampleFrames, value => baselineMs = value);
 
+            LogSceneRootsBeforeDisable(scene, roots);
             RootActiveState[] rootStates = DisableSceneRoots(roots);
             yield return WaitFrames(settings.SettleFrames);
 
@@ -244,11 +256,59 @@ public sealed class SceneProfileManager : AppManagerBase<SceneProfileManager>
 
             if (root != null && root.activeSelf)
             {
+                Debug.Log(
+                    $"[SceneProfileTrace] " +
+                    $"scene={root.scene.name}, " +
+                    $"root={root.name}, " +
+                    $"beforeActiveSelf={root.activeSelf}, " +
+                    $"beforeActiveInHierarchy={root.activeInHierarchy}, " +
+                    $"frame={Time.frameCount}, " +
+                    $"SetActive(false) about to run"
+                );
+
                 root.SetActive(false);
+
+                Debug.Log(
+                    $"[SceneProfileTrace] " +
+                    $"scene={root.scene.name}, " +
+                    $"root={root.name}, " +
+                    $"afterActiveSelf={root.activeSelf}, " +
+                    $"afterActiveInHierarchy={root.activeInHierarchy}, " +
+                    $"frame={Time.frameCount}, " +
+                    $"SetActive(false) completed"
+                );
             }
         }
 
         return states;
+    }
+
+    private static void LogSceneRootsBeforeDisable(Scene scene, GameObject[] roots)
+    {
+        if (roots == null)
+        {
+            Debug.Log(
+                $"[SceneProfileTrace] " +
+                $"scene={scene.name}, " +
+                $"root=<null roots>, " +
+                $"frame={Time.frameCount}"
+            );
+            return;
+        }
+
+        for (int i = 0; i < roots.Length; i++)
+        {
+            GameObject root = roots[i];
+            Debug.Log(
+                $"[SceneProfileTrace] " +
+                $"scene={scene.name}, " +
+                $"root={(root != null ? root.name : "<null>")}, " +
+                $"beforeActiveSelf={(root != null && root.activeSelf)}, " +
+                $"beforeActiveInHierarchy={(root != null && root.activeInHierarchy)}, " +
+                $"frame={Time.frameCount}, " +
+                $"before DisableSceneRoots"
+            );
+        }
     }
 
     private static void RestoreSceneRoots(RootActiveState[] states)

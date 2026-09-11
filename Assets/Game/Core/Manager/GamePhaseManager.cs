@@ -185,7 +185,20 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             {
                 yield return ClosePausePhase();
 
-                if (nextPhase == _phaseBeforePause && IsActiveSceneForPhase(nextPhase))
+                string expectedScene = string.Empty;
+                bool hasExpectedScene = _settings != null && _settings.TryGetSceneName(nextPhase, out expectedScene);
+                bool isActiveSceneForPhase = IsActiveSceneForPhase(nextPhase);
+                Debug.Log(
+                    $"[PhaseResumeTrace] " +
+                    $"oldPhase={oldPhase}, " +
+                    $"nextPhase={nextPhase}, " +
+                    $"phaseBeforePause={_phaseBeforePause}, " +
+                    $"activeScene={UnitySceneManager.GetActiveScene().name}, " +
+                    $"expectedScene={(hasExpectedScene ? expectedScene : "<none>")}, " +
+                    $"isActiveSceneForPhase={isActiveSceneForPhase}"
+                );
+
+                if (nextPhase == _phaseBeforePause && isActiveSceneForPhase)
                 {
                     SetCurrentPhase(nextPhase, oldPhase);
                     _isChangingPhase = false;

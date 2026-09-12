@@ -18,6 +18,10 @@ public class TransitionManager : MonoBehaviour
     [SerializeField] private RectTransform dumbbellCanvasRoot;
     [SerializeField] private GameObject dumbbellPrefab;
 
+    [Header("シーンと同時に解放するUI")]
+    [SerializeField] private GameObject[] sceneUiRoots;
+    private Scene sceneUiOwner;
+
     [Header("遷移先シーン")]
     [SerializeField] private string nextSceneName = "GameScene";
 
@@ -51,9 +55,11 @@ public class TransitionManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            sceneUiOwner = gameObject.scene;
             DontDestroyOnLoad(gameObject);
             InitPool();
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
 
             if (backgroundPanel != null)
             {
@@ -64,6 +70,8 @@ public class TransitionManager : MonoBehaviour
         }
         else
         {
+            // 常駐Canvasは再利用し、新しいUIシーンのGamePanelだけを引き継ぐ
+            Instance.AdoptSceneUi(this);
             Destroy(gameObject);
         }
     }
@@ -76,7 +84,58 @@ public class TransitionManager : MonoBehaviour
         }
 
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneUnloaded -= OnSceneUnloaded;
         Instance = null;
+    }
+
+    private void AdoptSceneUi(TransitionManager source)
+    {
+        if (source.sceneUiRoots == null || source.sceneUiRoots.Length == 0)
+        {
+            return;
+        }
+
+        ClearSceneUi();
+        sceneUiOwner = source.gameObject.scene;
+        sceneUiRoots = source.sceneUiRoots;
+        source.sceneUiRoots = null;
+        foreach (GameObject root in sceneUiRoots)
+        {
+            if (root != null)
+            {
+                root.transform.SetParent(transform, false);
+                root.transform.SetAsFirstSibling();
+            }
+        }
+        if (backgroundPanel != null)
+        {
+            backgroundPanel.transform.SetAsFirstSibling();
+        }
+    }
+
+    private void OnSceneUnloaded(Scene scene)
+    {
+        if (scene.handle == sceneUiOwner.handle)
+        {
+            ClearSceneUi();
+        }
+    }
+
+    // DontDestroyOnLoadへ移されたUIも、所有元シーンの解放時に破棄
+    private void ClearSceneUi()
+    {
+        if (sceneUiRoots != null)
+        {
+            foreach (GameObject root in sceneUiRoots)
+            {
+                if (root != null)
+                {
+                    root.SetActive(false);
+                    Destroy(root);
+                }
+            }
+        }
+        sceneUiRoots = null;
     }
 
     private void InitPool()

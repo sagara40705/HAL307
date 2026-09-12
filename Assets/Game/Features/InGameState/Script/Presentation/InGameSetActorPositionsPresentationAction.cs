@@ -5,8 +5,20 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "InGameSetActorPositionsPresentationAction", menuName = "Game/InGame/Presentation/Set Actor Positions")]
 public sealed class InGameSetActorPositionsPresentationAction : InGamePresentationAction
 {
+    [Header("3P Positions (World Space)")]
+    [InspectorName("Enemy 1 Position")]
+    [SerializeField] private Vector3 threePlayerEnemy1Position;
+    [InspectorName("Enemy 2 Position")]
+    [SerializeField] private Vector3 threePlayerEnemy2Position;
+    [InspectorName("Player Position")]
+    [SerializeField] private Vector3 threePlayerPlayerPosition;
+
+    // 既存のシリアライズ名を5P用として保持
+    [Header("5P Positions (World Space)")]
     [SerializeField] private Vector3 enemy1Position;
     [SerializeField] private Vector3 enemy2Position;
+    [SerializeField] private Vector3 enemy3Position;
+    [SerializeField] private Vector3 enemy4Position;
     [SerializeField] private Vector3 playerPosition;
 
     public override IEnumerator Play(InGameFlowContext context)
@@ -14,14 +26,28 @@ public sealed class InGameSetActorPositionsPresentationAction : InGamePresentati
         EnemyLineupManager lineup = context != null ? context.EnemyLineup : null;
         Player.PlayerPoseContoroller player = Object.FindFirstObjectByType<Player.PlayerPoseContoroller>();
 
-        SetEnemyPosition(lineup, EnemySlotId.Enemy1, enemy1Position);
-        SetEnemyPosition(lineup, EnemySlotId.Enemy2, enemy2Position);
-        SetPlayerPosition(player, playerPosition);
+        // 現在人数ではなく選択済みモードで配置を決定。5Pで敵が少ないWaveも5P用を使用
+        GameModeManager gameModeManager = GameModeManager.Instance;
+        bool useFivePlayerPositions = gameModeManager != null && gameModeManager.IsInitialized &&
+            gameModeManager.CurrentGameMode == GameMode.FivePlayer;
+        if (gameModeManager == null || !gameModeManager.IsInitialized)
+        {
+            Debug.LogWarning("[InGameSetActorPositionsPresentationAction] GameModeManager is not ready. ThreePlayer positions are used.");
+        }
+
+        SetEnemyPosition(lineup, EnemySlotId.Enemy1, useFivePlayerPositions ? enemy1Position : threePlayerEnemy1Position, true);
+        SetEnemyPosition(lineup, EnemySlotId.Enemy2, useFivePlayerPositions ? enemy2Position : threePlayerEnemy2Position, true);
+        if (useFivePlayerPositions)
+        {
+            SetEnemyPosition(lineup, EnemySlotId.Enemy3, enemy3Position, false);
+            SetEnemyPosition(lineup, EnemySlotId.Enemy4, enemy4Position, false);
+        }
+        SetPlayerPosition(player, useFivePlayerPositions ? playerPosition : threePlayerPlayerPosition);
 
         yield break;
     }
 
-    private void SetEnemyPosition(EnemyLineupManager lineup, EnemySlotId slot, Vector3 position)
+    private void SetEnemyPosition(EnemyLineupManager lineup, EnemySlotId slot, Vector3 position, bool isRequired)
     {
         if (lineup == null)
         {
@@ -32,7 +58,11 @@ public sealed class InGameSetActorPositionsPresentationAction : InGamePresentati
         global::Enemy.Enemy enemy = lineup.GetEnemy(slot);
         if (enemy == null)
         {
-            Debug.LogWarning($"[InGameSetActorPositionsPresentationAction] Enemy was not found. Slot={slot}");
+            if (isRequired)
+            {
+                Debug.LogWarning($"[InGameSetActorPositionsPresentationAction] Enemy was not found. Slot={slot}");
+            }
+
             return;
         }
 

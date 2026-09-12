@@ -9,6 +9,10 @@ namespace AudienceRequest
         [SerializeField] private AudienceRequestContext _context;
         [SerializeField] private AudienceRequestSystem _requestSystem;
 
+        [Header("音声クリア時のテキスト演出")]
+        [SerializeField]
+        private AudienceRequestTextAnimationController _textAnimationController;
+
         private PlayerPoseContoroller _playerPoseController;
         private EnemyContext _enemyContext;
 
@@ -45,24 +49,35 @@ namespace AudienceRequest
         // プレイヤーからのイベント受付
         private void OnPlayerPoseStart(Pose.PoseID poseID)
         {
-            JudgeRequest(poseID, true);
+            bool wasCleared = JudgeRequest(poseID, true);
+
+            if (!wasCleared)
+            {
+                return;
+            }
+
+            _textAnimationController?.PlayVoiceClearAnimation(poseID);
         }
 
+
         // 敵からのイベント受付
-       private void OnEnemyPoseStart(Enemy.Enemy enemy, Pose.PoseID poseID)
+        private void OnEnemyPoseStart(Enemy.Enemy enemy, Pose.PoseID poseID)
        {
             JudgeRequest(poseID, false, enemy);
         }
 
         // 共通判定ロジック
-        public void JudgeRequest(Pose.PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
+        public bool JudgeRequest(Pose.PoseID poseID,bool isPlayer, Enemy.Enemy enemy = null)
         {
-            // ここでリクエストの判定を行う
             int requestCount = _requestSystem.GetRequestCount(poseID);
-            if (requestCount > 0)
+
+            if (requestCount <= 0)
             {
-                _requestSystem.ClearRequest(poseID, isPlayer, enemy);
+                return false;
             }
+
+            _requestSystem.ClearRequest(poseID, isPlayer, enemy);
+            return true;
         }
     }
 }

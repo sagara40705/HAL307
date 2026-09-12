@@ -7,9 +7,40 @@ public sealed class StageModelContext : ContextBase
     [SerializeField] private StageEndJudge stageEndJudge;
     [SerializeField] private Transform waveEndArea;
     [SerializeField] private InGamePresentationEventRegistry presentationEventRegistry;
+    [SerializeField] private StageModelModeSystem stageModelModeSystem = new StageModelModeSystem();
 
+    private void Start()
+    {
+        ApplySelectedGameMode();
+    }
 
-    // ステージ終了判定のTransform
+    // 現在選択中のゲームモードをStageModelへ反映
+    public bool ApplySelectedGameMode()
+    {
+        if (stageModelModeSystem == null)
+        {
+            stageModelModeSystem = new StageModelModeSystem();
+        }
+
+        return stageModelModeSystem.Apply(gameObject.scene);
+    }
+
+    // Wave演出用の一時モデル切り替え
+    public bool BeginThreePlayerPresentation()
+    {
+        return stageModelModeSystem != null && stageModelModeSystem.BeginThreePlayerPresentation(gameObject.scene);
+    }
+
+    public void EndThreePlayerPresentation()
+    {
+        stageModelModeSystem?.EndThreePlayerPresentation();
+    }
+
+    private void OnDisable()
+    {
+        EndThreePlayerPresentation();
+    }
+
     // ステージ終了判定
     public StageEndJudge StageEndJudge => stageEndJudge;
 

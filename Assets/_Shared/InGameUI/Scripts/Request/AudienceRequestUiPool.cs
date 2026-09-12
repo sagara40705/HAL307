@@ -29,7 +29,16 @@ namespace AudienceRequest
         [SerializeField] private float _clearScale = 1.5f;
         [SerializeField] private float _clearDelay = 1.0f;
 
+        // ハートが消える瞬間
         [SerializeField] private GameObject _explosionPrefab;
+
+        [Header("リクエストからハートへ変化する演出")]
+        [SerializeField] private GameObject _heartChangeEffectPrefab;
+        [SerializeField] private Vector3 _heartChangeEffectScale = Vector3.one;
+
+        [Header("ハート表示時間")]
+        [SerializeField, Min(0f)]
+        private float _heartDisplayDuration = 0.5f;
 
         [Header("黒リクエストUI")]
         [SerializeField] private List<GameObject> _blackUiPrefabs = new();
@@ -54,12 +63,16 @@ namespace AudienceRequest
         private List<ObjectPool<GameObject>> _uiPools = new(); // UIオブジェクトプールのリスト
         private List<List<GameObject>> _activeUis = new(); // アクティブなUIオブジェクトのリスト
 
+        // 
         private void Awake()
         {
+            // スプライト変換テーブルを構築
             BuildSpriteLookup();
 
+            // UIプールの初期化
             int capacity = _audienceRequestSystem.MaxRequestCount; // キャパはリクエストの最大合計
 
+            // UIプレハブの数とPoseIDの数が一致しているか確認
             int count = _uiPrefabs.Count;
             if (count != (int)PoseID.Pose_Count)
             {
@@ -67,6 +80,7 @@ namespace AudienceRequest
                 return;
             }
 
+            // UIプールの作成
             for (int i = 0; i < count; ++i)
             {
                 int idx = i;
@@ -89,33 +103,33 @@ namespace AudienceRequest
             }
 
             // 黒リクエストUI用プール作成
-if (_blackUiPrefabs.Count != (int)PoseID.Pose_Count)
-{
-    Debug.LogError("Black UI Prefabs count does not match PoseID count.");
-    return;
-}
+            if (_blackUiPrefabs.Count != (int)PoseID.Pose_Count)
+            {
+                Debug.LogError("Black UI Prefabs count does not match PoseID count.");
+                return;
+            }
 
-for (int i = 0; i < _blackUiPrefabs.Count; ++i)
-{
-    int idx = i;
+            for (int i = 0; i < _blackUiPrefabs.Count; ++i)
+            {
+                int idx = i;
 
-    ObjectPool<GameObject> blackPool = new ObjectPool<GameObject>(
-        () => Instantiate(_blackUiPrefabs[idx]),
-        obj => obj.SetActive(true),
-        obj =>
-        {
-            obj.SetActive(false);
-            obj.transform.SetParent(_uiParent.transform, false);
-            obj.transform.localScale = Vector3.one;
-        },
-        obj => Destroy(obj),
-        false,
-        1
-    );
+                ObjectPool<GameObject> blackPool = new ObjectPool<GameObject>(
+                    () => Instantiate(_blackUiPrefabs[idx]),
+                    obj => obj.SetActive(true),
+                    obj =>
+                    {
+                        obj.SetActive(false);
+                        obj.transform.SetParent(_uiParent.transform, false);
+                        obj.transform.localScale = Vector3.one;
+                    },
+                    obj => Destroy(obj),
+                    false,
+                    1
+                );
 
-    _blackUiPools.Add(blackPool);
-    _activeBlackUis.Add(new List<GameObject>());
-}
+                _blackUiPools.Add(blackPool);
+                _activeBlackUis.Add(new List<GameObject>());
+            }
 
         }
 
@@ -124,8 +138,14 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
             //_audienceRequestSystem.OnRequestReceived += Generate;
         }
 
+        // 指定ポーズのUIを生成する
         public GameObject Generate(PoseID pose)
         {
+            if (!CanGenerateUi())
+            {
+                return null;
+            }
+
             if (!IsValidPose(pose))
             {
                 Debug.LogError($"Invalid audience request pose: {pose}");
@@ -156,6 +176,7 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                 }
             }
 
+            PlayShowPresentation(obj);
 
             _activeUis[(int)pose].Add(obj);
             return obj;
@@ -173,44 +194,32 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                 return;
             }
 
-            if (!IsValidPose(pose))
-            {
-                Debug.LogError($"Invalid audience request pose: {pose}");
-                return;
-            }
-
             List<GameObject> targetList = new List<GameObject>(_activeUis[(int)pose]);
             _activeUis[(int)pose].Clear();
             TryGetSpritePair(pose, out SpritePair spriteSetting);
 
-            foreach (var obj in targetList)
+            foreach (GameObject obj in targetList)
             {
-                if (obj == null) continue;
-
-
-                if (_explosionPrefab != null)
+                if (obj == null)
                 {
-                    GameObject effect = Instantiate(_explosionPrefab, _uiParent);
-
-                    RectTransform effectRect = effect.GetComponent<RectTransform>();
-                    RectTransform targetRect = obj.GetComponent<RectTransform>();
-
-                    if (effectRect != null && targetRect != null)
-                    {
-                        effectRect.anchoredPosition = targetRect.anchoredPosition;
-                        effectRect.localScale = Vector3.one;
-                    }
+                    continue;
                 }
-
 
                 Image img = obj.GetComponent<Image>();
+
                 if (img != null && spriteSetting != null)
                 {
-                    img.sprite = isPlayer ? spriteSetting.changeSprite : spriteSetting.enemyChangeSprite;
+                    // リクエスト画像をハート画像へ変更
+                    img.sprite = isPlayer
+                        ? spriteSetting.changeSprite
+                        : spriteSetting.enemyChangeSprite;
+
+                    // リクエストからハートへ変わった瞬間のエフェクト
+                    SpawnEffect(_heartChangeEffectPrefab, obj,_heartChangeEffectScale,true);
                 }
 
-                obj.transform.localScale = Vector3.one;
-                StartCoroutine(ReleaseAfterDelay(obj, pose, _clearDelay));
+                // ハートを一定時間表示してからExplosionで消す
+                StartCoroutine(PlayHeartThenRelease(obj,pose));
             }
         }
 
@@ -255,21 +264,35 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
             }
         }
 
-        private IEnumerator ReleaseAfterDelay(GameObject obj, PoseID pose, float delay)
+        private IEnumerator PlayHeartThenRelease( GameObject obj,PoseID pose)
         {
-            Debug.Log($"[AudienceRequestUiPool] Release wait start : {pose}");
-
-            yield return new WaitForSecondsRealtime(delay);
-
-            Debug.Log($"[AudienceRequestUiPool] Release execute : {pose}");
+            // ハートの姿を一定時間見せる
+            if (_heartDisplayDuration > 0f)
+            {
+                yield return new WaitForSecondsRealtime(_heartDisplayDuration);
+            }
 
             if (obj == null)
             {
                 yield break;
             }
 
-            // 念のため、Release前に強制的に非表示にする
-            obj.SetActive(false);
+            // ハートが消える瞬間に既存Explosionを再生
+            SpawnEffect(_explosionPrefab,obj,Vector3.one,false);
+
+            // ハートを消す
+            PlayHidePresentation(obj);
+
+            // AdjustableUiPresenterのHide演出を見せる時間
+            if (_clearDelay > 0f)
+            {
+                yield return new WaitForSecondsRealtime(_clearDelay);
+            }
+
+            if (obj == null)
+            {
+                yield break;
+            }
 
             if (!IsValidPose(pose))
             {
@@ -280,11 +303,47 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
 
             if (poseIndex < 0 || poseIndex >= _uiPools.Count)
             {
-                Debug.LogError($"[AudienceRequestUiPool] UI Pool is missing for pose : {pose}");
+                Debug.LogError(
+                    $"[AudienceRequestUiPool] UI Pool is missing for pose : {pose}"
+                );
                 yield break;
             }
 
             _uiPools[poseIndex].Release(obj);
+        }
+
+        private IEnumerator PlayHeartThenReleaseBlack(GameObject obj,PoseID pose)
+        {
+            if (_heartDisplayDuration > 0f)
+            {
+                yield return new WaitForSecondsRealtime(_heartDisplayDuration);
+            }
+
+            if (obj == null)
+            {
+                yield break;
+            }
+
+            SpawnEffect(_explosionPrefab,obj,Vector3.one,false);
+
+            PlayHidePresentation(obj);
+
+            if (_clearDelay > 0f)
+            {
+                yield return new WaitForSecondsRealtime(_clearDelay);
+            }
+
+            if (obj == null)
+            {
+                yield break;
+            }
+
+            if (!IsValidPose(pose))
+            {
+                yield break;
+            }
+
+            _blackUiPools[(int)pose].Release(obj);
         }
 
 
@@ -476,8 +535,9 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                 }
             }
 
-            _activeUis[(int)pose].Add(obj);
+            PlayShowPresentation(obj);
 
+            _activeUis[(int)pose].Add(obj);
             return obj;
         }
 
@@ -533,8 +593,9 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                 rect.anchoredPosition = spawnPos;
             }
 
-            _activeBlackUis[(int)pose].Add(obj);
+            PlayShowPresentation(obj);
 
+            _activeBlackUis[(int)pose].Add(obj);
             return obj;
         }
 
@@ -556,42 +617,13 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
                     continue;
                 }
 
-                // 通常リクエストと同じ爆発演出を出す
-                if (_explosionPrefab != null)
-                {
-                    GameObject effect = Instantiate(_explosionPrefab, _uiParent);
+                // リクエストからハートへ変わった瞬間のエフェクト
+                SpawnEffect(_heartChangeEffectPrefab, obj, _heartChangeEffectScale,true);
 
-                    RectTransform effectRect = effect.GetComponent<RectTransform>();
-                    RectTransform targetRect = obj.GetComponent<RectTransform>();
+                // ハートを一定時間表示してからExplosionで消す
+                StartCoroutine( PlayHeartThenReleaseBlack(obj, pose) );
 
-                    if (effectRect != null && targetRect != null)
-                    {
-                        effectRect.anchoredPosition = targetRect.anchoredPosition;
-                        effectRect.localScale = Vector3.one;
-                    }
-                }
-
-                StartCoroutine(ReleaseBlackAfterDelay(obj, pose, _clearDelay));
             }
-        }
-
-        private IEnumerator ReleaseBlackAfterDelay(GameObject obj, PoseID pose, float delay)
-        {
-            yield return new WaitForSecondsRealtime(delay);
-
-            if (obj == null)
-            {
-                yield break;
-            }
-
-            obj.SetActive(false);
-
-            if (!IsValidPose(pose))
-            {
-                yield break;
-            }
-
-            _blackUiPools[(int)pose].Release(obj);
         }
 
         public void ClearAllBlackUiPools()
@@ -615,7 +647,103 @@ for (int i = 0; i < _blackUiPrefabs.Count; ++i)
             }
         }
 
+        private void SpawnEffect(
+         GameObject effectPrefab,
+         GameObject target,
+         Vector3 effectScale,
+         bool showInFront)
+        {
+            if (effectPrefab == null || target == null || _uiParent == null)
+            {
+                return;
+            }
 
+            GameObject effect = Instantiate(effectPrefab, _uiParent);
+
+            RectTransform effectRect = effect.GetComponent<RectTransform>();
+            RectTransform targetRect = target.GetComponent<RectTransform>();
+
+            if (effectRect == null || targetRect == null)
+            {
+                return;
+            }
+
+            effectRect.anchoredPosition = targetRect.anchoredPosition;
+            effectRect.localScale = effectScale;
+
+            if (showInFront)
+            {
+                // ハートより手前へ表示
+                effectRect.SetAsLastSibling();
+            }
+            else
+            {
+                // ハートのすぐ奥へ表示
+                int targetIndex = targetRect.GetSiblingIndex();
+
+                effectRect.SetSiblingIndex(
+                    Mathf.Max(0, targetIndex - 1)
+                );
+            }
+        }
+
+
+        private void PlayShowPresentation(GameObject obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            if (!obj.activeSelf)
+            {
+                obj.SetActive(true);
+            }
+
+            AdjustableUiPresenter presenter =
+                obj.GetComponent<AdjustableUiPresenter>();
+
+            if (presenter == null)
+            {
+                return;
+            }
+
+            presenter.CaptureCurrentAsBase();
+            presenter.Show();
+        }
+
+        private void PlayHidePresentation(GameObject obj)
+        {
+            if (obj == null || !obj.activeInHierarchy)
+            {
+                return;
+            }
+
+            AdjustableUiPresenter presenter =
+                obj.GetComponent<AdjustableUiPresenter>();
+
+            if (presenter == null)
+            {
+                return;
+            }
+
+            presenter.Hide();
+        }
+
+
+        private bool CanGenerateUi()
+        {
+            if (_uiParent == null)
+            {
+                Debug.LogWarning(
+                    "[AudienceRequestUiPool] UI generation skipped. UI Parent is null."
+                );
+
+                return false;
+            }
+
+            return _uiParent.gameObject.activeInHierarchy;
+        }
     }
 }
 

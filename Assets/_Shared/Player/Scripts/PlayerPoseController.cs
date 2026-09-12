@@ -10,7 +10,12 @@ namespace Player
 
     public class PlayerPoseContoroller : MonoBehaviour
     {
+        private const float DefaultPoseDuration = 7f;
+
         private static readonly int IdleStateHash = Animator.StringToHash("Idle");
+        private static readonly Color DefaultYaaColor = new Color(0f, 0.41078663f, 1f, 0f);
+        private static readonly Color DefaultPowerColor = new Color(1f, 0f, 0f, 0f);
+        private static readonly Color DefaultMuscleColor = new Color(0.9113277f, 1f, 0f, 0f);
         private static readonly int[] AnimationTriggerHashes =
         {
             Animator.StringToHash("Idle"),
@@ -22,11 +27,9 @@ namespace Player
         [SerializeField] private PlayerContext _playerContext;
         [SerializeField] private PoseParryJudge _poseParryJudge;
         [SerializeField] private PoseStateTracker _poseStateTracker;
+        [SerializeField] private PlayerPoseSettings _poseSettings;
 
         [SerializeField] private Proto_PlayerColorChanger _colorChanger;
-        [SerializeField] private Color _yaaColor;
-        [SerializeField] private Color _powerColor;
-        [SerializeField] private Color _muscleColor;
 
 
         [SerializeField] private string _currentPoseName = "None";
@@ -44,6 +47,11 @@ namespace Player
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         private void Start()
         {
+            if (_poseSettings == null)
+            {
+                Debug.LogWarning("[PlayerPoseContoroller] PlayerPoseSettings is not assigned. Default pose values are used.", this);
+            }
+
             PoseContext poseContext = _playerContext?.GetPoseContext();
             _poseParryJudge = poseContext?.GetPoseParryJudge;
             _poseStateTracker = poseContext?.GetPoseStateTracker;
@@ -101,7 +109,7 @@ namespace Player
         private void OnPose(PoseID poseID)
         {
             _isPose = true;
-            _poseTimer = 7f; // ポーズ状態の持続時間を設定
+            _poseTimer = PoseDuration;
             _poseStateTracker?.BeginPose();
             _poseParryJudge?.StartPlayerPose(poseID);
             ChangeColor(poseID);
@@ -133,15 +141,15 @@ namespace Player
             switch (poseID)
             {
                 case PoseID.Pose_Yaa:
-                    _colorChanger?.SetColor(_yaaColor);
+                    _colorChanger?.SetColor(YaaColor);
                     _animator.SetTrigger("Yaa");
                     break;
                 case PoseID.Pose_Power:
-                    _colorChanger?.SetColor(_powerColor);
+                    _colorChanger?.SetColor(PowerColor);
                     _animator.SetTrigger("Power");
                     break;
                 case PoseID.Pose_Muscle:
-                    _colorChanger?.SetColor(_muscleColor);
+                    _colorChanger?.SetColor(MuscleColor);
                     _animator.SetTrigger("Muscle");
                     break;
                 default:
@@ -173,5 +181,21 @@ namespace Player
                 _animator.ResetTrigger(triggerHash);
             }
         }
+
+        private float PoseDuration => _poseSettings != null
+            ? _poseSettings.PoseDuration
+            : DefaultPoseDuration;
+
+        private Color YaaColor => _poseSettings != null
+            ? _poseSettings.YaaColor
+            : DefaultYaaColor;
+
+        private Color PowerColor => _poseSettings != null
+            ? _poseSettings.PowerColor
+            : DefaultPowerColor;
+
+        private Color MuscleColor => _poseSettings != null
+            ? _poseSettings.MuscleColor
+            : DefaultMuscleColor;
     }
 }

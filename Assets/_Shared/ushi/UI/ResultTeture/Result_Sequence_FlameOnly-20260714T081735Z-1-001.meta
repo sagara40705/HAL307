@@ -1,7 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/_Shared/ushi/UI/ResultTeture/Result_Sequence_FlameOnly-20260714T081735Z-1-001.meta
 guid: 46b6f155e87875b438986965ca05908d
 folderAsset: yes
 DefaultImporter:
+========
+guid: 6a98b4b19e7bb3a48a403da65105280c
+PrefabImporter:
+>>>>>>>> main:Assets/_Shared/Enemy/Prefabs/P_Enemy_2.prefab.meta
   externalObjects: {}
   userData: 
   assetBundleName: 

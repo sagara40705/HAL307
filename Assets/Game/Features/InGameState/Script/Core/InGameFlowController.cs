@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 // インゲーム進行とWave進行の制御
 public sealed class InGameFlowController : MonoBehaviour
@@ -12,13 +13,17 @@ public sealed class InGameFlowController : MonoBehaviour
     private IInGameFlowState _currentState;
     private bool _isChangingState;
     private int _currentWaveIndex;
+    private WaveData _currentWaveData;
+    private int _currentTargetScore;
+    private float _currentEnemyAnimationSpeed = 1f;
 
     public int CurrentWaveIndex => _currentWaveIndex;
-    public WaveData CurrentWaveData => stageData != null ? stageData.GetWaveOrNull(_currentWaveIndex) : null;
+    public WaveData CurrentWaveData => _currentWaveData;
     public string CurrentStateName => _currentState != null ? _currentState.StateName : "None";
     public bool IsFlowRunning => _flowCoroutine != null;
     public bool IsChangingState => _isChangingState;
-    public int CurrentTargetScore => CurrentWaveData != null ? CurrentWaveData.TargetScore : 0;
+    public int CurrentTargetScore => _currentTargetScore;
+    public float CurrentEnemyAnimationSpeed => _currentEnemyAnimationSpeed;
 
     // Context未設定時の同一GameObject検索
     private void Awake()
@@ -27,6 +32,12 @@ public sealed class InGameFlowController : MonoBehaviour
         {
             context = GetComponent<InGameFlowContext>();
         }
+    }
+
+    // 進行オブジェクト停止時に演出用モデルを復元
+    private void OnDisable()
+    {
+        context?.RestoreWavePresentationStage();
     }
 
     // 自動開始設定時の進行開始
@@ -38,6 +49,7 @@ public sealed class InGameFlowController : MonoBehaviour
         }
 
         StartFlow();
+        Sound.Manager.SoundManager.Play((int)SceneSoundTag.IntroSound, (int)IntroSoundTag.Handclap);
     }
 
     // インゲーム進行の開始
@@ -82,14 +94,18 @@ public sealed class InGameFlowController : MonoBehaviour
             yield return null;
         }
 
-        while (stageData.HasWave(_currentWaveIndex))
+        _currentWaveData = stageData.GetWaveOrNull(_currentWaveIndex);
+        _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
+        _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);
+
+        while (_currentWaveData != null)
         {
-            WaveData currentWave = stageData.GetWaveOrNull(_currentWaveIndex);
-            yield return ChangeStateCoroutine(new PlayingFlowState(stageData, currentWave));
+            WaveData currentWave = _currentWaveData;
+            yield return ChangeStateCoroutine(new PlayingFlowState(stageData, currentWave, _currentEnemyAnimationSpeed));
 
             int currentScore = context != null ? context.CurrentPlayerScore : 0;
             bool hasNextWave = stageData.HasWave(_currentWaveIndex + 1);
-            var resultCheckState = new WaveResultCheckFlowState(currentWave, currentScore, hasNextWave);
+            var resultCheckState = new WaveResultCheckFlowState(CurrentTargetScore, currentScore, hasNextWave);
             yield return ChangeStateCoroutine(resultCheckState);
 
             if (resultCheckState.IsTargetScoreReached)
@@ -103,8 +119,17 @@ public sealed class InGameFlowController : MonoBehaviour
             }
 
             WaveData nextWave = stageData.GetWaveOrNull(_currentWaveIndex + 1);
+            if (nextWave == null)
+            {
+                Debug.LogError($"[InGameFlowController] Next wave selection failed. WaveIndex={_currentWaveIndex + 1}, Endless={stageData.IsEndlessMode}");
+                break;
+            }
+
             yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave, nextWave));
             _currentWaveIndex++;
+            _currentWaveData = nextWave;
+            _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
+            _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);
         }
 
         yield return ChangeStateCoroutine(new GameEndFlowState(stageData));

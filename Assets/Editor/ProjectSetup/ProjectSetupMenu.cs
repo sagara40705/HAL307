@@ -13,23 +13,8 @@ public static class ProjectSetupMenu
 
     private static readonly string[] SceneSearchFolders =
     {
-        "Assets/Game/Scenes",
-        "Assets/Game/Features",
-        "Assets/_Shared/Prototype/Scenes",
-        "Assets/_Shared/AudienceRequest/Scenes",
-        "Assets/_Shared/Enemy/Scenes",
-        "Assets/_Shared/InGameUI/Scenes",
-        "Assets/_Shared/Pose/Scenes",
-        "Assets/_Shared/Player/Scenes",
-        "Assets/_Shared/RuntimeDebug/Scenes",
-        "Assets/_Shared/taichi/Scenes",
-        "Assets/_Shared/TaiyouVoiceAI/Scenes",
-        "Assets/_Shared/Crowd/Scenes",
-    };
-
-    private static readonly string[] ExcludedScenePathPrefixes =
-    {
-        "_Sandbox/",
+        "Assets/Game",
+        "Assets/_Shared",
     };
 
     private static readonly string[] PriorityScenePaths =
@@ -79,7 +64,6 @@ public static class ProjectSetupMenu
             desiredInputHandling: DesiredInputHandling,
             buildSceneListConfig: new BuildSceneListSetup.Config(
                 sceneSearchFolders: SceneSearchFolders,
-                excludedScenePathPrefixes: ExcludedScenePathPrefixes,
                 priorityScenePaths: PriorityScenePaths,
                 syncOverrideBuildProfiles: true
             ),

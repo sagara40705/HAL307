@@ -3,16 +3,18 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
+    private const int DefaultScoreUnit = 10;
+    private const int DefaultFeverScoreMultiplier = 2;
+
     public static ScoreManager Instance { get; private set; }
 
     public int PlayerScore { get; private set; }
     public int Enemy1Score { get; private set; }
     public int Enemy2Score { get; private set; }
+    public int Enemy3Score { get; private set; }
+    public int Enemy4Score { get; private set; }
 
-    [SerializeField] private int AddScore = 10;
-
-    [Header("フィーバー中のプレイヤー加算倍率")]
-    [SerializeField] private int feverScoreMultiplier = 2;
+    [SerializeField] private ScoreSettings scoreSettings;
 
     public event Action OnScoreChanged;
 
@@ -22,6 +24,11 @@ public class ScoreManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            if (scoreSettings == null)
+            {
+                Debug.LogWarning("[ScoreManager] ScoreSettings is not assigned. Default score values are used.");
+            }
         }
         else
         {
@@ -32,9 +39,9 @@ public class ScoreManager : MonoBehaviour
     // プレイヤースコア加算
     public void AddPlayerScore(int score, bool isFever = false)
     {
-        int multiplier = isFever ? feverScoreMultiplier : 1;
+        int multiplier = isFever ? FeverScoreMultiplier : 1;
 
-        PlayerScore += score * AddScore * multiplier;
+        PlayerScore += score * ScoreUnit * multiplier;
 
         OnScoreChanged?.Invoke();
     }
@@ -67,11 +74,19 @@ public class ScoreManager : MonoBehaviour
     {
         if (slot == Enemy.EnemySlotId.Enemy1)
         {
-            Enemy1Score += score * AddScore;
+            Enemy1Score += score * ScoreUnit;
         }
         else if (slot == Enemy.EnemySlotId.Enemy2)
         {
-            Enemy2Score += score * AddScore;
+            Enemy2Score += score * ScoreUnit;
+        }
+        else if (slot == Enemy.EnemySlotId.Enemy3)
+        {
+            Enemy3Score += score * ScoreUnit;
+        }
+        else if (slot == Enemy.EnemySlotId.Enemy4)
+        {
+            Enemy4Score += score * ScoreUnit;
         }
 
         OnScoreChanged?.Invoke();
@@ -84,7 +99,17 @@ public class ScoreManager : MonoBehaviour
             return Enemy1Score;
         }
 
-        return Enemy2Score;
+        if (slot == Enemy.EnemySlotId.Enemy2)
+        {
+            return Enemy2Score;
+        }
+
+        if (slot == Enemy.EnemySlotId.Enemy3)
+        {
+            return Enemy3Score;
+        }
+
+        return slot == Enemy.EnemySlotId.Enemy4 ? Enemy4Score : 0;
     }
 
     public Enemy.EnemySlotId GetLowestEnemySlot()
@@ -102,6 +127,14 @@ public class ScoreManager : MonoBehaviour
         {
             Enemy2Score = 0;
         }
+        else if (slot == Enemy.EnemySlotId.Enemy3)
+        {
+            Enemy3Score = 0;
+        }
+        else if (slot == Enemy.EnemySlotId.Enemy4)
+        {
+            Enemy4Score = 0;
+        }
 
         OnScoreChanged?.Invoke();
     }
@@ -111,9 +144,19 @@ public class ScoreManager : MonoBehaviour
         PlayerScore = 0;
         Enemy1Score = 0;
         Enemy2Score = 0;
+        Enemy3Score = 0;
+        Enemy4Score = 0;
 
         OnScoreChanged?.Invoke();
     }
+
+    private int ScoreUnit => scoreSettings != null
+        ? scoreSettings.ScoreUnit
+        : DefaultScoreUnit;
+
+    private int FeverScoreMultiplier => scoreSettings != null
+        ? scoreSettings.FeverScoreMultiplier
+        : DefaultFeverScoreMultiplier;
 
 
 }

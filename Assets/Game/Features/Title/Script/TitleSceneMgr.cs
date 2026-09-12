@@ -1,4 +1,5 @@
 using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 public class TitleSceneMgr : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class TitleSceneMgr : MonoBehaviour
     {
         if (DebugShortcuts.Pressed(_key))
         {
+            Sound.Manager.SoundManager.Stop((int)SceneSoundTag.TitleSound, (int)TitleSoundTag.TitleBGM);
             StartLoad();
         }
     }

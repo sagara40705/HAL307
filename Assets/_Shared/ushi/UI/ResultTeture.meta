@@ -1,7 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/_Shared/ushi/UI/ResultTeture.meta
 guid: de11eef68ea1c3849844e939da0fc199
 folderAsset: yes
 DefaultImporter:
+========
+guid: c7b7fe1fd8b4c62449e48c7db128a348
+PrefabImporter:
+>>>>>>>> main:Assets/_Shared/Enemy/Prefabs/P_Enemy_1.prefab.meta
   externalObjects: {}
   userData: 
   assetBundleName: 

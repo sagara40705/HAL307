@@ -7,8 +7,8 @@ public class SimpleAI : MonoBehaviour
     public float speed = 3f;
     public float moveTimeMin = 2f;
     public float moveTimeMax = 5f;
-    public float stopTimeMin = 1f;
-    public float stopTimeMax = 3f;
+    public float stopTimeMin = 4f;
+    public float stopTimeMax = 8f;
     // 色の設定
     //ポーズ種類
     public Color moveColor = Color.white; // 動いてるとき

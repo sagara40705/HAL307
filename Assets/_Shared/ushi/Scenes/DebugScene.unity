@@ -152,10 +152,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleAI
   speed: 3
-  moveTimeMin: 2
-  moveTimeMax: 2
+  moveTimeMin: 4
+  moveTimeMax: 8
   stopTimeMin: 2
-  stopTimeMax: 1
+  stopTimeMax: 2
   moveColor: {r: 1, g: 1, b: 1, a: 1}
   stopColor: {r: 1, g: 0, b: 0, a: 1}
   PowerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

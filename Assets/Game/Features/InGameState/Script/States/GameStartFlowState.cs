@@ -17,7 +17,7 @@ public sealed class GameStartFlowState : InGameFlowStateBase
     {
         IsPresentationFinished = false;
 
-        if (_stageData != null && _stageData.HasInitialEnemies)
+        if (_stageData != null)
         {
             if (context == null || context.EnemyLineup == null)
             {
@@ -25,7 +25,23 @@ public sealed class GameStartFlowState : InGameFlowStateBase
             }
             else
             {
-                context.EnemyLineup.SetupInitialEnemies(_stageData.InitialEnemies);
+                // StageModelと同じゲームモードで敵上限を確定。未初期化時は3P扱い
+                GameModeManager gameModeManager = GameModeManager.Instance;
+                Enemy.EnemyMaxCount maxEnemyCount = Enemy.EnemyMaxCount.Two;
+                if (gameModeManager != null && gameModeManager.IsInitialized)
+                {
+                    gameModeManager.LockSelection();
+                    maxEnemyCount = (Enemy.EnemyMaxCount)gameModeManager.MaxEnemyCount;
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning("[GameStartFlowState] GameModeManager is not ready. ThreePlayer enemy capacity is used.");
+                }
+
+                context.EnemyLineup.SetupInitialEnemies(
+                    _stageData.InitialEnemies,
+                    _stageData.InitialEnemyCount,
+                    maxEnemyCount);
             }
         }
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Enemy
 {
-    // 2体の敵枠とWave間の入れ替えを管理
+    // 最大4体の敵枠とWave間の追加・入れ替えを管理
     public sealed class EnemyLineupManager : MonoBehaviour
     {
         [SerializeField] private EnemyGenerator _enemyGenerator;
@@ -13,10 +13,14 @@ namespace Enemy
         [Header("Current Enemies")]
         [SerializeField] private Enemy _enemy1;
         [SerializeField] private Enemy _enemy2;
+        [SerializeField] private Enemy _enemy3;
+        [SerializeField] private Enemy _enemy4;
 
         [Header("Spawn Points")]
         [SerializeField] private Transform _enemy1SpawnPoint;
         [SerializeField] private Transform _enemy2SpawnPoint;
+        [SerializeField] private Transform _enemy3SpawnPoint;
+        [SerializeField] private Transform _enemy4SpawnPoint;
 
         [Header("Replace")]
         [SerializeField] private EnemyData _replacementEnemyData;
@@ -26,9 +30,14 @@ namespace Enemy
         private EnemySlotId _pendingReplacementSlot;
         private Enemy _pendingOldEnemy;
         private Enemy _pendingNewEnemy;
+        private EnemyMaxCount _maxEnemyCount = EnemyMaxCount.Two;
 
         public Enemy Enemy1 => GetEnemy(EnemySlotId.Enemy1);
         public Enemy Enemy2 => GetEnemy(EnemySlotId.Enemy2);
+        public Enemy Enemy3 => GetEnemy(EnemySlotId.Enemy3);
+        public Enemy Enemy4 => GetEnemy(EnemySlotId.Enemy4);
+        public int MaxEnemyCount => (int)_maxEnemyCount;
+        public int CurrentEnemyCount => CountCurrentEnemies();
         public bool HasPendingReplacement => _hasPendingReplacement;
         public EnemySlotId PendingReplacementSlot => _pendingReplacementSlot;
         public Enemy PendingOldEnemy => _pendingOldEnemy;
@@ -43,8 +52,25 @@ namespace Enemy
         // StageDataの初期敵設定で敵枠を初期化
         public void SetupInitialEnemies(EnemyLineupEntry[] entries)
         {
+            SetupInitialEnemies(entries, EnemyMaxCount.Two, _maxEnemyCount);
+        }
+
+        public void SetupInitialEnemies(EnemyLineupEntry[] entries, EnemyMaxCount maxEnemyCount)
+        {
+            SetupInitialEnemies(entries, EnemyMaxCount.Two, maxEnemyCount);
+        }
+
+        public void SetupInitialEnemies(
+            EnemyLineupEntry[] entries,
+            EnemyMaxCount initialEnemyCount,
+            EnemyMaxCount maxEnemyCount)
+        {
+            ConfigureMaxEnemyCount(maxEnemyCount);
+            int requiredInitialEnemyCount = Mathf.Min((int)initialEnemyCount, MaxEnemyCount);
+
             if (entries == null)
             {
+                Debug.LogWarning($"[EnemyLineupManager] Initial enemy setup failed. Reason=Entries are null. RequiredCount={requiredInitialEnemyCount}");
                 return;
             }
 
@@ -55,8 +81,65 @@ namespace Enemy
                     continue;
                 }
 
+                if (!IsInitialEnemySlot(entry.Slot, requiredInitialEnemyCount))
+                {
+                    continue;
+                }
+
                 ReplaceEnemy(entry.Slot, entry.EnemyData, entry.Position, entry.Rotation);
             }
+
+            int actualInitialEnemyCount = 0;
+            for (int slotNumber = 1; slotNumber <= requiredInitialEnemyCount; slotNumber++)
+            {
+                if (GetEnemy((EnemySlotId)slotNumber) != null)
+                {
+                    actualInitialEnemyCount++;
+                }
+            }
+
+            if (actualInitialEnemyCount != requiredInitialEnemyCount)
+            {
+                Debug.LogWarning($"[EnemyLineupManager] Initial enemy count is invalid. Count={actualInitialEnemyCount}, RequiredCount={requiredInitialEnemyCount}");
+            }
+        }
+
+        public void ConfigureMaxEnemyCount(EnemyMaxCount maxEnemyCount)
+        {
+            _maxEnemyCount = maxEnemyCount == EnemyMaxCount.Four
+                ? EnemyMaxCount.Four
+                : EnemyMaxCount.Two;
+        }
+
+        // 現在存在する全EnemyへWave共通のアニメーション速度を設定
+        public void SetAllEnemyAnimationSpeed(float animationSpeed)
+        {
+            ResolveReferences();
+            if (_enemyRegistry == null)
+            {
+                Debug.LogWarning("[EnemyLineupManager] Animation speed was not applied. Reason=EnemyRegistry is null.");
+                return;
+            }
+
+            foreach (Enemy enemy in _enemyRegistry.Enemies)
+            {
+                enemy?.SetAnimationSpeed(animationSpeed);
+            }
+        }
+
+        // 確定済みのEnemy枠数を取得
+        private int CountCurrentEnemies()
+        {
+            int enemyCount = 0;
+            for (int slotNumber = 1; slotNumber <= MaxEnemyCount; slotNumber++)
+            {
+                if (GetEnemy((EnemySlotId)slotNumber) != null)
+                {
+                    enemyCount++;
+                }
+            }
+
+            return enemyCount;
         }
 
         // スコアが低い敵枠を取得
@@ -70,7 +153,35 @@ namespace Enemy
                 return EnemySlotId.Enemy1;
             }
 
-            return _scoreManager.GetLowestEnemySlot();
+            EnemySlotId lowestSlot = EnemySlotId.Enemy1;
+            int lowestScore = int.MaxValue;
+            bool foundEnemy = false;
+
+            for (int slotNumber = 1; slotNumber <= MaxEnemyCount; slotNumber++)
+            {
+                EnemySlotId slot = (EnemySlotId)slotNumber;
+                if (GetEnemy(slot) == null)
+                {
+                    continue;
+                }
+
+                int score = _scoreManager.GetEnemyScore(slot);
+                if (foundEnemy && score >= lowestScore)
+                {
+                    continue;
+                }
+
+                lowestSlot = slot;
+                lowestScore = score;
+                foundEnemy = true;
+            }
+
+            if (!foundEnemy)
+            {
+                Debug.LogWarning("[EnemyLineupManager] Active enemy was not found. Enemy1 is selected.");
+            }
+
+            return lowestSlot;
         }
 
         // Inspector指定の敵データで低スコア側を入れ替え
@@ -99,6 +210,17 @@ namespace Enemy
             return BeginEnemyReplacement(slot, enemyData, position, rotation);
         }
 
+        public Enemy BeginWaveEnemyChange(EnemyData enemyData, Vector3 position, Quaternion rotation)
+        {
+            if (TryGetFirstAvailableSlot(out EnemySlotId availableSlot))
+            {
+                Debug.Log($"[EnemyLineupManager] Empty slot selected for wave enemy. Slot={availableSlot}, MaxEnemyCount={MaxEnemyCount}");
+                return BeginEnemyReplacement(availableSlot, enemyData, position, rotation);
+            }
+
+            return BeginLowestScoreEnemyReplacement(enemyData, position, rotation);
+        }
+
         public Enemy BeginEnemyReplacement(EnemySlotId slot, EnemyData enemyData, Vector3 position, Quaternion rotation)
         {
             ResolveReferences();
@@ -108,6 +230,12 @@ namespace Enemy
             {
                 Debug.LogWarning("[EnemyLineupManager] BeginEnemyReplacement skipped. Reason=Pending replacement already exists.");
                 return _pendingNewEnemy;
+            }
+
+            if (!IsSlotWithinCapacity(slot))
+            {
+                Debug.LogWarning($"[EnemyLineupManager] BeginEnemyReplacement skipped. Reason=Slot exceeds capacity. Slot={slot}, MaxEnemyCount={MaxEnemyCount}");
+                return null;
             }
 
             if (enemyData == null)
@@ -198,6 +326,12 @@ namespace Enemy
             ResolveReferences();
             ResolveSlotEnemies();
 
+            if (!IsSlotWithinCapacity(slot))
+            {
+                Debug.LogWarning($"[EnemyLineupManager] ReplaceEnemy skipped. Reason=Slot exceeds capacity. Slot={slot}, MaxEnemyCount={MaxEnemyCount}");
+                return null;
+            }
+
             if (enemyData == null)
             {
                 Debug.LogWarning("[EnemyLineupManager] ReplaceEnemy skipped. Reason=EnemyData is null.");
@@ -221,6 +355,12 @@ namespace Enemy
         {
             ResolveReferences();
             ResolveSlotEnemies();
+
+            if (!IsSlotWithinCapacity(slot))
+            {
+                Debug.LogWarning($"[EnemyLineupManager] ReplaceEnemy skipped. Reason=Slot exceeds capacity. Slot={slot}, MaxEnemyCount={MaxEnemyCount}");
+                return null;
+            }
 
             if (enemyData == null)
             {
@@ -293,11 +433,13 @@ namespace Enemy
             }
         }
 
-        // EnemyRegistryからEnemy1/Enemy2を復元
+        // EnemyRegistryから現在の最大数までのEnemyを復元
         private void ResolveSlotEnemies()
         {
-            GetEnemy(EnemySlotId.Enemy1);
-            GetEnemy(EnemySlotId.Enemy2);
+            for (int slotNumber = 1; slotNumber <= MaxEnemyCount; slotNumber++)
+            {
+                GetEnemy((EnemySlotId)slotNumber);
+            }
         }
 
         private Enemy ReplaceEnemyInternal(EnemySlotId slot, EnemyData enemyData, Vector3 position, Quaternion rotation, Enemy oldEnemy)
@@ -330,7 +472,19 @@ namespace Enemy
 
         private Enemy GetAssignedEnemy(EnemySlotId slot)
         {
-            return slot == EnemySlotId.Enemy1 ? _enemy1 : _enemy2;
+            switch (slot)
+            {
+                case EnemySlotId.Enemy1:
+                    return _enemy1;
+                case EnemySlotId.Enemy2:
+                    return _enemy2;
+                case EnemySlotId.Enemy3:
+                    return _enemy3;
+                case EnemySlotId.Enemy4:
+                    return _enemy4;
+                default:
+                    return null;
+            }
         }
 
         private void SetEnemy(EnemySlotId slot, Enemy enemy)
@@ -341,7 +495,22 @@ namespace Enemy
                 return;
             }
 
-            _enemy2 = enemy;
+            if (slot == EnemySlotId.Enemy2)
+            {
+                _enemy2 = enemy;
+                return;
+            }
+
+            if (slot == EnemySlotId.Enemy3)
+            {
+                _enemy3 = enemy;
+                return;
+            }
+
+            if (slot == EnemySlotId.Enemy4)
+            {
+                _enemy4 = enemy;
+            }
         }
 
         private void ClearPendingReplacement()
@@ -375,7 +544,51 @@ namespace Enemy
 
         private Transform GetSpawnPoint(EnemySlotId slot)
         {
-            return slot == EnemySlotId.Enemy1 ? _enemy1SpawnPoint : _enemy2SpawnPoint;
+            switch (slot)
+            {
+                case EnemySlotId.Enemy1:
+                    return _enemy1SpawnPoint;
+                case EnemySlotId.Enemy2:
+                    return _enemy2SpawnPoint;
+                case EnemySlotId.Enemy3:
+                    return _enemy3SpawnPoint;
+                case EnemySlotId.Enemy4:
+                    return _enemy4SpawnPoint;
+                default:
+                    return null;
+            }
+        }
+
+        private bool TryGetFirstAvailableSlot(out EnemySlotId availableSlot)
+        {
+            ResolveSlotEnemies();
+
+            for (int slotNumber = 1; slotNumber <= MaxEnemyCount; slotNumber++)
+            {
+                EnemySlotId slot = (EnemySlotId)slotNumber;
+                if (GetEnemy(slot) != null)
+                {
+                    continue;
+                }
+
+                availableSlot = slot;
+                return true;
+            }
+
+            availableSlot = EnemySlotId.Enemy1;
+            return false;
+        }
+
+        private bool IsSlotWithinCapacity(EnemySlotId slot)
+        {
+            int slotNumber = (int)slot;
+            return slotNumber >= (int)EnemySlotId.Enemy1 && slotNumber <= MaxEnemyCount;
+        }
+
+        private static bool IsInitialEnemySlot(EnemySlotId slot, int initialEnemyCount)
+        {
+            int slotNumber = (int)slot;
+            return slotNumber >= (int)EnemySlotId.Enemy1 && slotNumber <= initialEnemyCount;
         }
     }
 }

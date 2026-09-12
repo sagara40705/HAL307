@@ -57,6 +57,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
     private bool _isMuted;
     private bool _isCriAvailable;
     private bool _isCriUnavailableLoggedOnPlayback;
+    private bool _isSceneTransitioning;
 
     public float MasterVolume => _masterVolume;
     public float BgmVolume => _bgmVolume;
@@ -180,6 +181,36 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
         _bgmFadeCoroutine = StartCoroutine(CoStopBgmWithFade(fadeTime));
     }
 
+
+    // フェード予約を含む全再生を即時停止。音量設定やCRIリソースは維持
+    public void StopAll()
+    {
+        if (_bgmFadeCoroutine != null)
+        {
+            StopCoroutine(_bgmFadeCoroutine);
+            _bgmFadeCoroutine = null;
+        }
+        _bgmPlayer?.Stop(true);
+        if (_sePlayers != null)
+        {
+            foreach (CriAtomExPlayer player in _sePlayers)
+            {
+                player?.Stop(true);
+            }
+        }
+        ClearCurrentBgmState();
+    }
+
+    public void BeginSceneTransition()
+    {
+        _isSceneTransitioning = true;
+        StopAll();
+    }
+
+    public void EndSceneTransition()
+    {
+        _isSceneTransitioning = false;
+    }
 
     // SEの再生
     public void PlaySe(SeId id, float volumeScale = 1f, float pitch = 1f)
@@ -548,6 +579,11 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
 
     private bool EnsureReady()
     {
+        if (_isSceneTransitioning)
+        {
+            return false;
+        }
+
         if (!IsInitialized)
         {
             Debug.LogWarning("[SoundManager] Not initialized yet.");

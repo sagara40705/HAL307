@@ -20,47 +20,57 @@ public sealed class InGameEnemyIntroMovePresentationAction : InGamePresentationA
         }
 
         Player.PlayerPoseContoroller player = Object.FindFirstObjectByType<Player.PlayerPoseContoroller>();
-        yield return MoveTargets(lineup.Enemy1, lineup.Enemy2, player);
+        Transform[] targets =
+        {
+            lineup.Enemy1 != null ? lineup.Enemy1.transform : null,
+            lineup.Enemy2 != null ? lineup.Enemy2.transform : null,
+            lineup.Enemy3 != null ? lineup.Enemy3.transform : null,
+            lineup.Enemy4 != null ? lineup.Enemy4.transform : null,
+            player != null ? player.MoveTargetTransform : null,
+        };
+
+        yield return MoveTargets(targets);
     }
 
-    private IEnumerator MoveTargets(global::Enemy.Enemy enemy1, global::Enemy.Enemy enemy2, Player.PlayerPoseContoroller player)
+    private IEnumerator MoveTargets(Transform[] targets)
     {
-        Transform enemy1Transform = enemy1 != null ? enemy1.transform : null;
-        Transform enemy2Transform = enemy2 != null ? enemy2.transform : null;
-        Transform playerTransform = player != null ? player.MoveTargetTransform : null;
+        Vector3[] startPositions = new Vector3[targets.Length];
+        bool hasTarget = false;
+        for (int i = 0; i < targets.Length; i++)
+        {
+            Transform target = targets[i];
+            if (target == null)
+            {
+                continue;
+            }
 
-        if (enemy1Transform == null && enemy2Transform == null && playerTransform == null)
+            startPositions[i] = target.position;
+            hasTarget = true;
+        }
+
+        if (!hasTarget)
         {
             yield break;
         }
 
-        Vector3 enemy1StartPosition = enemy1Transform != null ? enemy1Transform.position : Vector3.zero;
-        Vector3 enemy2StartPosition = enemy2Transform != null ? enemy2Transform.position : Vector3.zero;
-        Vector3 playerStartPosition = playerTransform != null ? playerTransform.position : Vector3.zero;
         Vector3 direction = GetMoveDirection();
 
         if (totalDurationSeconds <= 0f)
         {
-            ApplyMovePosition(enemy1Transform, enemy1StartPosition, direction, 0f);
-            ApplyMovePosition(enemy2Transform, enemy2StartPosition, direction, 0f);
-            ApplyMovePosition(playerTransform, playerStartPosition, direction, 0f);
+            ApplyMovePositions(targets, startPositions, direction, 0f);
             yield break;
         }
 
         float elapsed = 0f;
         while (elapsed < totalDurationSeconds)
         {
-            ApplyMovePosition(enemy1Transform, enemy1StartPosition, direction, elapsed);
-            ApplyMovePosition(enemy2Transform, enemy2StartPosition, direction, elapsed);
-            ApplyMovePosition(playerTransform, playerStartPosition, direction, elapsed);
+            ApplyMovePositions(targets, startPositions, direction, elapsed);
 
             yield return null;
             elapsed += Time.deltaTime;
         }
 
-        ApplyMovePosition(enemy1Transform, enemy1StartPosition, direction, totalDurationSeconds);
-        ApplyMovePosition(enemy2Transform, enemy2StartPosition, direction, totalDurationSeconds);
-        ApplyMovePosition(playerTransform, playerStartPosition, direction, totalDurationSeconds);
+        ApplyMovePositions(targets, startPositions, direction, totalDurationSeconds);
     }
 
     private Vector3 GetMoveDirection()
@@ -82,5 +92,13 @@ public sealed class InGameEnemyIntroMovePresentationAction : InGamePresentationA
 
         float moveElapsed = Mathf.Clamp(elapsed, 0f, enemyMoveSeconds);
         target.position = startPosition + direction * moveSpeed * moveElapsed;
+    }
+
+    private void ApplyMovePositions(Transform[] targets, Vector3[] startPositions, Vector3 direction, float elapsed)
+    {
+        for (int i = 0; i < targets.Length; i++)
+        {
+            ApplyMovePosition(targets[i], startPositions[i], direction, elapsed);
+        }
     }
 }

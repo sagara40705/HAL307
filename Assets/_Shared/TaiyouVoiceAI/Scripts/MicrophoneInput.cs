@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class MicrophoneInput : MonoBehaviour
 {
+    private static AudioClip sharedMicrophoneClip;
+    private static string sharedDeviceName;
+    private static int activeClientCount;
+
     [SerializeField] private int sampleRate = 16000;
     [SerializeField] private int recordLengthSec = 1;
 
@@ -10,6 +14,18 @@ public class MicrophoneInput : MonoBehaviour
     private string deviceName;
     private int sampleCount;
     private float[] sampleBuffer;
+    private bool isRegisteredClient;
+
+    private void OnEnable()
+    {
+        if (isRegisteredClient)
+        {
+            return;
+        }
+
+        activeClientCount++;
+        isRegisteredClient = true;
+    }
 
     private void Start()
     {
@@ -43,9 +59,15 @@ public class MicrophoneInput : MonoBehaviour
 
     private void StartRecording()
     {
-        if (!string.IsNullOrEmpty(deviceName) && Microphone.IsRecording(deviceName))
+        if (TryAttachToSharedRecording())
         {
             return;
+        }
+
+        if (!string.IsNullOrEmpty(deviceName) && Microphone.IsRecording(deviceName))
+        {
+            Debug.LogWarning("[MicrophoneInput] Existing recording has no shared AudioClip. Restarting the device.");
+            Microphone.End(deviceName);
         }
 
         Debug.Log("使用するマイク: " + deviceName);
@@ -63,6 +85,9 @@ public class MicrophoneInput : MonoBehaviour
             return;
         }
 
+        sharedDeviceName = deviceName;
+        sharedMicrophoneClip = microphoneClip;
+
         Debug.Log("マイク録音開始");
     }
 
@@ -78,6 +103,11 @@ public class MicrophoneInput : MonoBehaviour
 
     public void RestartRecordingIfNeeded()
     {
+        if (TryAttachToSharedRecording())
+        {
+            return;
+        }
+
         if (Microphone.devices.Length == 0)
         {
             Debug.LogError("マイクが見つかりません。");
@@ -94,6 +124,25 @@ public class MicrophoneInput : MonoBehaviour
             Debug.LogWarning("マイクが停止していたので再開します。");
             StartRecording();
         }
+    }
+
+    private bool TryAttachToSharedRecording()
+    {
+        if (sharedMicrophoneClip == null || string.IsNullOrEmpty(sharedDeviceName))
+        {
+            return false;
+        }
+
+        if (!Microphone.IsRecording(sharedDeviceName))
+        {
+            sharedMicrophoneClip = null;
+            sharedDeviceName = null;
+            return false;
+        }
+
+        deviceName = sharedDeviceName;
+        microphoneClip = sharedMicrophoneClip;
+        return true;
     }
 
     public float[] GetLatestSamples()
@@ -152,10 +201,26 @@ public class MicrophoneInput : MonoBehaviour
     {
         Debug.LogWarning("MicrophoneInput が Disable されました");
 
-        if (!string.IsNullOrEmpty(deviceName) && Microphone.IsRecording(deviceName))
+        if (isRegisteredClient)
         {
-            Microphone.End(deviceName);
+            activeClientCount = Mathf.Max(0, activeClientCount - 1);
+            isRegisteredClient = false;
+        }
+
+        microphoneClip = null;
+
+        if (activeClientCount > 0)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(sharedDeviceName) && Microphone.IsRecording(sharedDeviceName))
+        {
+            Microphone.End(sharedDeviceName);
             Debug.LogWarning("マイク録音終了");
         }
+
+        sharedMicrophoneClip = null;
+        sharedDeviceName = null;
     }
 }

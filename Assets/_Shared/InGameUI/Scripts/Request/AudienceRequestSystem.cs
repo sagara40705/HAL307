@@ -59,21 +59,40 @@ namespace AudienceRequest
         // 黒リクエストがアクティブかどうかを判定するプロパティ
         public bool HasActiveBlackRequest => _activeBlackRequestPoseID != PoseID.None;
 
+        //  
+        [Header("Wave状態")]
+        [SerializeField]
+        private WaveGaugeController _waveGaugeController;
+
         // 初期化
         private void Start()
         {
-            // 
             ResetRequests();
 
-            // 依存関係の解決
             if (_feverGaugeController == null)
             {
-                _feverGaugeController = FindFirstObjectByType<FeverGaugeController>();
+                _feverGaugeController =
+                    FindFirstObjectByType<FeverGaugeController>();
             }
 
             if (_context == null)
             {
-                _context = FindFirstObjectByType<AudienceRequestContext>();
+                _context =
+                    FindFirstObjectByType<AudienceRequestContext>();
+            }
+
+            if (_waveGaugeController == null)
+            {
+                _waveGaugeController =
+                    FindFirstObjectByType<WaveGaugeController>();
+            }
+
+            if (_waveGaugeController == null)
+            {
+                Debug.LogWarning(
+                    "[AudienceRequestSystem] " +
+                    "WaveGaugeController was not found."
+                );
             }
         }
 
@@ -149,40 +168,61 @@ namespace AudienceRequest
         }
 
         // リクエストをクリアする関数
-        public void ClearRequest(PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
+        public void ClearRequest(PoseID poseID,bool isPlayer,Enemy.Enemy enemy = null)
         {
-            //
             int value = _audienceRequests.GetCount(poseID);
-            if (value <= 0) return;
 
+            if (value <= 0)
+            {
+                return;
+            }
+
+            // リクエストデータは消す
             _audienceRequests.ClearCount(poseID);
 
             _currentRequestCount -= value;
-            if (_currentRequestCount < 0)
-                _currentRequestCount = 0;
 
-            // 
+            if (_currentRequestCount < 0)
+            {
+                _currentRequestCount = 0;
+            }
+
+            bool blockScoreReward = IsScoreRewardBlocked();
+
             if (isPlayer)
             {
+                // フィーバー加算は今まで通り行う
                 _feverGaugeController?.AddFill();
 
-                //
-                if (ScoreManager.Instance != null)
+                // FinalPose中でなければスコアを加算
+                if (!blockScoreReward &&
+                    ScoreManager.Instance != null)
                 {
-                    bool isFever = _feverGaugeController != null && _feverGaugeController.IsFever;
-                    ScoreManager.Instance.AddPlayerScore(value, isFever);
+                    bool isFever =_feverGaugeController != null &&_feverGaugeController.IsFever;
+
+                    ScoreManager.Instance.AddPlayerScore(value,isFever);
                 }
             }
             else
             {
-                //
-                if (ScoreManager.Instance != null && enemy != null)
+                // FinalPose中でなければ敵スコアを加算
+                if (!blockScoreReward &&ScoreManager.Instance != null && enemy != null)
                 {
-                    ScoreManager.Instance.AddEnemyScore(value, enemy.name);
+                    ScoreManager.Instance.AddEnemyScore(value,enemy.name);
                 }
             }
 
-            _uiPool.PlayClearEffectAndRelease(poseID, isPlayer);
+            if (blockScoreReward)
+            {
+                Debug.Log(
+                    $"[AudienceRequestSystem] " +
+                    $"Score reward skipped during FinalPose. " +
+                    $"Pose={poseID}, IsPlayer={isPlayer}, Count={value}"
+                );
+            }
+
+            // ハート化や消去演出は実行する
+            _uiPool.PlayClearEffectAndRelease(poseID,isPlayer);
         }
 
         // リクエスト発生関数
@@ -593,5 +633,18 @@ namespace AudienceRequest
 
             return poseID;
         }
+
+        private bool IsScoreRewardBlocked()
+        {
+            if (_waveGaugeController == null)
+            {
+                _waveGaugeController =
+                    FindFirstObjectByType<WaveGaugeController>();
+            }
+
+            return _waveGaugeController != null &&
+                   _waveGaugeController.IsFinalPoseVisible;
+        }
+
     }
 }

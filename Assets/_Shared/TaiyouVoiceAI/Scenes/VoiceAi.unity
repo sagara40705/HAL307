@@ -255,9 +255,11 @@ MonoBehaviour:
   logPrediction: 1
   logScores: 1
   useSafetyFilter: 1
-  muscleNoneMargin: 10
-  powerNoneMargin: 10
-  yaaNoneMargin: 10
+  muscleNoneMargin: 2
+  powerNoneMargin: 2
+  yaaNoneMargin: 2
+  minimumTopScore: 1
+  minimumTop2Margin: 1
 --- !u!114 &62380393
 MonoBehaviour:
   m_ObjectHideFlags: 0

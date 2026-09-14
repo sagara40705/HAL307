@@ -27,6 +27,12 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
     [Header("Command Filter")]
     [SerializeField] private bool ignoreNone = true;
     [SerializeField] private float commandCooldown = 0.6f;
+    [SerializeField] private bool useSafetyFilter = true;
+    [SerializeField] private float minimumTopScore = 0f;
+    [SerializeField] private float minimumTop2Margin = 0f;
+    [SerializeField] private float timeNoneMargin = 2.0f;
+    [SerializeField] private float timeTop2Margin = 1.0f;
+    [SerializeField] private int timeRequiredConsecutive = 2;
 
     private readonly string[] fallbackLabels = { "ue", "sita", "hidari", "migi", "kettei", "time", "none" };
 
@@ -36,6 +42,20 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
     private float timer;
     private float lastCommandTime = -999f;
     private string lastCommand = "";
+    private string pendingCommand = "";
+    private int pendingCommandCount;
+    private string acceptedConsecutiveText = "1/1";
+
+    private struct PredictionStats
+    {
+        public int Top1Index;
+        public int Top2Index;
+        public float Top1Score;
+        public float Top2Score;
+        public float Top2Margin;
+        public float NoneScore;
+        public float TimeScore;
+    }
 
     private void Start()
     {
@@ -125,6 +145,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         Debug.Log($"[MenuVoiceTrace] Volume check. volume={volume:F8}, minVolumeThreshold={minVolumeThreshold:F8}, belowThreshold={belowVolumeThreshold}");
         if (volume < minVolumeThreshold)
         {
+            Debug.Log($"[MenuVoiceReject] label=unknown reason=VolumeThreshold required={minVolumeThreshold:F8} actual={volume:F8}");
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=volume below minVolumeThreshold");
             return;
         }
@@ -174,8 +195,19 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         }
 
         string predictedLabel = labels[predictedIndex].Trim().ToLowerInvariant();
+        PredictionStats stats = GetPredictionStats(readable);
         Debug.Log($"[MenuVoiceTrace] Scores {BuildScoreLog(readable)}");
         Debug.Log($"[MenuVoiceTrace] predictedIndex={predictedIndex}, predictedLabel={predictedLabel}, volume={volume:F8}");
+        Debug.Log(
+            $"[MenuVoiceDebug] " +
+            $"volume={volume:F8} " +
+            $"predicted={predictedLabel} " +
+            $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+            $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+            $"margin={stats.Top2Margin:F4} " +
+            $"none={stats.NoneScore:F4} " +
+            $"time={stats.TimeScore:F4}"
+        );
 
         if (logPrediction)
         {
@@ -189,7 +221,24 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         if (ignoreNone && predictedLabel == "none")
         {
+            ResetPendingCommand();
+            Debug.Log(
+                $"[MenuVoiceReject] " +
+                $"label={predictedLabel} " +
+                $"reason=NoneIgnored " +
+                $"volume={volume:F8} " +
+                $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+                $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+                $"top2Margin={stats.Top2Margin:F4} " +
+                $"none={stats.NoneScore:F4} " +
+                $"time={stats.TimeScore:F4}"
+            );
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=predictedLabel none and ignoreNone is true");
+            return;
+        }
+
+        if (useSafetyFilter && !PassSafetyFilter(predictedLabel, stats, volume))
+        {
             return;
         }
 
@@ -197,6 +246,19 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         Debug.Log($"[MenuVoiceTrace] Cooldown check. command={predictedLabel}, isCooldown={isCooldown}, lastCommand={lastCommand}, elapsed={Time.unscaledTime - lastCommandTime:F3}, commandCooldown={commandCooldown:F3}");
         if (isCooldown)
         {
+            Debug.Log(
+                $"[MenuVoiceReject] " +
+                $"label={predictedLabel} " +
+                $"reason=CommandCooldown " +
+                $"required={commandCooldown:F3} " +
+                $"actual={Time.unscaledTime - lastCommandTime:F3} " +
+                $"volume={volume:F8} " +
+                $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+                $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+                $"top2Margin={stats.Top2Margin:F4} " +
+                $"none={stats.NoneScore:F4} " +
+                $"noneMargin={stats.Top1Score - stats.NoneScore:F4}"
+            );
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=commandCooldown");
             return;
         }
@@ -206,6 +268,18 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         if (menuVoiceCommandAction != null)
         {
+            Debug.Log(
+                $"[MenuVoiceAccept] " +
+                $"label={predictedLabel} " +
+                $"volume={volume:F8} " +
+                $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+                $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+                $"top2Margin={stats.Top2Margin:F4} " +
+                $"none={stats.NoneScore:F4} " +
+                $"noneMargin={stats.Top1Score - stats.NoneScore:F4} " +
+                $"time={stats.TimeScore:F4} " +
+                $"consecutive={GetAcceptedConsecutiveText(predictedLabel)}"
+            );
             Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand before. command={predictedLabel}, volume={volume:F8}, target={menuVoiceCommandAction.name}, scene={menuVoiceCommandAction.gameObject.scene.name}, activeSelf={menuVoiceCommandAction.gameObject.activeSelf}, activeInHierarchy={menuVoiceCommandAction.gameObject.activeInHierarchy}, enabled={menuVoiceCommandAction.enabled}");
             menuVoiceCommandAction.ExecuteCommand(predictedLabel, volume);
             Debug.Log("[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand after");
@@ -214,6 +288,100 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         {
             Debug.LogWarning("[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand skipped. menuVoiceCommandAction is null");
         }
+    }
+
+    private bool PassSafetyFilter(string command, PredictionStats stats, float volume)
+    {
+        if (stats.Top1Score < minimumTopScore)
+        {
+            ResetPendingCommand();
+            Debug.Log(BuildMenuRejectLog(command, "MinimumTopScore", minimumTopScore, stats.Top1Score, stats, volume));
+            return false;
+        }
+
+        if (stats.Top2Margin < minimumTop2Margin)
+        {
+            ResetPendingCommand();
+            Debug.Log(BuildMenuRejectLog(command, "MinimumTop2Margin", minimumTop2Margin, stats.Top2Margin, stats, volume));
+            return false;
+        }
+
+        if (command == "time")
+        {
+            float timeNoneScoreMargin = stats.TimeScore - stats.NoneScore;
+            if (timeNoneScoreMargin < timeNoneMargin)
+            {
+                ResetPendingCommand();
+                Debug.Log(BuildMenuRejectLog(command, "TimeNoneMargin", timeNoneMargin, timeNoneScoreMargin, stats, volume));
+                return false;
+            }
+
+            if (stats.Top2Margin < timeTop2Margin)
+            {
+                ResetPendingCommand();
+                Debug.Log(BuildMenuRejectLog(command, "TimeTop2Margin", timeTop2Margin, stats.Top2Margin, stats, volume));
+                return false;
+            }
+
+            int requiredCount = Mathf.Max(1, timeRequiredConsecutive);
+            if (pendingCommand == command)
+            {
+                pendingCommandCount++;
+            }
+            else
+            {
+                pendingCommand = command;
+                pendingCommandCount = 1;
+            }
+
+            Debug.Log($"[MenuVoiceDebug] time consecutive count={pendingCommandCount}, required={requiredCount}");
+            if (pendingCommandCount < requiredCount)
+            {
+                Debug.Log(BuildMenuRejectLog(command, "ConsecutiveCount", requiredCount, pendingCommandCount, stats, volume));
+                return false;
+            }
+
+            acceptedConsecutiveText = $"{pendingCommandCount}/{requiredCount}";
+            ResetPendingCommand();
+            return true;
+        }
+
+        acceptedConsecutiveText = "1/1";
+        ResetPendingCommand();
+        return true;
+    }
+
+    private void ResetPendingCommand()
+    {
+        pendingCommand = "";
+        pendingCommandCount = 0;
+    }
+
+    private string GetAcceptedConsecutiveText(string command)
+    {
+        if (command == "time")
+        {
+            return acceptedConsecutiveText;
+        }
+
+        return "1/1";
+    }
+
+    private string BuildMenuRejectLog(string label, string reason, float required, float actual, PredictionStats stats, float volume)
+    {
+        return
+            $"[MenuVoiceReject] " +
+            $"label={label} " +
+            $"reason={reason} " +
+            $"required={required:F4} " +
+            $"actual={actual:F4} " +
+            $"volume={volume:F8} " +
+            $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+            $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+            $"top2Margin={stats.Top2Margin:F4} " +
+            $"none={stats.NoneScore:F4} " +
+            $"noneMargin={stats.Top1Score - stats.NoneScore:F4} " +
+            $"time={stats.TimeScore:F4}";
     }
 
     private bool IsCooldown(string command)
@@ -283,6 +451,74 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         }
 
         return maxIndex;
+    }
+
+    private PredictionStats GetPredictionStats(Tensor<float> tensor)
+    {
+        PredictionStats stats = new PredictionStats
+        {
+            Top1Index = -1,
+            Top2Index = -1,
+            Top1Score = float.NegativeInfinity,
+            Top2Score = float.NegativeInfinity,
+            NoneScore = GetScoreForLabel(tensor, "none"),
+            TimeScore = GetScoreForLabel(tensor, "time")
+        };
+
+        int count = Mathf.Min(labels.Length, tensor.shape.length);
+        for (int i = 0; i < count; i++)
+        {
+            float score = tensor[i];
+            if (score > stats.Top1Score)
+            {
+                stats.Top2Score = stats.Top1Score;
+                stats.Top2Index = stats.Top1Index;
+                stats.Top1Score = score;
+                stats.Top1Index = i;
+            }
+            else if (score > stats.Top2Score)
+            {
+                stats.Top2Score = score;
+                stats.Top2Index = i;
+            }
+        }
+
+        stats.Top2Margin = stats.Top1Score - stats.Top2Score;
+        return stats;
+    }
+
+    private float GetScoreForLabel(Tensor<float> tensor, string label)
+    {
+        int index = GetLabelIndex(label);
+        if (index < 0 || index >= tensor.shape.length)
+        {
+            return float.NegativeInfinity;
+        }
+
+        return tensor[index];
+    }
+
+    private int GetLabelIndex(string label)
+    {
+        for (int i = 0; i < labels.Length; i++)
+        {
+            if (labels[i].Trim().ToLowerInvariant() == label)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private string GetLabelOrUnknown(int index)
+    {
+        if (index < 0 || index >= labels.Length)
+        {
+            return "unknown";
+        }
+
+        return labels[index].Trim().ToLowerInvariant();
     }
 
     private string BuildScoreLog(Tensor<float> tensor)

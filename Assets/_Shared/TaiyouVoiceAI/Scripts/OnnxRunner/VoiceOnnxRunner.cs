@@ -21,9 +21,11 @@ public class VoiceOnnxRunner : MonoBehaviour
 
     [Header("誤爆防止")]
     [SerializeField] private bool useSafetyFilter = true;
-    [SerializeField] private float muscleNoneMargin = 3.0f;
-    [SerializeField] private float powerNoneMargin = 10.0f;
-    [SerializeField] private float yaaNoneMargin = 5.0f;
+    [SerializeField] private float muscleNoneMargin = 2.0f;
+    [SerializeField] private float powerNoneMargin = 2.0f;
+    [SerializeField] private float yaaNoneMargin = 2.0f;
+    [SerializeField] private float minimumTopScore = 1.0f;
+    [SerializeField] private float minimumTop2Margin = 1.2f;
 
     private Worker worker;
     private Model runtimeModel;
@@ -74,6 +76,16 @@ public class VoiceOnnxRunner : MonoBehaviour
     private float[,] cachedMfcc;
     private Tensor<float> cachedOutput;
     private string cachedLabel;
+
+    private struct PredictionStats
+    {
+        public int Top1Index;
+        public int Top2Index;
+        public float Top1Score;
+        public float Top2Score;
+        public float Top2Margin;
+        public float NoneScore;
+    }
 
     private void Update()
     {
@@ -201,6 +213,7 @@ public class VoiceOnnxRunner : MonoBehaviour
 
         if (isBelowThreshold)
         {
+            Debug.Log($"[GameVoiceReject] label=unknown reason=VolumeThreshold required={minVolumeThreshold:F8} actual={cachedVolume:F8}");
             Debug.Log("[VoiceDebug] CheckVolumeStep stopped. reason=volume below threshold");
             state = VoiceProcessState.Idle;
             return;
@@ -304,9 +317,53 @@ public class VoiceOnnxRunner : MonoBehaviour
             Debug.Log(BuildScoreLog(cachedOutput));
         }
 
+        if (cachedOutput != null)
+        {
+            PredictionStats stats = GetPredictionStats(cachedOutput);
+            Debug.Log(
+                $"[GameVoiceDebug] " +
+                $"volume={cachedVolume:F8} " +
+                $"predicted={cachedLabel} " +
+                $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+                $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+                $"margin={stats.Top2Margin:F4} " +
+                $"none={stats.NoneScore:F4} " +
+                $"noneMargin={stats.Top1Score - stats.NoneScore:F4}"
+            );
+
+            if (useSafetyFilter && !PassSafetyFilter(cachedLabel, stats, cachedVolume))
+            {
+                cachedOutput?.Dispose();
+                cachedOutput = null;
+
+                cachedSamples = null;
+                cachedMfcc = null;
+                cachedLabel = null;
+
+                state = VoiceProcessState.Idle;
+                return;
+            }
+        }
+
         // none の場合は何もしない
         if (cachedLabel == "none")
         {
+            if (cachedOutput != null)
+            {
+                PredictionStats stats = GetPredictionStats(cachedOutput);
+                Debug.Log(
+                    $"[GameVoiceReject] " +
+                    $"label={cachedLabel} " +
+                    $"reason=NoneIgnored " +
+                    $"volume={cachedVolume:F8} " +
+                    $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+                    $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+                    $"top2Margin={stats.Top2Margin:F4} " +
+                    $"none={stats.NoneScore:F4} " +
+                    $"noneMargin={stats.Top1Score - stats.NoneScore:F4}"
+                );
+            }
+
             Debug.Log("[ActionTrace] HandleResultStep return. reason=predictedLabel is none");
             cachedOutput?.Dispose();
             cachedOutput = null;
@@ -322,6 +379,21 @@ public class VoiceOnnxRunner : MonoBehaviour
         // 認識結果を実行
         if (voiceCommandAction != null)
         {
+            if (cachedOutput != null)
+            {
+                PredictionStats stats = GetPredictionStats(cachedOutput);
+                Debug.Log(
+                    $"[GameVoiceAccept] " +
+                    $"label={cachedLabel} " +
+                    $"volume={cachedVolume:F8} " +
+                    $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+                    $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+                    $"top2Margin={stats.Top2Margin:F4} " +
+                    $"none={stats.NoneScore:F4} " +
+                    $"noneMargin={stats.Top1Score - stats.NoneScore:F4}"
+                );
+            }
+
             Debug.Log($"[ActionTrace] ExecuteCommand before. target={voiceCommandAction.name}, scene={voiceCommandAction.gameObject.scene.name}, activeSelf={voiceCommandAction.gameObject.activeSelf}, activeInHierarchy={voiceCommandAction.gameObject.activeInHierarchy}, enabled={voiceCommandAction.enabled}");
             voiceCommandAction.ExecuteCommand(cachedLabel, cachedVolume);
             Debug.Log("[ActionTrace] ExecuteCommand after");
@@ -421,6 +493,149 @@ public class VoiceOnnxRunner : MonoBehaviour
         }
 
         return maxIndex;
+    }
+
+    private bool PassSafetyFilter(string label, PredictionStats stats, float volume)
+    {
+        if (label == "none")
+        {
+            return true;
+        }
+
+        if (stats.Top1Score < minimumTopScore)
+        {
+            Debug.Log(BuildGameRejectLog(label, "MinimumTopScore", minimumTopScore, stats.Top1Score, stats, volume));
+            return false;
+        }
+
+        if (stats.Top2Margin < minimumTop2Margin)
+        {
+            Debug.Log(BuildGameRejectLog(label, "MinimumTop2Margin", minimumTop2Margin, stats.Top2Margin, stats, volume));
+            return false;
+        }
+
+        float requiredNoneMargin = GetRequiredNoneMargin(label);
+        float noneMargin = stats.Top1Score - stats.NoneScore;
+        if (noneMargin < requiredNoneMargin)
+        {
+            Debug.Log(BuildGameRejectLog(label, GetNoneMarginReason(label), requiredNoneMargin, noneMargin, stats, volume));
+            return false;
+        }
+
+        return true;
+    }
+
+    private string GetNoneMarginReason(string label)
+    {
+        switch (label)
+        {
+            case "muscle":
+                return "MuscleNoneMargin";
+            case "power":
+                return "PowerNoneMargin";
+            case "yaa":
+                return "YaaNoneMargin";
+            default:
+                return "NoneMargin";
+        }
+    }
+
+    private string BuildGameRejectLog(string label, string reason, float required, float actual, PredictionStats stats, float volume)
+    {
+        return
+            $"[GameVoiceReject] " +
+            $"label={label} " +
+            $"reason={reason} " +
+            $"required={required:F4} " +
+            $"actual={actual:F4} " +
+            $"volume={volume:F8} " +
+            $"top1={GetLabelOrUnknown(stats.Top1Index)} score={stats.Top1Score:F4} " +
+            $"top2={GetLabelOrUnknown(stats.Top2Index)} score={stats.Top2Score:F4} " +
+            $"top2Margin={stats.Top2Margin:F4} " +
+            $"none={stats.NoneScore:F4} " +
+            $"noneMargin={stats.Top1Score - stats.NoneScore:F4}";
+    }
+
+    private float GetRequiredNoneMargin(string label)
+    {
+        switch (label)
+        {
+            case "muscle":
+                return muscleNoneMargin;
+            case "power":
+                return powerNoneMargin;
+            case "yaa":
+                return yaaNoneMargin;
+            default:
+                return 0f;
+        }
+    }
+
+    private PredictionStats GetPredictionStats(Tensor<float> tensor)
+    {
+        PredictionStats stats = new PredictionStats
+        {
+            Top1Index = -1,
+            Top2Index = -1,
+            Top1Score = float.NegativeInfinity,
+            Top2Score = float.NegativeInfinity,
+            NoneScore = GetScoreForLabel(tensor, "none")
+        };
+
+        int count = Mathf.Min(labels.Length, tensor.shape.length);
+        for (int i = 0; i < count; i++)
+        {
+            float score = tensor[i];
+            if (score > stats.Top1Score)
+            {
+                stats.Top2Score = stats.Top1Score;
+                stats.Top2Index = stats.Top1Index;
+                stats.Top1Score = score;
+                stats.Top1Index = i;
+            }
+            else if (score > stats.Top2Score)
+            {
+                stats.Top2Score = score;
+                stats.Top2Index = i;
+            }
+        }
+
+        stats.Top2Margin = stats.Top1Score - stats.Top2Score;
+        return stats;
+    }
+
+    private float GetScoreForLabel(Tensor<float> tensor, string label)
+    {
+        int index = GetLabelIndex(label);
+        if (index < 0 || index >= tensor.shape.length)
+        {
+            return float.NegativeInfinity;
+        }
+
+        return tensor[index];
+    }
+
+    private int GetLabelIndex(string label)
+    {
+        for (int i = 0; i < labels.Length; i++)
+        {
+            if (labels[i] == label)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private string GetLabelOrUnknown(int index)
+    {
+        if (index < 0 || index >= labels.Length)
+        {
+            return "unknown";
+        }
+
+        return labels[index];
     }
 
     private bool HasInvalidMfccValue(float[,] mfcc)

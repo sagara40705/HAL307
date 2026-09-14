@@ -55,7 +55,7 @@ public class MicrophoneInput : MonoBehaviour
 
             if (Microphone.devices.Length > 0)
             {
-                deviceName = Microphone.devices[0];
+                deviceName = SelectMicrophoneDevice();
                 AcquireSharedRecording();
                 yield break;
             }
@@ -147,7 +147,7 @@ public class MicrophoneInput : MonoBehaviour
 
         if (string.IsNullOrEmpty(deviceName))
         {
-            deviceName = Microphone.devices[0];
+            deviceName = SelectMicrophoneDevice();
             LogSharedMicTrace("RestartRecordingIfNeeded assigned deviceName");
         }
 
@@ -467,5 +467,88 @@ public class MicrophoneInput : MonoBehaviour
         }
 
         return recording.UseCount;
+    }
+
+    private string SelectMicrophoneDevice()
+    {
+        string[] devices = Microphone.devices;
+
+        if (devices == null || devices.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        string selectedDevice = null;
+        string reason = string.Empty;
+
+        for (int i = 0; i < devices.Length; i++)
+        {
+            string device = devices[i];
+
+            if (ContainsIgnoreCase(device, "HyperX") || ContainsIgnoreCase(device, "SoloCast"))
+            {
+                selectedDevice = device;
+                reason = "preferred external microphone";
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(selectedDevice))
+        {
+            for (int i = 0; i < devices.Length; i++)
+            {
+                string device = devices[i];
+
+                if (LooksLikeExternalMicrophone(device) && !LooksLikeLowPriorityMicrophone(device))
+                {
+                    selectedDevice = device;
+                    reason = "external microphone candidate";
+                    break;
+                }
+            }
+        }
+
+        if (string.IsNullOrEmpty(selectedDevice))
+        {
+            selectedDevice = devices[0];
+            reason = "fallback first available device";
+        }
+
+        LogMicrophoneDeviceSelection(devices, selectedDevice, reason);
+        return selectedDevice;
+    }
+
+    private bool LooksLikeExternalMicrophone(string device)
+    {
+        return ContainsIgnoreCase(device, "USB")
+            || ContainsIgnoreCase(device, "External")
+            || ContainsIgnoreCase(device, "Headset")
+            || ContainsIgnoreCase(device, "Mic")
+            || ContainsIgnoreCase(device, "マイク");
+    }
+
+    private bool LooksLikeLowPriorityMicrophone(string device)
+    {
+        return ContainsIgnoreCase(device, "Realtek");
+    }
+
+    private bool ContainsIgnoreCase(string text, string value)
+    {
+        return !string.IsNullOrEmpty(text)
+            && !string.IsNullOrEmpty(value)
+            && text.IndexOf(value, System.StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private void LogMicrophoneDeviceSelection(string[] devices, string selectedDevice, string reason)
+    {
+        string message = "[MicDeviceSelect]\ndevices:";
+
+        for (int i = 0; i < devices.Length; i++)
+        {
+            message += $"\n{i}: {devices[i]}";
+        }
+
+        message += $"\nselected={selectedDevice}\nreason={reason}";
+        Debug.Log(message);
     }
 }

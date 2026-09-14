@@ -3352,8 +3352,14 @@ MonoBehaviour:
   holdToTalkKey: 36
   logPrediction: 1
   logScores: 1
-  ignoreNone: 0
+  ignoreNone: 1
   commandCooldown: 0.8
+  useSafetyFilter: 1
+  minimumTopScore: 0
+  minimumTop2Margin: 0
+  timeNoneMargin: 1.8
+  timeTop2Margin: 1
+  timeRequiredConsecutive: 1
 --- !u!114 &1796446401
 MonoBehaviour:
   m_ObjectHideFlags: 0

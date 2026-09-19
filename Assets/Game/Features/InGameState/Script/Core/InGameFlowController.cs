@@ -128,6 +128,7 @@ public sealed class InGameFlowController : MonoBehaviour
             // ウェーブ切り替え演出を実行
             yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave, nextWave));
             _currentWaveIndex++;    // ウェーブを進める
+            ScoreManager.Instance?.ResetAllScores();
             _currentWaveData = nextWave;
             _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
             _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);

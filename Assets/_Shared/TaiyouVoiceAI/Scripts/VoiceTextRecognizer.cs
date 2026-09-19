@@ -6,37 +6,42 @@ using Debug = UnityEngine.Debug;
 
 public class VoiceTextRecognizer : MonoBehaviour
 {
+    [SerializeField]
+    private bool enableDebugWindowsRecognition = false;
+
     private DictationRecognizer dictationRecognizer;
 
-    [SerializeField]
-    private VoiceCommandAction voiceCommandAction;
-
-    private void Start()
+    private void OnEnable()
     {
+        if (!enableDebugWindowsRecognition)
+        {
+            return;
+        }
+
+        InitializeRecognizer();
+    }
+
+    private void InitializeRecognizer()
+    {
+        if (dictationRecognizer != null)
+        {
+            return;
+        }
 
         dictationRecognizer = new DictationRecognizer();
-
         dictationRecognizer.DictationResult += OnDictationResult;
-
         dictationRecognizer.DictationError += OnDictationError;
-
         dictationRecognizer.Start();
-
-        Debug.Log("音声認識開始");
     }
 
     private void OnDictationResult(string text, ConfidenceLevel confidence)
     {
-        Debug.Log("認識文字: " + text);
-
         string command = NarrowCommandFromText(text);
-
-        if (command != "none")
-        {
-            Debug.Log("確定コマンド: " + command);
-
-            voiceCommandAction.ExecuteCommand(command, 1.0f);
-        }
+        Debug.Log(
+            $"[WindowsVoiceDebug] text={text} " +
+            $"mappedCommand={command} " +
+            $"forwardedToGame=False"
+        );
     }
 
     private string NarrowCommandFromText(string text)
@@ -68,13 +73,35 @@ public class VoiceTextRecognizer : MonoBehaviour
         return "none";
     }
 
+    private void OnDisable()
+    {
+        DisposeRecognizer();
+    }
+
     private void OnDestroy()
     {
-        if (dictationRecognizer != null)
+        DisposeRecognizer();
+    }
+
+    private void DisposeRecognizer()
+    {
+        if (dictationRecognizer == null)
         {
-            dictationRecognizer.Stop();
-            dictationRecognizer.Dispose();
+            return;
         }
+
+        DictationRecognizer recognizer = dictationRecognizer;
+        dictationRecognizer = null;
+
+        recognizer.DictationResult -= OnDictationResult;
+        recognizer.DictationError -= OnDictationError;
+
+        if (recognizer.Status == SpeechSystemStatus.Running)
+        {
+            recognizer.Stop();
+        }
+
+        recognizer.Dispose();
     }
 
     // エラーが発生した場合設定を開く

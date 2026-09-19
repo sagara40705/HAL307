@@ -62,6 +62,11 @@ public class VoiceCommandAction : MonoBehaviour
             return;
         }
 
+        if (IsPoseCommand(command) && !CanExecutePoseCommand(command))
+        {
+            return;
+        }
+
         switch (command)
         {
             case "power":
@@ -118,6 +123,52 @@ public class VoiceCommandAction : MonoBehaviour
     private static bool IsMenuCommand(string command)
     {
         return command == "ue" || command == "sita" || command == "kettei" || command == "time";
+    }
+
+    private static bool IsPoseCommand(string command)
+    {
+        return command == "power" || command == "yaa" || command == "muscle";
+    }
+
+    private bool CanExecutePoseCommand(string command)
+    {
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        PauseManager pauseManager = PauseManager.Instance;
+
+        if ((gamePhaseManager != null && gamePhaseManager.IsInitialized && gamePhaseManager.IsChangingPhase) ||
+            (pauseManager != null && pauseManager.IsApplyingPauseView))
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=SceneTransition");
+            return false;
+        }
+
+        if ((gamePhaseManager != null && gamePhaseManager.IsInitialized && gamePhaseManager.CurrentPhase == GamePhase.Pause) ||
+            (pauseManager != null && pauseManager.IsPaused))
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=Pause");
+            return false;
+        }
+
+        if (gamePhaseManager == null || !gamePhaseManager.IsInitialized)
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=GameStateUnavailable");
+            return false;
+        }
+
+        if (gamePhaseManager.CurrentPhase != GamePhase.InGame)
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=NotInGame phase={gamePhaseManager.CurrentPhase}");
+            return false;
+        }
+
+        ResolvePlayerPoseController();
+        if (playerPoseController == null || !playerPoseController.isActiveAndEnabled)
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=PlayerUnavailable");
+            return false;
+        }
+
+        return true;
     }
 
     private void HideOrDestroy(GameObject obj, string label)

@@ -3324,7 +3324,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb284adafa9eb7045baea8feb51844c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuVoiceCommandAction
-  menuController: {fileID: 0}
+  menuController: {fileID: 1796446398}
+  mainMenuPanel: {fileID: 2138444099}
+  micSettingPanel: {fileID: 471578821}
+  micSettingController: {fileID: 471578823}
+  howToPanel: {fileID: 303607548}
+  howToController: {fileID: 303607550}
   stageSelectController: {fileID: 0}
   requireTimeBeforeMenuControl: 1
   menuControlStartDelay: 1
@@ -3357,7 +3362,7 @@ MonoBehaviour:
   useSafetyFilter: 1
   minimumTopScore: 0
   minimumTop2Margin: 0
-  timeNoneMargin: 1.8
+  timeNoneMargin: 1.5
   timeTop2Margin: 1
   timeRequiredConsecutive: 1
 --- !u!114 &1796446401
@@ -3392,21 +3397,6 @@ MonoBehaviour:
   melFilterCount: 40
   preEmphasis: 0.97
   normalizePerFeature: 1
---- !u!114 &1796446404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1796446392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7afed63fe97445228c7246b936eeb6b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PythonCompatMfccFeatureExtractor
-  logFeatureStats: 1
-  exportCsvOnNextExtraction: 0
-  csvFileName: python_compat_mfcc.csv
 --- !u!114 &1796446403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3422,6 +3412,21 @@ MonoBehaviour:
   onRetaire:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1796446404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796446392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7afed63fe97445228c7246b936eeb6b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PythonCompatMfccFeatureExtractor
+  logFeatureStats: 1
+  exportCsvOnNextExtraction: 0
+  csvFileName: python_compat_mfcc.csv
 --- !u!1 &1808320849
 GameObject:
   m_ObjectHideFlags: 0

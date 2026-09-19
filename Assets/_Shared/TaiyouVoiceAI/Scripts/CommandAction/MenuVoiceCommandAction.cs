@@ -15,6 +15,13 @@ public class MenuVoiceCommandAction : MonoBehaviour
     [Tooltip("Assign a component that has OnVoiceCommand(string command).")]
     [SerializeField] private MonoBehaviour menuController;
 
+    [Header("Pause Voice Routing")]
+    [SerializeField] private GameObject mainMenuPanel;
+    [SerializeField] private GameObject micSettingPanel;
+    [SerializeField] private MonoBehaviour micSettingController;
+    [SerializeField] private GameObject howToPanel;
+    [SerializeField] private MonoBehaviour howToController;
+
     [Header("Stage Select")]
     [Tooltip("Legacy fallback target that has OnVoiceCommand(string command).")]
     [SerializeField] private MonoBehaviour stageSelectController;
@@ -245,13 +252,64 @@ public class MenuVoiceCommandAction : MonoBehaviour
             case CommandLeft:
             case CommandRight:
             case CommandDecision:
-                SendCommandTo(menuController, command);
+                RoutePauseCommand(command);
                 break;
 
             default:
                 Debug.Log($"[Menu Voice] Command skipped. Reason=Pause phase unsupported command. Command={command}");
                 break;
         }
+    }
+
+    private void RoutePauseCommand(string command)
+    {
+        bool mainMenuActive = IsPanelActive(mainMenuPanel);
+        bool micSettingActive = IsPanelActive(micSettingPanel);
+        bool howToActive = IsPanelActive(howToPanel);
+        int activeReceiverCount = (mainMenuActive ? 1 : 0) + (micSettingActive ? 1 : 0) + (howToActive ? 1 : 0);
+
+        if (activeReceiverCount == 0)
+        {
+            Debug.Log($"[MenuVoiceBlocked] command={command} reason=NoActiveReceiver");
+            return;
+        }
+
+        if (activeReceiverCount > 1)
+        {
+            Debug.Log($"[MenuVoiceBlocked] command={command} reason=MultipleActiveReceivers mainMenu={mainMenuActive} micSetting={micSettingActive} howTo={howToActive}");
+            return;
+        }
+
+        if (micSettingActive)
+        {
+            RouteToActiveReceiver(command, micSettingController, "MicSetting");
+            return;
+        }
+
+        if (howToActive)
+        {
+            RouteToActiveReceiver(command, howToController, "HowTo");
+            return;
+        }
+
+        RouteToActiveReceiver(command, menuController, "MainMenu");
+    }
+
+    private void RouteToActiveReceiver(string command, MonoBehaviour receiver, string receiverName)
+    {
+        if (receiver == null || !receiver.isActiveAndEnabled)
+        {
+            Debug.Log($"[MenuVoiceBlocked] command={command} reason=NoActiveReceiver target={receiverName}");
+            return;
+        }
+
+        Debug.Log($"[MenuVoiceRoute] command={command} target={receiverName}");
+        SendCommandTo(receiver, command);
+    }
+
+    private static bool IsPanelActive(GameObject panel)
+    {
+        return panel != null && panel.activeInHierarchy;
     }
 
     private void ExecuteFallbackCommand(string command)

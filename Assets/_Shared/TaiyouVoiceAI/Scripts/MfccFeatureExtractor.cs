@@ -18,8 +18,9 @@ using UnityEngine;
 /// 生成したMFCCはONNXモデルの入力として使用する。
 public class MfccFeatureExtractor : MonoBehaviour
 {
-    public const int MfccCount = 24;
-    public const int TargetWidth = 64;
+    public const int MfccCount = 20;
+    public const int TargetWidth = 32;
+    private const int TargetSampleCount = 16000;
 
     [Header("Audio Settings")]
     [SerializeField] private int sampleRate = 16000;
@@ -60,7 +61,8 @@ public class MfccFeatureExtractor : MonoBehaviour
             return new float[MfccCount, TargetWidth];
         }
 
-        float[] processed = PreEmphasis(samples, preEmphasis);
+        float[] fixedSamples = PadOrTrim(samples, TargetSampleCount);
+        float[] processed = PreEmphasis(fixedSamples, preEmphasis);
 
         int frameCount = 1 + Mathf.Max(0, (processed.Length - fftSize) / hopLength);
         if (processed.Length < fftSize)
@@ -106,6 +108,14 @@ public class MfccFeatureExtractor : MonoBehaviour
     public float[,] ExtractDummyMfcc(float[] samples)
     {
         return ExtractMfcc(samples);
+    }
+
+    private float[] PadOrTrim(float[] samples, int targetLength)
+    {
+        float[] output = new float[targetLength];
+        int copyLength = Mathf.Min(samples.Length, targetLength);
+        Array.Copy(samples, output, copyLength);
+        return output;
     }
 
     private float[] PreEmphasis(float[] input, float coeff)
@@ -297,7 +307,7 @@ public class MfccFeatureExtractor : MonoBehaviour
             }
             variance /= cols;
 
-            float std = Mathf.Sqrt(variance + 1e-6f);
+            float std = Mathf.Sqrt(variance) + 1e-6f;
 
             for (int c = 0; c < cols; c++)
             {

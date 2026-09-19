@@ -45,6 +45,10 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
     private string pendingCommand = "";
     private int pendingCommandCount;
     private string acceptedConsecutiveText = "1/1";
+    private int inferenceSessionGeneration;
+    private bool inferenceSessionValid;
+    private int inferenceStartRunnerGeneration = -1;
+    private int inferenceStartMicrophoneGeneration = -1;
 
     private struct PredictionStats
     {
@@ -57,8 +61,20 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         public float TimeScore;
     }
 
-    private void Start()
+    private void OnEnable()
     {
+        ResetTransientInferenceState();
+        LogRunnerLifecycle("Enable");
+        InitializeInferenceResources();
+    }
+
+    private void InitializeInferenceResources()
+    {
+        if (worker != null)
+        {
+            return;
+        }
+
         labels = LoadLabels();
 
         if (modelAsset == null)
@@ -97,8 +113,11 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         runtimeModel = ModelLoader.Load(modelAsset);
         worker = new Worker(runtimeModel, BackendType.CPU);
+        inferenceSessionGeneration++;
+        inferenceSessionValid = true;
 
         Debug.Log("VoiceOnnxRunner_Menu ready. labels=" + string.Join(", ", labels));
+        LogRunnerLifecycle("Initialize");
     }
 
     private void Update()
@@ -140,6 +159,8 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
             return;
         }
 
+        CaptureInferenceContext();
+
         float volume = GetMaxAbs(samples);
         bool belowVolumeThreshold = volume < minVolumeThreshold;
         Debug.Log($"[MenuVoiceTrace] Volume check. volume={volume:F8}, minVolumeThreshold={minVolumeThreshold:F8}, belowThreshold={belowVolumeThreshold}");
@@ -147,6 +168,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         {
             Debug.Log($"[MenuVoiceReject] label=unknown reason=VolumeThreshold required={minVolumeThreshold:F8} actual={volume:F8}");
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=volume below minVolumeThreshold");
+            ClearInferenceContext();
             return;
         }
 
@@ -172,6 +194,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         if (output == null)
         {
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=output null");
+            ClearInferenceContext();
             return;
         }
 
@@ -179,6 +202,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         if (readable == null)
         {
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=ReadbackAndClone failed");
+            ClearInferenceContext();
             return;
         }
 
@@ -191,11 +215,18 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         if (predictedIndex < 0 || predictedIndex >= labels.Length)
         {
             Debug.LogWarning($"VoiceOnnxRunner_Menu: predicted index {predictedIndex} is outside labels length {labels.Length}.");
+            ClearInferenceContext();
             return;
         }
 
         string predictedLabel = labels[predictedIndex].Trim().ToLowerInvariant();
         PredictionStats stats = GetPredictionStats(readable);
+
+        if (DiscardIfInferenceContextChanged())
+        {
+            return;
+        }
+
         Debug.Log($"[MenuVoiceTrace] Scores {BuildScoreLog(readable)}");
         Debug.Log($"[MenuVoiceTrace] predictedIndex={predictedIndex}, predictedLabel={predictedLabel}, volume={volume:F8}");
         Debug.Log(
@@ -208,6 +239,7 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
             $"none={stats.NoneScore:F4} " +
             $"time={stats.TimeScore:F4}"
         );
+        Debug.Log(BuildMenuAllScoresLog(readable, predictedLabel, stats, volume));
 
         if (logPrediction)
         {
@@ -234,11 +266,13 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
                 $"time={stats.TimeScore:F4}"
             );
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=predictedLabel none and ignoreNone is true");
+            ClearInferenceContext();
             return;
         }
 
         if (useSafetyFilter && !PassSafetyFilter(predictedLabel, stats, volume))
         {
+            ClearInferenceContext();
             return;
         }
 
@@ -260,6 +294,12 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
                 $"noneMargin={stats.Top1Score - stats.NoneScore:F4}"
             );
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=commandCooldown");
+            ClearInferenceContext();
+            return;
+        }
+
+        if (DiscardIfInferenceContextChanged())
+        {
             return;
         }
 
@@ -288,6 +328,67 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         {
             Debug.LogWarning("[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand skipped. menuVoiceCommandAction is null");
         }
+
+        ClearInferenceContext();
+    }
+
+    private void CaptureInferenceContext()
+    {
+        inferenceStartRunnerGeneration = inferenceSessionGeneration;
+        inferenceStartMicrophoneGeneration = microphoneInput != null
+            ? microphoneInput.CurrentGeneration
+            : -1;
+    }
+
+    private bool DiscardIfInferenceContextChanged()
+    {
+        int currentMicrophoneGeneration = microphoneInput != null
+            ? microphoneInput.CurrentGeneration
+            : -1;
+        string reason = null;
+
+        if (!inferenceSessionValid || inferenceStartRunnerGeneration != inferenceSessionGeneration)
+        {
+            reason = "RunnerGenerationChanged";
+        }
+        else if (inferenceStartMicrophoneGeneration != currentMicrophoneGeneration)
+        {
+            reason = "MicrophoneGenerationChanged";
+        }
+
+        if (reason == null)
+        {
+            return false;
+        }
+
+        Debug.LogWarning(
+            $"[VoiceInferenceDiscard] runner=Menu " +
+            $"reason={reason} " +
+            $"startRunnerGeneration={inferenceStartRunnerGeneration} " +
+            $"currentRunnerGeneration={inferenceSessionGeneration} " +
+            $"startMicGeneration={inferenceStartMicrophoneGeneration} " +
+            $"currentMicGeneration={currentMicrophoneGeneration}"
+        );
+        ResetPendingCommand();
+        ClearInferenceContext();
+        return true;
+    }
+
+    private void ClearInferenceContext()
+    {
+        inferenceStartRunnerGeneration = -1;
+        inferenceStartMicrophoneGeneration = -1;
+    }
+
+    private void ResetTransientInferenceState()
+    {
+        timer = 0f;
+        lastCommandTime = -999f;
+        lastCommand = "";
+        pendingCommand = "";
+        pendingCommandCount = 0;
+        acceptedConsecutiveText = "1/1";
+        ClearInferenceContext();
     }
 
     private bool PassSafetyFilter(string command, PredictionStats stats, float volume)
@@ -541,10 +642,52 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         return sb.ToString();
     }
 
-    private void OnDisable()
+    private string BuildMenuAllScoresLog(Tensor<float> tensor, string predictedLabel, PredictionStats stats, float volume)
+    {
+        return
+            $"[MenuAllScores] " +
+            $"volume={volume:F8} " +
+            $"predicted={predictedLabel} " +
+            $"ue={GetScoreForLabel(tensor, "ue"):F4} " +
+            $"sita={GetScoreForLabel(tensor, "sita"):F4} " +
+            $"hidari={GetScoreForLabel(tensor, "hidari"):F4} " +
+            $"migi={GetScoreForLabel(tensor, "migi"):F4} " +
+            $"kettei={GetScoreForLabel(tensor, "kettei"):F4} " +
+            $"time={GetScoreForLabel(tensor, "time"):F4} " +
+            $"none={GetScoreForLabel(tensor, "none"):F4} " +
+            $"top1={GetLabelOrUnknown(stats.Top1Index)} " +
+            $"top1Score={stats.Top1Score:F4} " +
+            $"top2={GetLabelOrUnknown(stats.Top2Index)} " +
+            $"top2Score={stats.Top2Score:F4} " +
+            $"top2Margin={stats.Top2Margin:F4}";
+    }
+
+    private void LogRunnerLifecycle(string action)
+    {
+        Debug.Log(
+            $"[VoiceRunnerLifecycle] runner=Menu " +
+            $"object={gameObject.name} " +
+            $"action={action} " +
+            $"runnerGeneration={inferenceSessionGeneration} " +
+            $"micGeneration={(microphoneInput != null ? microphoneInput.CurrentGeneration : -1)} " +
+            $"workerValid={worker != null}"
+        );
+    }
+
+    private void DisposeInferenceResources()
     {
         worker?.Dispose();
         worker = null;
+        runtimeModel = null;
+        LogRunnerLifecycle("Dispose");
+    }
+
+    private void OnDisable()
+    {
+        inferenceSessionValid = false;
+        LogRunnerLifecycle("Disable");
+        ResetTransientInferenceState();
+        DisposeInferenceResources();
     }
 
     public void SetMinVolumeThreshold(float value)

@@ -9,6 +9,7 @@ public sealed class InGameSetGameplayObjectsEnabledPresentationAction : InGamePr
     [SerializeField] private bool targetEnabled = true;
     [SerializeField] private bool includeMainCamera = true;
     [SerializeField] private bool includeEnemies = true;
+    [SerializeField] private bool includeSceneDiscoveredEnemies = true;
     [SerializeField] private bool includePlayer = true;
     [SerializeField] private bool includeBehaviours = true;
     [SerializeField] private bool includeRenderers = true;
@@ -169,10 +170,13 @@ public sealed class InGameSetGameplayObjectsEnabledPresentationAction : InGamePr
             }
         }
 
-        global::Enemy.Enemy[] enemies = Object.FindObjectsByType<global::Enemy.Enemy>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (global::Enemy.Enemy enemy in enemies)
+        if (includeSceneDiscoveredEnemies)
         {
-            AddEnemy(enemy, actorRoots);
+            global::Enemy.Enemy[] enemies = Object.FindObjectsByType<global::Enemy.Enemy>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (global::Enemy.Enemy enemy in enemies)
+            {
+                AddEnemy(enemy, actorRoots);
+            }
         }
     }
 

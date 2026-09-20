@@ -186,7 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b649044af3654bbc8ca4eb8e483bf7b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveTransitionPreview.WaveTransitionPreviewController
-  waveData: {fileID: 11400000, guid: 4521901d14f44feab6b59bb1eb740d98, type: 2}
+  waveData: {fileID: 11400000, guid: 4c8434a0b59b45e08a708ea179ff1ec2, type: 2}
   completedWaveData: {fileID: 0}
   stageDataSettings: {fileID: 11400000, guid: 22e7880a1eccc7144b13d16ea34dcb71, type: 2}
   context: {fileID: 100003}

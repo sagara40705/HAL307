@@ -15,7 +15,7 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
-    motionNodeName: 
+    motionNodeName: ALL_JNT/C_Hip_JNT
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 

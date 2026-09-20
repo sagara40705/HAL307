@@ -52,7 +52,13 @@ public class OnStartPose : MonoBehaviour
         }
 
         ResetAnimationTriggers();
-        _animator.Play(IdleStateHash, 0, 0f);
+
+        _animator.CrossFadeInFixedTime(
+            IdleStateHash,
+            0.5f,  // Transition duration (seconds)
+            0,     // Layer
+            0f     // Start Idle from beginning
+        );
     }
 
     public void PlayRandomPoseAnimation()

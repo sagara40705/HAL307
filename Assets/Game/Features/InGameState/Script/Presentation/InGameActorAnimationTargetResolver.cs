@@ -4,11 +4,22 @@ using UnityEngine;
 
 internal static class InGameActorAnimationTargetResolver
 {
-    public static HashSet<OnStartPose> Collect(InGameFlowContext context)
+    public static HashSet<OnStartPose> Collect(
+        InGameFlowContext context,
+        bool includeEnemies = true,
+        bool includePlayer = true)
     {
         HashSet<OnStartPose> targets = new();
-        AddEnemies(context, targets);
-        AddPlayer(targets);
+        if (includeEnemies)
+        {
+            AddEnemies(context, targets);
+        }
+
+        if (includePlayer)
+        {
+            AddPlayer(targets);
+        }
+
         return targets;
     }
 

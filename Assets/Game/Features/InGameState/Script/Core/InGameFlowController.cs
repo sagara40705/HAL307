@@ -17,6 +17,7 @@ public sealed class InGameFlowController : MonoBehaviour
     private WaveData _currentWaveData;
     private int _currentTargetScore;
     private float _currentEnemyAnimationSpeed = 1f;
+    private WaveData _preparedNextWaveData;
 
     public int CurrentWaveIndex => _currentWaveIndex;
     public WaveData CurrentWaveData => _currentWaveData;
@@ -133,7 +134,15 @@ public sealed class InGameFlowController : MonoBehaviour
         while (_currentWaveData != null)
         {
             WaveData currentWave = _currentWaveData;
-            yield return ChangeStateCoroutine(new PlayingFlowState(stageData, currentWave, _currentEnemyAnimationSpeed));
+            _preparedNextWaveData = stageData.HasWave(_currentWaveIndex + 1)
+                ? stageData.GetWaveOrNull(_currentWaveIndex + 1)
+                : null;
+
+            yield return ChangeStateCoroutine(new PlayingFlowState(
+                stageData,
+                currentWave,
+                _currentEnemyAnimationSpeed,
+                _preparedNextWaveData));
 
             int currentScore = context != null ? context.CurrentPlayerScore : 0;
             bool hasNextWave = stageData.HasWave(_currentWaveIndex + 1);
@@ -150,7 +159,7 @@ public sealed class InGameFlowController : MonoBehaviour
                 break;
             }
 
-            WaveData nextWave = stageData.GetWaveOrNull(_currentWaveIndex + 1);
+            WaveData nextWave = _preparedNextWaveData ?? stageData.GetWaveOrNull(_currentWaveIndex + 1);
             if (nextWave == null)
             {
                 Debug.LogError($"[InGameFlowController] Next wave selection failed. WaveIndex={_currentWaveIndex + 1}, Endless={stageData.IsEndlessMode}");
@@ -162,6 +171,7 @@ public sealed class InGameFlowController : MonoBehaviour
             _currentWaveIndex++;    // ウェーブを進める
             ScoreManager.Instance?.ResetAllScores();
             _currentWaveData = nextWave;
+            _preparedNextWaveData = null;
             _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
             _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);
         }

@@ -65,6 +65,11 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
         yield return RunManagedOperation(LoadCoroutine(sceneName, LoadSceneMode.Additive));
     }
 
+    public IEnumerator LoadAdditiveAsync(string sceneName, int priority)
+    {
+        yield return RunManagedOperation(LoadCoroutine(sceneName, LoadSceneMode.Additive, priority));
+    }
+
     public IEnumerator UnloadAsync(string sceneName)
     {
         yield return RunManagedOperation(UnloadCoroutine(sceneName));
@@ -136,7 +141,7 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
         onCompleted?.Invoke();
     }
 
-    private IEnumerator LoadCoroutine(string sceneName, LoadSceneMode mode)
+    private IEnumerator LoadCoroutine(string sceneName, LoadSceneMode mode, int priority = 0)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
         {
@@ -179,6 +184,8 @@ public sealed class SceneLoader : AppManagerBase<SceneLoader>
             Debug.LogError($"[SceneLoader] Load failed. Reason=LoadSceneAsync returned null. Scene='{sceneName}', Mode={mode}");
             yield break;
         }
+
+        op.priority = priority;
 
         yield return op;
 

@@ -3451,6 +3451,9 @@ MonoBehaviour:
   backgroundPanel: {fileID: 1703384834}
   dumbbellCanvasRoot: {fileID: 1162309330}
   dumbbellPrefab: {fileID: 538094209684891605, guid: f044afaf720143a4e89dd5210938c0d8, type: 3}
+  revealDumbbellTotalDuration: 1
+  revealFallStaggerRatio: 0.35
+  presentationStartFadeRatio: 0.5
   sceneUiRoots:
   - {fileID: 1718496973}
   nextSceneName: 
@@ -4132,13 +4135,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703384833}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

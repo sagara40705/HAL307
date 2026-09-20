@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Enemy;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static Sound.Manager.SoundManager;
 
 // インゲーム進行Stateから参照するシーン要素
@@ -19,6 +20,11 @@ public sealed class InGameFlowContext : MonoBehaviour
     [SerializeField] private InGamePresentationAction resetPositionAction;
     [SerializeField] private AudienceRequestSystem audienceRequestSystem;
     private StageModelContext _wavePresentationStage;
+    private Coroutine _scenePreloadCoroutine;
+    private string _preloadedSceneName;
+    private readonly Dictionary<GameObject, bool> _preloadedSceneRootStates = new();
+
+    private const int ScenePreloadPriority = -10;
 
     // 前進制御
     public ForwardProgressMover ForwardProgressMover
@@ -112,66 +118,100 @@ public sealed class InGameFlowContext : MonoBehaviour
     }
 
     // Wave演出中だけ3Pモデルを表示。入れ子の演出例外でも復元処理を実行
-    public IEnumerator PlayWavePresentation(IEnumerator presentation)
+    public IEnumerator PlayWavePresentation(
+        IEnumerator presentation,
+        bool revealTransitionCover = false)
     {
         if (presentation == null)
         {
             yield break;
         }
 
+        BeginWavePresentationUi();
+
         // ダンベルが落ち切って画面を覆うまで元のステージ表示を維持
-        yield return TransitionManager.WaitForTransitionCompletion();
-
-        ResolveStageModelContext();
-        StageModelContext stage = stageModelContext;
-        bool ownsOverride = stage != null && stage.BeginThreePlayerPresentation();
-        if (ownsOverride)
-        {
-            _wavePresentationStage = stage;
-        }
-
-        var routines = new Stack<IEnumerator>();
-        routines.Push(presentation);
         try
         {
-            while (routines.Count > 0)
+            yield return TransitionManager.WaitForTransitionCompletion();
+
+            if (!revealTransitionCover)
             {
-                IEnumerator current = routines.Peek();
-                if (!current.MoveNext())
-                {
-                    routines.Pop();
-                    (current as System.IDisposable)?.Dispose();
-                }
-                else if (current.Current is IEnumerator nested)
-                {
-                    routines.Push(nested);
-                }
-                else
-                {
-                    yield return current.Current;
-                }
+                TransitionManager.HoldBlackCover();
             }
 
-            // 演出から開始したフェードも完了後にモデルを復元
-            yield return TransitionManager.WaitForTransitionCompletion();
-        }
-        finally
-        {
+            ResolveStageModelContext();
+            StageModelContext stage = stageModelContext;
+            bool ownsOverride = stage != null && stage.BeginThreePlayerPresentation();
+            if (ownsOverride)
+            {
+                _wavePresentationStage = stage;
+            }
+
+            if (revealTransitionCover)
+            {
+                // 黒背景のフェードが指定位置まで進んだら、ダンベル落下中に演出を重ねて開始する
+                yield return TransitionManager.RevealIfCovered();
+            }
+
+            var routines = new Stack<IEnumerator>();
+            routines.Push(presentation);
             try
             {
                 while (routines.Count > 0)
                 {
-                    (routines.Pop() as System.IDisposable)?.Dispose();
+                    IEnumerator current = routines.Peek();
+                    if (!current.MoveNext())
+                    {
+                        routines.Pop();
+                        (current as System.IDisposable)?.Dispose();
+                    }
+                    else if (current.Current is IEnumerator nested)
+                    {
+                        routines.Push(nested);
+                    }
+                    else
+                    {
+                        yield return current.Current;
+                    }
                 }
+
+                // 演出から開始したフェードも完了後にモデルを復元
+                yield return TransitionManager.WaitForTransitionCompletion();
             }
             finally
             {
-                if (ownsOverride)
+                try
                 {
-                    RestoreWavePresentationStage();
+                    while (routines.Count > 0)
+                    {
+                        (routines.Pop() as System.IDisposable)?.Dispose();
+                    }
+                }
+                finally
+                {
+                    if (ownsOverride)
+                    {
+                        RestoreWavePresentationStage();
+                    }
                 }
             }
         }
+        finally
+        {
+            EndWavePresentationUi();
+        }
+    }
+
+    private void BeginWavePresentationUi()
+    {
+        WaveGauge?.BeginWavePresentation();
+        AudienceRequest?.ResetRequests();
+    }
+
+    private void EndWavePresentationUi()
+    {
+        AudienceRequest?.ResetRequests();
+        WaveGauge?.EndWavePresentation();
     }
 
     // 演出終了・進行停止・シーン解放時のモデル復元
@@ -188,6 +228,193 @@ public sealed class InGameFlowContext : MonoBehaviour
     private void OnDisable()
     {
         RestoreWavePresentationStage();
+        RestorePreloadedSceneRoots();
+    }
+
+    public void BeginScenePreload(WaveData waveData)
+    {
+        if (waveData == null || !waveData.ShouldPreloadScene)
+        {
+            return;
+        }
+
+        string sceneName = waveData.PreloadSceneName;
+        if (string.Equals(_preloadedSceneName, sceneName, System.StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (_scenePreloadCoroutine != null)
+        {
+            Debug.LogWarning(
+                $"[InGameFlowContext] Scene preload skipped. Another preload is running. " +
+                $"Current='{_preloadedSceneName}', Requested='{sceneName}'");
+            return;
+        }
+
+        _scenePreloadCoroutine = StartCoroutine(PreloadSceneCoroutine(sceneName));
+    }
+
+    public bool IsScenePreloadTracked(string sceneName)
+    {
+        return !string.IsNullOrWhiteSpace(sceneName) &&
+               string.Equals(_preloadedSceneName, sceneName, System.StringComparison.OrdinalIgnoreCase);
+    }
+
+    public IEnumerator ActivatePreloadedScene(string sceneName)
+    {
+        if (!IsScenePreloadTracked(sceneName))
+        {
+            yield break;
+        }
+
+        while (_scenePreloadCoroutine != null)
+        {
+            yield return null;
+        }
+
+        Scene scene = FindLoadedScene(sceneName);
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            Debug.LogWarning($"[InGameFlowContext] Preloaded scene is not available. Scene='{sceneName}'");
+            ClearScenePreloadState();
+            yield break;
+        }
+
+        RestorePreloadedSceneRoots();
+        ClearScenePreloadState();
+    }
+
+    private IEnumerator PreloadSceneCoroutine(string sceneName)
+    {
+        if (!string.IsNullOrWhiteSpace(_preloadedSceneName) &&
+            !string.Equals(_preloadedSceneName, sceneName, System.StringComparison.OrdinalIgnoreCase))
+        {
+            string previousSceneName = _preloadedSceneName;
+            _preloadedSceneRootStates.Clear();
+
+            Scene previousScene = FindLoadedScene(previousSceneName);
+            if (previousScene.IsValid() && previousScene.isLoaded)
+            {
+                SceneLoader sceneLoader = SceneLoader.Instance;
+                if (sceneLoader != null && sceneLoader.IsInitialized)
+                {
+                    yield return sceneLoader.UnloadAsync(previousScene.name);
+                }
+                else
+                {
+                    AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(previousScene);
+                    if (unloadOperation != null)
+                    {
+                        yield return unloadOperation;
+                    }
+                }
+            }
+
+            previousScene = FindLoadedScene(previousSceneName);
+            if (previousScene.IsValid() && previousScene.isLoaded)
+            {
+                Debug.LogWarning(
+                    $"[InGameFlowContext] Scene preload skipped. Previous preloaded scene could not be unloaded. " +
+                    $"Previous='{previousSceneName}', Requested='{sceneName}'");
+                _scenePreloadCoroutine = null;
+                yield break;
+            }
+        }
+
+        _preloadedSceneName = sceneName;
+        _preloadedSceneRootStates.Clear();
+
+        Scene scene = FindLoadedScene(sceneName);
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            SceneLoader sceneLoader = SceneLoader.Instance;
+            if (sceneLoader != null && sceneLoader.IsInitialized)
+            {
+                yield return sceneLoader.LoadAdditiveAsync(sceneName, ScenePreloadPriority);
+            }
+            else if (Application.CanStreamedLevelBeLoaded(sceneName))
+            {
+                AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+                if (operation != null)
+                {
+                    operation.priority = ScenePreloadPriority;
+                    yield return operation;
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[InGameFlowContext] Scene preload skipped. Scene cannot be loaded. Scene='{sceneName}'");
+            }
+
+            scene = FindLoadedScene(sceneName);
+        }
+
+        if (scene.IsValid() && scene.isLoaded)
+        {
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                if (root == null)
+                {
+                    continue;
+                }
+
+                _preloadedSceneRootStates[root] = root.activeSelf;
+                root.SetActive(false);
+            }
+
+            Debug.Log($"[InGameFlowContext] Scene preload completed. Scene='{sceneName}', Priority={ScenePreloadPriority}");
+        }
+        else
+        {
+            Debug.LogWarning($"[InGameFlowContext] Scene preload failed. Scene='{sceneName}'");
+        }
+
+        _scenePreloadCoroutine = null;
+    }
+
+    private void RestorePreloadedSceneRoots()
+    {
+        foreach (KeyValuePair<GameObject, bool> pair in _preloadedSceneRootStates)
+        {
+            if (pair.Key != null)
+            {
+                pair.Key.SetActive(pair.Value);
+            }
+        }
+
+        _preloadedSceneRootStates.Clear();
+    }
+
+    private void ClearScenePreloadState()
+    {
+        _preloadedSceneName = null;
+        _scenePreloadCoroutine = null;
+        _preloadedSceneRootStates.Clear();
+    }
+
+    private static Scene FindLoadedScene(string scenePathOrName)
+    {
+        if (string.IsNullOrWhiteSpace(scenePathOrName))
+        {
+            return default;
+        }
+
+        string normalizedPath = scenePathOrName.Replace('\\', '/');
+        Scene scene = SceneManager.GetSceneByPath(normalizedPath);
+        if (scene.IsValid())
+        {
+            return scene;
+        }
+
+        int slashIndex = normalizedPath.LastIndexOf('/');
+        string sceneName = slashIndex >= 0 ? normalizedPath.Substring(slashIndex + 1) : normalizedPath;
+        if (sceneName.EndsWith(".unity", System.StringComparison.OrdinalIgnoreCase))
+        {
+            sceneName = sceneName.Substring(0, sceneName.Length - ".unity".Length);
+        }
+
+        return SceneManager.GetSceneByName(sceneName);
     }
 
     public void ResetCameraPosition(StageData stageData)

@@ -6,19 +6,26 @@ public sealed class PlayingFlowState : InGameFlowStateBase
 {
     private readonly StageData _stageData;
     private readonly WaveData _waveData;
+    private readonly WaveData _nextWaveForPreload;
     private readonly float _enemyAnimationSpeed;
 
-    public PlayingFlowState(StageData stageData, WaveData waveData, float enemyAnimationSpeed)
+    public PlayingFlowState(
+        StageData stageData,
+        WaveData waveData,
+        float enemyAnimationSpeed,
+        WaveData nextWaveForPreload = null)
     {
         _stageData = stageData;
         _waveData = waveData;
+        _nextWaveForPreload = nextWaveForPreload;
         _enemyAnimationSpeed = Mathf.Max(0f, enemyAnimationSpeed);
     }
 
     // Wave開始演出の実行
     public override IEnumerator Enter(InGameFlowContext context)
     {
-        context?.WaveGauge?.ResetWaveGauge();
+        // Wave切り替えの黒背景は開始演出が実際に始まるまで維持する
+        context?.WaveGauge?.ResetWaveGauge(false);
         context?.AudienceRequest?.ResetRequests();
         context?.ResetProgressFollowerPositions(_stageData);
         // 追加演出中の仮Enemyを含めず、生成管理と同じ上限で判定
@@ -32,9 +39,11 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         InGamePresentationAction action = _waveData?.GetWaveStartAction(currentEnemyCount, maxEnemyCount);
         if (action == null)
         {
+            yield return TransitionManager.RevealIfCovered();
             CommitPendingEnemyReplacement(context);
             yield return PlayResetPositionAction(context);
             context?.ForwardProgressMover?.ResumeMove();
+            context?.BeginScenePreload(_nextWaveForPreload);
             yield break;
         }
 
@@ -42,7 +51,9 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         try
         {
             IEnumerator presentation = action.Play(context);
-            yield return context != null ? context.PlayWavePresentation(presentation) : presentation;
+            yield return context != null
+                ? context.PlayWavePresentation(presentation, true)
+                : presentation;
         }
         finally
         {
@@ -52,6 +63,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         CommitPendingEnemyReplacement(context);
         yield return PlayResetPositionAction(context);
         context?.ForwardProgressMover?.ResumeMove();
+        context?.BeginScenePreload(_nextWaveForPreload);
     }
 
     // StageEndJudgeの終了通知まで待機

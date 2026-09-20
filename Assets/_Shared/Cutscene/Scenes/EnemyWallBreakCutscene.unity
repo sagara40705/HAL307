@@ -576,7 +576,7 @@ Camera:
   field of view: 50
   orthographic: 0
   orthographic size: 5
-  m_Depth: -1
+  m_Depth: 100
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -743,12 +743,12 @@ MonoBehaviour:
   _breakWallRotationEuler: {x: 0, y: 0, z: 0}
   _breakWallScale: {x: 22, y: 13, z: 1}
   _glowWallPosition: {x: 0, y: 9.927004, z: -32.02}
-  _enemyPrefab: {fileID: 4337204638815677587, guid: 0310228b91b618d4aa5cf6a257e42c17, type: 3}
+  _enemyPrefab: {fileID: 8215094965593640161, guid: 6a98b4b19e7bb3a48a403da65105280c, type: 3}
   _entrancePoseClip: {fileID: 1827226128182048838, guid: f7d4987b32c82a2469142b091a91f636, type: 3}
   _enemyStartPosition: {x: 0, y: 4.21, z: -34}
   _enemyPosePosition: {x: 0, y: 4.21, z: -25}
   _enemyRotationEuler: {x: 0, y: 0, z: 0}
-  _enemyScale: {x: 1, y: 1, z: 1}
+  _enemyScale: {x: 1.5, y: 1.5, z: 1.5}
   _breakDelay: 1
   _enemyRevealDelay: 0.5
   _walkDuration: 5

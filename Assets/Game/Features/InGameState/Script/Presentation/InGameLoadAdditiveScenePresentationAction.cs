@@ -18,6 +18,16 @@ public sealed class InGameLoadAdditiveScenePresentationAction : InGamePresentati
             yield break;
         }
 
+        if (context != null && context.IsScenePreloadTracked(sceneName))
+        {
+            yield return context.ActivatePreloadedScene(sceneName);
+            Scene preloadedScene = GetLoadedScene();
+            if (preloadedScene.IsValid() && preloadedScene.isLoaded)
+            {
+                yield break;
+            }
+        }
+
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {
             yield return LoadWithoutSceneLoader();

@@ -133,10 +133,20 @@ public class WaveGaugeController : MonoBehaviour
         }
     }
 
-    public void ResetWaveGauge()
+    public void ResetWaveGauge(bool resetTransition = true)
     {
-        // TransitionManagerの状態をリセット
-        TransitionManager.ResetImmediate();
+        if (resetTransition)
+        {
+            // 通常リセット時だけTransitionManagerの状態も即時解除する
+            TransitionManager.ResetImmediate();
+        }
+
+        ResetWaveGaugeState();
+        ShowOtherUis();
+    }
+
+    private void ResetWaveGaugeState()
+    {
 
         // WaveGaugeControllerの状態をリセット
         isTransitionStarted = false;
@@ -161,7 +171,17 @@ public class WaveGaugeController : MonoBehaviour
 
         // 警告UIを非表示にする
         SetWaveFinalVisible(false);
+    }
 
+    public void BeginWavePresentation()
+    {
+        ResetWaveGaugeState();
+        HideOtherUis();
+    }
+
+    public void EndWavePresentation()
+    {
+        ResetWaveGaugeState();
         ShowOtherUis();
     }
 

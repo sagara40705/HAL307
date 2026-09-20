@@ -18,6 +18,11 @@ public class TransitionManager : MonoBehaviour
     [SerializeField] private RectTransform dumbbellCanvasRoot;
     [SerializeField] private GameObject dumbbellPrefab;
 
+    [Header("演出開始時の落下設定")]
+    [SerializeField, Min(0.1f)] private float revealDumbbellTotalDuration = 1f;
+    [SerializeField, Range(0f, 0.9f)] private float revealFallStaggerRatio = 0.35f;
+    [SerializeField, Range(0f, 1f)] private float presentationStartFadeRatio = 0.5f;
+
     [Header("シーンと同時に解放するUI")]
     [SerializeField] private GameObject[] sceneUiRoots;
     private Scene sceneUiOwner;
@@ -48,6 +53,7 @@ public class TransitionManager : MonoBehaviour
     private readonly List<GameObject> activeDumbbells = new List<GameObject>();
 
     private bool isFading = false;
+    private bool presentationRevealReady;
     private int transitionVersion;
 
     private void Awake()
@@ -63,8 +69,8 @@ public class TransitionManager : MonoBehaviour
 
             if (backgroundPanel != null)
             {
-                Color color = backgroundPanel.color;
-                backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
+                backgroundPanel.enabled = true;
+                backgroundPanel.color = new Color(0f, 0f, 0f, 0f);
                 backgroundPanel.gameObject.SetActive(false);
             }
         }
@@ -179,6 +185,36 @@ public class TransitionManager : MonoBehaviour
         await Instance.FadeInInternal(duration);
     }
 
+    // 黒背景が指定割合まで薄くなったら演出本体を開始可能にする
+    public static IEnumerator RevealIfCovered(float duration = 0.5f)
+    {
+        if (Instance == null || !Instance.HasVisibleTransition())
+        {
+            yield break;
+        }
+
+        Instance.presentationRevealReady = false;
+        FadeIn(duration).Forget();
+        while (Instance != null && Instance.isFading && !Instance.presentationRevealReady)
+        {
+            yield return null;
+        }
+    }
+
+    public static void HoldBlackCover()
+    {
+        if (Instance == null || Instance.backgroundPanel == null)
+        {
+            return;
+        }
+
+        Image panel = Instance.backgroundPanel;
+        panel.enabled = true;
+        panel.color = new Color(0f, 0f, 0f, 1f);
+        panel.gameObject.SetActive(true);
+        panel.transform.SetAsFirstSibling();
+    }
+
     public static void ResetImmediate()
     {
         if (Instance == null)
@@ -209,6 +245,7 @@ public class TransitionManager : MonoBehaviour
         }
 
         isFading = true;
+        presentationRevealReady = false;
         int operationVersion = ++transitionVersion;
 
         CancellationToken token = this.GetCancellationTokenOnDestroy();
@@ -216,10 +253,11 @@ public class TransitionManager : MonoBehaviour
         ClearDumbbellsImmediate();
 
         backgroundPanel.gameObject.SetActive(true);
+        backgroundPanel.enabled = true;
         backgroundPanel.transform.SetAsFirstSibling();
 
-        Color baseColor = backgroundPanel.color;
-        backgroundPanel.color = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
+        Color baseColor = Color.black;
+        backgroundPanel.color = new Color(0f, 0f, 0f, 0f);
 
         // 画面サイズ取得
         Rect rect = dumbbellCanvasRoot.rect;
@@ -333,10 +371,11 @@ public class TransitionManager : MonoBehaviour
         int operationVersion = ++transitionVersion;
 
         backgroundPanel.gameObject.SetActive(true);
+        backgroundPanel.enabled = true;
         backgroundPanel.transform.SetAsFirstSibling();
 
-        Color color = backgroundPanel.color;
-        backgroundPanel.color = new Color(color.r, color.g, color.b, 1f);
+        Color color = Color.black;
+        backgroundPanel.color = new Color(0f, 0f, 0f, 1f);
 
         CancellationToken token = this.GetCancellationTokenOnDestroy();
 
@@ -345,6 +384,11 @@ public class TransitionManager : MonoBehaviour
         {
             Rect rect = dumbbellCanvasRoot.rect;
             float screenHeight = rect.height;
+            float fadeDuration = Mathf.Max(0.01f, duration);
+            float fadeStartTime = Time.time;
+            float totalFallDuration = Mathf.Max(0.1f, revealDumbbellTotalDuration);
+            float staggerDuration = totalFallDuration * revealFallStaggerRatio;
+            float individualFallDuration = Mathf.Max(0.1f, totalFallDuration - staggerDuration);
 
             float outTargetY = -screenHeight / 2f - 300f;
 
@@ -366,6 +410,22 @@ public class TransitionManager : MonoBehaviour
                     return;
                 }
 
+                float staggerRate = activeDumbbells.Count > 1
+                    ? (float)i / (activeDumbbells.Count - 1)
+                    : 0f;
+                float scheduledStartTime = fadeStartTime + staggerDuration * staggerRate;
+
+                while (Time.time < scheduledStartTime)
+                {
+                    if (operationVersion != transitionVersion)
+                    {
+                        return;
+                    }
+
+                    UpdateRevealFade(color, fadeDuration, Time.time - fadeStartTime);
+                    await UniTask.Yield(token);
+                }
+
                 GameObject d = activeDumbbells[i];
                 if (d == null) continue;
 
@@ -373,33 +433,36 @@ public class TransitionManager : MonoBehaviour
 
                 if (fall != null)
                 {
+                    RectTransform dumbbellRect = d.GetComponent<RectTransform>();
+                    float fallDistance = dumbbellRect != null
+                        ? Mathf.Max(1f, dumbbellRect.anchoredPosition.y - outTargetY)
+                        : screenHeight + 300f;
+                    float initialSpeed = fallDistance * 0.5f / individualFallDuration;
+                    float acceleration = fallDistance /
+                                         (individualFallDuration * individualFallDuration);
+
                     fall.StartFallOut(
                         outTargetY,
-                        Random.Range(300f, 700f),
-                        Random.Range(1800f, 2800f),
+                        initialSpeed,
+                        acceleration,
                         Random.Range(-120f, 120f),
                         Random.Range(360f, 900f)
                     );
                 }
-
-                // 少しずつ崩れる感じ
-                await UniTask.Delay(8, cancellationToken: token);
             }
 
-            // 背景も同時に薄くする
-            float time = 0f;
+            float concurrentFadeTime = Time.time - fadeStartTime;
 
-            while (time < duration)
+            while (concurrentFadeTime < fadeDuration)
             {
                 if (operationVersion != transitionVersion)
                 {
                     return;
                 }
 
-                time += Time.deltaTime;
+                concurrentFadeTime += Time.deltaTime;
 
-                float alpha = Mathf.Lerp(1f, 0f, time / duration);
-                backgroundPanel.color = new Color(color.r, color.g, color.b, alpha);
+                UpdateRevealFade(color, fadeDuration, concurrentFadeTime);
 
                 await UniTask.Yield(token);
             }
@@ -414,6 +477,7 @@ public class TransitionManager : MonoBehaviour
 
             backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
             backgroundPanel.gameObject.SetActive(false);
+            presentationRevealReady = true;
 
             if (operationVersion == transitionVersion)
             {
@@ -437,15 +501,32 @@ public class TransitionManager : MonoBehaviour
             float alpha = Mathf.Lerp(1f, 0f, fadeTime / duration);
             backgroundPanel.color = new Color(color.r, color.g, color.b, alpha);
 
+            if (fadeTime / Mathf.Max(0.01f, duration) >= presentationStartFadeRatio)
+            {
+                presentationRevealReady = true;
+            }
+
             await UniTask.Yield(token);
         }
 
         backgroundPanel.color = new Color(color.r, color.g, color.b, 0f);
         backgroundPanel.gameObject.SetActive(false);
+        presentationRevealReady = true;
 
         if (operationVersion == transitionVersion)
         {
             isFading = false;
+        }
+    }
+
+    private void UpdateRevealFade(Color color, float duration, float elapsed)
+    {
+        float progress = Mathf.Clamp01(elapsed / duration);
+        backgroundPanel.color = new Color(color.r, color.g, color.b, 1f - progress);
+
+        if (progress >= presentationStartFadeRatio)
+        {
+            presentationRevealReady = true;
         }
     }
 

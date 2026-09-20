@@ -12,6 +12,10 @@ public sealed class WaveData : ScriptableObject
     [SerializeField] private InGamePresentationAction waveStartActionWhenFourEnemies;
     [SerializeField] private InGamePresentationAction waveTransitionAction;
 
+    [Header("Scene Preload")]
+    [SerializeField] private string preloadSceneName;
+    [SerializeField] private bool disableAsyncScenePreload;
+
     [Header("Enemy")]
     [SerializeField] private EnemyData replacementEnemyData;
     [SerializeField] private Vector3 replacementEnemyPosition;
@@ -21,6 +25,9 @@ public sealed class WaveData : ScriptableObject
     public InGamePresentationAction WaveStartAction => waveStartAction;
     public InGamePresentationAction WaveStartActionWhenFourEnemies => waveStartActionWhenFourEnemies;
     public InGamePresentationAction WaveTransitionAction => waveTransitionAction;
+    public string PreloadSceneName => preloadSceneName;
+    public bool ShouldPreloadScene =>
+        !disableAsyncScenePreload && !string.IsNullOrWhiteSpace(preloadSceneName);
     public EnemyData ReplacementEnemyData => replacementEnemyData;
     public Vector3 ReplacementEnemyPosition => replacementEnemyPosition;
     public Quaternion ReplacementEnemyRotation => Quaternion.Euler(replacementEnemyRotationEuler);

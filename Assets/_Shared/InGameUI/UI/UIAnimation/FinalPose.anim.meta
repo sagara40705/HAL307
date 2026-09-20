@@ -1,11 +1,6 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/StreamingAssets/HAL307.acf.meta
-guid: d132f72fdd6cc064f8e1ddd235b1e290
-DefaultImporter:
-========
 guid: 782d154a11b295040b1f68df67238a09
 NativeFormatImporter:
->>>>>>>> main:Assets/_Shared/InGameUI/UI/UIAnimation/FinalPose.anim.meta
   externalObjects: {}
   mainObjectFileID: 7400000
   userData: 

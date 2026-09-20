@@ -83,12 +83,35 @@ public sealed class InGameSetGameplayObjectsEnabledPresentationAction : InGamePr
         }
 
         AddBehaviours(camera.gameObject, MainCameraBehaviours);
+
+        // StageModel/wのような同一シーン内の画面出力カメラも演出中だけ停止する。
+        // RenderTexture向けカメラはステージ内モニター表示に必要なため対象外にする。
+        foreach (GameObject root in camera.gameObject.scene.GetRootGameObjects())
+        {
+            Camera[] sceneCameras = root.GetComponentsInChildren<Camera>(true);
+            foreach (Camera sceneCamera in sceneCameras)
+            {
+                if (sceneCamera == null || sceneCamera.targetTexture != null)
+                {
+                    continue;
+                }
+
+                AddBehaviours(sceneCamera.gameObject, MainCameraBehaviours);
+            }
+        }
     }
 
     private Camera FindMainCamera(InGameFlowContext context)
     {
-        Transform cameraTransform = context != null && context.ForwardProgressMover != null
-            ? context.ForwardProgressMover.CameraTransform
+        ForwardProgressMover forwardProgressMover = context != null
+            ? context.ForwardProgressMover
+            : null;
+
+        // Camera.mainは加算ロード済みの演出カメラを返すことがあるため使わない。
+        // ゲーム進行を所有するStageModel側の参照だけを対象にする。
+        forwardProgressMover ??= Object.FindFirstObjectByType<ForwardProgressMover>(FindObjectsInactive.Include);
+        Transform cameraTransform = forwardProgressMover != null
+            ? forwardProgressMover.CameraTransform
             : null;
 
         if (cameraTransform != null)
@@ -112,7 +135,7 @@ public sealed class InGameSetGameplayObjectsEnabledPresentationAction : InGamePr
             }
         }
 
-        return Camera.main != null ? Camera.main : Object.FindFirstObjectByType<Camera>();
+        return null;
     }
 
     private void CaptureActors(InGameFlowContext context)

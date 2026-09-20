@@ -1,6 +1,4 @@
-using UnityEditor.Animations;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class ResultRandomAnimation : MonoBehaviour
 {

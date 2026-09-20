@@ -66,25 +66,23 @@ public sealed class ResultSceneContext : ContextBase
         string WaveStr = currentScore.ToString();
         string ParryStr = ParrySocre.ToString();
         string ScoreStr = MaxPoint.ToString();
-        int Wave = WaveParent.Length;
-        int Parry =ParryParent.Length;
-        int Score= ScoreParent.Length;
-        // 桁数が足りない場合はImageを追加
-        for (int i=0; i <= WaveStr.Length;i++)
+        // 表示する桁数分だけImageを追加する。
+        // Sprite未設定のImageは白い矩形として描画されるため、余分には生成しない。
+        for (int i = 0; i < WaveStr.Length; i++)
         {
             GameObject digitObj = new GameObject("Digit", typeof(Image));
             digitObj.transform.SetParent(WaveParent[i], false);
             Image img = digitObj.GetComponent<Image>();
             digitImages.Add(img);
         }
-        for (int u = 0; u <= ParryStr.Length; u++)
+        for (int u = 0; u < ParryStr.Length; u++)
         {
             GameObject digitObj1 = new GameObject("Digit", typeof(Image));
             digitObj1.transform.SetParent(ParryParent[u], false);
             Image img1 = digitObj1.GetComponent<Image>();
             digitImages1.Add(img1);
         }
-        for (int h = 0; h <= ScoreStr.Length; h++)
+        for (int h = 0; h < ScoreStr.Length; h++)
         {
             GameObject digitObj2 = new GameObject("Digit", typeof(Image));
             digitObj2.transform.SetParent(ScoreParent[h], false);
@@ -96,9 +94,9 @@ public sealed class ResultSceneContext : ContextBase
         for (int i = 0; i < ScoreStr.Length; i++)
         {
             int digit = ScoreStr[i] - '0';
-            digitImages[i].sprite = numberSprites[digit];
-            digitImages[i].preserveAspect = true;
-            digitImages[i].enabled = true;
+            digitImages2[i].sprite = numberSprites[digit];
+            digitImages2[i].preserveAspect = true;
+            digitImages2[i].enabled = true;
         }
         for (int i = 0; i < ParryStr.Length; i++)
         {
@@ -110,17 +108,9 @@ public sealed class ResultSceneContext : ContextBase
         for (int i = 0; i < WaveStr.Length; i++)
         {
             int digit = WaveStr[i] - '0';
-            digitImages2[i].sprite = numberSprites[digit];
-            digitImages2[i].preserveAspect = true;
-            digitImages2[i].enabled = true;
-        }
-
-        // 余った桁は非表示
-        for (int i = ScoreStr.Length; i < digitImages.Count; i++)
-        {
-            digitImages[i].enabled = false;
-            digitImages1[i].enabled = false;
-            digitImages2[i].enabled = false;
+            digitImages[i].sprite = numberSprites[digit];
+            digitImages[i].preserveAspect = true;
+            digitImages[i].enabled = true;
         }
 
     }

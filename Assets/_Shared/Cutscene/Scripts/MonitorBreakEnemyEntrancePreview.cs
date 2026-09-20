@@ -98,7 +98,12 @@ namespace Cutscene
         {
             if (_monitorBreakController == null || _enemyPrefab == null || _entrancePoseClip == null)
             {
-                Debug.LogError("[MonitorBreakEnemyEntrancePreview] Required references are not assigned.", this);
+                Debug.LogError(
+                    $"[MonitorBreakEnemyEntrancePreview] Required references are not assigned. " +
+                    $"MonitorBreakController={(_monitorBreakController != null)}, " +
+                    $"EnemyPrefab={(_enemyPrefab != null)}, " +
+                    $"EntrancePoseClip={(_entrancePoseClip != null)}",
+                    this);
                 return false;
             }
 
@@ -121,13 +126,16 @@ namespace Cutscene
 
         public void PlayFromStart()
         {
+            _isEnding = false;
+            SetContentActive(true);
+
             if (_enemy == null && !CreateEnemy())
             {
+                // 依存アセットに問題があっても演出カメラまで消えた状態にはしない。
                 return;
             }
 
-            _isEnding = false;
-            SetContentActive(true);
+            enabled = true;
             Replay();
         }
 

@@ -30,15 +30,15 @@ Material:
     m_Ints: []
     m_Floats:
     - _BreakAmount: 1
-    - _CrackCount: 75.93
-    - _CrackLength: 1
-    - _CrackSharpness: 48.7
-    - _CrackStrength: 1
-    - _EdgeDarkness: 1
-    - _HoleRadius: 0.4
+    - _CrackCount: 80
+    - _CrackLength: 0.537
+    - _CrackSharpness: 32.1
+    - _CrackStrength: 0.816
+    - _EdgeDarkness: 0.695
+    - _HoleRadius: 0.312
     - _HoleSoftness: 0.001
     m_Colors:
     - _BreakSize: {r: 0.5, g: 0.5, b: 0, a: 25.24}
-    - _HoleCenter: {r: 0.6, g: 0.57, b: 0, a: 0}
+    - _HoleCenter: {r: 0.49, g: 0.51, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

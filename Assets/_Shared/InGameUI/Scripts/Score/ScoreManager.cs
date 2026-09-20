@@ -1,8 +1,13 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
+    [Header("スコア初期化")]
+    [SerializeField]
+    private string _inGameSceneName = "InGameUI";
+
     private const int DefaultScoreUnit = 10;
     private const int DefaultFeverScoreMultiplier = 2;
 
@@ -18,22 +23,49 @@ public class ScoreManager : MonoBehaviour
 
     public event Action OnScoreChanged;
 
+    // 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            if (scoreSettings == null)
-            {
-                Debug.LogWarning("[ScoreManager] ScoreSettings is not assigned. Default score values are used.");
-            }
-        }
-        else
+        //  
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+
+        //  
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        if (scoreSettings == null)
+        {
+            Debug.LogWarning(
+                "[ScoreManager] ScoreSettings is not assigned. " +
+                "Default score values are used."
+            );
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene,LoadSceneMode loadSceneMode)
+    {
+        if (scene.name != _inGameSceneName)
+        {
+            return;
+        }
+
+        ResetAllScores();
+    }
+    private void OnDestroy()
+    {
+        if (Instance != this)
+        {
+            return;
+        }
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        Instance = null;
     }
 
     // プレイヤースコア加算
@@ -139,7 +171,7 @@ public class ScoreManager : MonoBehaviour
         OnScoreChanged?.Invoke();
     }
 
-    public void ResetScoresForTutorial()
+    public void ResetAllScores()
     {
         PlayerScore = 0;
         Enemy1Score = 0;
@@ -148,6 +180,12 @@ public class ScoreManager : MonoBehaviour
         Enemy4Score = 0;
 
         OnScoreChanged?.Invoke();
+
+    }
+
+    public void ResetScoresForTutorial()
+    {
+        ResetAllScores();
     }
 
     private int ScoreUnit => scoreSettings != null

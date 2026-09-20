@@ -166,7 +166,7 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             yield break;
         }
 
-        yield return sceneLoader.LoadAsync(sceneName);
+        yield return LoadSceneWithPhaseCleanup(sceneLoader, sceneName);
 
         SyncPhaseWithActiveScene();
 
@@ -270,13 +270,53 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             yield break;
         }
 
-        yield return sceneLoader.LoadAsync(sceneName);
+        yield return LoadSceneWithPhaseCleanup(sceneLoader, sceneName);
         SyncPhaseWithActiveScene();
 
         if (_currentPhase != nextPhase)
         {
             Debug.LogError($"[GamePhaseManager] ChangePhase failed. Reason=Active scene did not resolve to the requested phase. RequestedPhase={nextPhase}, Scene='{sceneName}', ActiveScene='{UnitySceneManager.GetActiveScene().name}', ResolvedPhase={_currentPhase}");
             yield break;
+        }
+    }
+
+    // 実シーン遷移のみ旧フェーズの音を停止。Pauseの開閉・復帰では呼ばない
+    private IEnumerator LoadSceneWithPhaseCleanup(SceneLoader sceneLoader, string sceneName)
+    {
+        SoundManager soundManager = SoundManager.Instance;
+
+        void ResumePlayback()
+        {
+            if (soundManager != null)
+            {
+                soundManager.EndSceneTransition();
+            }
+            Sound.Manager.SoundManager.EndSceneTransition();
+        }
+
+        // 遷移先のStartで再生される音を止めないよう、ロード通知で再生を解禁
+        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (mode == LoadSceneMode.Single)
+            {
+                ResumePlayback();
+            }
+        }
+
+        UnitySceneManager.sceneLoaded += OnSceneLoaded;
+        try
+        {
+            if (soundManager != null)
+            {
+                soundManager.BeginSceneTransition();
+            }
+            Sound.Manager.SoundManager.BeginSceneTransition();
+            yield return sceneLoader.LoadAsync(sceneName);
+        }
+        finally
+        {
+            UnitySceneManager.sceneLoaded -= OnSceneLoaded;
+            ResumePlayback();
         }
     }
 

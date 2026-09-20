@@ -6,13 +6,13 @@ using static Sound.Manager.SoundManager;
 public class FeverGaugeController : MonoBehaviour
 {
     private const string DebugWindowName = "Fever Gauge";
-    private const float DefaultFillIncrease = 0.05f;
     private const float DefaultFeverDuration = 10f;
     private const float DefaultCutInDisplayTime = 3f;
     private const bool DefaultResetFillOnFeverEnd = true;
 
     [SerializeField] private Material _flameMaterial;
     [SerializeField] private string _fillAmountProperty = "_FillAmount";
+    [SerializeField] private float DefaultFillIncrease = 0.05f;
     [SerializeField] private FeverSettings _settings;
 
     [Header("フィーバー演出")]

@@ -34,6 +34,12 @@ public sealed class InGameFlowController : MonoBehaviour
         }
     }
 
+    // 進行オブジェクト停止時に演出用モデルを復元
+    private void OnDisable()
+    {
+        context?.RestoreWavePresentationStage();
+    }
+
     // 自動開始設定時の進行開始
     private void Start()
     {
@@ -119,8 +125,10 @@ public sealed class InGameFlowController : MonoBehaviour
                 break;
             }
 
+            // ウェーブ切り替え演出を実行
             yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave, nextWave));
-            _currentWaveIndex++;
+            _currentWaveIndex++;    // ウェーブを進める
+            ScoreManager.Instance?.ResetAllScores();
             _currentWaveData = nextWave;
             _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
             _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);

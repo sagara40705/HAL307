@@ -16,6 +16,10 @@ public sealed class StageModelModeSystem
     [SerializeField] private GameObject stage3P;
     [SerializeField] private GameObject stage5P;
 
+    [NonSerialized] private bool _isPresentationOverride;
+    [NonSerialized] private bool _stage3PWasActive;
+    [NonSerialized] private bool _stage5PWasActive;
+
     public bool Apply(Scene scene)
     {
         ResolveStageObjects(scene);
@@ -32,6 +36,64 @@ public sealed class StageModelModeSystem
             Debug.LogWarning("[StageModelModeSystem] GameModeManager is not ready. ThreePlayer mode is used.");
         }
 
+        if (!ValidateStageObjects(scene))
+        {
+            return false;
+        }
+
+        bool useFivePlayerStage = gameMode == GameMode.FivePlayer && !_isPresentationOverride;
+        stage3P.SetActive(!useFivePlayerStage);
+        stage5P.SetActive(useFivePlayerStage);
+
+        Debug.Log($"[StageModelModeSystem] Stage switched. Mode={gameMode}, Stage3PActive={stage3P.activeSelf}, Stage5PActive={stage5P.activeSelf}");
+        return true;
+    }
+
+    // ゲームモードを変更せず、5Pの演出中だけ3Pモデルを表示
+    public bool BeginThreePlayerPresentation(Scene scene)
+    {
+        GameModeManager manager = GameModeManager.Instance;
+        if (_isPresentationOverride || manager == null || !manager.IsInitialized ||
+            manager.CurrentGameMode != GameMode.FivePlayer)
+        {
+            return false;
+        }
+
+        ResolveStageObjects(scene);
+        if (!ValidateStageObjects(scene))
+        {
+            return false;
+        }
+
+        _stage3PWasActive = stage3P.activeSelf;
+        _stage5PWasActive = stage5P.activeSelf;
+        _isPresentationOverride = true;
+        stage3P.SetActive(true);
+        stage5P.SetActive(false);
+        return true;
+    }
+
+    // 演出開始直前の有効状態を復元。多重終了は無視
+    public void EndThreePlayerPresentation()
+    {
+        if (!_isPresentationOverride)
+        {
+            return;
+        }
+
+        _isPresentationOverride = false;
+        if (stage5P != null)
+        {
+            stage5P.SetActive(_stage5PWasActive);
+        }
+        if (stage3P != null)
+        {
+            stage3P.SetActive(_stage3PWasActive);
+        }
+    }
+
+    private bool ValidateStageObjects(Scene scene)
+    {
         if (stage3P == null || stage5P == null)
         {
             Debug.LogError($"[StageModelModeSystem] Stage switch failed. Reason=Stage object was not found. Scene='{scene.name}', Stage3P={stage3P}, Stage5P={stage5P}");
@@ -44,11 +106,6 @@ public sealed class StageModelModeSystem
             return false;
         }
 
-        bool useFivePlayerStage = gameMode == GameMode.FivePlayer;
-        stage3P.SetActive(!useFivePlayerStage);
-        stage5P.SetActive(useFivePlayerStage);
-
-        Debug.Log($"[StageModelModeSystem] Stage switched. Mode={gameMode}, Stage3PActive={stage3P.activeSelf}, Stage5PActive={stage5P.activeSelf}");
         return true;
     }
 

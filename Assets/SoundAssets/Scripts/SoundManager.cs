@@ -44,6 +44,8 @@ namespace Sound.Manager
             ParrySE,
             InGameBGM,
             FeverBGM,
+            DecideSE,
+            MoveCursorSE,
         }
 
         public enum ResultSoundTag

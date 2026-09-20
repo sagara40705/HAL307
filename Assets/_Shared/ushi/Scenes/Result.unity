@@ -1062,6 +1062,7 @@ GameObject:
   - component: {fileID: 775001706}
   - component: {fileID: 775001705}
   - component: {fileID: 775001704}
+  - component: {fileID: 775001707}
   m_Layer: 5
   m_Name: result
   m_TagString: Untagged
@@ -1098,7 +1099,7 @@ Animator:
   m_GameObject: {fileID: 775001702}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d6677abb690cd5143b8ada4ff5dee2e1, type: 2}
+  m_Controller: {fileID: 9100000, guid: 53e352922cec4804a9beea3ff9319881, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1148,6 +1149,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 775001702}
   m_CullTransparentMesh: 1
+--- !u!114 &775001707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775001702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f79cb7163ff2e044b0c67c8247919ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResultRandomAnimation
+  AnimationName:
+  - Result pafomance
+  - Result nice
+  - Result kirekire
+  - Result tamasii
+  - Result king
+  _animator: {fileID: 775001704}
 --- !u!1 &853896027
 GameObject:
   m_ObjectHideFlags: 0
@@ -2366,7 +2386,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 87b57ff6a3fa408296c2788d59a3e3b5, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResultPhaseInput
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

@@ -41,7 +41,7 @@ AnimatorState:
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
-  m_WriteDefaultValues: 1
+  m_WriteDefaultValues: 0
   m_Mirror: 0
   m_SpeedParameterActive: 0
   m_MirrorParameterActive: 0
@@ -67,7 +67,7 @@ AnimatorStateMachine:
     m_Position: {x: 340, y: 50, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -8310462892388103423}
-    m_Position: {x: 490, y: 110, z: 0}
+    m_Position: {x: 560, y: 120, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2205804988349524827}
     m_Position: {x: 600, y: 220, z: 0}
@@ -143,9 +143,9 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 2.2716775
+  m_TransitionDuration: 4.652619
   m_TransitionOffset: 0
-  m_ExitTime: 0.0000000030318175
+  m_ExitTime: 0.0000000025550377
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0

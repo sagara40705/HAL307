@@ -11,7 +11,7 @@ namespace ushiharu.Sandbox
 
     public class BaceAI : CharacterBase
     {
-
+        public Color stopColor2 = Color.red;
         int[] Poose = new int [5];
         int randomPoose;
         public Vector3 moveDirection= Vector3.forward;
@@ -33,20 +33,13 @@ namespace ushiharu.Sandbox
             {
                 // 正規化（念のため）
                dir = moveDirection.normalized;
-
-                //float moveTime = Random.Range(moveTimeMax, moveTimeMin);
-                //float move = 0f;
-
-                randomPoose = Random.Range(0, Poose.Length);
-                //while (move>=moveTime)
-                //{
-                //  }
-                // timer = 0f;
+               randomPoose = Random.Range(0, Poose.Length);
                 timer = 0f;
                 float stoptime = Random.Range(stopTimeMin, stopTimeMax);
                 float stop = 0f;
                 if (Random.value <= 0.6)
                 {
+
                     while (timer <= movetime)
                     {
                         transform.position += dir * speed * Time.deltaTime;
@@ -55,42 +48,8 @@ namespace ushiharu.Sandbox
                         timer += Time.deltaTime * 1.5f;
                         yield return null;
                     }
-                    ////transform.position += dir * speed * Time.deltaTime;
-                    //if (Random.value <= 0.6)
-                    //{
-                    //    while (timer <= movetime)
-                    //    {
-
-                    //        Debug.Log("P!");
-                    //        AiState();
-                    //        timer += Time.deltaTime * 1.5f;
-                    //        yield return null;
-                    //    }
-                    //}
-                    // base.ChangeColor(Color.red);
-                   // yield return null;
                 }
-                //else
-                //{
-                //    Debug.Log("P!");
-                //    yield return null;
-                //}
-
-
-
-
-                //float stopTime = Random.Range(stopTimeMin, stopTimeMax);
-                //float stop = 0;
-
-                //while (stop <=stopTime)
-                //{
-                //    stop += Time.deltaTime;
-                //    yield return null;
-                //}
-
-
-
-               yield return new WaitForSeconds(stoptime);
+           yield return new WaitForSeconds(stoptime);
             }
         }
 

@@ -6,6 +6,7 @@ using static Sound.Manager.SoundManager;
 public sealed class InGameFlowController : MonoBehaviour
 {
     [SerializeField] private StageData stageData;
+    [SerializeField] private GameModeStageDataSettings stageDataSettings;
     [SerializeField] private InGameFlowContext context;
     [SerializeField] private bool playOnStart = true;
 
@@ -60,6 +61,8 @@ public sealed class InGameFlowController : MonoBehaviour
             return;
         }
 
+        ResolveStageData();
+
         if (stageData == null)
         {
             Debug.LogError("[InGameFlowController] StartFlow failed. Reason=StageData is not assigned.");
@@ -67,6 +70,35 @@ public sealed class InGameFlowController : MonoBehaviour
         }
 
         _flowCoroutine = StartCoroutine(FlowCoroutine());
+    }
+
+    private void ResolveStageData()
+    {
+        if (stageDataSettings == null)
+        {
+            return;
+        }
+
+        GameMode gameMode = GameMode.ThreePlayer;
+        GameModeManager gameModeManager = GameModeManager.Instance;
+        if (gameModeManager != null && gameModeManager.IsInitialized)
+        {
+            gameMode = gameModeManager.CurrentGameMode;
+        }
+        else
+        {
+            Debug.LogWarning("[InGameFlowController] GameModeManager is not ready. ThreePlayer StageData is used.");
+        }
+
+        StageData selectedStageData = stageDataSettings.GetStageDataOrNull(gameMode);
+        if (selectedStageData == null)
+        {
+            Debug.LogWarning($"[InGameFlowController] StageDataSettings has no StageData for {gameMode}. Inspector StageData is used.");
+            return;
+        }
+
+        stageData = selectedStageData;
+        Debug.Log($"[InGameFlowController] StageData selected. Mode={gameMode}, StageData={stageData.name}");
     }
 
     // 指定Stateへの切り替え開始

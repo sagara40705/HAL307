@@ -22,7 +22,6 @@ Shader "Custom/MonitorBreak"
         _CrackLength("Crack Length", Range(0.0, 1.0)) = 0.7
         _CrackStrength("Crack Strength", Range(0.0, 1.0)) = 0.85
         _EdgeDarkness("Break Darkness", Range(0.0, 1.0)) = 0.85
-
         // Inspectorではチェックボックスとして表示される。
         // OFF = 0、ON = 1としてHLSLへ渡す。
         [Toggle] _BreakAmount("Break Amount", Float) = 0
@@ -33,14 +32,14 @@ Shader "Custom/MonitorBreak"
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
-            "RenderType" = "Transparent"
-            "Queue" = "Transparent"
+            "RenderType" = "TransparentCutout"
+            "Queue" = "AlphaTest"
             "IgnoreProjector" = "True"
         }
 
-        // 穴の部分をアルファ0にして、後ろ側を見せるための設定。
-        Blend SrcAlpha OneMinusSrcAlpha
-        ZWrite Off
+        // 破壊壁の穴だけをclipし、奥に置いた白い発光面を見せる。
+        Blend One Zero
+        ZWrite On
         Cull Off
 
         Pass

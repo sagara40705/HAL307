@@ -21,8 +21,11 @@ struct Varyings
     // 画面へ描画するためのクリップ空間座標
     float4 positionHCS : SV_POSITION;
 
-    // Render Textureと破壊マスクの両方で使用するUV座標
-    float2 uv : TEXCOORD0;
+    // Render Texture用のTiling/Offset適用済みUV
+    float2 monitorUV : TEXCOORD0;
+
+    // 破壊形状用の0～1の元UV。映像のTiling/Offsetには影響されない。
+    float2 breakUV : TEXCOORD1;
 };
 
 // Render Texture本体と、そのサンプラーを宣言する。
@@ -70,8 +73,8 @@ Varyings MonitorBreakVertex(Attributes input)
     // モデル座標から、最終的に画面へ表示できる座標へ変換する。
     output.positionHCS = TransformObjectToHClip(input.positionOS.xyz);
 
-    // MaterialのTilingとOffsetを反映したUVを作る。
-    output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
+    output.monitorUV = TRANSFORM_TEX(input.uv, _BaseMap);
+    output.breakUV = input.uv;
 
     return output;
 }
@@ -144,7 +147,6 @@ half4 ApplyBreakEffect(half4 baseColor, float2 uv)
     float brokenRadius = _HoleRadius + jaggedOffset * _HoleRadius;
 
     // 穴の内側が0、外側が1になる。
-    // 最後にアルファへ掛けることで、穴の内側を透明にする。
     float holeMask = smoothstep(
         brokenRadius,
         brokenRadius + _HoleSoftness,
@@ -196,7 +198,7 @@ half4 ApplyBreakEffect(half4 baseColor, float2 uv)
     baseColor.rgb = lerp(baseColor.rgb, half3(0.03h, 0.025h, 0.02h), crackMask);
     baseColor.rgb = lerp(baseColor.rgb, half3(0.08h, 0.075h, 0.07h), branchMask);
 
-    // 穴の中心だけ透明にする。
+    // 穴だけを透明にし、背面の白い発光壁を見せる。
     baseColor.a *= holeMask;
 
     return baseColor;
@@ -212,22 +214,25 @@ half4 ApplyBreakEffect(half4 baseColor, float2 uv)
 half4 MonitorBreakFragment(Varyings input) : SV_Target
 {
     // Main Cameraなどが描画したRender Textureを取得する。
-    half4 textureColor = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv);
+    half4 textureColor = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.monitorUV);
 
     half3 monitorColor = ApplySaturation(textureColor.rgb, _Saturation);
 
     // LEDの粒ごとに明暗を付ける。
-    half ledMask = GetLedMask(input.uv);
+    half ledMask = GetLedMask(input.monitorUV);
     monitorColor *= lerp(0.6h, 1.2h, ledMask);
 
     // 暗部を少し持ち上げたあと、モニター全体の明るさを掛ける。
     monitorColor += _AmbientStrength;
     monitorColor *= _Monitorlight;
 
-    half4 monitorOutput = half4(monitorColor, textureColor.a);
+    half4 monitorOutput = half4(monitorColor, 1.0h);
 
     // 最後に破壊表現を重ねた色を返す。
-    return ApplyBreakEffect(monitorOutput, input.uv);
+    half4 breakOutput = ApplyBreakEffect(monitorOutput, input.breakUV);
+
+    clip(breakOutput.a - 0.5h);
+    return breakOutput;
 }
 
 #endif

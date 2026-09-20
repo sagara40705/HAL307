@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InGameFlowController
   stageData: {fileID: 11400000, guid: f44bee14d7e0dac4bbb5a84ab221e057, type: 2}
+  stageDataSettings: {fileID: 11400000, guid: 22e7880a1eccc7144b13d16ea34dcb71, type: 2}
   context: {fileID: 1717693389}
   playOnStart: 1
 --- !u!114 &25093266

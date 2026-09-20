@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class MonitorBreakController : MonoBehaviour
 {
@@ -21,6 +22,9 @@ public class MonitorBreakController : MonoBehaviour
     // エフェクトを表示する位置
     [SerializeField]
     private Transform effectSpawnPoint;
+
+    [SerializeField, Min(0.01f)]
+    private float breakEffectScale = 1.0f;
 
     private void Awake()
     {
@@ -45,7 +49,7 @@ public class MonitorBreakController : MonoBehaviour
 
         // ゲーム開始時は破壊表示をOFFにする。
         // 0 = 通常のモニター表示
-        runtimeMaterial.SetFloat(BreakAmountId, 0.0f);
+        ResetMonitor();
     }
 
     private void Update()
@@ -66,7 +70,23 @@ public class MonitorBreakController : MonoBehaviour
     /// <summary>
     /// Shaderの破壊表示をONにする。
     /// </summary>
-    private void BreakMonitor()
+    public void ResetMonitor()
+    {
+        if (runtimeMaterial != null)
+        {
+            runtimeMaterial.SetFloat(BreakAmountId, 0.0f);
+        }
+    }
+
+    public void BreakMonitor()
+    {
+        Vector3 spawnPosition = effectSpawnPoint != null
+            ? effectSpawnPoint.position
+            : transform.position;
+        BreakMonitor(spawnPosition);
+    }
+
+    public void BreakMonitor(Vector3 spawnPosition)
     {
         if (runtimeMaterial == null)
         {
@@ -87,24 +107,22 @@ public class MonitorBreakController : MonoBehaviour
             return;
         }
 
-        //エフェクトを生成する位置
-        Vector3 SpawnOpint;
-
-        if (effectSpawnPoint != null)
-        {
-            SpawnOpint = effectSpawnPoint.position;
-        }
-        else
-        {
-            SpawnOpint = transform.position;
-        }
-
         // 破壊エフェクトを生成する。
         GameObject effrctInstanece = Instantiate(
             breakEffectPrefab,
-            SpawnOpint,
+            spawnPosition,
             Quaternion.identity
         );
+        SceneManager.MoveGameObjectToScene(effrctInstanece, gameObject.scene);
+        effrctInstanece.transform.localScale *= breakEffectScale;
+
+        // このVFXはPrefab内のParticle Systemに大きなローカル座標が入っているため、
+        // 主Particle Systemの位置が指定した破壊中心へ来るようルートを補正する。
+        ParticleSystem effectAnchor = effrctInstanece.GetComponentInChildren<ParticleSystem>(true);
+        if (effectAnchor != null)
+        {
+            effrctInstanece.transform.position += spawnPosition - effectAnchor.transform.position;
+        }
 
         //5秒後破壊エフェクトを削除する。
         Destroy(effrctInstanece, 5.0f);

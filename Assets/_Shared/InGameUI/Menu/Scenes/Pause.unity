@@ -3346,7 +3346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2325b13f2f4fb0d4aa07d6adf6568982, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceOnnxRunner_Menu
-  modelAsset: {fileID: 5022602860645237092, guid: a4e7059e7aea44d46957b7c16415f3f1, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 7f5474dedabf4dbfbdcb2abf06c96943, type: 3}
   labelsAsset: {fileID: 4900000, guid: dd5c08f4a1eda6c4bb73efbdbf86595c, type: 3}
   microphoneInput: {fileID: 1796446401}
   featureExtractor: {fileID: 1796446404}

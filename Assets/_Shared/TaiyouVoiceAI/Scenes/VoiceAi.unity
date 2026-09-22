@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 467bbb5e34a1f834fa51766e760bba8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceOnnxRunner
-  modelAsset: {fileID: 5022602860645237092, guid: a33416011209da1468935a76ae9cfecd, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 6ef058133395407bab1f8200e71fa12c, type: 3}
   microphoneInput: {fileID: 62380394}
   featureExtractor: {fileID: 62380396}
   voiceCommandAction: {fileID: 62380393}

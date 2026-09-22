@@ -50,6 +50,16 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
     private int inferenceStartRunnerGeneration = -1;
     private int inferenceStartMicrophoneGeneration = -1;
 
+#if UNITY_EDITOR
+    private const float ExpectedLabelMarkerDuration = 2.5f;
+    private int menuVoiceTestMarkerId;
+    private bool menuVoiceTestMarkerActive;
+    private string menuVoiceTestExpectedLabel = "";
+    private float menuVoiceTestMarkerEndTime;
+    private string menuVoiceTestLastSafetyRejectReason = "";
+    private string menuVoiceTestLastDiscardReason = "";
+#endif
+
     private struct PredictionStats
     {
         public int Top1Index;
@@ -122,6 +132,10 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR
+        UpdateExpectedLabelTestMarker();
+#endif
+
         if (worker == null)
         {
             return;
@@ -156,18 +170,43 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         if (samples == null || samples.Length == 0)
         {
             Debug.Log($"[MenuVoiceTrace] RunInference return. reason=samples empty, samplesLength={(samples == null ? -1 : samples.Length)}");
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                "not_run",
+                default,
+                0f,
+                0f,
+                0f,
+                false,
+                "SamplesUnavailable",
+                false);
+#endif
             return;
         }
 
         CaptureInferenceContext();
 
         float volume = GetMaxAbs(samples);
+#if UNITY_EDITOR
+        GetSampleStatistics(samples, out float meanAbs, out float rms);
+#endif
         bool belowVolumeThreshold = volume < minVolumeThreshold;
         Debug.Log($"[MenuVoiceTrace] Volume check. volume={volume:F8}, minVolumeThreshold={minVolumeThreshold:F8}, belowThreshold={belowVolumeThreshold}");
         if (volume < minVolumeThreshold)
         {
             Debug.Log($"[MenuVoiceReject] label=unknown reason=VolumeThreshold required={minVolumeThreshold:F8} actual={volume:F8}");
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=volume below minVolumeThreshold");
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                "not_run",
+                default,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                "VolumeThreshold",
+                false);
+#endif
             ClearInferenceContext();
             return;
         }
@@ -194,6 +233,17 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         if (output == null)
         {
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=output null");
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                "not_run",
+                default,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                "InferenceOutputUnavailable",
+                false);
+#endif
             ClearInferenceContext();
             return;
         }
@@ -202,6 +252,17 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         if (readable == null)
         {
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=ReadbackAndClone failed");
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                "not_run",
+                default,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                "ReadbackFailed",
+                false);
+#endif
             ClearInferenceContext();
             return;
         }
@@ -215,6 +276,17 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         if (predictedIndex < 0 || predictedIndex >= labels.Length)
         {
             Debug.LogWarning($"VoiceOnnxRunner_Menu: predicted index {predictedIndex} is outside labels length {labels.Length}.");
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                "not_run",
+                default,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                "PredictedIndexInvalid",
+                false);
+#endif
             ClearInferenceContext();
             return;
         }
@@ -224,6 +296,17 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         if (DiscardIfInferenceContextChanged())
         {
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                predictedLabel,
+                stats,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                menuVoiceTestLastDiscardReason,
+                true);
+#endif
             return;
         }
 
@@ -266,12 +349,37 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
                 $"time={stats.TimeScore:F4}"
             );
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=predictedLabel none and ignoreNone is true");
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                predictedLabel,
+                stats,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                "NoneIgnored",
+                true);
+#endif
             ClearInferenceContext();
             return;
         }
 
+#if UNITY_EDITOR
+        menuVoiceTestLastSafetyRejectReason = "";
+#endif
         if (useSafetyFilter && !PassSafetyFilter(predictedLabel, stats, volume))
         {
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                predictedLabel,
+                stats,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                menuVoiceTestLastSafetyRejectReason,
+                true);
+#endif
             ClearInferenceContext();
             return;
         }
@@ -294,12 +402,34 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
                 $"noneMargin={stats.Top1Score - stats.NoneScore:F4}"
             );
             Debug.Log("[MenuVoiceTrace] RunInference return. reason=commandCooldown");
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                predictedLabel,
+                stats,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                "CommandCooldown",
+                true);
+#endif
             ClearInferenceContext();
             return;
         }
 
         if (DiscardIfInferenceContextChanged())
         {
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                predictedLabel,
+                stats,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                menuVoiceTestLastDiscardReason,
+                true);
+#endif
             return;
         }
 
@@ -320,6 +450,17 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
                 $"time={stats.TimeScore:F4} " +
                 $"consecutive={GetAcceptedConsecutiveText(predictedLabel)}"
             );
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                predictedLabel,
+                stats,
+                volume,
+                meanAbs,
+                rms,
+                true,
+                "None",
+                true);
+#endif
             Debug.Log($"[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand before. command={predictedLabel}, volume={volume:F8}, target={menuVoiceCommandAction.name}, scene={menuVoiceCommandAction.gameObject.scene.name}, activeSelf={menuVoiceCommandAction.gameObject.activeSelf}, activeInHierarchy={menuVoiceCommandAction.gameObject.activeInHierarchy}, enabled={menuVoiceCommandAction.enabled}");
             menuVoiceCommandAction.ExecuteCommand(predictedLabel, volume);
             Debug.Log("[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand after");
@@ -327,6 +468,17 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         else
         {
             Debug.LogWarning("[MenuVoiceTrace] MenuVoiceCommandAction.ExecuteCommand skipped. menuVoiceCommandAction is null");
+#if UNITY_EDITOR
+            LogMenuVoiceEvaluation(
+                predictedLabel,
+                stats,
+                volume,
+                meanAbs,
+                rms,
+                false,
+                "MenuVoiceCommandActionMissing",
+                true);
+#endif
         }
 
         ClearInferenceContext();
@@ -360,6 +512,10 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
         {
             return false;
         }
+
+#if UNITY_EDITOR
+        menuVoiceTestLastDiscardReason = reason;
+#endif
 
         Debug.LogWarning(
             $"[VoiceInferenceDiscard] runner=Menu " +
@@ -395,6 +551,9 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
     {
         if (stats.Top1Score < minimumTopScore)
         {
+#if UNITY_EDITOR
+            menuVoiceTestLastSafetyRejectReason = "MinimumTopScore";
+#endif
             ResetPendingCommand();
             Debug.Log(BuildMenuRejectLog(command, "MinimumTopScore", minimumTopScore, stats.Top1Score, stats, volume));
             return false;
@@ -402,6 +561,9 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
         if (stats.Top2Margin < minimumTop2Margin)
         {
+#if UNITY_EDITOR
+            menuVoiceTestLastSafetyRejectReason = "MinimumTop2Margin";
+#endif
             ResetPendingCommand();
             Debug.Log(BuildMenuRejectLog(command, "MinimumTop2Margin", minimumTop2Margin, stats.Top2Margin, stats, volume));
             return false;
@@ -412,6 +574,9 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
             float timeNoneScoreMargin = stats.TimeScore - stats.NoneScore;
             if (timeNoneScoreMargin < timeNoneMargin)
             {
+#if UNITY_EDITOR
+                menuVoiceTestLastSafetyRejectReason = "TimeNoneMargin";
+#endif
                 ResetPendingCommand();
                 Debug.Log(BuildMenuRejectLog(command, "TimeNoneMargin", timeNoneMargin, timeNoneScoreMargin, stats, volume));
                 return false;
@@ -419,6 +584,9 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
             if (stats.Top2Margin < timeTop2Margin)
             {
+#if UNITY_EDITOR
+                menuVoiceTestLastSafetyRejectReason = "TimeTop2Margin";
+#endif
                 ResetPendingCommand();
                 Debug.Log(BuildMenuRejectLog(command, "TimeTop2Margin", timeTop2Margin, stats.Top2Margin, stats, volume));
                 return false;
@@ -438,6 +606,9 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
             Debug.Log($"[MenuVoiceDebug] time consecutive count={pendingCommandCount}, required={requiredCount}");
             if (pendingCommandCount < requiredCount)
             {
+#if UNITY_EDITOR
+                menuVoiceTestLastSafetyRejectReason = "TimeConsecutive";
+#endif
                 Debug.Log(BuildMenuRejectLog(command, "ConsecutiveCount", requiredCount, pendingCommandCount, stats, volume));
                 return false;
             }
@@ -662,6 +833,162 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
             $"top2Margin={stats.Top2Margin:F4}";
     }
 
+#if UNITY_EDITOR
+    private void UpdateExpectedLabelTestMarker()
+    {
+        if (menuVoiceTestMarkerActive && Time.unscaledTime >= menuVoiceTestMarkerEndTime)
+        {
+            EndExpectedLabelTestMarker("Timeout");
+        }
+
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard == null)
+        {
+            return;
+        }
+
+        string expectedLabel = null;
+        if (keyboard[Key.F1].wasPressedThisFrame)
+        {
+            expectedLabel = "ue";
+        }
+        else if (keyboard[Key.F2].wasPressedThisFrame)
+        {
+            expectedLabel = "sita";
+        }
+        else if (keyboard[Key.F3].wasPressedThisFrame)
+        {
+            expectedLabel = "hidari";
+        }
+        else if (keyboard[Key.F4].wasPressedThisFrame)
+        {
+            expectedLabel = "migi";
+        }
+        else if (keyboard[Key.F5].wasPressedThisFrame)
+        {
+            expectedLabel = "kettei";
+        }
+        else if (keyboard[Key.F6].wasPressedThisFrame)
+        {
+            expectedLabel = "time";
+        }
+        else if (keyboard[Key.F7].wasPressedThisFrame)
+        {
+            expectedLabel = "none";
+        }
+
+        if (expectedLabel != null)
+        {
+            StartExpectedLabelTestMarker(expectedLabel);
+        }
+    }
+
+    private void StartExpectedLabelTestMarker(string expectedLabel)
+    {
+        if (menuVoiceTestMarkerActive)
+        {
+            EndExpectedLabelTestMarker("Replaced");
+        }
+
+        menuVoiceTestMarkerId++;
+        menuVoiceTestExpectedLabel = expectedLabel;
+        menuVoiceTestMarkerEndTime = Time.unscaledTime + ExpectedLabelMarkerDuration;
+        menuVoiceTestMarkerActive = true;
+
+        Debug.Log(
+            $"[MenuVoiceTestMarker] " +
+            $"markerId={menuVoiceTestMarkerId} " +
+            $"expected={menuVoiceTestExpectedLabel} " +
+            $"action=Start"
+        );
+    }
+
+    private void EndExpectedLabelTestMarker(string reason)
+    {
+        if (!menuVoiceTestMarkerActive)
+        {
+            return;
+        }
+
+        Debug.Log(
+            $"[MenuVoiceTestMarker] " +
+            $"markerId={menuVoiceTestMarkerId} " +
+            $"expected={menuVoiceTestExpectedLabel} " +
+            $"action=End " +
+            $"reason={reason}"
+        );
+
+        menuVoiceTestMarkerActive = false;
+        menuVoiceTestExpectedLabel = "";
+        menuVoiceTestMarkerEndTime = 0f;
+    }
+
+    private void LogMenuVoiceEvaluation(
+        string predictedLabel,
+        PredictionStats stats,
+        float maxAbs,
+        float meanAbs,
+        float rms,
+        bool accepted,
+        string rejectReason,
+        bool hasScores)
+    {
+        if (!menuVoiceTestMarkerActive)
+        {
+            return;
+        }
+
+        string top1Label = hasScores ? GetLabelOrUnknown(stats.Top1Index) : "not_run";
+        string top2Label = hasScores ? GetLabelOrUnknown(stats.Top2Index) : "not_run";
+        float top1Score = hasScores ? stats.Top1Score : float.NaN;
+        float top2Score = hasScores ? stats.Top2Score : float.NaN;
+        float top2Margin = hasScores ? stats.Top2Margin : float.NaN;
+        float noneScore = hasScores ? stats.NoneScore : float.NaN;
+        float noneMargin = hasScores ? stats.Top1Score - stats.NoneScore : float.NaN;
+
+        Debug.Log(
+            $"[MenuVoiceEvaluation] " +
+            $"markerId={menuVoiceTestMarkerId} " +
+            $"expected={menuVoiceTestExpectedLabel} " +
+            $"predicted={predictedLabel} " +
+            $"maxAbs={maxAbs:F8} " +
+            $"meanAbs={meanAbs:F8} " +
+            $"RMS={rms:F8} " +
+            $"top1={top1Label} " +
+            $"top1Score={top1Score:F4} " +
+            $"top2={top2Label} " +
+            $"top2Score={top2Score:F4} " +
+            $"top2Margin={top2Margin:F4} " +
+            $"noneScore={noneScore:F4} " +
+            $"noneMargin={noneMargin:F4} " +
+            $"accepted={accepted} " +
+            $"rejectReason={rejectReason}"
+        );
+    }
+
+    private static void GetSampleStatistics(
+        float[] samples,
+        out float meanAbs,
+        out float rms)
+    {
+        double absoluteSum = 0.0;
+        double squareSum = 0.0;
+        for (int index = 0; index < samples.Length; index++)
+        {
+            float sample = samples[index];
+            absoluteSum += Mathf.Abs(sample);
+            squareSum += sample * sample;
+        }
+
+        meanAbs = samples.Length > 0
+            ? (float)(absoluteSum / samples.Length)
+            : 0f;
+        rms = samples.Length > 0
+            ? (float)System.Math.Sqrt(squareSum / samples.Length)
+            : 0f;
+    }
+#endif
+
     private void LogRunnerLifecycle(string action)
     {
         Debug.Log(
@@ -684,6 +1011,9 @@ public class VoiceOnnxRunner_Menu : MonoBehaviour
 
     private void OnDisable()
     {
+#if UNITY_EDITOR
+        EndExpectedLabelTestMarker("RunnerDisabled");
+#endif
         inferenceSessionValid = false;
         LogRunnerLifecycle("Disable");
         ResetTransientInferenceState();

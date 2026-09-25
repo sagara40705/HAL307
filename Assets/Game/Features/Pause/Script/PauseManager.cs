@@ -220,9 +220,19 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
 
     private bool SetPauseViewActive(bool active)
     {
+        if (!active)
+        {
+            SetPauseSceneCamerasEnabled(false);
+        }
+
         if (!TryResolvePauseMenuController(out VoiceMainMenuController controller))
         {
             return false;
+        }
+
+        if (active)
+        {
+            SetPauseSceneCamerasEnabled(true);
         }
 
         _isApplyingPauseView = true;
@@ -244,6 +254,24 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
         }
 
         return true;
+    }
+
+    private void SetPauseSceneCamerasEnabled(bool enabled)
+    {
+        Scene pauseScene = SceneManager.GetSceneByName(pauseSceneName);
+        if (!pauseScene.IsValid() || !pauseScene.isLoaded)
+        {
+            return;
+        }
+
+        foreach (GameObject root in pauseScene.GetRootGameObjects())
+        {
+            Camera[] cameras = root.GetComponentsInChildren<Camera>(true);
+            foreach (Camera camera in cameras)
+            {
+                camera.enabled = enabled;
+            }
+        }
     }
 
     private bool TryResolvePauseMenuController(out VoiceMainMenuController controller)

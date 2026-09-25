@@ -88,7 +88,21 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             yield break;
         }
 
+        bool isCompleted = false;
+
+        // Scene遷移で呼び出し元が破棄されてもManager側でPhase同期まで継続する
+        StartCoroutine(RunPhaseChange(nextPhase, () => isCompleted = true));
+
+        while (!isCompleted)
+        {
+            yield return null;
+        }
+    }
+
+    private IEnumerator RunPhaseChange(GamePhase nextPhase, Action onCompleted)
+    {
         yield return ChangePhaseRoutine(nextPhase);
+        onCompleted?.Invoke();
     }
 
     public bool ResumePreviousPhase()
@@ -152,7 +166,7 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             yield break;
         }
 
-        yield return sceneLoader.LoadAsync(sceneName);
+        yield return LoadSceneWithPhaseCleanup(sceneLoader, sceneName);
 
         SyncPhaseWithActiveScene();
 
@@ -269,13 +283,53 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             yield break;
         }
 
-        yield return sceneLoader.LoadAsync(sceneName);
+        yield return LoadSceneWithPhaseCleanup(sceneLoader, sceneName);
         SyncPhaseWithActiveScene();
 
         if (_currentPhase != nextPhase)
         {
             Debug.LogError($"[GamePhaseManager] ChangePhase failed. Reason=Active scene did not resolve to the requested phase. RequestedPhase={nextPhase}, Scene='{sceneName}', ActiveScene='{UnitySceneManager.GetActiveScene().name}', ResolvedPhase={_currentPhase}");
             yield break;
+        }
+    }
+
+    // 実シーン遷移のみ旧フェーズの音を停止。Pauseの開閉・復帰では呼ばない
+    private IEnumerator LoadSceneWithPhaseCleanup(SceneLoader sceneLoader, string sceneName)
+    {
+        SoundManager soundManager = SoundManager.Instance;
+
+        void ResumePlayback()
+        {
+            if (soundManager != null)
+            {
+                soundManager.EndSceneTransition();
+            }
+            Sound.Manager.SoundManager.EndSceneTransition();
+        }
+
+        // 遷移先のStartで再生される音を止めないよう、ロード通知で再生を解禁
+        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (mode == LoadSceneMode.Single)
+            {
+                ResumePlayback();
+            }
+        }
+
+        UnitySceneManager.sceneLoaded += OnSceneLoaded;
+        try
+        {
+            if (soundManager != null)
+            {
+                soundManager.BeginSceneTransition();
+            }
+            Sound.Manager.SoundManager.BeginSceneTransition();
+            yield return sceneLoader.LoadAsync(sceneName);
+        }
+        finally
+        {
+            UnitySceneManager.sceneLoaded -= OnSceneLoaded;
+            ResumePlayback();
         }
     }
 

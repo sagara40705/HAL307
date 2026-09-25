@@ -39,6 +39,7 @@ namespace RuntimeDebugEditor
     {
         private const string MenuPath = "Tools/Runtime Debug";
         private const int Priority = 140;
+        private static bool _isDestroyingWindow;
 
         private Vector2 _scroll;
 
@@ -65,6 +66,11 @@ namespace RuntimeDebugEditor
 
         internal static void CloseOpenWindows()
         {
+            if (_isDestroyingWindow)
+            {
+                return;
+            }
+
             foreach (RuntimeDebugMenuWindow window in Resources.FindObjectsOfTypeAll<RuntimeDebugMenuWindow>())
             {
                 window.Close();
@@ -99,7 +105,17 @@ namespace RuntimeDebugEditor
         {
             if (RuntimeDebugMenu.IsVisible)
             {
-                RuntimeDebugMenu.SetVisible(false);
+                // SetVisible(false)はVisibilityChanged経由でCloseOpenWindowsを呼ぶ。
+                // 破棄中の同じEditorWindowを再度Closeしないよう再入を防ぐ。
+                _isDestroyingWindow = true;
+                try
+                {
+                    RuntimeDebugMenu.SetVisible(false);
+                }
+                finally
+                {
+                    _isDestroyingWindow = false;
+                }
             }
         }
 

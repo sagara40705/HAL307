@@ -11,23 +11,58 @@ namespace AudienceRequest
         // チュートリアルモードかどうかのフラグ
         [SerializeField] private bool _isTutorialMode = false;
 
+        // 最大リクエスト数の設定
         [SerializeField] private int _maxRequestCount = 3;
-        public int MaxRequestCount => _maxRequestCount;
 
+        // 最大リクエスト数を取得するプロパティ
+        public int MaxRequestCount
+        {
+            get
+            {
+                if (_levelDesignSettings != null)
+                {
+                    return _levelDesignSettings.MaxRequestCount;
+                }
+
+                return _maxRequestCount;
+            }
+        }
+
+        // 現在のリクエスト数を保持する変数
         [SerializeField] private int _currentRequestCount = 0;
         public int CurrentRequestCount => _currentRequestCount;
 
+        // リクエストのデータベース、UIプール、レベルデザイン設定、コンテキストの参照
         [SerializeField] private AudienceRequests _audienceRequests; // リクエストのデータベース
         [SerializeField] private AudienceRequestUiPool _uiPool; // UIプールの参照
+        [SerializeField] private AudienceRequestLevelDesignSettings _levelDesignSettings;
+        [SerializeField] private AudienceRequestContext _context;
 
         // フィーバーゲージ
         [SerializeField] private FeverGaugeController _feverGaugeController;
 
+        // リクエスト生成の間隔とタイマー
         [SerializeField] private float _requestInterval = 5f;
         private float _requestTimer = 0f;
 
         // リクエスト生成時のイベント
         public event Action<PoseID> OnRequestReceived;
+
+        [Header("黒リクエスト")]
+        [SerializeField] private float _blackRequestInterval = 15f;
+        [SerializeField, Range(0f, 1f)] private float _blackRequestChance = 0.35f;
+
+        // 黒リクエストのタイマーと状態
+        private float _blackRequestTimer = 0f;
+        private PoseID _activeBlackRequestPoseID = PoseID.None;
+
+        // 黒リクエストがアクティブかどうかを判定するプロパティ
+        public bool HasActiveBlackRequest => _activeBlackRequestPoseID != PoseID.None;
+
+        //  
+        [Header("Wave状態")]
+        [SerializeField]
+        private WaveGaugeController _waveGaugeController;
 
         // 初期化
         private void Start()
@@ -36,7 +71,28 @@ namespace AudienceRequest
 
             if (_feverGaugeController == null)
             {
-                _feverGaugeController = FindFirstObjectByType<FeverGaugeController>();
+                _feverGaugeController =
+                    FindFirstObjectByType<FeverGaugeController>();
+            }
+
+            if (_context == null)
+            {
+                _context =
+                    FindFirstObjectByType<AudienceRequestContext>();
+            }
+
+            if (_waveGaugeController == null)
+            {
+                _waveGaugeController =
+                    FindFirstObjectByType<WaveGaugeController>();
+            }
+
+            if (_waveGaugeController == null)
+            {
+                Debug.LogWarning(
+                    "[AudienceRequestSystem] " +
+                    "WaveGaugeController was not found."
+                );
             }
         }
 
@@ -52,64 +108,121 @@ namespace AudienceRequest
             if (InGameFlowLock.IsPresentationPlaying) { return; }
 
             // リクエストが満杯の場合は新しいリクエストを生成しない   
-            if (FullRequest()) { return; }
-
-            // 一定時間ごとにリクエストを生成する
-            _requestTimer += Time.deltaTime;
-            if (_requestTimer >= _requestInterval)
+            if (!FullRequest())
             {
-                _requestTimer = 0f;
-                GenerateRequest();
-                Debug.Log("New request received! Current request count: " + _currentRequestCount);
+                _requestTimer += Time.deltaTime;
+
+                float interval = _levelDesignSettings != null
+                    ? _levelDesignSettings.NormalRequestInterval
+                    : _requestInterval;
+
+                if (_requestTimer >= interval)
+                {
+                    _requestTimer = 0f;
+                    GenerateRequest();
+                }
             }
+
+            // 黒リクエスト生成判定
+            UpdateBlackRequestTimer();
         }
 
+        // 指定Poseのリクエスト数を取得する関数
         public int GetRequestCount(PoseID poseID)
         {
             return _audienceRequests.GetCount(poseID);
         }
 
+        // 指定Poseが確定IDになるFakePoseをEnemyへ要求する
+        public void RequestFakePoseForNextPose(PoseID committedPoseID)
+        {
+            if (_context == null)
+            {
+                _context = FindFirstObjectByType<AudienceRequestContext>();
+            }
+
+            Enemy.EnemyContext enemyContext = _context?.GetEnemyContext();
+            Enemy.EnemyPoseController poseController = enemyContext?.GetEnemyPoseController();
+            if (poseController == null)
+            {
+                Debug.LogWarning($"[AudienceRequestSystem] Fake pose request skipped. Reason=EnemyPoseController was not found. Pose={committedPoseID}");
+                return;
+            }
+
+            // EnemyPoseControllerにFakePoseを要求する
+            poseController.RequestFakePoseForNextPose(committedPoseID);
+        }
+
         // リクエストをクリアする関数
         public void ResetRequests()
         {
+            // リクエストのカウントをリセット
             _requestTimer = 0f;
+            _blackRequestTimer = 0f;
+            _activeBlackRequestPoseID = PoseID.None;
+
             _currentRequestCount = 0;
             _audienceRequests?.ClearAll();
             _uiPool?.ClearAllUiPools();
+            _uiPool?.ClearAllBlackUiPools();
         }
 
-        public void ClearRequest(PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
+        // リクエストをクリアする関数
+        public void ClearRequest(PoseID poseID,bool isPlayer,Enemy.Enemy enemy = null)
         {
             int value = _audienceRequests.GetCount(poseID);
-            if (value <= 0) return;
 
+            if (value <= 0)
+            {
+                return;
+            }
+
+            // リクエストデータは消す
             _audienceRequests.ClearCount(poseID);
 
             _currentRequestCount -= value;
+
             if (_currentRequestCount < 0)
+            {
                 _currentRequestCount = 0;
+            }
+
+            bool blockScoreReward = IsScoreRewardBlocked();
 
             if (isPlayer)
             {
+                // フィーバー加算は今まで通り行う
                 _feverGaugeController?.AddFill();
 
-                //
-                if (ScoreManager.Instance != null)
+                // FinalPose中でなければスコアを加算
+                if (!blockScoreReward &&
+                    ScoreManager.Instance != null)
                 {
-                    bool isFever = _feverGaugeController != null && _feverGaugeController.IsFever;
-                    ScoreManager.Instance.AddPlayerScore(value, isFever);
+                    bool isFever =_feverGaugeController != null &&_feverGaugeController.IsFever;
+
+                    ScoreManager.Instance.AddPlayerScore(value,isFever);
                 }
             }
             else
             {
-                //
-                if (ScoreManager.Instance != null && enemy != null)
+                // FinalPose中でなければ敵スコアを加算
+                if (!blockScoreReward &&ScoreManager.Instance != null && enemy != null)
                 {
-                    ScoreManager.Instance.AddEnemyScore(value, enemy.name);
+                    ScoreManager.Instance.AddEnemyScore(value,enemy.name);
                 }
             }
 
-            _uiPool.PlayClearEffectAndRelease(poseID, isPlayer);
+            if (blockScoreReward)
+            {
+                Debug.Log(
+                    $"[AudienceRequestSystem] " +
+                    $"Score reward skipped during FinalPose. " +
+                    $"Pose={poseID}, IsPlayer={isPlayer}, Count={value}"
+                );
+            }
+
+            // ハート化や消去演出は実行する
+            _uiPool.PlayClearEffectAndRelease(poseID,isPlayer);
         }
 
         // リクエスト発生関数
@@ -119,7 +232,11 @@ namespace AudienceRequest
 
             if (FullRequest()) { return; }
             // 生成できるリクエストの数を計算
-            int canSpawnCount = Mathf.Min(3, _maxRequestCount - _currentRequestCount);
+            int spawnCountPerWave = _levelDesignSettings != null
+                 ? _levelDesignSettings.SpawnCountPerWave
+                 : 3;
+
+            int canSpawnCount = Mathf.Min(spawnCountPerWave, MaxRequestCount - _currentRequestCount);
             if (canSpawnCount <= 0) { return; }
 
             // ランダムにリクエストを生成
@@ -133,15 +250,22 @@ namespace AudienceRequest
                 if (availableRequests.Count == 0) { break; }
 
                 // ランダムにリクエストを選ぶ
-                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
-                AudienceRequestEntry requestEntry = availableRequests[randomIndex];
-                availableRequests.RemoveAt(randomIndex);
+                PoseID poseID = GetRandomNormalRequestPose(availableRequests);
 
-                // もしリクエストがnullならスキップ
-                if (requestEntry == null) { continue; }
+                if (poseID == PoseID.None)
+                {
+                    continue;
+                }
 
-                // 
-                PoseID poseID = requestEntry.poseID;
+                AudienceRequestEntry requestEntry = availableRequests.Find(r => r.poseID == poseID);
+
+                if (requestEntry == null)
+                {
+                    continue;
+                }
+
+                // 選ばれたリクエストを利用可能リストから削除
+                //availableRequests.Remove(requestEntry);
 
                 // 先にUI生成を試す
                 GameObject ui = _uiPool.Generate(poseID);
@@ -162,7 +286,7 @@ namespace AudienceRequest
         // リクエストが満杯かどうかをチェックする関数
         private bool FullRequest()
         {
-            return _currentRequestCount >= _maxRequestCount;
+            return _currentRequestCount >= MaxRequestCount;
         }
 
         // チュートリアルモードの設定
@@ -206,11 +330,13 @@ namespace AudienceRequest
             Debug.Log("[Tutorial] Show tutorial request: " + poseID);
         }
 
+        // チュートリアルモードのリクエストをクリアする関数
         public void ClearTutorialRequest(PoseID poseID, bool isPlayer)
         {
             ClearRequest(poseID, isPlayer);
         }
 
+        // チュートリアルモードのリクエストをクリアする関数
         public void ClearTutorialRequestWithoutReward(PoseID poseID, bool isPlayer)
         {
             int value = _audienceRequests.GetCount(poseID);
@@ -234,6 +360,7 @@ namespace AudienceRequest
             _uiPool.PlayClearEffectAndRelease(poseID, isPlayer);
         }
 
+        // チュートリアルモードのリクエストをすべてクリアする関数
         public void ClearAllTutorialRequests()
         {
             for (int i = 0; i < (int)PoseID.Pose_Count; i++)
@@ -246,6 +373,7 @@ namespace AudienceRequest
             _currentRequestCount = 0;
         }
 
+        // チュートリアルモードのリクエストを指定範囲内に表示する関数
         public void ShowTutorialRequestInArea(PoseID poseID, Vector2 areaMin, Vector2 areaMax)
         {
             if (FullRequest())
@@ -272,5 +400,251 @@ namespace AudienceRequest
 
             Debug.Log("[Tutorial] Show tutorial request in area: " + poseID);
         }
+
+        // 黒リクエストの生成タイマーを更新する関数
+        private void UpdateBlackRequestTimer()
+        {
+            // すでに黒リクエストが出ているなら、新しく出さない
+            if (_activeBlackRequestPoseID != PoseID.None)
+            {
+                return;
+            }
+
+            // 通常リクエストが1個もないなら、黒リクエストは出さない
+            if (_currentRequestCount <= 0)
+            {
+                return;
+            }
+
+            // 黒リクエストの生成タイマーを更新
+            _blackRequestTimer += Time.deltaTime;
+
+            // レベルデザイン設定がある場合は、そこから黒リクエストの生成間隔と確率を取得
+            float blackInterval = _levelDesignSettings != null
+              ? _levelDesignSettings.BlackRequestInterval
+              : _blackRequestInterval;
+
+            // 黒リクエストの生成確率を取得
+            float blackChance = _levelDesignSettings != null
+                ? _levelDesignSettings.BlackRequestChance
+                : _blackRequestChance;
+
+            // 黒リクエストの生成間隔に達していない場合は、何もしない
+            if (_blackRequestTimer < blackInterval)
+            {
+                return;
+            }
+
+            _blackRequestTimer = 0f;
+
+            // 黒リクエストの生成確率に基づいて、黒リクエストを生成するかどうかを判定
+            if (UnityEngine.Random.value > blackChance)
+            {
+                return;
+            }
+
+            //
+            TryGenerateBlackRequestFromActiveRequests();
+        }
+
+        // 黒リクエストを通常リクエストから生成する関数
+        private void TryGenerateBlackRequestFromActiveRequests()
+        {
+            List<PoseID> candidates = new List<PoseID>();
+
+            //
+            foreach (AudienceRequestEntry request in _audienceRequests.Requests)
+            {
+                if (request == null)
+                {
+                    continue;
+                }
+
+                // 今出ていない通常リクエストは候補にしない
+                if (request.count <= 0)
+                {
+                    continue;
+                }
+
+                // Enemy側がFakePoseとして指定できるものだけ候補にする
+                if (!IsFakeRequestablePose(request.poseID))
+                {
+                    continue;
+                }
+
+                candidates.Add(request.poseID);
+            }
+
+            //
+            if (candidates.Count == 0)
+            {
+                return;
+            }
+
+            //
+            PoseID selectedPoseID = GetRandomBlackRequestPose(candidates);
+
+            if (selectedPoseID == PoseID.None)
+            {
+                return;
+            }
+
+            GameObject blackUi = _uiPool.GenerateBlack(selectedPoseID);
+
+            if (blackUi == null)
+            {
+                return;
+            }
+
+            _activeBlackRequestPoseID = selectedPoseID;
+
+            Debug.Log("[AudienceRequestSystem] Black request generated: " + selectedPoseID);
+        }
+
+        // 黒リクエストとして指定できるPoseIDかどうかを判定する関数
+        private static bool IsFakeRequestablePose(PoseID poseID)
+        {
+            return poseID == PoseID.Pose_Yaa ||
+                   poseID == PoseID.Pose_Power ||
+                   poseID == PoseID.Pose_Muscle;
+        }
+
+        // 黒リクエストをクリアして、対応する通常リクエストのPoseIDをEnemyへ渡す関数
+        public void ClearBlackRequestAndRequestFakePose()
+        {
+            if (_activeBlackRequestPoseID == PoseID.None)
+            {
+                Debug.LogWarning("[AudienceRequestSystem] Black request was not found.");
+                return;
+            }
+
+            PoseID committedPoseID = _activeBlackRequestPoseID;
+
+            // 先に黒リクエストUIを消す
+            _uiPool.PlayBlackClearEffectAndRelease(committedPoseID);
+
+            // 黒リクエスト状態を解除
+            _activeBlackRequestPoseID = PoseID.None;
+
+            // 消えた黒リクエストに対応する普通リクエストのPoseIDをEnemyへ渡す
+            RequestFakePoseForNextPose(committedPoseID);
+
+            Debug.Log("[AudienceRequestSystem] Black request cleared. Fake pose committed ID = " + committedPoseID);
+        }
+
+        // ランダムに通常リクエストのPoseIDを取得する関数
+        private PoseID GetRandomNormalRequestPose(List<AudienceRequestEntry> availableRequests)
+        {
+            //
+            if (_levelDesignSettings == null)
+            {
+                if (availableRequests == null || availableRequests.Count == 0)
+                {
+                    return PoseID.None;
+                }
+
+                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
+                return availableRequests[randomIndex].poseID;
+            }
+
+            List<RequestSpawnWeight> filteredWeights = new();
+
+            // 
+            foreach (RequestSpawnWeight weight in _levelDesignSettings.NormalRequestWeights)
+            {
+                if (weight == null)
+                {
+                    continue;
+                }
+
+                if (!weight.IsEnabled)
+                {
+                    continue;
+                }
+
+                if (weight.Weight <= 0)
+                {
+                    continue;
+                }
+
+                bool exists = availableRequests.Exists(r => r.poseID == weight.PoseID);
+
+                if (!exists)
+                {
+                    continue;
+                }
+
+                filteredWeights.Add(weight);
+            }
+
+            //  
+            if (filteredWeights.Count == 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
+                return availableRequests[randomIndex].poseID;
+            }
+
+            int totalWeight = 0;
+
+            //
+            foreach (RequestSpawnWeight weight in filteredWeights)
+            {
+                totalWeight += weight.Weight;
+            }
+
+            int randomValue = UnityEngine.Random.Range(0, totalWeight);
+            int current = 0;
+
+            foreach (RequestSpawnWeight weight in filteredWeights)
+            {
+                current += weight.Weight;
+
+                if (randomValue < current)
+                {
+                    return weight.PoseID;
+                }
+            }
+
+            return PoseID.None;
+        }
+
+        // ランダムに黒リクエストのPoseIDを取得する関数
+        private PoseID GetRandomBlackRequestPose(List<PoseID> candidates)
+        {
+            //
+            if (candidates == null || candidates.Count == 0)
+            {
+                return PoseID.None;
+            }
+
+            if (_levelDesignSettings == null)
+            {
+                int index = UnityEngine.Random.Range(0, candidates.Count);
+                return candidates[index];
+            }
+
+            PoseID poseID = _levelDesignSettings.GetRandomBlackPoseFromCandidates(candidates);
+
+            if (poseID == PoseID.None)
+            {
+                int index = UnityEngine.Random.Range(0, candidates.Count);
+                return candidates[index];
+            }
+
+            return poseID;
+        }
+
+        private bool IsScoreRewardBlocked()
+        {
+            if (_waveGaugeController == null)
+            {
+                _waveGaugeController =
+                    FindFirstObjectByType<WaveGaugeController>();
+            }
+
+            return _waveGaugeController != null &&
+                   _waveGaugeController.IsFinalPoseVisible;
+        }
+
     }
 }

@@ -1,5 +1,6 @@
-using UnityEngine;
 using System;
+using UnityEngine;
+using static Sound.Manager.SoundManager;
 
 namespace Pose
 {
@@ -48,20 +49,27 @@ namespace Pose
         {
             Debug.Log($"PoseParryJudge CheckParry() Player pose: {_playerPoseID}");
             Debug.Log($"PoseParryJudge CheckParry() Enemy pose: {_enemyPoseID}");
-            if (_enemyPoseID == PoseID.None) { return; }
+            if (_enemyPoseID == PoseID.None)
+            {
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.PoseSE);
+                return;
+            }
             if (_playerPoseID == PoseID.None) { return; }
 
             if (IsParrySuccessful())
             {
                 Debug.Log("Parry Successful!");
                 // パリイ成功時の処理
-                OnParrySuccess?.Invoke();
-                _confettiEffect.Play();
+                NotifyParrySuccess();
+                _confettiEffect?.Play();
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.ParrySE);
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.CheersSE);
             }
             else
             {
                 Debug.Log("Parry Failed!");
                 // パリイ失敗時の処理をここに追加
+                Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.PoseSE);
             }
         }
 
@@ -76,6 +84,12 @@ namespace Pose
         public void DebugOnParry()
         {
             Debug.Log("Debug: Parry triggered.");
+            NotifyParrySuccess();
+        }
+
+        private void NotifyParrySuccess()
+        {
+            GameResultManager.Instance?.RecordParrySuccess();
             OnParrySuccess?.Invoke();
         }
     }

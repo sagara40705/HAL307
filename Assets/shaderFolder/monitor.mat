@@ -33,7 +33,7 @@ Material:
     - _LedCount: 400
     - _LedDotSize: 0.607
     - _Monitorlight: 4.18
-    - _Saturation: 1.787
+    - _Saturation: 1.396
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

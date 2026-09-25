@@ -7,8 +7,8 @@ public class SimpleAI : MonoBehaviour
     public float speed = 3f;
     public float moveTimeMin = 2f;
     public float moveTimeMax = 5f;
-    public float stopTimeMin = 1f;
-    public float stopTimeMax = 3f;
+    public float stopTimeMin = 4f;
+    public float stopTimeMax = 8f;
     // 色の設定
     //ポーズ種類
     public Color moveColor = Color.white; // 動いてるとき
@@ -29,6 +29,10 @@ public class SimpleAI : MonoBehaviour
     private int index;
     //ポーズ中パリィが発生したかどうか
     private bool isParry = false;
+    public int  PowerPoint;
+    public int MassuruPont;
+    public int YaaPoint;
+
     void Start()
     {
 
@@ -60,6 +64,7 @@ public class SimpleAI : MonoBehaviour
 
                     isParry = true;
                     rend.material.color = ParryColor;
+                    Yaapoint(YaaPoint);
                 }
 
                 break;
@@ -76,6 +81,7 @@ public class SimpleAI : MonoBehaviour
                     Debug.Log("Push!");
                     isParry = true;
                     rend.material.color = ParryColor;
+                    Powerpoint(PowerPoint);
                 }
 
                 break;
@@ -92,6 +98,7 @@ public class SimpleAI : MonoBehaviour
                     Debug.Log("Push!");
                     isParry = true;
                     rend.material.color = ParryColor;
+                    Massurupoint(MassuruPont);
                 }
 
                 break;
@@ -133,10 +140,25 @@ public class SimpleAI : MonoBehaviour
                 timer += Time.deltaTime * 1.2f;
                 yield return null;
             }
-           // }
 
             yield return new WaitForSeconds(stopTime);
 
         }
+    }
+
+    public int Powerpoint(int power)
+    {
+        power++;
+        return power;
+    }
+    public int Massurupoint(int massuru)
+    {
+        massuru++;
+        return massuru;
+    }
+    public int Yaapoint(int yaa)
+    {
+        yaa++;
+        return yaa;
     }
 }

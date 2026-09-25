@@ -246,6 +246,7 @@ public class HowToController : MonoBehaviour
             return;
         }
 
+        howToImage.preserveAspect = true;
         howToImage.sprite = pages[pageIndex];
     }
 

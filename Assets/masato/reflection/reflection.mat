@@ -24,14 +24,14 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 8400000, guid: bf754a73a637c8e4dbb24f5d1277ecee, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _FresnelPower: 1.5
-    - _ReflectStrength: 0.292
-    - _Roughness: 0.361
+    - _FresnelPower: 8
+    - _ReflectStrength: 0.601
+    - _Roughness: 0.646
     m_Colors:
     - _BaseColor: {r: 0.14999998, g: 0.14999998, b: 0.14999998, a: 1}
   m_BuildTextureStacks: []

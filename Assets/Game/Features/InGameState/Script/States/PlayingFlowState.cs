@@ -6,35 +6,54 @@ public sealed class PlayingFlowState : InGameFlowStateBase
 {
     private readonly StageData _stageData;
     private readonly WaveData _waveData;
+    private readonly WaveData _nextWaveForPreload;
+    private readonly float _enemyAnimationSpeed;
 
-    public PlayingFlowState(StageData stageData, WaveData waveData)
+    public PlayingFlowState(
+        StageData stageData,
+        WaveData waveData,
+        float enemyAnimationSpeed,
+        WaveData nextWaveForPreload = null)
     {
         _stageData = stageData;
         _waveData = waveData;
+        _nextWaveForPreload = nextWaveForPreload;
+        _enemyAnimationSpeed = Mathf.Max(0f, enemyAnimationSpeed);
     }
 
     // Wave開始演出の実行
     public override IEnumerator Enter(InGameFlowContext context)
     {
-        context?.StageEndJudge?.ResetJudge();
-        context?.WaveGauge?.ResetWaveGauge();
+        // Wave切り替えの黒背景は開始演出が実際に始まるまで維持する
+        context?.WaveGauge?.ResetWaveGauge(false);
         context?.AudienceRequest?.ResetRequests();
-        context?.ResetCameraPosition(_stageData);
+        context?.ResetProgressFollowerPositions(_stageData);
+        // 追加演出中の仮Enemyを含めず、生成管理と同じ上限で判定
+        Enemy.EnemyLineupManager enemyLineup = context?.EnemyLineup;
+        int currentEnemyCount = enemyLineup?.CurrentEnemyCount ?? 0;
+        int maxEnemyCount = enemyLineup?.MaxEnemyCount ?? 0;
         BeginWaveEnemyReplacement(context);
+        ApplyWaveAnimationSpeed(context);
 
-        InGamePresentationAction action = _waveData?.WaveStartAction;
+
+        InGamePresentationAction action = _waveData?.GetWaveStartAction(currentEnemyCount, maxEnemyCount);
         if (action == null)
         {
+            yield return TransitionManager.RevealIfCovered();
             CommitPendingEnemyReplacement(context);
             yield return PlayResetPositionAction(context);
             context?.ForwardProgressMover?.ResumeMove();
+            context?.BeginScenePreload(_nextWaveForPreload);
             yield break;
         }
 
         InGameFlowLock.BeginPresentation();
         try
         {
-            yield return action.Play(context);
+            IEnumerator presentation = action.Play(context);
+            yield return context != null
+                ? context.PlayWavePresentation(presentation, true)
+                : presentation;
         }
         finally
         {
@@ -44,6 +63,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         CommitPendingEnemyReplacement(context);
         yield return PlayResetPositionAction(context);
         context?.ForwardProgressMover?.ResumeMove();
+        context?.BeginScenePreload(_nextWaveForPreload);
     }
 
     // StageEndJudgeの終了通知まで待機
@@ -65,12 +85,18 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         }
 
         stageEndJudge.OnStageEnd += OnStageEnd;
-        while (!isStageEnd)
+        stageEndJudge.ResetJudge();
+        try
         {
-            yield return null;
+            while (!isStageEnd)
+            {
+                yield return null;
+            }
         }
-
-        stageEndJudge.OnStageEnd -= OnStageEnd;
+        finally
+        {
+            stageEndJudge.OnStageEnd -= OnStageEnd;
+        }
     }
 
     private void BeginWaveEnemyReplacement(InGameFlowContext context)
@@ -87,7 +113,19 @@ public sealed class PlayingFlowState : InGameFlowStateBase
             return;
         }
 
-        enemyLineup.BeginLowestScoreEnemyReplacement(_waveData.ReplacementEnemyData, _waveData.ReplacementEnemyPosition, _waveData.ReplacementEnemyRotation);
+        enemyLineup.BeginWaveEnemyChange(_waveData.ReplacementEnemyData, _waveData.ReplacementEnemyPosition, _waveData.ReplacementEnemyRotation);
+    }
+
+    private void ApplyWaveAnimationSpeed(InGameFlowContext context)
+    {
+        Enemy.EnemyLineupManager enemyLineup = context != null ? context.EnemyLineup : null;
+        if (enemyLineup == null)
+        {
+            Debug.LogWarning("[PlayingFlowState] Animation speed was not applied. Reason=EnemyLineupManager is null.");
+            return;
+        }
+
+        enemyLineup.SetAllEnemyAnimationSpeed(_enemyAnimationSpeed);
     }
 
     private void CommitPendingEnemyReplacement(InGameFlowContext context)

@@ -40,6 +40,7 @@ namespace Enemy
         private bool _isPoseCommitted = false;
         private bool _hasEnemyRequestNotified = false;
         private bool _isPoseTracked = false;
+        private float _animationSpeed = 1.0f;
 
         // パリイ関連
         private bool _isParried = false;
@@ -54,6 +55,7 @@ namespace Enemy
         public EnemyPoseState PoseState => _poseState;
         public float PoseStateElapsedTime => _poseStateElapsedTime;
         public bool IsPosing => _isPaused;
+        public float AnimationSpeed => _animationSpeed;
 
         private Animator animator;
         public Animator GetAnimator => animator;
@@ -88,11 +90,11 @@ namespace Enemy
         {
             if (_isPaused)
             {
-                float deltaTime = Time.deltaTime;
+                float poseDeltaTime = Time.deltaTime * _animationSpeed;
 
-                _poseElapsedTime += deltaTime;
-                _poseStateElapsedTime += deltaTime;
-                _currentPoseData?.PoseAction?.OnUpdate(this, deltaTime);
+                _poseElapsedTime += poseDeltaTime;
+                _poseStateElapsedTime += poseDeltaTime;
+                _currentPoseData?.PoseAction?.OnUpdate(this, poseDeltaTime);
 
                 if (!_isPoseCommitted && _currentPoseData != null && _poseElapsedTime >= _currentPoseData.CommitDelay)
                 {
@@ -103,14 +105,14 @@ namespace Enemy
 
                 if (_isPoseCommitted && !_hasEnemyRequestNotified)
                 {
-                    _parryGraceTimer -= deltaTime;
+                    _parryGraceTimer -= poseDeltaTime;
                     if (_parryGraceTimer <= 0f)
                     {
                         CompleteParryGrace();
                     }
                 }
 
-                _poseTimer -= deltaTime;
+                _poseTimer -= poseDeltaTime;
                 if (_poseTimer <= 0f)
                 {
                     OnUnpause();
@@ -145,6 +147,21 @@ namespace Enemy
             _poseParryJudge = poseParryJudge;
         }
 
+        // Wave共通のアニメーション速度をAnimatorとPose進行へ反映
+        public void SetAnimationSpeed(float animationSpeed)
+        {
+            _animationSpeed = Mathf.Max(0f, animationSpeed);
+
+            OnStartPose animationController = GetComponentInChildren<OnStartPose>(true);
+            if (animationController == null)
+            {
+                Debug.LogWarning($"[Enemy] Animation speed was not applied. Reason=OnStartPose was not found. Enemy={name}", this);
+                return;
+            }
+
+            animationController.SetAnimationSpeed(_animationSpeed);
+        }
+
         // Pose終了時の共通処理
         private void OnUnpause()
         {
@@ -175,18 +192,42 @@ namespace Enemy
             RuntimeDebug.DebugMenu.DestroyWindow(name);
         }
 
-        public PoseID RandomPose()
+        public bool HasPoseOfType(EnemyPoseType poseType, PoseID committedPoseID = PoseID.None)
+        {
+            if (poseType == EnemyPoseType.Fake && committedPoseID != PoseID.None)
+            {
+                return _data != null &&
+                       _data.PoseSet != null &&
+                       _data.PoseSet.ContainsFakePose(committedPoseID);
+            }
+
+            return _data != null &&
+                   _data.PoseSet != null &&
+                   _data.PoseSet.ContainsPoseType(poseType);
+        }
+
+        public PoseID RandomPose(
+            EnemyPoseType poseType = EnemyPoseType.Normal,
+            PoseID committedPoseID = PoseID.None)
         {
             if (InGameFlowLock.IsPresentationPlaying)
             {
                 return PoseID.None;
             }
 
-            if (_data == null || _data.PoseSet.Poses.Count == 0)
+            if (_data == null || _data.PoseSet == null)
             {
                 return PoseID.None;
             }
-            EnemyPoseData randomPoseData = _data.PoseSet.GetRandomPose();
+
+            EnemyPoseData randomPoseData = poseType == EnemyPoseType.Fake && committedPoseID != PoseID.None
+                ? _data.PoseSet.GetRandomFakePose(committedPoseID)
+                : _data.PoseSet.GetRandomPose(poseType);
+            if (randomPoseData == null)
+            {
+                return PoseID.None;
+            }
+
             Pause(randomPoseData);
             return randomPoseData.ID;
         }

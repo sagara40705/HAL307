@@ -12,8 +12,7 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
-  m_InvalidKeywords:
-  - _SHOWNUMBER_ON
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -25,11 +24,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: e55269526d09dd240924955964f2c5eb, type: 3}
+        m_Texture: {fileID: 2800000, guid: 464518616e3b38047a0f68d7feef4fe0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: 1271c934859c12a40bdfe946cb34bd7a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7fd827432d2678f499ab6948690b7b19, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NumTex:
@@ -39,16 +38,16 @@ Material:
     m_Ints: []
     m_Floats:
     - _AmbientStrength: 0.507
-    - _Darkness: 0.35
+    - _Darkness: 0.458
     - _Digit0: 0
     - _Digit1: 0
     - _Digit2: 0
-    - _NormalStrength: 0
-    - _ShowNumber: 1
-    - _SpecPower: 48
-    - _SpecStrength: 1.2
+    - _NormalStrength: 0.97
+    - _ShowNumber: 0
+    - _SpecPower: 51.3
+    - _SpecStrength: 1.54
     m_Colors:
-    - _BaseColor: {r: 0.54999995, g: 0.41999996, b: 0.31999996, a: 1}
+    - _BaseColor: {r: 0.94716984, g: 0.91158164, b: 0.8846209, a: 1}
     - _DigitArea: {r: 0.3, g: 0.3, b: 0.2, a: 0.2}
     - _DigitColor: {r: 1, g: 0, b: 0, a: 1}
     - _DigitScale: {r: 1, g: 1, b: 0, a: 0}

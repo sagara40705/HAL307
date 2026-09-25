@@ -1,7 +1,6 @@
 using Unity.InferenceEngine;
 using UnityEngine;
 using System.Text;
-using UnityEngine.InputSystem;
 
 public class VoiceOnnxRunner : MonoBehaviour
 {
@@ -115,31 +114,6 @@ public class VoiceOnnxRunner : MonoBehaviour
             return;
         }
 
-
-        //// Vキー押している間だけ動作
-        //if (!DebugShortcuts.Held(Key.V))
-        //{
-        //    state = VoiceProcessState.Idle;
-        //    timer = 0f;
-        //    return;
-        //}
-
-        // Idle中のみタイマー進行
-        if (state == VoiceProcessState.Idle)
-        {
-            timer += Time.deltaTime;
-
-            if (timer >= inferenceInterval)
-            {
-                timer = 0f;
-
-                Debug.Log("[Voice] 推論開始");
-
-                state = VoiceProcessState.CheckVolume;
-            }
-
-            return;
-        }
 
         // 分割処理
         switch (state)
@@ -266,52 +240,6 @@ public class VoiceOnnxRunner : MonoBehaviour
         state = VoiceProcessState.Idle;
     }
 
-
-    private void RunInferenceWithSamples(float[] samples, float volume)
-    {
-        float[,] mfcc = featureExtractor.ExtractMfcc(samples, ModelMfccCount, ModelTargetWidth);
-
-        using Tensor<float> inputTensor =
-            new Tensor<float>(new TensorShape(1, 1, ModelMfccCount, ModelTargetWidth));
-
-        for (int m = 0; m < ModelMfccCount; m++)
-        {
-            for (int t = 0; t < ModelTargetWidth; t++)
-            {
-                inputTensor[0, 0, m, t] = mfcc[m, t];
-            }
-        }
-
-        worker.Schedule(inputTensor);
-
-        Tensor<float> output = worker.PeekOutput() as Tensor<float>;
-
-        if (output == null)
-        {
-            return;
-        }
-
-        Tensor<float> readable =
-            output.ReadbackAndClone() as Tensor<float>;
-
-        if (readable == null)
-        {
-            return;
-        }
-
-        int predictedIndex = ArgMax(readable);
-        string predictedLabel = labels[predictedIndex];
-        StoreInferenceDebugSnapshot(readable, predictedLabel, volume);
-
-        Debug.Log("[AI] " + predictedLabel);
-
-        if (voiceCommandAction != null)
-        {
-            voiceCommandAction.ExecuteCommand(predictedLabel, volume);
-        }
-
-        readable.Dispose();
-    }
 
     private float GetMaxAbs(float[] samples)
     {

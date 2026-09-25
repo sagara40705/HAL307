@@ -22,6 +22,14 @@ public class StageProgressProvider : MonoBehaviour
         Instance = this;
     }
 
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
     private void Start()
     {
         if (startPoint == null || endPoint == null || currentPoint == null)
@@ -71,12 +79,6 @@ public class StageProgressProvider : MonoBehaviour
             currentDistance
         );
 
-        Debug.Log(
-    $"GaugeRate={GaugeRate} " +
-    $"Current={currentDistance}"
-);
-
-        GaugeRate = Mathf.Clamp01(GaugeRate);
         IsArrived = false;
     }
 }

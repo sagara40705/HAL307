@@ -53,7 +53,7 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             return false;
         }
 
-        StartCoroutine(ChangePhaseRoutine(nextPhase));
+        StartCoroutine(CoroutineUtility.Run(ChangePhaseRoutine(nextPhase)));
         return true;
     }
 
@@ -77,7 +77,7 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             return false;
         }
 
-        StartCoroutine(LoadSceneAndSyncPhaseRoutine(sceneName));
+        StartCoroutine(CoroutineUtility.Run(LoadSceneAndSyncPhaseRoutine(sceneName)));
         return true;
     }
 
@@ -88,21 +88,8 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             yield break;
         }
 
-        bool isCompleted = false;
-
         // Scene遷移で呼び出し元が破棄されてもManager側でPhase同期まで継続する
-        StartCoroutine(RunPhaseChange(nextPhase, () => isCompleted = true));
-
-        while (!isCompleted)
-        {
-            yield return null;
-        }
-    }
-
-    private IEnumerator RunPhaseChange(GamePhase nextPhase, Action onCompleted)
-    {
-        yield return ChangePhaseRoutine(nextPhase);
-        onCompleted?.Invoke();
+        yield return StartCoroutine(CoroutineUtility.Run(ChangePhaseRoutine(nextPhase)));
     }
 
     public bool ResumePreviousPhase()
@@ -149,68 +136,74 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
     private IEnumerator LoadSceneAndSyncPhaseRoutine(string sceneName)
     {
         _isChangingPhase = true;
-        Debug.Log($"[GamePhaseManager] Scene load started. Scene='{sceneName}', CurrentPhase={_currentPhase}");
-
-        if (!Application.CanStreamedLevelBeLoaded(sceneName))
+        try
         {
-            Debug.LogError($"[GamePhaseManager] Scene load failed. Reason=Scene cannot be loaded. Scene='{sceneName}'. Check Build Settings scene list or Build Profile scene list.");
-            _isChangingPhase = false;
-            yield break;
-        }
+            Debug.Log($"[GamePhaseManager] Scene load started. Scene='{sceneName}', CurrentPhase={_currentPhase}");
 
-        SceneLoader sceneLoader = SceneLoader.Instance;
-        if (sceneLoader == null || !sceneLoader.IsInitialized)
+            if (!Application.CanStreamedLevelBeLoaded(sceneName))
+            {
+                Debug.LogError($"[GamePhaseManager] Scene load failed. Reason=Scene cannot be loaded. Scene='{sceneName}'. Check Build Settings scene list or Build Profile scene list.");
+                yield break;
+            }
+
+            SceneLoader sceneLoader = SceneLoader.Instance;
+            if (sceneLoader == null || !sceneLoader.IsInitialized)
+            {
+                Debug.LogError($"[GamePhaseManager] Scene load failed. Reason=SceneLoader is not ready. Scene='{sceneName}'");
+                yield break;
+            }
+
+            yield return LoadSceneWithPhaseCleanup(sceneLoader, sceneName);
+
+            SyncPhaseWithActiveScene();
+
+            Scene activeScene = UnitySceneManager.GetActiveScene();
+            if (!sceneLoader.IsSceneLoaded(sceneName))
+            {
+                Debug.LogError($"[GamePhaseManager] Scene load failed. Reason=Requested scene is not loaded. RequestedScene='{sceneName}', ActiveScene='{activeScene.name}', CurrentPhase={_currentPhase}");
+                yield break;
+            }
+
+            Debug.Log($"[GamePhaseManager] Scene load completed. RequestedScene='{sceneName}', ActiveScene='{activeScene.name}', CurrentPhase={_currentPhase}");
+        }
+        finally
         {
-            Debug.LogError($"[GamePhaseManager] Scene load failed. Reason=SceneLoader is not ready. Scene='{sceneName}'");
             _isChangingPhase = false;
-            yield break;
         }
-
-        yield return LoadSceneWithPhaseCleanup(sceneLoader, sceneName);
-
-        SyncPhaseWithActiveScene();
-
-        Scene activeScene = UnitySceneManager.GetActiveScene();
-        if (!sceneLoader.IsSceneLoaded(sceneName))
-        {
-            Debug.LogError($"[GamePhaseManager] Scene load failed. Reason=Requested scene is not loaded. RequestedScene='{sceneName}', ActiveScene='{activeScene.name}', CurrentPhase={_currentPhase}");
-            _isChangingPhase = false;
-            yield break;
-        }
-
-        Debug.Log($"[GamePhaseManager] Scene load completed. RequestedScene='{sceneName}', ActiveScene='{activeScene.name}', CurrentPhase={_currentPhase}");
-        _isChangingPhase = false;
     }
 
     private IEnumerator ChangePhaseRoutine(GamePhase nextPhase)
     {
         _isChangingPhase = true;
-
-        GamePhase oldPhase = _currentPhase;
-        Debug.Log($"[GamePhaseManager] ChangePhase started. From={oldPhase}, To={nextPhase}");
-
-        if (nextPhase == GamePhase.Pause)
+        try
         {
-            yield return OpenPausePhase(oldPhase);
-        }
-        else
-        {
-            if (oldPhase == GamePhase.Pause)
+            GamePhase oldPhase = _currentPhase;
+            Debug.Log($"[GamePhaseManager] ChangePhase started. From={oldPhase}, To={nextPhase}");
+
+            if (nextPhase == GamePhase.Pause)
             {
-                yield return ClosePausePhase();
-
-                if (nextPhase == _phaseBeforePause && IsActiveSceneForPhase(nextPhase))
-                {
-                    SetCurrentPhase(nextPhase, oldPhase);
-                    _isChangingPhase = false;
-                    yield break;
-                }
+                yield return OpenPausePhase(oldPhase);
             }
+            else
+            {
+                if (oldPhase == GamePhase.Pause)
+                {
+                    yield return ClosePausePhase();
 
-            yield return LoadPhaseScene(nextPhase);
+                    if (nextPhase == _phaseBeforePause && IsActiveSceneForPhase(nextPhase))
+                    {
+                        SetCurrentPhase(nextPhase, oldPhase);
+                        yield break;
+                    }
+                }
+
+                yield return LoadPhaseScene(nextPhase);
+            }
         }
-
-        _isChangingPhase = false;
+        finally
+        {
+            _isChangingPhase = false;
+        }
     }
 
     private IEnumerator OpenPausePhase(GamePhase oldPhase)
@@ -397,7 +390,7 @@ public sealed class GamePhaseManager : AppManagerBase<GamePhaseManager>
             return false;
         }
 
-        return string.Equals(UnitySceneManager.GetActiveScene().name, sceneName, StringComparison.Ordinal);
+        return SceneLookup.Matches(UnitySceneManager.GetActiveScene(), sceneName);
     }
 
     private GamePhase ResolvePhaseFromActiveScene()

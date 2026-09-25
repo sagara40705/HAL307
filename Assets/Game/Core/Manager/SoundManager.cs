@@ -495,12 +495,17 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
 
     private void StartBgmImmediate(BgmEntry entry)
     {
+        _bgmPlayer.Stop();
+        StartBgmPlayback(entry, 1f);
+    }
+
+    private void StartBgmPlayback(BgmEntry entry, float initialFade)
+    {
         _currentBgmId = entry.id;
         _currentBgmBaseVolume = Mathf.Clamp01(entry.volume);
-        _currentBgmFade01 = 1f;
+        _currentBgmFade01 = initialFade;
         _hasCurrentBgm = true;
 
-        _bgmPlayer.Stop();
         _bgmPlayer.ResetParameters();
         _bgmPlayer.SetCue(_atomExAcb, entry.CueName);
         _bgmPlayer.SetVolume(GetEffectiveBgmPlayerVolume(_currentBgmBaseVolume, _currentBgmFade01));
@@ -516,16 +521,7 @@ public sealed class SoundManager : AppManagerBase<SoundManager>
             _bgmPlayer.Stop();
         }
 
-        _currentBgmId = nextEntry.id;
-        _currentBgmBaseVolume = Mathf.Clamp01(nextEntry.volume);
-        _currentBgmFade01 = 0f;
-        _hasCurrentBgm = true;
-
-        _bgmPlayer.ResetParameters();
-        _bgmPlayer.SetCue(_atomExAcb, nextEntry.CueName);
-        _bgmPlayer.SetVolume(GetEffectiveBgmPlayerVolume(_currentBgmBaseVolume, _currentBgmFade01));
-        _bgmPlayer.Loop(true);
-        _bgmPlayback = _bgmPlayer.Start();
+        StartBgmPlayback(nextEntry, 0f);
 
         yield return FadeCurrentBgm(1f, fadeTime);
 

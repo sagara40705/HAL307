@@ -38,6 +38,9 @@ namespace AudienceRequest
         [SerializeField] private AudienceRequestLevelDesignSettings _levelDesignSettings;
         [SerializeField] private AudienceRequestContext _context;
 
+        private readonly List<PoseID> _normalRequestCandidates = new();
+        private readonly List<PoseID> _blackRequestCandidates = new();
+
         // フィーバーゲージ
         [SerializeField] private FeverGaugeController _feverGaugeController;
 
@@ -59,7 +62,7 @@ namespace AudienceRequest
         // 黒リクエストがアクティブかどうかを判定するプロパティ
         public bool HasActiveBlackRequest => _activeBlackRequestPoseID != PoseID.None;
 
-        //  
+        //
         [Header("Wave状態")]
         [SerializeField]
         private WaveGaugeController _waveGaugeController;
@@ -107,7 +110,7 @@ namespace AudienceRequest
 
             if (InGameFlowLock.IsPresentationPlaying) { return; }
 
-            // リクエストが満杯の場合は新しいリクエストを生成しない   
+            // リクエストが満杯の場合は新しいリクエストを生成しない
             if (!FullRequest())
             {
                 _requestTimer += Time.deltaTime;
@@ -130,7 +133,7 @@ namespace AudienceRequest
         // 指定Poseのリクエスト数を取得する関数
         public int GetRequestCount(PoseID poseID)
         {
-            return _audienceRequests.GetCount(poseID);
+            return _audienceRequests != null ? _audienceRequests.GetCount(poseID) : 0;
         }
 
         // 指定Poseが確定IDになるFakePoseをEnemyへ要求する
@@ -168,23 +171,13 @@ namespace AudienceRequest
         }
 
         // リクエストをクリアする関数
-        public void ClearRequest(PoseID poseID,bool isPlayer,Enemy.Enemy enemy = null)
+        public void ClearRequest(PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
         {
-            int value = _audienceRequests.GetCount(poseID);
+            int value = RemoveRequestCount(poseID);
 
             if (value <= 0)
             {
                 return;
-            }
-
-            // リクエストデータは消す
-            _audienceRequests.ClearCount(poseID);
-
-            _currentRequestCount -= value;
-
-            if (_currentRequestCount < 0)
-            {
-                _currentRequestCount = 0;
             }
 
             bool blockScoreReward = IsScoreRewardBlocked();
@@ -222,7 +215,7 @@ namespace AudienceRequest
             }
 
             // ハート化や消去演出は実行する
-            _uiPool.PlayClearEffectAndRelease(poseID,isPlayer);
+            _uiPool?.PlayClearEffectAndRelease(poseID, isPlayer);
         }
 
         // リクエスト発生関数
@@ -230,7 +223,7 @@ namespace AudienceRequest
         {
             if (InGameFlowLock.IsPresentationPlaying) { return; }
 
-            if (FullRequest()) { return; }
+            if (FullRequest() || _audienceRequests == null || _uiPool == null) { return; }
             // 生成できるリクエストの数を計算
             int spawnCountPerWave = _levelDesignSettings != null
                  ? _levelDesignSettings.SpawnCountPerWave
@@ -240,45 +233,32 @@ namespace AudienceRequest
             if (canSpawnCount <= 0) { return; }
 
             // ランダムにリクエストを生成
-            List<AudienceRequestEntry> availableRequests = new List<AudienceRequestEntry>(_audienceRequests.Requests);
-            if (availableRequests.Count == 0) { return; }
+            _normalRequestCandidates.Clear();
+            foreach (AudienceRequestEntry request in _audienceRequests.Requests)
+            {
+                if (request != null)
+                {
+                    _normalRequestCandidates.Add(request.poseID);
+                }
+            }
+            if (_normalRequestCandidates.Count == 0) { return; }
 
             // 生成するリクエストの数だけループ
             for (int i = 0; i < canSpawnCount; i++)
             {
-                // 生成できるリクエストがなくなったらループを抜ける
-                if (availableRequests.Count == 0) { break; }
-
                 // ランダムにリクエストを選ぶ
-                PoseID poseID = GetRandomNormalRequestPose(availableRequests);
+                PoseID poseID = GetRandomNormalRequestPose(_normalRequestCandidates);
 
                 if (poseID == PoseID.None)
                 {
                     continue;
                 }
 
-                AudienceRequestEntry requestEntry = availableRequests.Find(r => r.poseID == poseID);
-
-                if (requestEntry == null)
-                {
-                    continue;
-                }
-
-                // 選ばれたリクエストを利用可能リストから削除
-                //availableRequests.Remove(requestEntry);
-
                 // 先にUI生成を試す
-                GameObject ui = _uiPool.Generate(poseID);
-                if (ui == null)
+                if (!RegisterGeneratedRequest(poseID, _uiPool.Generate(poseID)))
                 {
                     continue;
                 }
-
-                // UI生成に成功した時だけカウントを増やす
-                _audienceRequests.AddCount(poseID);
-                _currentRequestCount++;
-
-                OnRequestReceived?.Invoke(poseID);
                 Debug.Log("New request received! Current request count: " + _currentRequestCount);
             }
         }
@@ -298,33 +278,16 @@ namespace AudienceRequest
 
         public void ShowTutorialRequest(PoseID poseID)
         {
-            // チュートリアルモードでない場合は何もしない
-            if (FullRequest())
-            {
-                return;
-            }
-
-            // すでに同じリクエストが存在する場合は何もしない
-            if (_audienceRequests.GetCount(poseID) > 0)
+            if (!CanShowTutorialRequest(poseID))
             {
                 return;
             }
 
             // UI生成を試す
-            GameObject ui = _uiPool.Generate(poseID);
-
-            // UI生成に失敗した場合は何もしない
-            if (ui == null)
+            if (!RegisterGeneratedRequest(poseID, _uiPool.Generate(poseID)))
             {
                 return;
             }
-
-            // UI生成に成功した場合はカウントを増やす
-            _audienceRequests.AddCount(poseID);
-            _currentRequestCount++;
-
-            // リクエスト生成時のイベントを発火
-            OnRequestReceived?.Invoke(poseID);
 
             // デバッグログを出力
             Debug.Log("[Tutorial] Show tutorial request: " + poseID);
@@ -339,64 +302,36 @@ namespace AudienceRequest
         // チュートリアルモードのリクエストをクリアする関数
         public void ClearTutorialRequestWithoutReward(PoseID poseID, bool isPlayer)
         {
-            int value = _audienceRequests.GetCount(poseID);
-
-            if (value <= 0)
+            if (RemoveRequestCount(poseID) <= 0)
             {
                 return;
             }
 
-            _audienceRequests.ClearCount(poseID);
-
-            _currentRequestCount -= value;
-
-            if (_currentRequestCount < 0)
-            {
-                _currentRequestCount = 0;
-            }
-
             // スコア加算・フィーバー加算はしない
             // UIの演出だけ再生して消す
-            _uiPool.PlayClearEffectAndRelease(poseID, isPlayer);
+            _uiPool?.PlayClearEffectAndRelease(poseID, isPlayer);
         }
 
         // チュートリアルモードのリクエストをすべてクリアする関数
         public void ClearAllTutorialRequests()
         {
-            for (int i = 0; i < (int)PoseID.Pose_Count; i++)
-            {
-                PoseID poseID = (PoseID)i;
-                _uiPool.ClearUiPool(poseID);
-            }
-
-            _audienceRequests.ClearAll();
+            _uiPool?.ClearAllUiPools();
+            _audienceRequests?.ClearAll();
             _currentRequestCount = 0;
         }
 
         // チュートリアルモードのリクエストを指定範囲内に表示する関数
         public void ShowTutorialRequestInArea(PoseID poseID, Vector2 areaMin, Vector2 areaMax)
         {
-            if (FullRequest())
+            if (!CanShowTutorialRequest(poseID))
             {
                 return;
             }
 
-            if (_audienceRequests.GetCount(poseID) > 0)
+            if (!RegisterGeneratedRequest(poseID, _uiPool.GenerateInArea(poseID, areaMin, areaMax)))
             {
                 return;
             }
-
-            GameObject ui = _uiPool.GenerateInArea(poseID, areaMin, areaMax);
-
-            if (ui == null)
-            {
-                return;
-            }
-
-            _audienceRequests.AddCount(poseID);
-            _currentRequestCount++;
-
-            OnRequestReceived?.Invoke(poseID);
 
             Debug.Log("[Tutorial] Show tutorial request in area: " + poseID);
         }
@@ -450,7 +385,12 @@ namespace AudienceRequest
         // 黒リクエストを通常リクエストから生成する関数
         private void TryGenerateBlackRequestFromActiveRequests()
         {
-            List<PoseID> candidates = new List<PoseID>();
+            if (_audienceRequests == null || _uiPool == null)
+            {
+                return;
+            }
+
+            _blackRequestCandidates.Clear();
 
             //
             foreach (AudienceRequestEntry request in _audienceRequests.Requests)
@@ -472,17 +412,17 @@ namespace AudienceRequest
                     continue;
                 }
 
-                candidates.Add(request.poseID);
+                _blackRequestCandidates.Add(request.poseID);
             }
 
             //
-            if (candidates.Count == 0)
+            if (_blackRequestCandidates.Count == 0)
             {
                 return;
             }
 
             //
-            PoseID selectedPoseID = GetRandomBlackRequestPose(candidates);
+            PoseID selectedPoseID = GetRandomBlackRequestPose(_blackRequestCandidates);
 
             if (selectedPoseID == PoseID.None)
             {
@@ -532,80 +472,53 @@ namespace AudienceRequest
             Debug.Log("[AudienceRequestSystem] Black request cleared. Fake pose committed ID = " + committedPoseID);
         }
 
-        // ランダムに通常リクエストのPoseIDを取得する関数
-        private PoseID GetRandomNormalRequestPose(List<AudienceRequestEntry> availableRequests)
+        private bool CanShowTutorialRequest(PoseID poseID)
         {
-            //
-            if (_levelDesignSettings == null)
-            {
-                if (availableRequests == null || availableRequests.Count == 0)
-                {
-                    return PoseID.None;
-                }
+            return !FullRequest() && _audienceRequests != null && _uiPool != null &&
+                   _audienceRequests.Contains(poseID) && GetRequestCount(poseID) == 0;
+        }
 
-                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
-                return availableRequests[randomIndex].poseID;
+        // UI生成に成功したリクエストだけを登録する。
+        private bool RegisterGeneratedRequest(PoseID poseID, GameObject ui)
+        {
+            if (ui == null)
+            {
+                return false;
             }
 
-            List<RequestSpawnWeight> filteredWeights = new();
+            _audienceRequests.AddCount(poseID);
+            _currentRequestCount++;
+            OnRequestReceived?.Invoke(poseID);
+            return true;
+        }
 
-            // 
-            foreach (RequestSpawnWeight weight in _levelDesignSettings.NormalRequestWeights)
+        private int RemoveRequestCount(PoseID poseID)
+        {
+            int count = GetRequestCount(poseID);
+            if (count <= 0)
             {
-                if (weight == null)
-                {
-                    continue;
-                }
-
-                if (!weight.IsEnabled)
-                {
-                    continue;
-                }
-
-                if (weight.Weight <= 0)
-                {
-                    continue;
-                }
-
-                bool exists = availableRequests.Exists(r => r.poseID == weight.PoseID);
-
-                if (!exists)
-                {
-                    continue;
-                }
-
-                filteredWeights.Add(weight);
+                return 0;
             }
 
-            //  
-            if (filteredWeights.Count == 0)
+            _audienceRequests.ClearCount(poseID);
+            _currentRequestCount = Mathf.Max(0, _currentRequestCount - count);
+            return count;
+        }
+
+        // 通常・黒リクエストとも重み付き抽選を設定データ側に集約する。
+        private PoseID GetRandomNormalRequestPose(List<PoseID> candidates)
+        {
+            if (candidates.Count == 0)
             {
-                int randomIndex = UnityEngine.Random.Range(0, availableRequests.Count);
-                return availableRequests[randomIndex].poseID;
+                return PoseID.None;
             }
 
-            int totalWeight = 0;
-
-            //
-            foreach (RequestSpawnWeight weight in filteredWeights)
-            {
-                totalWeight += weight.Weight;
-            }
-
-            int randomValue = UnityEngine.Random.Range(0, totalWeight);
-            int current = 0;
-
-            foreach (RequestSpawnWeight weight in filteredWeights)
-            {
-                current += weight.Weight;
-
-                if (randomValue < current)
-                {
-                    return weight.PoseID;
-                }
-            }
-
-            return PoseID.None;
+            PoseID poseID = _levelDesignSettings != null
+                ? _levelDesignSettings.GetRandomNormalPoseFromCandidates(candidates)
+                : PoseID.None;
+            return poseID != PoseID.None
+                ? poseID
+                : candidates[UnityEngine.Random.Range(0, candidates.Count)];
         }
 
         // ランダムに黒リクエストのPoseIDを取得する関数

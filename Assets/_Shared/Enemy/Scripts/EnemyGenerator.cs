@@ -28,26 +28,22 @@ namespace Enemy
             if (index < 0 || index >= _spawnData.SpawnEntries.Count) { return; }
 
             EnemySpawnEntry entry = _spawnData.SpawnEntries[index];
-            GameObject instance = Instantiate(entry.EnemyData.EnemyPrefab, entry.Position, entry.Rotation, _parent);
-
-            Enemy enemy = instance.GetComponent<Enemy>();
-
-            // 名前を付ける
-            int enemyNumber  = _enemyRegistry.Count + 1;
-            enemy.name = $"Enemy{enemyNumber}";
-
-           // Debug.Log($"Generated enemy from data: {enemy.name}");
-
-            PoseParryJudge poseParryJudge = _enemyContext?.GetPoseContext()?.GetPoseParryJudge;
-            enemy.Initialize(_enemyRegistry, _poseController, entry.EnemyData, poseParryJudge);
-
-            if (_enemyContext != null)
+            if (entry == null || _enemyRegistry == null)
             {
-                enemy.OnPoseStart += (poseID) => _enemyContext.NotifyEnemyPoseStart(enemy, poseID);
+                Debug.LogWarning("[EnemyGenerator] GenerateFromData skipped. Entry or EnemyRegistry is missing.");
+                return;
             }
+
+            string enemyName = $"Enemy{_enemyRegistry.Count + 1}";
+            GenerateInternal(entry.EnemyData, enemyName, entry.Position, entry.Rotation);
         }
 
         public Enemy Generate(EnemyData enemyData, EnemySlotId slot, Vector3 position, Quaternion rotation)
+        {
+            return GenerateInternal(enemyData, slot.ToString(), position, rotation);
+        }
+
+        private Enemy GenerateInternal(EnemyData enemyData, string enemyName, Vector3 position, Quaternion rotation)
         {
             if (enemyData == null)
             {
@@ -71,7 +67,7 @@ namespace Enemy
             }
 
             // EnemySlotIdと同じ名前を設定
-            enemy.name = slot.ToString();
+            enemy.name = enemyName;
 
             PoseParryJudge poseParryJudge = _enemyContext?.GetPoseContext()?.GetPoseParryJudge;
             enemy.Initialize(_enemyRegistry, _poseController, enemyData, poseParryJudge);

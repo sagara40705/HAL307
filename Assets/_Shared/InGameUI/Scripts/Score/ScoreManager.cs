@@ -1,4 +1,5 @@
 using System;
+using Enemy;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,26 +15,25 @@ public class ScoreManager : MonoBehaviour
     public static ScoreManager Instance { get; private set; }
 
     public int PlayerScore { get; private set; }
-    public int Enemy1Score { get; private set; }
-    public int Enemy2Score { get; private set; }
-    public int Enemy3Score { get; private set; }
-    public int Enemy4Score { get; private set; }
+    private readonly int[] _enemyScores = new int[(int)EnemySlotId.Enemy4];
+
+    public int Enemy1Score => GetEnemyScore(EnemySlotId.Enemy1);
+    public int Enemy2Score => GetEnemyScore(EnemySlotId.Enemy2);
+    public int Enemy3Score => GetEnemyScore(EnemySlotId.Enemy3);
+    public int Enemy4Score => GetEnemyScore(EnemySlotId.Enemy4);
 
     [SerializeField] private ScoreSettings scoreSettings;
 
     public event Action OnScoreChanged;
 
-    // 
     private void Awake()
     {
-        //  
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
 
-        //  
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
@@ -48,9 +48,9 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    private void OnSceneLoaded(Scene scene,LoadSceneMode loadSceneMode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
-        if (scene.name != _inGameSceneName)
+        if (!SceneLookup.Matches(scene, _inGameSceneName))
         {
             return;
         }
@@ -72,8 +72,13 @@ public class ScoreManager : MonoBehaviour
     public void AddPlayerScore(int score, bool isFever = false)
     {
         int multiplier = isFever ? FeverScoreMultiplier : 1;
+        int delta = score * ScoreUnit * multiplier;
+        if (delta == 0)
+        {
+            return;
+        }
 
-        PlayerScore += score * ScoreUnit * multiplier;
+        PlayerScore += delta;
 
         OnScoreChanged?.Invoke();
     }
@@ -95,7 +100,6 @@ public class ScoreManager : MonoBehaviour
         if (!Enum.TryParse(enemyName, out Enemy.EnemySlotId slot))
         {
             Debug.LogWarning($"[ScoreManager] AddEnemyScore skipped. Reason=Unknown enemyName. EnemyName={enemyName}");
-            OnScoreChanged?.Invoke();
             return;
         }
 
@@ -104,44 +108,13 @@ public class ScoreManager : MonoBehaviour
 
     public void AddEnemyScore(int score, Enemy.EnemySlotId slot)
     {
-        if (slot == Enemy.EnemySlotId.Enemy1)
-        {
-            Enemy1Score += score * ScoreUnit;
-        }
-        else if (slot == Enemy.EnemySlotId.Enemy2)
-        {
-            Enemy2Score += score * ScoreUnit;
-        }
-        else if (slot == Enemy.EnemySlotId.Enemy3)
-        {
-            Enemy3Score += score * ScoreUnit;
-        }
-        else if (slot == Enemy.EnemySlotId.Enemy4)
-        {
-            Enemy4Score += score * ScoreUnit;
-        }
-
-        OnScoreChanged?.Invoke();
+        SetEnemyScore(slot, GetEnemyScore(slot) + score * ScoreUnit);
     }
 
     public int GetEnemyScore(Enemy.EnemySlotId slot)
     {
-        if (slot == Enemy.EnemySlotId.Enemy1)
-        {
-            return Enemy1Score;
-        }
-
-        if (slot == Enemy.EnemySlotId.Enemy2)
-        {
-            return Enemy2Score;
-        }
-
-        if (slot == Enemy.EnemySlotId.Enemy3)
-        {
-            return Enemy3Score;
-        }
-
-        return slot == Enemy.EnemySlotId.Enemy4 ? Enemy4Score : 0;
+        int index = (int)slot - 1;
+        return index >= 0 && index < _enemyScores.Length ? _enemyScores[index] : 0;
     }
 
     public Enemy.EnemySlotId GetLowestEnemySlot()
@@ -151,33 +124,31 @@ public class ScoreManager : MonoBehaviour
 
     public void ResetEnemyScore(Enemy.EnemySlotId slot)
     {
-        if (slot == Enemy.EnemySlotId.Enemy1)
+        SetEnemyScore(slot, 0);
+    }
+
+    private void SetEnemyScore(EnemySlotId slot, int score)
+    {
+        int index = (int)slot - 1;
+        if (index < 0 || index >= _enemyScores.Length)
         {
-            Enemy1Score = 0;
-        }
-        else if (slot == Enemy.EnemySlotId.Enemy2)
-        {
-            Enemy2Score = 0;
-        }
-        else if (slot == Enemy.EnemySlotId.Enemy3)
-        {
-            Enemy3Score = 0;
-        }
-        else if (slot == Enemy.EnemySlotId.Enemy4)
-        {
-            Enemy4Score = 0;
+            Debug.LogWarning($"[ScoreManager] Score update skipped. Reason=Unknown enemy slot. Slot={slot}");
+            return;
         }
 
+        if (_enemyScores[index] == score)
+        {
+            return;
+        }
+
+        _enemyScores[index] = score;
         OnScoreChanged?.Invoke();
     }
 
     public void ResetAllScores()
     {
         PlayerScore = 0;
-        Enemy1Score = 0;
-        Enemy2Score = 0;
-        Enemy3Score = 0;
-        Enemy4Score = 0;
+        Array.Clear(_enemyScores, 0, _enemyScores.Length);
 
         OnScoreChanged?.Invoke();
 

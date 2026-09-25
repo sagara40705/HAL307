@@ -51,7 +51,7 @@ public sealed class GamePhaseSceneSettings : ScriptableObject
             return false;
         }
 
-        string normalizedSceneName = NormalizeSceneName(sceneName);
+        string normalizedSceneName = SceneLookup.NormalizeName(sceneName);
 
         for (int i = 0; i < phaseScenes.Count; i++)
         {
@@ -61,7 +61,7 @@ public sealed class GamePhaseSceneSettings : ScriptableObject
                 continue;
             }
 
-            if (string.Equals(NormalizeSceneName(binding.SceneName), normalizedSceneName, StringComparison.Ordinal))
+            if (string.Equals(SceneLookup.NormalizeName(binding.SceneName), normalizedSceneName, StringComparison.Ordinal))
             {
                 phase = binding.Phase;
                 return phase != GamePhase.None;
@@ -72,23 +72,6 @@ public sealed class GamePhaseSceneSettings : ScriptableObject
         return false;
     }
 
-    private static string NormalizeSceneName(string sceneName)
-    {
-        string normalized = sceneName.Replace('\\', '/').Trim();
-        int slashIndex = normalized.LastIndexOf('/');
-        if (slashIndex >= 0 && slashIndex + 1 < normalized.Length)
-        {
-            normalized = normalized.Substring(slashIndex + 1);
-        }
-
-        const string unityExtension = ".unity";
-        if (normalized.EndsWith(unityExtension, StringComparison.OrdinalIgnoreCase))
-        {
-            normalized = normalized.Substring(0, normalized.Length - unityExtension.Length);
-        }
-
-        return normalized;
-    }
 }
 
 [Serializable]

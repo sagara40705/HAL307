@@ -99,24 +99,6 @@ public sealed class InGameLoadAdditiveScenePresentationAction : InGamePresentati
 
     private Scene GetLoadedScene()
     {
-        string normalizedScenePath = sceneName.Replace('\\', '/');
-        Scene scene = SceneManager.GetSceneByPath(normalizedScenePath);
-        if (scene.IsValid())
-        {
-            return scene;
-        }
-
-        int slashIndex = normalizedScenePath.LastIndexOf('/');
-        string normalizedSceneName = slashIndex >= 0
-            ? normalizedScenePath.Substring(slashIndex + 1)
-            : normalizedScenePath;
-
-        const string unityExtension = ".unity";
-        if (normalizedSceneName.EndsWith(unityExtension, System.StringComparison.OrdinalIgnoreCase))
-        {
-            normalizedSceneName = normalizedSceneName.Substring(0, normalizedSceneName.Length - unityExtension.Length);
-        }
-
-        return SceneManager.GetSceneByName(normalizedSceneName);
+        return SceneLookup.Find(sceneName);
     }
 }

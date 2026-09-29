@@ -1,7 +1,5 @@
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static Sound.Manager.SoundManager;
 
 //　オプション
 public enum TitleMenuItem
@@ -46,17 +44,17 @@ public class TitleUiManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (DebugShortcuts.Pressed(UnityEngine.InputSystem.Key.UpArrow))
+        if (DebugShortcuts.Pressed(Key.UpArrow))
         {
             UpCommand();
             return;
         }
-        if (DebugShortcuts.Pressed(UnityEngine.InputSystem.Key.DownArrow))
+        if (DebugShortcuts.Pressed(Key.DownArrow))
         {
             DownCommand();
             return;
         }
-        if (DebugShortcuts.Pressed(UnityEngine.InputSystem.Key.Space))
+        if (DebugShortcuts.Pressed(Key.Space))
         {
             DecideCommand();
             return;
@@ -66,29 +64,25 @@ public class TitleUiManager : MonoBehaviour
     // メニューの上移動コマンド
     public bool UpCommand()
     {
-        int index = (int)mTitleMenuItem;
-        if (index > 0)
-        {
-            index--;
-            mTitleMenuItem = (TitleMenuItem)index;
-            return SetCursurPos();
-        }
-
-        return false;
+        return MoveSelection(-1);
     }
 
     // メニューの下移動コマンド
     public bool DownCommand()
     {
-        int index = (int)mTitleMenuItem;
-        if (index < (int)TitleMenuItem.Count - 1)
+        return MoveSelection(1);
+    }
+
+    private bool MoveSelection(int direction)
+    {
+        int index = (int)mTitleMenuItem + direction;
+        if (index < 0 || index >= (int)TitleMenuItem.Count)
         {
-            index++;
-            mTitleMenuItem = (TitleMenuItem)index;
-            return SetCursurPos();
+            return false;
         }
 
-        return false;
+        mTitleMenuItem = (TitleMenuItem)index;
+        return SetCursurPos();
     }
 
     // メニューの決定コマンド（選択確定）
@@ -149,5 +143,5 @@ public class TitleUiManager : MonoBehaviour
         return true;
     }
 
-    
+
 }

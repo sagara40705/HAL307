@@ -88,26 +88,27 @@ namespace FeverGauge.Sandbox
 
             if (amount <= 0) { return; }
 
-            currentGauge = Mathf.Clamp(currentGauge + amount, 0, maxGauge);
-            OnGaugeChanged?.Invoke(currentGauge, maxGauge);
-
-            if (currentGauge >= maxGauge)
-            {
-                StartFeverMode();
-            }
+            SetGauge((int)Math.Min((long)currentGauge + amount, maxGauge));
         }
 
         public void SetGauge(int amount)
         {
             if (isFeverMode) { return; }
 
-            currentGauge = Mathf.Clamp(amount, 0, maxGauge);
-            OnGaugeChanged?.Invoke(currentGauge, maxGauge);
-
-            if (currentGauge >= maxGauge)
+            int nextGauge = Mathf.Clamp(amount, 0, maxGauge);
+            if (nextGauge >= maxGauge)
             {
                 StartFeverMode();
+                return;
             }
+
+            if (currentGauge == nextGauge)
+            {
+                return;
+            }
+
+            currentGauge = nextGauge;
+            OnGaugeChanged?.Invoke(currentGauge, maxGauge);
         }
 
 
@@ -164,5 +165,3 @@ namespace FeverGauge.Sandbox
     }
 
 }
-
-

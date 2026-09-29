@@ -1,13 +1,16 @@
-using System.Collections;
+using UnityEngine;
 using Player;
 using Pose;
 using TaiyouVoiceAI;
-using UnityEngine;
 
 public class VoiceCommandAction : MonoBehaviour
 {
     [Header("Menu")]
     //[SerializeField] private VoiceMenuController menuController;
+
+    [Header("Player Pose")]
+    [SerializeField] private VoiceAiContext voiceAiContext;
+    [SerializeField] private PlayerPoseContoroller playerPoseController;
 
     [Header("Legacy Objects")]
     [SerializeField] private GameObject powerObject;
@@ -15,176 +18,157 @@ public class VoiceCommandAction : MonoBehaviour
     [SerializeField] private GameObject muscleObject;
 
     [Header("Voice Gate")]
-    [SerializeField] private float minimumDb = -20f;
+    [SerializeField] private float minimumDb = -60f;
     [SerializeField] private bool onlyHide = true;
-    [SerializeField] private float hideTime = 5f;
     [SerializeField] private bool logCommand = true;
-
-    [Header("Player")]
-    [SerializeField] private VoiceAiContext _voiceAiContext;
-    [SerializeField] private PlayerPoseContoroller _playerPoseController;
 
     private void Awake()
     {
         ResolvePlayerPoseController();
     }
 
-    private void Start()
-    {
-        if (!ResolvePlayerPoseController())
-        {
-            Debug.LogError("[VoiceCommandAction] PlayerPoseContoroller was not found through VoiceAiContext.");
-        }
-    }
-
     public void ExecuteCommand(string command, float volume)
     {
-        if (string.IsNullOrWhiteSpace(command))
+        Debug.Log($"[ActionTrace] VoiceCommandAction.ExecuteCommand entered. command={command}, volume={volume:F8}, object={name}, scene={gameObject.scene.name}, activeSelf={gameObject.activeSelf}, activeInHierarchy={gameObject.activeInHierarchy}, enabled={enabled}");
+
+        if (string.IsNullOrWhiteSpace(command) || command == "none")
         {
+            Debug.Log("[ActionTrace] VoiceCommandAction return. reason=empty command or none");
             return;
         }
 
-        command = command.Trim().ToLowerInvariant();
-
         float db = VolumeToDb(volume);
 
+        Debug.Log($"[ActionTrace] VoiceCommandAction gate. command={command}, db={db:F2}, minimumDb={minimumDb:F2}, belowMinimum={db < minimumDb}");
         if (db < minimumDb)
         {
             if (logCommand)
             {
-                Debug.Log(
-                    $"[Voice] ignored small input command={command} db={db:F1}"
-                );
+                Debug.Log($"[Voice] ignored small input command={command} db={db:F1}");
             }
-
+            Debug.Log("[ActionTrace] VoiceCommandAction return. reason=db below minimumDb");
             return;
         }
 
         if (logCommand)
         {
-            Debug.Log(
-                $"[Voice] command={command} volume={volume:F4} db={db:F1}"
-            );
+            Debug.Log($"[Voice] command={command} volume={volume:F4} db={db:F1}");
         }
 
         if (IsMenuCommand(command))
         {
-            // menuController.ExecuteVoiceCommand(command);
+            Debug.Log($"[ActionTrace] VoiceCommandAction return. reason=menu command command={command}");
+            //menuController.ExecuteVoiceCommand(command);
+            return;
+        }
+
+        if (IsPoseCommand(command) && !CanExecutePoseCommand(command))
+        {
             return;
         }
 
         switch (command)
         {
-            case "none":
-                {
-                    int random = Random.Range(0, 3);
-
-                    if (logCommand)
-                    {
-                        Debug.Log("[Voice] none random index = " + random);
-                    }
-
-                    switch (random)
-                    {
-                        case 0:
-                            HideOrDestroy(powerObject, "power");
-                            TryStartPlayerPose(PoseID.Pose_Power, "power");
-                            break;
-
-                        case 1:
-                            HideOrDestroy(yaaObject, "yaa");
-                            TryStartPlayerPose(PoseID.Pose_Yaa, "yaa");
-                            break;
-
-                        case 2:
-                            HideOrDestroy(muscleObject, "muscle");
-                            TryStartPlayerPose(PoseID.Pose_Muscle, "muscle");
-                            break;
-                    }
-
-                    break;
-                }
-
             case "power":
+                Debug.Log("[ActionTrace] VoiceCommandAction branch=power");
+                TryExecutePose(PoseID.Pose_Power);
                 HideOrDestroy(powerObject, "power");
-                TryStartPlayerPose(PoseID.Pose_Power, command);
                 break;
-
             case "yaa":
+                Debug.Log("[ActionTrace] VoiceCommandAction branch=yaa");
+                TryExecutePose(PoseID.Pose_Yaa);
                 HideOrDestroy(yaaObject, "yaa");
-                TryStartPlayerPose(PoseID.Pose_Yaa, command);
                 break;
-
             case "muscle":
+                Debug.Log("[ActionTrace] VoiceCommandAction branch=muscle");
+                TryExecutePose(PoseID.Pose_Muscle);
                 HideOrDestroy(muscleObject, "muscle");
-                TryStartPlayerPose(PoseID.Pose_Muscle, command);
                 break;
-
             default:
-                if (logCommand)
-                {
-                    Debug.LogWarning(
-                        "[Voice] Unknown command: " + command
-                    );
-                }
+                Debug.Log($"[ActionTrace] VoiceCommandAction switch default. command={command}");
                 break;
         }
     }
 
-    private bool TryStartPlayerPose(PoseID poseID, string command)
+    private void TryExecutePose(PoseID poseID)
     {
-        if (!ResolvePlayerPoseController())
+        ResolvePlayerPoseController();
+
+        if (playerPoseController == null)
         {
-            Debug.LogWarning($"[VoiceCommandAction] Player pose skipped. Reason=PlayerPoseContoroller not found. Command={command}");
-            return false;
+            Debug.LogWarning($"[ActionTrace] PlayerPoseContoroller is not assigned. pose={poseID}");
+            return;
         }
 
-        if (InGameFlowLock.IsPresentationPlaying)
-        {
-            Debug.Log($"[VoiceCommandAction] Player pose skipped. Reason=Presentation is playing. Command={command}");
-            return false;
-        }
-
-        if (_playerPoseController.IsPosing)
-        {
-            Debug.Log($"[VoiceCommandAction] Player pose skipped. Reason=Player is already posing. Command={command}");
-            return false;
-        }
-
-        _playerPoseController.TryOnPose(poseID);
-        Debug.Log($"[VoiceCommandAction] Player pose started. Command={command}, Pose={poseID}");
-        return true;
+        Debug.Log($"[ActionTrace] PlayerPoseContoroller.TryOnPose before. pose={poseID}, target={playerPoseController.name}, scene={playerPoseController.gameObject.scene.name}, activeSelf={playerPoseController.gameObject.activeSelf}, activeInHierarchy={playerPoseController.gameObject.activeInHierarchy}, enabled={playerPoseController.enabled}");
+        playerPoseController.TryOnPose(poseID);
+        Debug.Log($"[ActionTrace] PlayerPoseContoroller.TryOnPose after. pose={poseID}");
     }
 
-    private bool ResolvePlayerPoseController()
+    private void ResolvePlayerPoseController()
     {
-        if (_playerPoseController != null)
+        if (playerPoseController != null)
         {
-            return true;
+            return;
         }
 
-        if (_voiceAiContext == null)
+        if (voiceAiContext == null)
         {
-            _voiceAiContext = FindFirstObjectByType<VoiceAiContext>();
+            voiceAiContext = FindFirstObjectByType<VoiceAiContext>();
         }
 
-        PlayerContext playerContext = _voiceAiContext?.GetPlayerContext();
-        _playerPoseController = playerContext?.GetPlayerPoseContoroller;
-
-        if (_playerPoseController == null)
-        {
-            _playerPoseController = FindFirstObjectByType<PlayerPoseContoroller>();
-        }
-
-        return _playerPoseController != null;
+        playerPoseController = voiceAiContext?.GetPlayerContext()?.GetPlayerPoseContoroller;
     }
 
     private static bool IsMenuCommand(string command)
     {
-        return command == "ue" ||
-               command == "sita" ||
-               command == "kettei" ||
-               command == "time";
+        return command == "ue" || command == "sita" || command == "kettei" || command == "time";
+    }
+
+    private static bool IsPoseCommand(string command)
+    {
+        return command == "power" || command == "yaa" || command == "muscle";
+    }
+
+    private bool CanExecutePoseCommand(string command)
+    {
+        GamePhaseManager gamePhaseManager = GamePhaseManager.Instance;
+        PauseManager pauseManager = PauseManager.Instance;
+
+        if ((gamePhaseManager != null && gamePhaseManager.IsInitialized && gamePhaseManager.IsChangingPhase) ||
+            (pauseManager != null && pauseManager.IsApplyingPauseView))
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=SceneTransition");
+            return false;
+        }
+
+        if ((gamePhaseManager != null && gamePhaseManager.IsInitialized && gamePhaseManager.CurrentPhase == GamePhase.Pause) ||
+            (pauseManager != null && pauseManager.IsPaused))
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=Pause");
+            return false;
+        }
+
+        if (gamePhaseManager == null || !gamePhaseManager.IsInitialized)
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=GameStateUnavailable");
+            return false;
+        }
+
+        if (gamePhaseManager.CurrentPhase != GamePhase.InGame)
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=NotInGame phase={gamePhaseManager.CurrentPhase}");
+            return false;
+        }
+
+        ResolvePlayerPoseController();
+        if (playerPoseController == null || !playerPoseController.isActiveAndEnabled)
+        {
+            Debug.Log($"[VoiceCommandBlocked] command={command} reason=PlayerUnavailable");
+            return false;
+        }
+
+        return true;
     }
 
     private void HideOrDestroy(GameObject obj, string label)
@@ -192,47 +176,23 @@ public class VoiceCommandAction : MonoBehaviour
         if (obj == null)
         {
             Debug.LogWarning(label + " target is not assigned.");
+            Debug.LogWarning($"[ActionTrace] HideOrDestroy skipped. label={label}, target=null");
             return;
         }
 
+        Debug.Log($"[ActionTrace] HideOrDestroy target. label={label}, target={obj.name}, scene={obj.scene.name}, activeSelf={obj.activeSelf}, activeInHierarchy={obj.activeInHierarchy}, onlyHide={onlyHide}");
+
         if (onlyHide)
         {
-            if (!obj.activeSelf)
-            {
-                return;
-            }
-
             obj.SetActive(false);
-            StartCoroutine(ShowAfterDelay(obj));
-
-            if (logCommand)
-            {
-                Debug.Log(label + " hidden.");
-            }
+            Debug.Log(label + " hidden.");
+            Debug.Log($"[ActionTrace] HideOrDestroy after hide. label={label}, target={obj.name}, activeSelf={obj.activeSelf}, activeInHierarchy={obj.activeInHierarchy}");
         }
         else
         {
             Destroy(obj);
-
-            if (logCommand)
-            {
-                Debug.Log(label + " destroyed.");
-            }
-        }
-    }
-
-    private IEnumerator ShowAfterDelay(GameObject obj)
-    {
-        yield return new WaitForSeconds(hideTime);
-
-        if (obj != null)
-        {
-            obj.SetActive(true);
-
-            if (logCommand)
-            {
-                Debug.Log(obj.name + " shown.");
-            }
+            Debug.Log(label + " destroyed.");
+            Debug.Log($"[ActionTrace] HideOrDestroy after destroy requested. label={label}, target={obj.name}");
         }
     }
 

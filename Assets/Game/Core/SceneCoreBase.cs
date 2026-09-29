@@ -9,17 +9,32 @@ public abstract class SceneCoreBase : MonoBehaviour
     protected virtual void Start()
     {
         SceneLoader sceneLoader = SceneLoader.Instance;
-        Debug.AssertFormat(sceneLoader != null, "SceneLoader instance is null");
         StartCoroutine(LoadAllScenesCoroutine(sceneLoader));
     }
 
     protected IEnumerator LoadAllScenesCoroutine(SceneLoader sceneLoader)
     {
-        foreach (var sceneName in _loadSceneNames)
+        return LoadAllScenesCoroutine(sceneLoader, _loadSceneNames);
+    }
+
+    protected IEnumerator LoadAllScenesCoroutine(SceneLoader sceneLoader, IEnumerable<string> sceneNames)
+    {
+        if (sceneLoader == null || !sceneLoader.IsInitialized)
         {
-            if (!string.IsNullOrEmpty(sceneName))
+            Debug.LogError($"[{GetType().Name}] SceneLoader is not ready.");
+            yield break;
+        }
+
+        if (sceneNames == null)
+        {
+            yield break;
+        }
+
+        foreach (string sceneName in sceneNames)
+        {
+            if (!string.IsNullOrWhiteSpace(sceneName))
             {
-                yield return StartCoroutine(sceneLoader.LoadAdditiveAsync(sceneName));
+                yield return sceneLoader.LoadAdditiveAsync(sceneName);
                 if (sceneLoader.IsSceneLoaded(sceneName))
                 {
                     Debug.Log($"Loaded scene: {sceneName}");

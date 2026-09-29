@@ -47,11 +47,21 @@ public abstract class AppManagerBase<T> : AppLifetimeSingleton<T>
 
         InitializeState = AppManagerInitializeState.Initializing;
 
-        yield return OnInitialize();
-
-        if (InitializeState != AppManagerInitializeState.Failed)
+        try
         {
-            InitializeState = AppManagerInitializeState.Initialized;
+            yield return OnInitialize();
+
+            if (!IsFailed)
+            {
+                InitializeState = AppManagerInitializeState.Initialized;
+            }
+        }
+        finally
+        {
+            if (IsInitializing)
+            {
+                FailInitialize("Initialization was interrupted before completion.");
+            }
         }
     }
 

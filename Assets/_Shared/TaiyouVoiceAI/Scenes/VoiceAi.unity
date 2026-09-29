@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 58132892}
   - component: {fileID: 58132891}
+  - component: {fileID: 58132893}
   m_Layer: 0
   m_Name: VoiceAiContext
   m_TagString: Untagged
@@ -168,6 +169,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &58132893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58132890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6f43ad397a44af5ab6f1d7e119fc5a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceAIManagerActiveTrace
+  target: {fileID: 62380389}
+  traceName: VoiceAIManager Watcher
 --- !u!1 &62380389
 GameObject:
   m_ObjectHideFlags: 0
@@ -182,6 +197,7 @@ GameObject:
   - component: {fileID: 62380393}
   - component: {fileID: 62380392}
   - component: {fileID: 62380398}
+  - component: {fileID: 62380410}
   m_Layer: 0
   m_Name: VoiceAIManager
   m_TagString: Untagged
@@ -216,7 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 467bbb5e34a1f834fa51766e760bba8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceOnnxRunner
-  modelAsset: {fileID: 5022602860645237092, guid: a33416011209da1468935a76ae9cfecd, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 6ef058133395407bab1f8200e71fa12c, type: 3}
   microphoneInput: {fileID: 62380394}
   featureExtractor: {fileID: 62380396}
   voiceCommandAction: {fileID: 62380393}
@@ -225,9 +241,11 @@ MonoBehaviour:
   logPrediction: 1
   logScores: 1
   useSafetyFilter: 1
-  muscleNoneMargin: 10
-  powerNoneMargin: 10
-  yaaNoneMargin: 10
+  muscleNoneMargin: 2
+  powerNoneMargin: 2
+  yaaNoneMargin: 2
+  minimumTopScore: 1
+  minimumTop2Margin: 1
 --- !u!114 &62380393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,12 +258,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e436a8f5e84b93c438658f58999e665e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceCommandAction
+  voiceAiContext: {fileID: 58132891}
+  playerPoseController: {fileID: 0}
   powerObject: {fileID: 293995663}
   yaaObject: {fileID: 1173539856}
   muscleObject: {fileID: 1790491365}
-  minimumDb: -20
+  minimumDb: -60
   onlyHide: 1
-  hideTime: 2
   logCommand: 1
 --- !u!114 &62380394
 MonoBehaviour:
@@ -274,9 +293,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MfccFeatureExtractor
   sampleRate: 16000
-  fftSize: 256
+  fftSize: 512
   hopLength: 256
-  melFilterCount: 24
+  melFilterCount: 40
   preEmphasis: 0.97
   normalizePerFeature: 1
 --- !u!114 &62380398
@@ -291,7 +310,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6453f4ca88bb50a4181422c0dae7df8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoiceTextRecognizer
-  voiceCommandAction: {fileID: 62380393}
+  enableDebugWindowsRecognition: 0
+--- !u!114 &62380410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62380389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6f43ad397a44af5ab6f1d7e119fc5a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceAIManagerActiveTrace
+  target: {fileID: 0}
+  traceName: VoiceAIManager Self
 --- !u!1 &293995663
 GameObject:
   m_ObjectHideFlags: 0

@@ -42,17 +42,7 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
 
     public void OpenPause()
     {
-        if (!CanStartPauseOperation())
-        {
-            return;
-        }
-
-        if (_isPaused)
-        {
-            return;
-        }
-
-        StartCoroutine(OpenPauseCoroutine());
+        StartCoroutine(OpenPauseAsync());
     }
 
     public IEnumerator OpenPauseAsync()
@@ -67,22 +57,12 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
             yield break;
         }
 
-        yield return OpenPauseCoroutine();
+        yield return StartCoroutine(CoroutineUtility.Run(OpenPauseCoroutine()));
     }
 
     public void ClosePause()
     {
-        if (!CanStartPauseOperation())
-        {
-            return;
-        }
-
-        if (!_isPaused)
-        {
-            return;
-        }
-
-        StartCoroutine(ClosePauseCoroutine());
+        StartCoroutine(ClosePauseAsync());
     }
 
     public IEnumerator ClosePauseAsync()
@@ -97,7 +77,7 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
             yield break;
         }
 
-        yield return ClosePauseCoroutine();
+        yield return StartCoroutine(CoroutineUtility.Run(ClosePauseCoroutine()));
     }
 
     protected override void OnDestroy()
@@ -114,12 +94,12 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (!preloadPauseSceneOnInitialize || !IsInitialized)
+        if (!IsInitialized)
         {
             return;
         }
 
-        if (scene.name == pauseSceneName)
+        if (SceneLookup.Matches(scene, pauseSceneName))
         {
             return;
         }
@@ -132,49 +112,63 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
             RestoreTimeScale();
         }
 
-        if (!IsPauseSceneLoaded())
+        if (preloadPauseSceneOnInitialize && !IsPauseSceneLoaded())
         {
-            StartCoroutine(PreloadPauseSceneAfterSceneLoad());
+            StartCoroutine(CoroutineUtility.Run(PreloadPauseSceneAfterSceneLoad()));
         }
     }
 
     private IEnumerator OpenPauseCoroutine()
     {
         _isTransitioning = true;
-
-        yield return EnsurePauseSceneLoaded("OpenPause");
-
-        if (!IsPauseSceneLoaded())
+        bool changedTimeScale = false;
+        try
         {
-            Debug.LogError($"[PauseManager] OpenPause failed. Reason=Pause scene is not loaded. Scene='{pauseSceneName}'");
-            _isTransitioning = false;
-            yield break;
+            yield return EnsurePauseSceneLoaded("OpenPause");
+
+            if (!IsPauseSceneLoaded())
+            {
+                Debug.LogError($"[PauseManager] OpenPause failed. Reason=Pause scene is not loaded. Scene='{pauseSceneName}'");
+                yield break;
+            }
+
+            _previousTimeScale = Time.timeScale;
+            Time.timeScale = 0f;
+            changedTimeScale = true;
+
+            if (!SetPauseViewActive(true))
+            {
+                yield break;
+            }
+
+            _isPaused = true;
         }
-
-        _previousTimeScale = Time.timeScale;
-        Time.timeScale = 0f;
-
-        if (!SetPauseViewActive(true))
+        finally
         {
-            RestoreTimeScale();
-            _isTransitioning = false;
-            yield break;
-        }
+            if (changedTimeScale && !_isPaused)
+            {
+                RestoreTimeScale();
+            }
 
-        _isPaused = true;
-        _isTransitioning = false;
+            _isTransitioning = false;
+        }
     }
 
     private IEnumerator ClosePauseCoroutine()
     {
         _isTransitioning = true;
+        try
+        {
+            SetPauseViewActive(false);
+            RestoreTimeScale();
 
-        SetPauseViewActive(false);
-        RestoreTimeScale();
-
-        _isPaused = false;
-        _isTransitioning = false;
-        yield break;
+            _isPaused = false;
+            yield break;
+        }
+        finally
+        {
+            _isTransitioning = false;
+        }
     }
 
     private IEnumerator EnsurePauseSceneLoaded(string operationName)
@@ -191,7 +185,7 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
             yield break;
         }
 
-        yield return StartCoroutine(sceneLoader.LoadAdditiveAsync(pauseSceneName));
+        yield return sceneLoader.LoadAdditiveAsync(pauseSceneName);
 
         if (!IsPauseSceneLoaded())
         {
@@ -207,22 +201,36 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
         }
 
         _isPreloading = true;
-
-        yield return EnsurePauseSceneLoaded("Preload");
-
-        if (IsPauseSceneLoaded())
+        try
         {
-            SetPauseViewActive(false);
-        }
+            yield return EnsurePauseSceneLoaded("Preload");
 
-        _isPreloading = false;
+            if (IsPauseSceneLoaded() && !_isPaused && !_isTransitioning)
+            {
+                SetPauseViewActive(false);
+            }
+        }
+        finally
+        {
+            _isPreloading = false;
+        }
     }
 
     private bool SetPauseViewActive(bool active)
     {
+        if (!active)
+        {
+            SetPauseSceneCamerasEnabled(false);
+        }
+
         if (!TryResolvePauseMenuController(out VoiceMainMenuController controller))
         {
             return false;
+        }
+
+        if (active)
+        {
+            SetPauseSceneCamerasEnabled(true);
         }
 
         _isApplyingPauseView = true;
@@ -246,6 +254,24 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
         return true;
     }
 
+    private void SetPauseSceneCamerasEnabled(bool enabled)
+    {
+        Scene pauseScene = SceneManager.GetSceneByName(pauseSceneName);
+        if (!pauseScene.IsValid() || !pauseScene.isLoaded)
+        {
+            return;
+        }
+
+        foreach (GameObject root in pauseScene.GetRootGameObjects())
+        {
+            Camera[] cameras = root.GetComponentsInChildren<Camera>(true);
+            foreach (Camera camera in cameras)
+            {
+                camera.enabled = enabled;
+            }
+        }
+    }
+
     private bool TryResolvePauseMenuController(out VoiceMainMenuController controller)
     {
         if (_pauseMenuController != null)
@@ -254,7 +280,7 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
             return true;
         }
 
-        Scene pauseScene = SceneManager.GetSceneByName(pauseSceneName);
+        Scene pauseScene = SceneLookup.Find(pauseSceneName);
         if (!pauseScene.IsValid() || !pauseScene.isLoaded)
         {
             Debug.LogError($"[PauseManager] Pause view operation failed. Reason=Pause scene is not loaded. Scene='{pauseSceneName}'");
@@ -302,7 +328,7 @@ public sealed class PauseManager : AppManagerBase<PauseManager>
 
     private bool IsPauseSceneLoaded()
     {
-        Scene scene = SceneManager.GetSceneByName(pauseSceneName);
+        Scene scene = SceneLookup.Find(pauseSceneName);
         return scene.IsValid() && scene.isLoaded;
     }
 

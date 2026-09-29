@@ -33,13 +33,13 @@ namespace AudienceRequest
 
         public int GetCount(PoseID poseID)
         {
-            var request = _requests.Find(r => r.poseID == poseID);
+            AudienceRequestEntry request = FindRequest(poseID);
             return request != null ? request.count : 0;
         }
 
         public void AddCount(PoseID poseID)
         {
-            var request = _requests.Find(r => r.poseID == poseID);
+            AudienceRequestEntry request = FindRequest(poseID);
             if (request != null)
             {
                 request.count++;
@@ -48,7 +48,7 @@ namespace AudienceRequest
 
         public void ClearCount(PoseID poseID)
         {
-            var request = _requests.Find(r => r.poseID == poseID);
+            AudienceRequestEntry request = FindRequest(poseID);
             if (request != null)
             {
                 request.count = 0;
@@ -59,8 +59,29 @@ namespace AudienceRequest
         {
             foreach (var request in _requests)
             {
-                request.count = 0;
+                if (request != null)
+                {
+                    request.count = 0;
+                }
             }
+        }
+
+        public bool Contains(PoseID poseID)
+        {
+            return FindRequest(poseID) != null;
+        }
+
+        private AudienceRequestEntry FindRequest(PoseID poseID)
+        {
+            foreach (AudienceRequestEntry request in _requests)
+            {
+                if (request != null && request.poseID == poseID)
+                {
+                    return request;
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -232,21 +232,8 @@ namespace Enemy
                 return _pendingNewEnemy;
             }
 
-            if (!IsSlotWithinCapacity(slot))
+            if (!CanReplaceEnemy(slot, enemyData))
             {
-                Debug.LogWarning($"[EnemyLineupManager] BeginEnemyReplacement skipped. Reason=Slot exceeds capacity. Slot={slot}, MaxEnemyCount={MaxEnemyCount}");
-                return null;
-            }
-
-            if (enemyData == null)
-            {
-                Debug.LogWarning("[EnemyLineupManager] BeginEnemyReplacement skipped. Reason=EnemyData is null.");
-                return null;
-            }
-
-            if (_enemyGenerator == null)
-            {
-                Debug.LogWarning("[EnemyLineupManager] BeginEnemyReplacement skipped. Reason=EnemyGenerator is null.");
                 return null;
             }
 
@@ -280,26 +267,13 @@ namespace Enemy
             Enemy oldEnemy = _pendingOldEnemy;
             Enemy newEnemy = _pendingNewEnemy;
 
-            if (oldEnemy != null)
+            if (newEnemy == null)
             {
-                _forwardProgressMover?.UnregisterMoveTarget(oldEnemy.transform);
-                Destroy(oldEnemy.gameObject);
+                ClearPendingReplacement();
+                return null;
             }
 
-            SetEnemy(slot, null);
-
-            if (newEnemy != null)
-            {
-                newEnemy.name = slot.ToString();
-                SetEnemy(slot, newEnemy);
-                _forwardProgressMover?.RegisterMoveTarget(newEnemy.transform);
-            }
-
-            if (_resetScoreOnReplace)
-            {
-                _scoreManager?.ResetEnemyScore(slot);
-            }
-
+            ApplyReplacement(slot, oldEnemy, newEnemy);
             ClearPendingReplacement();
             Debug.Log($"[EnemyLineupManager] Committed enemy replacement. Slot={slot}, Enemy={(newEnemy != null ? newEnemy.name : "null")}");
             return newEnemy;
@@ -326,21 +300,8 @@ namespace Enemy
             ResolveReferences();
             ResolveSlotEnemies();
 
-            if (!IsSlotWithinCapacity(slot))
+            if (!CanReplaceEnemy(slot, enemyData))
             {
-                Debug.LogWarning($"[EnemyLineupManager] ReplaceEnemy skipped. Reason=Slot exceeds capacity. Slot={slot}, MaxEnemyCount={MaxEnemyCount}");
-                return null;
-            }
-
-            if (enemyData == null)
-            {
-                Debug.LogWarning("[EnemyLineupManager] ReplaceEnemy skipped. Reason=EnemyData is null.");
-                return null;
-            }
-
-            if (_enemyGenerator == null)
-            {
-                Debug.LogWarning("[EnemyLineupManager] ReplaceEnemy skipped. Reason=EnemyGenerator is null.");
                 return null;
             }
 
@@ -356,21 +317,8 @@ namespace Enemy
             ResolveReferences();
             ResolveSlotEnemies();
 
-            if (!IsSlotWithinCapacity(slot))
+            if (!CanReplaceEnemy(slot, enemyData))
             {
-                Debug.LogWarning($"[EnemyLineupManager] ReplaceEnemy skipped. Reason=Slot exceeds capacity. Slot={slot}, MaxEnemyCount={MaxEnemyCount}");
-                return null;
-            }
-
-            if (enemyData == null)
-            {
-                Debug.LogWarning("[EnemyLineupManager] ReplaceEnemy skipped. Reason=EnemyData is null.");
-                return null;
-            }
-
-            if (_enemyGenerator == null)
-            {
-                Debug.LogWarning("[EnemyLineupManager] ReplaceEnemy skipped. Reason=EnemyGenerator is null.");
                 return null;
             }
 
@@ -393,9 +341,10 @@ namespace Enemy
                 return null;
             }
 
+            string slotName = slot.ToString();
             foreach (Enemy enemy in _enemyRegistry.Enemies)
             {
-                if (enemy == null || enemy.name != slot.ToString())
+                if (enemy == null || enemy.name != slotName)
                 {
                     continue;
                 }
@@ -444,13 +393,6 @@ namespace Enemy
 
         private Enemy ReplaceEnemyInternal(EnemySlotId slot, EnemyData enemyData, Vector3 position, Quaternion rotation, Enemy oldEnemy)
         {
-            if (oldEnemy != null)
-            {
-                _forwardProgressMover?.UnregisterMoveTarget(oldEnemy.transform);
-                Destroy(oldEnemy.gameObject);
-                SetEnemy(slot, null);
-            }
-
             Enemy newEnemy = _enemyGenerator.Generate(enemyData, slot, position, rotation);
             if (newEnemy == null)
             {
@@ -458,6 +400,38 @@ namespace Enemy
                 return null;
             }
 
+            ApplyReplacement(slot, oldEnemy, newEnemy);
+            Debug.Log($"[EnemyLineupManager] Replaced enemy. Slot={slot}, Enemy={newEnemy.name}");
+            return newEnemy;
+        }
+
+        private bool CanReplaceEnemy(EnemySlotId slot, EnemyData enemyData)
+        {
+            if (!IsSlotWithinCapacity(slot))
+            {
+                Debug.LogWarning($"[EnemyLineupManager] Replacement skipped. Slot={slot}, MaxEnemyCount={MaxEnemyCount}");
+                return false;
+            }
+
+            if (enemyData == null || _enemyGenerator == null)
+            {
+                Debug.LogWarning("[EnemyLineupManager] Replacement skipped. EnemyData or EnemyGenerator is missing.");
+                return false;
+            }
+
+            return true;
+        }
+
+        // 生成成功後にだけ旧Enemyを解放し、枠・移動対象・スコアを更新する。
+        private void ApplyReplacement(EnemySlotId slot, Enemy oldEnemy, Enemy newEnemy)
+        {
+            if (oldEnemy != null)
+            {
+                _forwardProgressMover?.UnregisterMoveTarget(oldEnemy.transform);
+                Destroy(oldEnemy.gameObject);
+            }
+
+            newEnemy.name = slot.ToString();
             SetEnemy(slot, newEnemy);
             _forwardProgressMover?.RegisterMoveTarget(newEnemy.transform);
 
@@ -465,9 +439,6 @@ namespace Enemy
             {
                 _scoreManager?.ResetEnemyScore(slot);
             }
-
-            Debug.Log($"[EnemyLineupManager] Replaced enemy. Slot={slot}, Enemy={newEnemy.name}");
-            return newEnemy;
         }
 
         private Enemy GetAssignedEnemy(EnemySlotId slot)
@@ -516,6 +487,7 @@ namespace Enemy
         private void ClearPendingReplacement()
         {
             _hasPendingReplacement = false;
+            _pendingReplacementSlot = default;
             _pendingOldEnemy = null;
             _pendingNewEnemy = null;
         }

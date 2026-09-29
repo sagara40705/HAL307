@@ -21,6 +21,12 @@ namespace AudienceRequest
 
         private void Start()
         {
+            if (_context == null || _requestSystem == null)
+            {
+                Debug.LogWarning("[AudienceRequestJudge] Context or request system is not assigned.");
+                return;
+            }
+
             // PlayerPoseControllerを取得
             _playerPoseController = _context.GetPlayerContext()?.GetPlayerPoseContoroller;
             if (_playerPoseController != null)
@@ -70,20 +76,18 @@ namespace AudienceRequest
 
         private void OnPlayerPoseStart(Pose.PoseID poseID)
         {
-            int requestCount =
-                _requestSystem.GetRequestCount(poseID);
-
-            if (requestCount <= 0)
+            if (!JudgeRequest(poseID, true))
             {
                 return;
             }
 
-            // リクエストを消す
-            JudgeRequest(poseID, true);
-
-            // テキストアニメーション
-            _textAnimationController
-                ?.PlayVoiceClearAnimation(poseID);
+            // FinalPose中はWaveFinal以外のUI演出を表示しない
+            if (_waveGaugeController == null ||
+                !_waveGaugeController.IsFinalPoseVisible)
+            {
+                _textAnimationController
+                    ?.PlayVoiceClearAnimation(poseID);
+            }
 
             // FinalPose中なら、その場でWave終了判定を発火
             _waveGaugeController
@@ -97,11 +101,9 @@ namespace AudienceRequest
         }
 
         // 共通判定ロジック
-        public bool JudgeRequest(Pose.PoseID poseID,bool isPlayer, Enemy.Enemy enemy = null)
+        public bool JudgeRequest(Pose.PoseID poseID, bool isPlayer, Enemy.Enemy enemy = null)
         {
-            int requestCount = _requestSystem.GetRequestCount(poseID);
-
-            if (requestCount <= 0)
+            if (_requestSystem == null || _requestSystem.GetRequestCount(poseID) <= 0)
             {
                 return false;
             }

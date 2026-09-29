@@ -43,32 +43,17 @@ namespace AudienceRequest
 
         public PoseID GetRandomBlackPoseFromCandidates(List<PoseID> candidates)
         {
-            List<RequestSpawnWeight> filteredWeights = new();
-
-            foreach (RequestSpawnWeight weight in _blackRequestWeights)
-            {
-                if (weight == null)
-                {
-                    continue;
-                }
-
-                if (!weight.IsEnabled)
-                {
-                    continue;
-                }
-
-                if (!candidates.Contains(weight.PoseID))
-                {
-                    continue;
-                }
-
-                filteredWeights.Add(weight);
-            }
-
-            return GetWeightedRandomPose(filteredWeights);
+            return candidates == null ? PoseID.None : GetWeightedRandomPose(_blackRequestWeights, candidates);
         }
 
-        private PoseID GetWeightedRandomPose(IReadOnlyList<RequestSpawnWeight> weights)
+        public PoseID GetRandomNormalPoseFromCandidates(List<PoseID> candidates)
+        {
+            return candidates == null ? PoseID.None : GetWeightedRandomPose(_normalRequestWeights, candidates);
+        }
+
+        private static PoseID GetWeightedRandomPose(
+            IReadOnlyList<RequestSpawnWeight> weights,
+            List<PoseID> candidates = null)
         {
             if (weights == null || weights.Count == 0)
             {
@@ -79,17 +64,7 @@ namespace AudienceRequest
 
             foreach (RequestSpawnWeight weight in weights)
             {
-                if (weight == null)
-                {
-                    continue;
-                }
-
-                if (!weight.IsEnabled)
-                {
-                    continue;
-                }
-
-                if (weight.Weight <= 0)
+                if (!IsEligible(weight, candidates))
                 {
                     continue;
                 }
@@ -107,17 +82,7 @@ namespace AudienceRequest
 
             foreach (RequestSpawnWeight weight in weights)
             {
-                if (weight == null)
-                {
-                    continue;
-                }
-
-                if (!weight.IsEnabled)
-                {
-                    continue;
-                }
-
-                if (weight.Weight <= 0)
+                if (!IsEligible(weight, candidates))
                 {
                     continue;
                 }
@@ -131,6 +96,12 @@ namespace AudienceRequest
             }
 
             return PoseID.None;
+        }
+
+        private static bool IsEligible(RequestSpawnWeight weight, List<PoseID> candidates)
+        {
+            return weight != null && weight.IsEnabled && weight.Weight > 0 &&
+                   (candidates == null || candidates.Contains(weight.PoseID));
         }
     }
 

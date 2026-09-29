@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
-using static Sound.Manager.SoundManager;
 
 public class VoiceMainMenuController : MonoBehaviour
 {
@@ -35,8 +34,14 @@ public class VoiceMainMenuController : MonoBehaviour
     [SerializeField] private Key upKey2 = Key.W;
     [SerializeField] private Key downKey = Key.DownArrow;
     [SerializeField] private Key downKey2 = Key.S;
+    [SerializeField] private Key leftKey = Key.LeftArrow;
+    [SerializeField] private Key rightKey = Key.RightArrow;
     [SerializeField] private Key decideKey = Key.Enter;
     [SerializeField] private Key decideKey2 = Key.Space;
+
+    [Header("Left / Right Actions")]
+    [SerializeField] private UnityEvent[] onLeftEvents;
+    [SerializeField] private UnityEvent[] onRightEvents;
 
     [Header("Debug Time Rule")]
     [SerializeField] private bool requireOpenBeforeControl = true;
@@ -57,53 +62,55 @@ public class VoiceMainMenuController : MonoBehaviour
 
     private void Update()
     {
+        if (!enableDebugKeyInput)
+        {
+            return;
+        }
+
         if (Keyboard.current == null)
         {
             return;
         }
 
-        if (enableDebugKeyInput && WasPressed(openMenuKey))
+        if (WasPressed(openMenuKey))
         {
             OpenMenu();
         }
 
-        if (enableDebugKeyInput && WasPressed(closeMenuKey))
+        if (WasPressed(closeMenuKey))
         {
             CloseMenu();
         }
 
-        if (requireOpenBeforeControl && !IsMenuControlAvailable())
+        if (requireOpenBeforeControl && !isMenuOpen)
         {
             return;
         }
 
-        bool moveUp = Keyboard.current.upArrowKey.wasPressedThisFrame;
-        bool moveDown = Keyboard.current.downArrowKey.wasPressedThisFrame;
-
-        if (enableDebugKeyInput)
-        {
-            moveUp |= WasPressed(upKey) || WasPressed(upKey2);
-            moveDown |= WasPressed(downKey) || WasPressed(downKey2);
-        }
-
-        if (moveUp)
+        if (WasPressed(upKey) || WasPressed(upKey2))
         {
             MoveUp();
         }
-        else if (moveDown)
+
+        if (WasPressed(downKey) || WasPressed(downKey2))
         {
             MoveDown();
         }
 
-        if (enableDebugKeyInput && (WasPressed(decideKey) || WasPressed(decideKey2)))
+        if (WasPressed(leftKey))
+        {
+            MoveLeft();
+        }
+
+        if (WasPressed(rightKey))
+        {
+            MoveRight();
+        }
+
+        if (WasPressed(decideKey) || WasPressed(decideKey2))
         {
             Decide();
         }
-    }
-
-    private bool IsMenuControlAvailable()
-    {
-        return menuPanel != null ? menuPanel.activeInHierarchy : isMenuOpen;
     }
 
     private bool WasPressed(Key key)
@@ -128,41 +135,88 @@ public class VoiceMainMenuController : MonoBehaviour
     /// </summary>
     public void OnVoiceCommand(string command)
     {
+        Debug.Log($"[MenuVoiceTrace] VoiceMainMenuController.OnVoiceCommand entered. command={command}, isMenuOpen={isMenuOpen}, requireOpenBeforeControl={requireOpenBeforeControl}, object={name}, scene={gameObject.scene.name}, activeSelf={gameObject.activeSelf}, activeInHierarchy={gameObject.activeInHierarchy}, enabled={enabled}");
+
         if (string.IsNullOrWhiteSpace(command))
         {
+            Debug.Log("[MenuVoiceTrace] VoiceMainMenuController.OnVoiceCommand return. reason=empty command");
             return;
         }
 
         command = command.Trim().ToLowerInvariant();
+        Debug.Log($"[MenuVoiceTrace] VoiceMainMenuController.OnVoiceCommand normalized command={command}");
 
         switch (command)
         {
             case "time":
+                Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=time -> OpenMenu");
                 OpenMenu();
                 break;
 
             case "ue":
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=ue -> MoveUp");
                     MoveUp();
-//                    Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.MoveCursorSE);
+                }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=ue skipped. reason=menu not open");
                 }
                 break;
 
             case "sita":
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=sita -> MoveDown");
                     MoveDown();
-//                    Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.MoveCursorSE);
+                }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=sita skipped. reason=menu not open");
+                }
+                break;
+
+            case "hidari":
+                if (!requireOpenBeforeControl || isMenuOpen)
+                {
+                    Debug.Log("[Menu Voice] hidari -> MoveLeft");
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=hidari -> MoveLeft");
+                    MoveLeft();
+                }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=hidari skipped. reason=menu not open");
+                }
+                break;
+
+            case "migi":
+                if (!requireOpenBeforeControl || isMenuOpen)
+                {
+                    Debug.Log("[Menu Voice] migi -> MoveRight");
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=migi -> MoveRight");
+                    MoveRight();
+                }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=migi skipped. reason=menu not open");
                 }
                 break;
 
             case "kettei":
                 if (!requireOpenBeforeControl || isMenuOpen)
                 {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=kettei -> Decide");
                     Decide();
-//                    Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.DecideSE);
                 }
+                else
+                {
+                    Debug.Log("[MenuVoiceTrace] VoiceMainMenuController command=kettei skipped. reason=menu not open");
+                }
+                break;
+
+            default:
+                Debug.Log($"[MenuVoiceTrace] VoiceMainMenuController command unsupported. command={command}");
                 break;
         }
     }
@@ -288,8 +342,6 @@ public class VoiceMainMenuController : MonoBehaviour
 
         UpdateSelection();
         Debug.Log("[VoiceMenuController] 上へ移動: " + currentIndex);
-
-        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.MoveCursorSE);
     }
 
     public void MoveDown()
@@ -308,8 +360,22 @@ public class VoiceMainMenuController : MonoBehaviour
 
         UpdateSelection();
         Debug.Log("[VoiceMenuController] 下へ移動: " + currentIndex);
+    }
 
-        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.MoveCursorSE);
+    public void MoveLeft()
+    {
+        if (!TryInvokeDirectionalEvent(onLeftEvents, "left"))
+        {
+            Debug.Log($"[VoiceMenuController] 左操作は現在の項目では未設定です: {currentIndex}");
+        }
+    }
+
+    public void MoveRight()
+    {
+        if (!TryInvokeDirectionalEvent(onRightEvents, "right"))
+        {
+            Debug.Log($"[VoiceMenuController] 右操作は現在の項目では未設定です: {currentIndex}");
+        }
     }
 
     public void Decide()
@@ -337,8 +403,19 @@ public class VoiceMainMenuController : MonoBehaviour
         }
 
         onDecideEvents[currentIndex]?.Invoke();
+    }
 
-        Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.DecideSE);
+    private bool TryInvokeDirectionalEvent(UnityEvent[] events, string direction)
+    {
+        if (events == null || currentIndex < 0 || currentIndex >= events.Length || events[currentIndex] == null)
+        {
+            Debug.Log($"[MenuVoiceTrace] Directional event skipped. direction={direction}, index={currentIndex}, reason=not assigned");
+            return false;
+        }
+
+        Debug.Log($"[MenuVoiceTrace] Directional event invoked. direction={direction}, index={currentIndex}");
+        events[currentIndex].Invoke();
+        return true;
     }
 
     private void UpdateSelection()

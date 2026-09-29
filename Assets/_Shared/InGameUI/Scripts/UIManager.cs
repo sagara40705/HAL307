@@ -7,6 +7,8 @@ public class UIManager : MonoBehaviour
     // シングルトンのインスタンス
     public static UIManager Instance;
 
+    private ScoreManager _scoreManager;
+
     //== UI要素の参照 ==//
     [Header("画面パネル")]
     public GameObject gamePanel;   // ゲームUI
@@ -27,8 +29,13 @@ public class UIManager : MonoBehaviour
     // シングルトンの初期化
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -36,9 +43,10 @@ public class UIManager : MonoBehaviour
     {
         ShowGameScreen();
 
-        if (ScoreManager.Instance != null)
+        _scoreManager = ScoreManager.Instance;
+        if (_scoreManager != null)
         {
-            ScoreManager.Instance.OnScoreChanged += UpdateScoreUI;
+            _scoreManager.OnScoreChanged += UpdateScoreUI;
         }
 
         UpdateScoreUI(); // 初期表示
@@ -46,24 +54,29 @@ public class UIManager : MonoBehaviour
     private void OnDestroy()
     {
         // オブジェクトが破棄されるときはイベントを解除する（メモリリーク防止）
-        if (ScoreManager.Instance != null)
+        if (_scoreManager != null)
         {
-            ScoreManager.Instance.OnScoreChanged -= UpdateScoreUI;
+            _scoreManager.OnScoreChanged -= UpdateScoreUI;
+        }
+
+        if (Instance == this)
+        {
+            Instance = null;
         }
     }
 
     private void UpdateScoreUI()
     {
-        if (ScoreManager.Instance == null) return;
+        if (_scoreManager == null) return;
 
         if (playerScoreText != null)
-            playerScoreText.text = ScoreManager.Instance.PlayerScore.ToString();
+            playerScoreText.text = _scoreManager.PlayerScore.ToString();
 
         if (enemy1ScoreText != null)
-            enemy1ScoreText.text = ScoreManager.Instance.Enemy1Score.ToString();
+            enemy1ScoreText.text = _scoreManager.Enemy1Score.ToString();
 
         if (enemy2ScoreText != null)
-            enemy2ScoreText.text = ScoreManager.Instance.Enemy2Score.ToString();
+            enemy2ScoreText.text = _scoreManager.Enemy2Score.ToString();
     }
 
     //== 画面切り替えのメソッド ==//

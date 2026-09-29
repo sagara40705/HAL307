@@ -81,9 +81,13 @@ namespace AudienceRequest
                 return;
             }
 
-            // テキストアニメーション
-            _textAnimationController
-                ?.PlayVoiceClearAnimation(poseID);
+            // FinalPose中はWaveFinal以外のUI演出を表示しない
+            if (_waveGaugeController == null ||
+                !_waveGaugeController.IsFinalPoseVisible)
+            {
+                _textAnimationController
+                    ?.PlayVoiceClearAnimation(poseID);
+            }
 
             // FinalPose中なら、その場でWave終了判定を発火
             _waveGaugeController

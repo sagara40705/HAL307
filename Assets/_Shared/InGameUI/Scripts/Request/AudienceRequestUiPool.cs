@@ -14,6 +14,7 @@ namespace AudienceRequest
 
         [SerializeField] private RectTransform _uiParent; // UIの親オブジェクト
         [SerializeField] private List<GameObject> _uiPrefabs = new(); // UIプレハブのリスト
+        private WaveGaugeController _waveGaugeController;
 
         [Header("ランダム配置設定")]
         [SerializeField] private Vector2 _spawnAreaMin = new Vector2(50f, 50f); // ランダム配置の最小座標
@@ -66,6 +67,8 @@ namespace AudienceRequest
         // 
         private void Awake()
         {
+            _waveGaugeController = FindFirstObjectByType<WaveGaugeController>();
+
             // スプライト変換テーブルを構築
             BuildSpriteLookup();
 
@@ -502,6 +505,11 @@ namespace AudienceRequest
 
         public GameObject GenerateInArea(PoseID pose, Vector2 areaMin, Vector2 areaMax)
         {
+            if (!CanGenerateUi())
+            {
+                return null;
+            }
+
             if (!IsValidPose(pose))
             {
                 Debug.LogError($"Invalid audience request pose: {pose}");
@@ -571,6 +579,11 @@ namespace AudienceRequest
 
         public GameObject GenerateBlack(PoseID pose)
         {
+            if (!CanGenerateUi())
+            {
+                return null;
+            }
+
             if (!IsValidPose(pose))
             {
                 Debug.LogError($"Invalid black audience request pose: {pose}");
@@ -653,6 +666,11 @@ namespace AudienceRequest
          Vector3 effectScale,
          bool showInFront)
         {
+            if (IsFinalPoseActive())
+            {
+                return;
+            }
+
             if (effectPrefab == null || target == null || _uiParent == null)
             {
                 return;
@@ -733,6 +751,11 @@ namespace AudienceRequest
 
         private bool CanGenerateUi()
         {
+            if (IsFinalPoseActive())
+            {
+                return false;
+            }
+
             if (_uiParent == null)
             {
                 Debug.LogWarning(
@@ -743,6 +766,18 @@ namespace AudienceRequest
             }
 
             return _uiParent.gameObject.activeInHierarchy;
+        }
+
+        private bool IsFinalPoseActive()
+        {
+            if (_waveGaugeController == null)
+            {
+                _waveGaugeController =
+                    FindFirstObjectByType<WaveGaugeController>();
+            }
+
+            return _waveGaugeController != null &&
+                   _waveGaugeController.IsFinalPoseVisible;
         }
     }
 }

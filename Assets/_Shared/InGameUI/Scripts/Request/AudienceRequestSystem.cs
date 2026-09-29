@@ -108,6 +108,9 @@ namespace AudienceRequest
                 return;
             }
 
+            // FinalPose中は新しいUIを生成しない
+            if (IsFinalPoseActive()) { return; }
+
             if (InGameFlowLock.IsPresentationPlaying) { return; }
 
             // リクエストが満杯の場合は新しいリクエストを生成しない
@@ -180,38 +183,40 @@ namespace AudienceRequest
                 return;
             }
 
-            bool blockScoreReward = IsScoreRewardBlocked();
+            bool isFinalPoseActive = IsFinalPoseActive();
 
             if (isPlayer)
             {
-                // フィーバー加算は今まで通り行う
-                _feverGaugeController?.AddFill();
-
-                // FinalPose中でなければスコアを加算
-                if (!blockScoreReward &&
-                    ScoreManager.Instance != null)
+                // FinalPose中はスコア、フィーバー、UI演出を更新しない
+                if (!isFinalPoseActive)
                 {
-                    bool isFever =_feverGaugeController != null &&_feverGaugeController.IsFever;
+                    _feverGaugeController?.AddFill();
 
-                    ScoreManager.Instance.AddPlayerScore(value,isFever);
+                    if (ScoreManager.Instance != null)
+                    {
+                        bool isFever = _feverGaugeController != null && _feverGaugeController.IsFever;
+                        ScoreManager.Instance.AddPlayerScore(value, isFever);
+                    }
                 }
             }
             else
             {
                 // FinalPose中でなければ敵スコアを加算
-                if (!blockScoreReward &&ScoreManager.Instance != null && enemy != null)
+                if (!isFinalPoseActive && ScoreManager.Instance != null && enemy != null)
                 {
-                    ScoreManager.Instance.AddEnemyScore(value,enemy.name);
+                    ScoreManager.Instance.AddEnemyScore(value, enemy.name);
                 }
             }
 
-            if (blockScoreReward)
+            if (isFinalPoseActive)
             {
                 Debug.Log(
                     $"[AudienceRequestSystem] " +
-                    $"Score reward skipped during FinalPose. " +
+                    $"Reward and UI presentation skipped during FinalPose. " +
                     $"Pose={poseID}, IsPlayer={isPlayer}, Count={value}"
                 );
+
+                return;
             }
 
             // ハート化や消去演出は実行する
@@ -221,6 +226,7 @@ namespace AudienceRequest
         // リクエスト発生関数
         private void GenerateRequest()
         {
+            if (IsFinalPoseActive()) { return; }
             if (InGameFlowLock.IsPresentationPlaying) { return; }
 
             if (FullRequest() || _audienceRequests == null || _uiPool == null) { return; }
@@ -547,7 +553,7 @@ namespace AudienceRequest
             return poseID;
         }
 
-        private bool IsScoreRewardBlocked()
+        private bool IsFinalPoseActive()
         {
             if (_waveGaugeController == null)
             {

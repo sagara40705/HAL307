@@ -1,0 +1,13 @@
+key,expected,wav,unity_top1,logit_muscle,logit_none,logit_power,logit_yaa
+muscle_0002,muscle,C:\HAL\python\voice_ai_project\dataset_v2\muscle\0002.wav,muscle,10.0144892,-0.743931353,-4.73457146,-7.73288727
+muscle_0003,muscle,C:\HAL\python\voice_ai_project\dataset_v2\muscle\0003.wav,muscle,8.028496,1.27510357,-3.91155958,-8.014094
+muscle_0015,muscle,C:\HAL\python\voice_ai_project\dataset_v2\muscle\0015.wav,muscle,5.45714045,0.969874,-2.83450365,-5.54240227
+none_0001,none,C:\HAL\python\voice_ai_project\dataset_v2\none\0001.wav,none,-3.001956,7.2573576,-2.33646917,-3.00611663
+none_0005,none,C:\HAL\python\voice_ai_project\dataset_v2\none\0005.wav,none,-1.86165535,7.62730455,-2.99521613,-3.62440681
+none_0012,none,C:\HAL\python\voice_ai_project\dataset_v2\none\0012.wav,none,-1.66076016,5.88012934,-2.1769762,-3.471743
+power_0008,power,C:\HAL\python\voice_ai_project\dataset_v2\power\0008.wav,power,-6.402697,-2.6801064,5.33103466,-0.585849
+power_0019,power,C:\HAL\python\voice_ai_project\dataset_v2\power\0019.wav,power,-4.7383337,-1.19868267,5.81206131,-3.02167821
+power_0021,power,C:\HAL\python\voice_ai_project\dataset_v2\power\0021.wav,power,-7.9773736,-6.008965,8.41507,-0.111868024
+yaa_0001,yaa,C:\HAL\python\voice_ai_project\dataset_v2\yaa\0001.wav,yaa,-8.224827,-2.21561265,0.107020222,4.890154
+yaa_0002,yaa,C:\HAL\python\voice_ai_project\dataset_v2\yaa\0002.wav,yaa,-6.13321829,0.00821626652,-0.139967486,2.08408737
+yaa_0004,yaa,C:\HAL\python\voice_ai_project\dataset_v2\yaa\0004.wav,power,-11.19294,-0.2116128,4.40672445,1.81765747

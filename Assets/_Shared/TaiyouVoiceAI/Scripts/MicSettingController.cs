@@ -40,6 +40,7 @@ public class MicSettingController : MonoBehaviour
 
     [SerializeField] private float minThreshold = 0.005f;
     [SerializeField] private float maxThreshold = 0.08f;
+    [SerializeField] private bool applyThresholdToVoiceRunner = false;
 
     [Header("Input")]
     [SerializeField] private Key upKey = Key.UpArrow;
@@ -238,12 +239,12 @@ public class MicSettingController : MonoBehaviour
         float t = sensitivity / 100f;
         float threshold = Mathf.Lerp(maxThreshold, minThreshold, t);
 
-        if (voiceRunner != null)
+        if (applyThresholdToVoiceRunner && voiceRunner != null)
         {
             voiceRunner.SetMinVolumeThreshold(threshold);
         }
 
-        Debug.Log($"マイク感度: {sensitivity} / threshold: {threshold:F4}");
+        Debug.Log($"マイク感度: {sensitivity} / threshold: {threshold:F4} / applyToVoiceRunner={applyThresholdToVoiceRunner}");
     }
 
     private void UpdateVolumeMeter()

@@ -1,0 +1,67 @@
+[
+  {
+    "key": "muscle_001",
+    "label": "muscle",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\muscle\\001.wav"
+  },
+  {
+    "key": "muscle_025",
+    "label": "muscle",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\muscle\\025.wav"
+  },
+  {
+    "key": "muscle_050",
+    "label": "muscle",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\muscle\\050.wav"
+  },
+  {
+    "key": "none_001",
+    "label": "none",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\none\\001.wav"
+  },
+  {
+    "key": "none_025",
+    "label": "none",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\none\\025.wav"
+  },
+  {
+    "key": "none_050",
+    "label": "none",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\none\\050.wav"
+  },
+  {
+    "key": "power_001",
+    "label": "power",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\power\\001.wav"
+  },
+  {
+    "key": "power_025",
+    "label": "power",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\power\\025.wav"
+  },
+  {
+    "key": "power_050",
+    "label": "power",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\power\\050.wav"
+  },
+  {
+    "key": "yaa_001",
+    "label": "yaa",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\yaa\\001.wav"
+  },
+  {
+    "key": "yaa_025",
+    "label": "yaa",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\yaa\\025.wav"
+  },
+  {
+    "key": "yaa_050",
+    "label": "yaa",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\yaa\\050.wav"
+  },
+  {
+    "key": "power_036",
+    "label": "power",
+    "wav": "C:\\HAL\\python\\voice_ai_project\\dataset\\power\\036.wav"
+  }
+]

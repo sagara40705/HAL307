@@ -119,15 +119,36 @@ namespace Player
 
         public void TryOnPose(PoseID poseID)
         {
+            Debug.Log(
+                $"[PoseTrace] TryOnPose entered. " +
+                $"pose={poseID}, " +
+                $"IsPresentationPlaying={InGameFlowLock.IsPresentationPlaying}, " +
+                $"isPose={_isPose}"
+            );
+
             if (InGameFlowLock.IsPresentationPlaying)
             {
+                Debug.Log(
+                    "[PoseTrace] TryOnPose return. " +
+                    "reason=InGameFlowLock.IsPresentationPlaying"
+                );
                 return;
             }
 
             if (!_isPose)
             {
+                Debug.Log($"[PoseTrace] OnPose before. pose={poseID}");
+
                 OnPose(poseID);
                 _currentPoseName = poseID.ToString();
+
+                Debug.Log($"[PoseTrace] OnPose after. pose={poseID}");
+            }
+            else
+            {
+                Debug.Log(
+                    "[PoseTrace] TryOnPose return. reason=already posing"
+                );
             }
         }
 

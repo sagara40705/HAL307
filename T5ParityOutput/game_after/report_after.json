@@ -1,0 +1,542 @@
+{
+  "labels": [
+    "muscle",
+    "none",
+    "power",
+    "yaa"
+  ],
+  "top1_matches": 13,
+  "count": 13,
+  "rows": [
+    {
+      "key": "muscle_001",
+      "expected": "muscle",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "muscle",
+      "python_top2": "none",
+      "python_margin": 5.6179728507995605,
+      "unity_top1": "muscle",
+      "unity_top2": "none",
+      "unity_margin": 5.617975234985352,
+      "mfcc_mae": 1.4028213399797096e-06,
+      "mfcc_rmse": 1.9385790892556543e-06,
+      "mfcc_max_error": 1.2218952178955078e-05,
+      "logit_max_error_end_to_end": 5.0067901611328125e-06,
+      "logit_max_error_same_python_tensor": 1.430511474609375e-06,
+      "python_logits": [
+        5.231937408447266,
+        -0.386035293340683,
+        -1.9951883554458618,
+        -5.059658527374268
+      ],
+      "unity_logits": [
+        5.231937408447266,
+        -0.3860377371311188,
+        -1.9951833486557007,
+        -5.059660911560059
+      ]
+    },
+    {
+      "key": "muscle_025",
+      "expected": "muscle",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "muscle",
+      "python_top2": "yaa",
+      "python_margin": 10.615370750427246,
+      "unity_top1": "muscle",
+      "unity_top2": "yaa",
+      "unity_margin": 10.615365982055664,
+      "mfcc_mae": 2.446445250825491e-06,
+      "mfcc_rmse": 4.3664695112966e-06,
+      "mfcc_max_error": 2.89231538772583e-05,
+      "logit_max_error_end_to_end": 6.67572021484375e-06,
+      "logit_max_error_same_python_tensor": 3.337860107421875e-06,
+      "python_logits": [
+        8.889476776123047,
+        -6.73399543762207,
+        -2.650639772415161,
+        -1.7258936166763306
+      ],
+      "unity_logits": [
+        8.88947868347168,
+        -6.734002113342285,
+        -2.650639057159424,
+        -1.725887656211853
+      ]
+    },
+    {
+      "key": "muscle_050",
+      "expected": "muscle",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "muscle",
+      "python_top2": "yaa",
+      "python_margin": 9.18657112121582,
+      "unity_top1": "muscle",
+      "unity_top2": "yaa",
+      "unity_margin": 9.186558723449707,
+      "mfcc_mae": 1.8086184354615398e-06,
+      "mfcc_rmse": 3.132554184048786e-06,
+      "mfcc_max_error": 1.9729137420654297e-05,
+      "logit_max_error_end_to_end": 1.0609626770019531e-05,
+      "logit_max_error_same_python_tensor": 9.5367431640625e-07,
+      "python_logits": [
+        8.064543724060059,
+        -5.29056978225708,
+        -3.1493871212005615,
+        -1.1220271587371826
+      ],
+      "unity_logits": [
+        8.064541816711426,
+        -5.290566921234131,
+        -3.149397373199463,
+        -1.1220165491104126
+      ]
+    },
+    {
+      "key": "none_001",
+      "expected": "none",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "none",
+      "python_top2": "muscle",
+      "python_margin": 10.348395347595215,
+      "unity_top1": "none",
+      "unity_top2": "muscle",
+      "unity_margin": 10.348398208618164,
+      "mfcc_mae": 3.3729786537151085e-06,
+      "mfcc_rmse": 6.53923416393809e-06,
+      "mfcc_max_error": 3.0994415283203125e-05,
+      "logit_max_error_end_to_end": 1.1920928955078125e-05,
+      "logit_max_error_same_python_tensor": 1.9073486328125e-06,
+      "python_logits": [
+        -2.9980835914611816,
+        7.350311756134033,
+        -5.201027870178223,
+        -3.047074556350708
+      ],
+      "unity_logits": [
+        -2.99808669090271,
+        7.350311279296875,
+        -5.201037883758545,
+        -3.047062635421753
+      ]
+    },
+    {
+      "key": "none_025",
+      "expected": "none",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "none",
+      "python_top2": "muscle",
+      "python_margin": 8.305431365966797,
+      "unity_top1": "none",
+      "unity_top2": "muscle",
+      "unity_margin": 8.305434226989746,
+      "mfcc_mae": 1.1828682318082429e-06,
+      "mfcc_rmse": 1.628656946195406e-06,
+      "mfcc_max_error": 8.58306884765625e-06,
+      "logit_max_error_end_to_end": 4.76837158203125e-06,
+      "logit_max_error_same_python_tensor": 1.430511474609375e-06,
+      "python_logits": [
+        -0.0020281197503209114,
+        8.3034029006958,
+        -9.436450958251953,
+        -3.3912222385406494
+      ],
+      "unity_logits": [
+        -0.002030165633186698,
+        8.303403854370117,
+        -9.436446189880371,
+        -3.3912270069122314
+      ]
+    },
+    {
+      "key": "none_050",
+      "expected": "none",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "none",
+      "python_top2": "muscle",
+      "python_margin": 7.690521240234375,
+      "unity_top1": "none",
+      "unity_top2": "muscle",
+      "unity_margin": 7.690515041351318,
+      "mfcc_mae": 1.8209484551334754e-06,
+      "mfcc_rmse": 2.4841294816724258e-06,
+      "mfcc_max_error": 1.0371208190917969e-05,
+      "logit_max_error_end_to_end": 3.814697265625e-06,
+      "logit_max_error_same_python_tensor": 7.152557373046875e-07,
+      "python_logits": [
+        -1.8328315019607544,
+        5.85768985748291,
+        -5.005990028381348,
+        -2.187546730041504
+      ],
+      "unity_logits": [
+        -1.8328286409378052,
+        5.857686519622803,
+        -5.005986213684082,
+        -2.187547206878662
+      ]
+    },
+    {
+      "key": "power_001",
+      "expected": "power",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "power",
+      "python_top2": "yaa",
+      "python_margin": 6.1960883140563965,
+      "unity_top1": "power",
+      "unity_top2": "yaa",
+      "unity_margin": 6.196073532104492,
+      "mfcc_mae": 4.673965122492518e-06,
+      "mfcc_rmse": 1.1731060112651903e-05,
+      "mfcc_max_error": 0.0001100301742553711,
+      "logit_max_error_end_to_end": 3.3855438232421875e-05,
+      "logit_max_error_same_python_tensor": 9.5367431640625e-07,
+      "python_logits": [
+        -2.034679889678955,
+        -5.509888648986816,
+        7.322679042816162,
+        1.1265907287597656
+      ],
+      "unity_logits": [
+        -2.034710168838501,
+        -5.509854793548584,
+        7.322662353515625,
+        1.1265885829925537
+      ]
+    },
+    {
+      "key": "power_025",
+      "expected": "power",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "power",
+      "python_top2": "yaa",
+      "python_margin": 0.984652042388916,
+      "unity_top1": "power",
+      "unity_top2": "yaa",
+      "unity_margin": 0.9846410751342773,
+      "mfcc_mae": 1.4891617183820927e-06,
+      "mfcc_rmse": 2.6775819605973084e-06,
+      "mfcc_max_error": 2.4706125259399414e-05,
+      "logit_max_error_end_to_end": 7.62939453125e-06,
+      "logit_max_error_same_python_tensor": 1.430511474609375e-06,
+      "python_logits": [
+        -1.1508187055587769,
+        -4.964395999908447,
+        4.394453525543213,
+        3.409801483154297
+      ],
+      "unity_logits": [
+        -1.150820255279541,
+        -4.964395523071289,
+        4.3944501876831055,
+        3.409809112548828
+      ]
+    },
+    {
+      "key": "power_050",
+      "expected": "power",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "power",
+      "python_top2": "yaa",
+      "python_margin": 3.607564687728882,
+      "unity_top1": "power",
+      "unity_top2": "yaa",
+      "unity_margin": 3.6075689792633057,
+      "mfcc_mae": 2.377134705966455e-06,
+      "mfcc_rmse": 3.7415445603983244e-06,
+      "mfcc_max_error": 2.0556151866912842e-05,
+      "logit_max_error_end_to_end": 6.794929504394531e-06,
+      "logit_max_error_same_python_tensor": 9.5367431640625e-07,
+      "python_logits": [
+        -1.8098154067993164,
+        -3.13523006439209,
+        4.325868606567383,
+        0.7183039784431458
+      ],
+      "unity_logits": [
+        -1.809812068939209,
+        -3.135223388671875,
+        4.325866222381592,
+        0.7182971835136414
+      ]
+    },
+    {
+      "key": "yaa_001",
+      "expected": "yaa",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "none",
+      "python_top2": "yaa",
+      "python_margin": 3.1034152507781982,
+      "unity_top1": "none",
+      "unity_top2": "yaa",
+      "unity_margin": 3.103423833847046,
+      "mfcc_mae": 1.045787598741299e-06,
+      "mfcc_rmse": 1.4420879779208917e-06,
+      "mfcc_max_error": 5.766749382019043e-06,
+      "logit_max_error_end_to_end": 6.9141387939453125e-06,
+      "logit_max_error_same_python_tensor": 9.5367431640625e-07,
+      "python_logits": [
+        -3.4199459552764893,
+        3.274660110473633,
+        -2.5982136726379395,
+        0.1712448000907898
+      ],
+      "unity_logits": [
+        -3.4199488162994385,
+        3.2746670246124268,
+        -2.5982162952423096,
+        0.1712431013584137
+      ]
+    },
+    {
+      "key": "yaa_025",
+      "expected": "yaa",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "yaa",
+      "python_top2": "power",
+      "python_margin": 8.020757675170898,
+      "unity_top1": "yaa",
+      "unity_top2": "power",
+      "unity_margin": 8.020770072937012,
+      "mfcc_mae": 4.8446709115523845e-06,
+      "mfcc_rmse": 9.398371730640065e-06,
+      "mfcc_max_error": 6.99162483215332e-05,
+      "logit_max_error_end_to_end": 1.4781951904296875e-05,
+      "logit_max_error_same_python_tensor": 1.9073486328125e-06,
+      "python_logits": [
+        -2.96528959274292,
+        -5.05966329574585,
+        0.012868048623204231,
+        8.033625602722168
+      ],
+      "unity_logits": [
+        -2.9652912616729736,
+        -5.059648513793945,
+        0.0128540163859725,
+        8.033623695373535
+      ]
+    },
+    {
+      "key": "yaa_050",
+      "expected": "yaa",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "yaa",
+      "python_top2": "power",
+      "python_margin": 5.115598678588867,
+      "unity_top1": "yaa",
+      "unity_top2": "power",
+      "unity_margin": 5.115590572357178,
+      "mfcc_mae": 1.8609696326166159e-06,
+      "mfcc_rmse": 3.2373677640862297e-06,
+      "mfcc_max_error": 1.7642974853515625e-05,
+      "logit_max_error_end_to_end": 9.715557098388672e-06,
+      "logit_max_error_same_python_tensor": 1.3113021850585938e-06,
+      "python_logits": [
+        -1.5411802530288696,
+        -4.3874921798706055,
+        0.879813551902771,
+        5.995412349700928
+      ],
+      "unity_logits": [
+        -1.541184425354004,
+        -4.387497901916504,
+        0.8798232674598694,
+        5.995413780212402
+      ]
+    },
+    {
+      "key": "power_036",
+      "expected": "power",
+      "shape_python": [
+        20,
+        32
+      ],
+      "shape_unity": [
+        20,
+        32
+      ],
+      "python_top1": "power",
+      "python_top2": "yaa",
+      "python_margin": 4.298567771911621,
+      "unity_top1": "power",
+      "unity_top2": "yaa",
+      "unity_margin": 4.2985663414001465,
+      "mfcc_mae": 1.0047990599559853e-06,
+      "mfcc_rmse": 1.382560981255665e-06,
+      "mfcc_max_error": 6.556510925292969e-06,
+      "logit_max_error_end_to_end": 3.814697265625e-06,
+      "logit_max_error_same_python_tensor": 2.384185791015625e-07,
+      "python_logits": [
+        -1.3291659355163574,
+        -2.8179495334625244,
+        4.2414326667785645,
+        -0.057134903967380524
+      ],
+      "unity_logits": [
+        -1.3291652202606201,
+        -2.817945718765259,
+        4.241429328918457,
+        -0.05713702738285065
+      ],
+      "mfcc_stats": {
+        "python": {
+          "min": -3.005114793777466,
+          "max": 3.1718645095825195,
+          "mean": -0.0023032748140394688,
+          "std": 0.9640787243843079
+        },
+        "unity": {
+          "min": -3.0051143169403076,
+          "max": 3.1718642711639404,
+          "mean": -0.002303288783878088,
+          "std": 0.9640787243843079
+        },
+        "max_index": [
+          15,
+          4
+        ],
+        "python_at_max": -0.6577196717262268,
+        "unity_at_max": -0.6577131152153015
+      }
+    }
+  ],
+  "power_036": {
+    "key": "power_036",
+    "expected": "power",
+    "shape_python": [
+      20,
+      32
+    ],
+    "shape_unity": [
+      20,
+      32
+    ],
+    "python_top1": "power",
+    "python_top2": "yaa",
+    "python_margin": 4.298567771911621,
+    "unity_top1": "power",
+    "unity_top2": "yaa",
+    "unity_margin": 4.2985663414001465,
+    "mfcc_mae": 1.0047990599559853e-06,
+    "mfcc_rmse": 1.382560981255665e-06,
+    "mfcc_max_error": 6.556510925292969e-06,
+    "logit_max_error_end_to_end": 3.814697265625e-06,
+    "logit_max_error_same_python_tensor": 2.384185791015625e-07,
+    "python_logits": [
+      -1.3291659355163574,
+      -2.8179495334625244,
+      4.2414326667785645,
+      -0.057134903967380524
+    ],
+    "unity_logits": [
+      -1.3291652202606201,
+      -2.817945718765259,
+      4.241429328918457,
+      -0.05713702738285065
+    ],
+    "mfcc_stats": {
+      "python": {
+        "min": -3.005114793777466,
+        "max": 3.1718645095825195,
+        "mean": -0.0023032748140394688,
+        "std": 0.9640787243843079
+      },
+      "unity": {
+        "min": -3.0051143169403076,
+        "max": 3.1718642711639404,
+        "mean": -0.002303288783878088,
+        "std": 0.9640787243843079
+      },
+      "max_index": [
+        15,
+        4
+      ],
+      "python_at_max": -0.6577196717262268,
+      "unity_at_max": -0.6577131152153015
+    }
+  }
+}

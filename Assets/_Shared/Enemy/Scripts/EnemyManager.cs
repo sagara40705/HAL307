@@ -7,16 +7,16 @@ namespace Enemy
         [SerializeField] private EnemyGenerator _enemyGenerator;
 
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
+        private void Start()
         {
+            if (_enemyGenerator == null)
+            {
+                Debug.LogWarning("[EnemyManager] EnemyGenerator is not assigned.");
+                return;
+            }
+
             _enemyGenerator.GenerateFromData(0);
             _enemyGenerator.GenerateFromData(1);
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
         }
     }
 }

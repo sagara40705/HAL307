@@ -20,7 +20,7 @@ public sealed class InGameFlowContext : MonoBehaviour
     [SerializeField] private InGamePresentationAction resetPositionAction;
     [SerializeField] private AudienceRequestSystem audienceRequestSystem;
     private StageModelContext _wavePresentationStage;
-    private Coroutine _scenePreloadCoroutine;
+    private bool _isScenePreloading;
     private string _preloadedSceneName;
     private readonly Dictionary<GameObject, bool> _preloadedSceneRootStates = new();
 
@@ -77,7 +77,14 @@ public sealed class InGameFlowContext : MonoBehaviour
     }
 
     // 現在のプレイヤースコア
-    public int CurrentPlayerScore => ScoreSource != null ? ScoreSource.PlayerScore : 0;
+    public int CurrentPlayerScore
+    {
+        get
+        {
+            ScoreManager source = ScoreSource;
+            return source != null ? source.PlayerScore : 0;
+        }
+    }
 
     public EnemyLineupManager EnemyLineup
     {
@@ -244,7 +251,7 @@ public sealed class InGameFlowContext : MonoBehaviour
             return;
         }
 
-        if (_scenePreloadCoroutine != null)
+        if (_isScenePreloading)
         {
             Debug.LogWarning(
                 $"[InGameFlowContext] Scene preload skipped. Another preload is running. " +
@@ -252,7 +259,7 @@ public sealed class InGameFlowContext : MonoBehaviour
             return;
         }
 
-        _scenePreloadCoroutine = StartCoroutine(PreloadSceneCoroutine(sceneName));
+        StartCoroutine(CoroutineUtility.Run(PreloadSceneCoroutine(sceneName)));
     }
 
     public bool IsScenePreloadTracked(string sceneName)
@@ -268,12 +275,12 @@ public sealed class InGameFlowContext : MonoBehaviour
             yield break;
         }
 
-        while (_scenePreloadCoroutine != null)
+        while (_isScenePreloading)
         {
             yield return null;
         }
 
-        Scene scene = FindLoadedScene(sceneName);
+        Scene scene = SceneLookup.Find(sceneName);
         if (!scene.IsValid() || !scene.isLoaded)
         {
             Debug.LogWarning($"[InGameFlowContext] Preloaded scene is not available. Scene='{sceneName}'");
@@ -287,19 +294,31 @@ public sealed class InGameFlowContext : MonoBehaviour
 
     private IEnumerator PreloadSceneCoroutine(string sceneName)
     {
+        _isScenePreloading = true;
+        try
+        {
+            yield return PreloadSceneCore(sceneName);
+        }
+        finally
+        {
+            _isScenePreloading = false;
+        }
+    }
+
+    private IEnumerator PreloadSceneCore(string sceneName)
+    {
         if (!string.IsNullOrWhiteSpace(_preloadedSceneName) &&
             !string.Equals(_preloadedSceneName, sceneName, System.StringComparison.OrdinalIgnoreCase))
         {
             string previousSceneName = _preloadedSceneName;
-            _preloadedSceneRootStates.Clear();
 
-            Scene previousScene = FindLoadedScene(previousSceneName);
+            Scene previousScene = SceneLookup.Find(previousSceneName);
             if (previousScene.IsValid() && previousScene.isLoaded)
             {
                 SceneLoader sceneLoader = SceneLoader.Instance;
                 if (sceneLoader != null && sceneLoader.IsInitialized)
                 {
-                    yield return sceneLoader.UnloadAsync(previousScene.name);
+                    yield return sceneLoader.UnloadAsync(previousSceneName);
                 }
                 else
                 {
@@ -311,13 +330,12 @@ public sealed class InGameFlowContext : MonoBehaviour
                 }
             }
 
-            previousScene = FindLoadedScene(previousSceneName);
+            previousScene = SceneLookup.Find(previousSceneName);
             if (previousScene.IsValid() && previousScene.isLoaded)
             {
                 Debug.LogWarning(
                     $"[InGameFlowContext] Scene preload skipped. Previous preloaded scene could not be unloaded. " +
                     $"Previous='{previousSceneName}', Requested='{sceneName}'");
-                _scenePreloadCoroutine = null;
                 yield break;
             }
         }
@@ -325,7 +343,7 @@ public sealed class InGameFlowContext : MonoBehaviour
         _preloadedSceneName = sceneName;
         _preloadedSceneRootStates.Clear();
 
-        Scene scene = FindLoadedScene(sceneName);
+        Scene scene = SceneLookup.Find(sceneName);
         if (!scene.IsValid() || !scene.isLoaded)
         {
             SceneLoader sceneLoader = SceneLoader.Instance;
@@ -347,7 +365,7 @@ public sealed class InGameFlowContext : MonoBehaviour
                 Debug.LogWarning($"[InGameFlowContext] Scene preload skipped. Scene cannot be loaded. Scene='{sceneName}'");
             }
 
-            scene = FindLoadedScene(sceneName);
+            scene = SceneLookup.Find(sceneName);
         }
 
         if (scene.IsValid() && scene.isLoaded)
@@ -368,9 +386,8 @@ public sealed class InGameFlowContext : MonoBehaviour
         else
         {
             Debug.LogWarning($"[InGameFlowContext] Scene preload failed. Scene='{sceneName}'");
+            ClearScenePreloadState();
         }
-
-        _scenePreloadCoroutine = null;
     }
 
     private void RestorePreloadedSceneRoots()
@@ -389,32 +406,8 @@ public sealed class InGameFlowContext : MonoBehaviour
     private void ClearScenePreloadState()
     {
         _preloadedSceneName = null;
-        _scenePreloadCoroutine = null;
+        _isScenePreloading = false;
         _preloadedSceneRootStates.Clear();
-    }
-
-    private static Scene FindLoadedScene(string scenePathOrName)
-    {
-        if (string.IsNullOrWhiteSpace(scenePathOrName))
-        {
-            return default;
-        }
-
-        string normalizedPath = scenePathOrName.Replace('\\', '/');
-        Scene scene = SceneManager.GetSceneByPath(normalizedPath);
-        if (scene.IsValid())
-        {
-            return scene;
-        }
-
-        int slashIndex = normalizedPath.LastIndexOf('/');
-        string sceneName = slashIndex >= 0 ? normalizedPath.Substring(slashIndex + 1) : normalizedPath;
-        if (sceneName.EndsWith(".unity", System.StringComparison.OrdinalIgnoreCase))
-        {
-            sceneName = sceneName.Substring(0, sceneName.Length - ".unity".Length);
-        }
-
-        return SceneManager.GetSceneByName(sceneName);
     }
 
     public void ResetCameraPosition(StageData stageData)
@@ -424,7 +417,8 @@ public sealed class InGameFlowContext : MonoBehaviour
             return;
         }
 
-        Transform cameraTransform = ForwardProgressMover != null ? ForwardProgressMover.CameraTransform : null;
+        ForwardProgressMover mover = ForwardProgressMover;
+        Transform cameraTransform = mover != null ? mover.CameraTransform : null;
         if (cameraTransform == null)
         {
             Debug.LogWarning("[InGameFlowContext] Camera transform was not found.");

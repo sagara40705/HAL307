@@ -10,19 +10,18 @@ public sealed class InGameFlowController : MonoBehaviour
     [SerializeField] private InGameFlowContext context;
     [SerializeField] private bool playOnStart = true;
 
-    private Coroutine _flowCoroutine;
+    private bool _isFlowRunning;
     private IInGameFlowState _currentState;
     private bool _isChangingState;
     private int _currentWaveIndex;
     private WaveData _currentWaveData;
     private int _currentTargetScore;
     private float _currentEnemyAnimationSpeed = 1f;
-    private WaveData _preparedNextWaveData;
 
     public int CurrentWaveIndex => _currentWaveIndex;
     public WaveData CurrentWaveData => _currentWaveData;
     public string CurrentStateName => _currentState != null ? _currentState.StateName : "None";
-    public bool IsFlowRunning => _flowCoroutine != null;
+    public bool IsFlowRunning => _isFlowRunning;
     public bool IsChangingState => _isChangingState;
     public int CurrentTargetScore => _currentTargetScore;
     public float CurrentEnemyAnimationSpeed => _currentEnemyAnimationSpeed;
@@ -57,7 +56,7 @@ public sealed class InGameFlowController : MonoBehaviour
     // インゲーム進行の開始
     public void StartFlow()
     {
-        if (_flowCoroutine != null)
+        if (_isFlowRunning)
         {
             return;
         }
@@ -70,7 +69,8 @@ public sealed class InGameFlowController : MonoBehaviour
             return;
         }
 
-        _flowCoroutine = StartCoroutine(FlowCoroutine());
+        _isFlowRunning = true;
+        StartCoroutine(CoroutineUtility.Run(FlowCoroutine()));
     }
 
     private void ResolveStageData()
@@ -111,74 +111,73 @@ public sealed class InGameFlowController : MonoBehaviour
             return;
         }
 
-        StartCoroutine(ChangeStateCoroutine(nextState));
+        StartCoroutine(CoroutineUtility.Run(ChangeStateCoroutine(nextState)));
     }
 
     // 標準のステージ進行
     private IEnumerator FlowCoroutine()
     {
-        _currentWaveIndex = 0;
-        GameResultManager.Instance?.BeginRun();
-
-        var gameStartState = new GameStartFlowState(stageData);
-        yield return ChangeStateCoroutine(gameStartState);
-        while (!gameStartState.IsPresentationFinished)
+        try
         {
-            yield return null;
-        }
+            _currentWaveIndex = 0;
+            GameResultManager.Instance?.BeginRun();
 
-        _currentWaveData = stageData.GetWaveOrNull(_currentWaveIndex);
-        _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
-        _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);
+            var gameStartState = new GameStartFlowState(stageData);
+            yield return ChangeStateCoroutine(gameStartState);
 
-        while (_currentWaveData != null)
-        {
-            WaveData currentWave = _currentWaveData;
-            _preparedNextWaveData = stageData.HasWave(_currentWaveIndex + 1)
-                ? stageData.GetWaveOrNull(_currentWaveIndex + 1)
-                : null;
-
-            yield return ChangeStateCoroutine(new PlayingFlowState(
-                stageData,
-                currentWave,
-                _currentEnemyAnimationSpeed,
-                _preparedNextWaveData));
-
-            int currentScore = context != null ? context.CurrentPlayerScore : 0;
-            bool hasNextWave = stageData.HasWave(_currentWaveIndex + 1);
-            var resultCheckState = new WaveResultCheckFlowState(CurrentTargetScore, currentScore, hasNextWave);
-            yield return ChangeStateCoroutine(resultCheckState);
-
-            if (resultCheckState.IsTargetScoreReached)
-            {
-                GameResultManager.Instance?.RecordWaveCleared(_currentWaveIndex + 1);
-            }
-
-            if (resultCheckState.Result != WaveResultCheckResult.NextWave)
-            {
-                break;
-            }
-
-            WaveData nextWave = _preparedNextWaveData ?? stageData.GetWaveOrNull(_currentWaveIndex + 1);
-            if (nextWave == null)
-            {
-                Debug.LogError($"[InGameFlowController] Next wave selection failed. WaveIndex={_currentWaveIndex + 1}, Endless={stageData.IsEndlessMode}");
-                break;
-            }
-
-            // ウェーブ切り替え演出を実行
-            yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave, nextWave));
-            _currentWaveIndex++;    // ウェーブを進める
-            ScoreManager.Instance?.ResetAllScores();
-            _currentWaveData = nextWave;
-            _preparedNextWaveData = null;
+            _currentWaveData = stageData.GetWaveOrNull(_currentWaveIndex);
             _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
             _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);
+
+            while (_currentWaveData != null)
+            {
+                WaveData currentWave = _currentWaveData;
+                bool hasNextWave = stageData.HasWave(_currentWaveIndex + 1);
+                WaveData nextWave = hasNextWave
+                    ? stageData.GetWaveOrNull(_currentWaveIndex + 1)
+                    : null;
+
+                yield return ChangeStateCoroutine(new PlayingFlowState(
+                    stageData,
+                    currentWave,
+                    _currentEnemyAnimationSpeed,
+                    nextWave));
+
+                int currentScore = context != null ? context.CurrentPlayerScore : 0;
+                var resultCheckState = new WaveResultCheckFlowState(CurrentTargetScore, currentScore, hasNextWave);
+                yield return ChangeStateCoroutine(resultCheckState);
+
+                if (resultCheckState.IsTargetScoreReached)
+                {
+                    GameResultManager.Instance?.RecordWaveCleared(_currentWaveIndex + 1);
+                }
+
+                if (resultCheckState.Result != WaveResultCheckResult.NextWave)
+                {
+                    break;
+                }
+
+                if (nextWave == null)
+                {
+                    Debug.LogError($"[InGameFlowController] Next wave selection failed. WaveIndex={_currentWaveIndex + 1}, Endless={stageData.IsEndlessMode}");
+                    break;
+                }
+
+                // ウェーブ切り替え演出を実行
+                yield return ChangeStateCoroutine(new WaveTransitionFlowState(currentWave, nextWave));
+                _currentWaveIndex++;    // ウェーブを進める
+                ScoreManager.Instance?.ResetAllScores();
+                _currentWaveData = nextWave;
+                _currentTargetScore = stageData.GetTargetScore(_currentWaveIndex);
+                _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(_currentWaveIndex);
+            }
+
+            yield return ChangeStateCoroutine(new GameEndFlowState(stageData));
         }
-
-        yield return ChangeStateCoroutine(new GameEndFlowState(stageData));
-
-        _flowCoroutine = null;
+        finally
+        {
+            _isFlowRunning = false;
+        }
     }
 
     // 現在StateのExitと次StateのEnter/Executeを実行
@@ -191,18 +190,22 @@ public sealed class InGameFlowController : MonoBehaviour
         }
 
         _isChangingState = true;
-
-        if (_currentState != null)
+        try
         {
-            yield return StartCoroutine(_currentState.Exit(context));
+            if (_currentState != null)
+            {
+                yield return _currentState.Exit(context);
+            }
+
+            _currentState = nextState;
+            Debug.Log($"[InGameFlowController] Enter State={_currentState.StateName}");
+
+            yield return _currentState.Enter(context);
+            yield return _currentState.Execute(context);
         }
-
-        _currentState = nextState;
-        Debug.Log($"[InGameFlowController] Enter State={_currentState.StateName}");
-
-        yield return StartCoroutine(_currentState.Enter(context));
-        yield return StartCoroutine(_currentState.Execute(context));
-
-        _isChangingState = false;
+        finally
+        {
+            _isChangingState = false;
+        }
     }
 }

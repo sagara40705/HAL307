@@ -116,13 +116,7 @@ public class MenuVoiceCommandAction : MonoBehaviour
         GamePhase currentPhase = GetCurrentPhase();
         Debug.Log($"[Menu Voice] Time command accepted. Phase={currentPhase}");
 
-        if (currentPhase == GamePhase.Title)
-        {
-            TryChangePhase(GamePhase.Pause);
-            return;
-        }
-
-        if (currentPhase == GamePhase.InGame)
+        if (currentPhase == GamePhase.Title || currentPhase == GamePhase.InGame)
         {
             TryChangePhase(GamePhase.Pause);
             return;

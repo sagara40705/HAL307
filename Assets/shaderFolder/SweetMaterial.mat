@@ -36,15 +36,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DropDensity: 16.5
-    - _DropEdgeSoftness: 1
+    - _DropDensity: 8.5
+    - _DropEdgeSoftness: 0.2
     - _DropExistThreshold: 0.759
-    - _DropFlowSpeed: 0.188
-    - _DropSize: 0.01
-    - _DropStrength: 0.324
+    - _DropFlowSpeed: 0.38
+    - _DropSize: 0.085
+    - _DropStrength: 0.469
     - _HighlightStrength: 1
-    - _ObjectFlowScale: 2.99
-    - _ShadowStrength: 0
+    - _ObjectFlowScale: 2.95
+    - _ShadowStrength: 0.165
     - _UseDropTexture: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}

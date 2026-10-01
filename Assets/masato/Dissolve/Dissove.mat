@@ -133,7 +133,7 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _Threshold: -0.44
+    - _Threshold: -0.47
     - _Width: 1.13
     - _WorkflowMode: 1
     - _ZTest: 4

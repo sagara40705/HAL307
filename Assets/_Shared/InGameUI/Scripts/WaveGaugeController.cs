@@ -12,7 +12,7 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private float minValue = 0.0f;
     [SerializeField] private StageEndJudge stageEndJudge;
 
-    [Header("警告UI")]
+    [Header("FinalPoseUI")]
     [SerializeField] private GameObject warningUI;
     [SerializeField] private float warningThreshold = 0.2f;
     [SerializeField] private Animator warningAnimator;
@@ -23,8 +23,11 @@ public class WaveGaugeController : MonoBehaviour
 
     [Header("Wave演出時に非表示にするUI")]
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
-
     [SerializeField] private AdjustableUiPresenter warningPresenter;
+
+    [Header("リクエスト管理")]
+    [SerializeField]
+    private AudienceRequest.AudienceRequestSystem audienceRequestSystem;
 
     private float currentValue;
     private bool isTransitionStarted;
@@ -55,6 +58,11 @@ public class WaveGaugeController : MonoBehaviour
             Debug.LogError("WaveMaterial was not found.");
         }
 
+        if(audienceRequestSystem == null)
+        {
+            audienceRequestSystem = FindFirstObjectByType<AudienceRequest.AudienceRequestSystem>();
+        }
+
         // 警告UIを非表示にする
         if (warningAnimator == null && warningUI != null)
         {
@@ -75,10 +83,10 @@ public class WaveGaugeController : MonoBehaviour
 
     private void OnDestroy()
     {
-        // StageEndJudgeのイベント購読を解除
+        // StageEndJudgeのイベントを解除
         if (stageEndJudge != null)
         {
-            // イベントの購読を解除
+            // イベントを解除
             stageEndJudge.OnStageEnd -= OnStageEnd;
         }
     }
@@ -189,7 +197,8 @@ public class WaveGaugeController : MonoBehaviour
     {
         isWaveFinalSuppressed = true;
         SetWaveFinalVisible(false);
-        ShowOtherUis();
+        // GameEnd中だから再表示しない
+        //ShowOtherUis();
     }
 
     private void SetupStageEndJudge()
@@ -280,7 +289,15 @@ public class WaveGaugeController : MonoBehaviour
 
     private void SetWaveFinalVisible(bool isVisible, bool immediateHide = false)
     {
+        // 非表示から表示へ変わる瞬間か
+        bool hasJustBecomeVisible = isVisible && !isWarningVisible;
+
         isWarningVisible = isVisible;
+
+        if(hasJustBecomeVisible)
+        {
+            audienceRequestSystem?.HideAllUisForFinalPose();
+        }
 
         if (warningAnimator != null)
         {

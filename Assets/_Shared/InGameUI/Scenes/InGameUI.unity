@@ -3320,15 +3320,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreSpriteUIController
   playerScoreDisplay: {fileID: 40763176}
-  enemy1ScoreDisplay: {fileID: 143103181}
-  enemy2ScoreDisplay: {fileID: 810082269}
+  enemy1ScoreDisplay: {fileID: 810082269}
+  enemy2ScoreDisplay: {fileID: 143103181}
   feverGaugeController: {fileID: 551905174}
   scoreUiPresenter: {fileID: 0}
   showScoreUiOnStart: 1
   playScoreUiOnScoreChanged: 0
   playerScoreAnimator: {fileID: 40763177}
-  enemy1ScoreAnimator: {fileID: 143103182}
-  enemy2ScoreAnimator: {fileID: 810082270}
+  enemy1ScoreAnimator: {fileID: 810082270}
+  enemy2ScoreAnimator: {fileID: 143103182}
   scoreUpTriggerName: ScoreUp
 --- !u!224 &1041751640 stripped
 RectTransform:

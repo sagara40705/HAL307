@@ -232,6 +232,13 @@ public class MenuVoiceCommandAction : MonoBehaviour
 
     private void ExecuteTitleCommand(string command)
     {
+        TitleMenuAnimation animation = TitleMenuAnimation.Instance;
+        if (animation != null && animation.isActiveAndEnabled)
+        {
+            animation.OnVoiceCommand(command);
+            return;
+        }
+
         if (command == CommandDecision)
         {
             TryChangePhase(GamePhase.InGame);

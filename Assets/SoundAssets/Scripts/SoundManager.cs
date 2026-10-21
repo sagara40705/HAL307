@@ -11,6 +11,10 @@ namespace Sound.Manager
         private static CriAtomExPlayer atomExPlayer;
         private static CriAtomExAcb[] atomExAcb;
         private static bool isSceneTransitioning;
+        private static CriAtomExPlayback currentBgmPlayback;
+        private static bool hasCurrentBgmPlayback;
+        private static int currentBgmSceneTag = -1;
+        private static int currentBgmSoundTag = -1;
 
         private void Awake()
         {
@@ -80,12 +84,14 @@ namespace Sound.Manager
         {
             atomExPlayer?.Dispose();
             atomExPlayer = null;
+            ClearCurrentBgm();
         }
 
         // 全Cueの停止。CRI未初期化時も呼び出し可能
         public static void StopAll()
         {
             atomExPlayer?.Stop(true);
+            ClearCurrentBgm();
         }
 
         public static void BeginSceneTransition()
@@ -99,16 +105,46 @@ namespace Sound.Manager
             isSceneTransitioning = false;
         }
 
-        public
-         static void Play(int scenesoundtag, int soundtag)
+        public static void Play(int scenesoundtag, int soundtag)
         {
             if (isSceneTransitioning || atomExPlayer == null)
             {
                 return;
             }
 
+            bool isBgm = IsBgmCue(scenesoundtag, soundtag);
+            if (isBgm && hasCurrentBgmPlayback)
+            {
+                CriAtomExPlayback.Status status = currentBgmPlayback.GetStatus();
+                bool isPlaying =
+                    status == CriAtomExPlayback.Status.Prep ||
+                    status == CriAtomExPlayback.Status.Playing;
+
+                if (isPlaying &&
+                    currentBgmSceneTag == scenesoundtag &&
+                    currentBgmSoundTag == soundtag)
+                {
+                    return;
+                }
+
+                if (isPlaying)
+                {
+                    currentBgmPlayback.Stop(true);
+                }
+
+                ClearCurrentBgm();
+            }
+
             atomExPlayer.SetCue(atomExAcb[scenesoundtag], cueInfoList[scenesoundtag][soundtag].name);
-            atomExPlayer.Start();
+            CriAtomExPlayback playback = atomExPlayer.Start();
+
+            if (isBgm)
+            {
+                currentBgmPlayback = playback;
+                currentBgmSceneTag = scenesoundtag;
+                currentBgmSoundTag = soundtag;
+                hasCurrentBgmPlayback = true;
+            }
         }
 
         public static void Stop(int scenesoundtag, int soundtag)
@@ -120,6 +156,24 @@ namespace Sound.Manager
 
             atomExPlayer.SetCue(atomExAcb[scenesoundtag], cueInfoList[scenesoundtag][soundtag].name);
             atomExPlayer.Stop();
+            ClearCurrentBgm();
+        }
+
+        private static bool IsBgmCue(int sceneSoundTag, int soundTag)
+        {
+            return
+                (sceneSoundTag == (int)SceneSoundTag.TitleSound &&
+                 soundTag == (int)TitleSoundTag.TitleBGM) ||
+                (sceneSoundTag == (int)SceneSoundTag.InGameSound &&
+                 (soundTag == (int)InGameSoundTag.InGameBGM ||
+                  soundTag == (int)InGameSoundTag.FeverBGM));
+        }
+
+        private static void ClearCurrentBgm()
+        {
+            hasCurrentBgmPlayback = false;
+            currentBgmSceneTag = -1;
+            currentBgmSoundTag = -1;
         }
     }
 }

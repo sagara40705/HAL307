@@ -185,6 +185,7 @@ MonoBehaviour:
   - {fileID: 1764857}
   - {fileID: 2119480822}
   warningPresenter: {fileID: 0}
+  audienceRequestSystem: {fileID: 0}
 --- !u!1 &36460463
 GameObject:
   m_ObjectHideFlags: 0
@@ -3535,8 +3536,8 @@ MonoBehaviour:
   sceneUiRoots:
   - {fileID: 1718496973}
   nextSceneName: 
-  cellWidth: 130
-  cellHeight: 80
+  cellWidth: 180
+  cellHeight: 120
   extraRows: 3
   spawnInterval: 0.006
   startYOffset: 250

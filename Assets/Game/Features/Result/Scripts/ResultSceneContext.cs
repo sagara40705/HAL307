@@ -8,18 +8,21 @@ using UnityEngine.UI;
 public sealed class ResultSceneContext : ContextBase
 {
     [Header("数字スプライト（0〜9）を順番に設定")]
-    public Sprite[] numberSprites; // 0〜9の画像を格納
+    public Sprite[] numberSprites;
 
-    [Header("数字を並べる親オブジェクト")]
-    public Transform[] ParryParent; // Horizontal Layout Groupが付いているオブジェクト
+    [Header("数字の表示先（右から左へ、1の位から順番に設定）")]
+    public Transform[] ParryParent;
     public Transform[] WaveParent;
     public Transform[] ScoreParent;
-    private List<Image> digitImages = new List<Image>();
-    private List<Image> digitImages1 = new List<Image>();
-    private List<Image> digitImages2 = new List<Image>();
-    private int currentScore;
-    private int ParrySocre;
-    private int MaxPoint;
+
+    [Header("最終点数の表示領域（7桁まで収まる大きさ）")]
+    [SerializeField] private RectTransform scoreArea;
+    [SerializeField, Min(0)] private float scoreDigitSpacing = 2f;
+
+    private readonly List<Image> waveDigits = new List<Image>();
+    private readonly List<Image> parryDigits = new List<Image>();
+    private readonly List<Image> scoreDigits = new List<Image>();
+
     [SerializeField] private int clearedWaveCount;
     [SerializeField] private int parrySuccessCount;
     [SerializeField] private int score;
@@ -38,80 +41,131 @@ public sealed class ResultSceneContext : ContextBase
         CaptureFromManager();
     }
 
-    // 常駐Managerの現在値をSceneローカルの値として保存する
+    // 常駐Managerの現在値をSceneローカルの値として保存する。
     public void CaptureFromManager()
     {
         GameResultManager manager = GameResultManager.Instance;
-        //if (manager == null)
-        //{
-        //    clearedWaveCount = 0;
-        //    parrySuccessCount = 0;
-        //    score = 0;
-        //    hasCompletedResult = false;
-        //    Debug.LogWarning("[ResultSceneContext] Result capture failed. Reason=GameResultManager is not available.");
-        //    ResultCaptured?.Invoke();
-        //    return;
-        //}
+        clearedWaveCount = manager != null ? manager.ClearedWaveCount : 0;
+        parrySuccessCount = manager != null ? manager.ParrySuccessCount : 0;
+        score = manager != null ? manager.Score : 0;
+        hasCompletedResult = manager != null && manager.HasCompletedResult;
 
-      
-        clearedWaveCount = manager.ClearedWaveCount;
-        parrySuccessCount = manager.ParrySuccessCount;
-        score = manager.Score;
-        hasCompletedResult = manager.HasCompletedResult;
+        RefreshDisplay();
         ResultCaptured?.Invoke();
-        //親オブジェクトの数分回す
-        currentScore = Mathf.Max(0, clearedWaveCount); // 負数防止
-        ParrySocre= Mathf.Max(0, parrySuccessCount);
-        MaxPoint= Mathf.Max(0, score);
-        string WaveStr = currentScore.ToString();
-        string ParryStr = ParrySocre.ToString();
-        string ScoreStr = MaxPoint.ToString();
-        // 表示する桁数分だけImageを追加する。
-        // Sprite未設定のImageは白い矩形として描画されるため、余分には生成しない。
-        for (int i = 0; i < WaveStr.Length; i++)
+    }
+
+    private void RefreshDisplay()
+    {
+        if (numberSprites == null || numberSprites.Length < 10)
         {
-            GameObject digitObj = new GameObject("Digit", typeof(Image));
-            digitObj.transform.SetParent(WaveParent[i], false);
-            Image img = digitObj.GetComponent<Image>();
-            digitImages.Add(img);
-        }
-        for (int u = 0; u < ParryStr.Length; u++)
-        {
-            GameObject digitObj1 = new GameObject("Digit", typeof(Image));
-            digitObj1.transform.SetParent(ParryParent[u], false);
-            Image img1 = digitObj1.GetComponent<Image>();
-            digitImages1.Add(img1);
-        }
-        for (int h = 0; h < ScoreStr.Length; h++)
-        {
-            GameObject digitObj2 = new GameObject("Digit", typeof(Image));
-            digitObj2.transform.SetParent(ScoreParent[h], false);
-            Image img2 = digitObj2.GetComponent<Image>();
-            digitImages2.Add(img2);
+            return;
         }
 
-        // 各桁の画像を設定
-        for (int i = 0; i < ScoreStr.Length; i++)
+        DisplayNumber(clearedWaveCount, WaveParent, waveDigits);
+        DisplayNumber(parrySuccessCount, ParryParent, parryDigits);
+        DisplayNumber(score, ScoreParent, scoreDigits);
+        LayoutScoreDigits();
+    }
+
+    private void DisplayNumber(int value, Transform[] parents, List<Image> digits)
+    {
+        if (parents == null || parents.Length == 0)
         {
-            int digit = ScoreStr[i] - '0';
-            digitImages2[i].sprite = numberSprites[digit];
-            digitImages2[i].preserveAspect = true;
-            digitImages2[i].enabled = true;
-        }
-        for (int i = 0; i < ParryStr.Length; i++)
-        {
-            int digit = ParryStr[i] - '0';
-            digitImages1[i].sprite = numberSprites[digit];
-            digitImages1[i].preserveAspect = true;
-            digitImages1[i].enabled = true;
-        }
-        for (int i = 0; i < WaveStr.Length; i++)
-        {
-            int digit = WaveStr[i] - '0';
-            digitImages[i].sprite = numberSprites[digit];
-            digitImages[i].preserveAspect = true;
-            digitImages[i].enabled = true;
+            return;
         }
 
+        if (digits.Count == 0)
+        {
+            // 表示先に既にあるImageを使い、再取得のたびに数字が重ならないようにする。
+            foreach (Transform parent in parents)
+            {
+                if (parent == null || !parent.TryGetComponent(out Image digit))
+                {
+                    digits.Clear();
+                    Debug.LogWarning("[ResultSceneContext] 数字の表示先にImageを設定してください。", this);
+                    return;
+                }
+
+                digits.Add(digit);
+            }
+        }
+
+        string text = Mathf.Max(0, value).ToString();
+        // エンドレス等で用意した桁数を超えても、上位桁を切り捨てず左へ追加する。
+        while (digits.Count < text.Length)
+        {
+            RectTransform rightmost = digits[0].rectTransform;
+            RectTransform leftmost = digits[digits.Count - 1].rectTransform;
+            var digitObject = new GameObject("Digit", typeof(RectTransform), typeof(Image));
+            Image digit = digitObject.GetComponent<Image>();
+            RectTransform rect = digit.rectTransform;
+            rect.SetParent(rightmost, false);
+            rect.anchorMin = rightmost.pivot;
+            rect.anchorMax = rightmost.pivot;
+            rect.pivot = rightmost.pivot;
+            rect.sizeDelta = rightmost.sizeDelta;
+            float leftEdge = digits.Count == 1 ? 0f : leftmost.anchoredPosition.x;
+            rect.anchoredPosition = new Vector2(leftEdge - rightmost.rect.width, 0f);
+            digits.Add(digit);
+        }
+
+        for (int i = 0; i < digits.Count; i++)
+        {
+            Image digit = digits[i];
+            // Image.enabledだけでは、非アクティブな親の下にある桁は表示されない。
+            digit.gameObject.SetActive(true);
+            digit.enabled = i < text.Length;
+            digit.raycastTarget = false;
+            if (!digit.enabled)
+            {
+                continue;
+            }
+
+            // 配列の先頭は1の位なので、文字列は末尾から読む。
+            int number = text[text.Length - 1 - i] - '0';
+            digit.sprite = numberSprites[number];
+            digit.preserveAspect = true;
+        }
+    }
+
+    private void LayoutScoreDigits()
+    {
+        if (scoreArea == null || scoreDigits.Count == 0)
+        {
+            return;
+        }
+
+        int count = Mathf.Max(0, score).ToString().Length;
+        float height = scoreArea.rect.height;
+        float width = scoreDigitSpacing * (count - 1);
+        for (int i = 0; i < count; i++)
+        {
+            Rect spriteRect = scoreDigits[i].sprite.rect;
+            width += height * spriteRect.width / spriteRect.height;
+        }
+
+        // 全ての数字を同じ高さに揃え、桁数が増えた場合は列全体を等倍で縮める。
+        // 「最終点数」のラベルやPtへはみ出さず、値を切り捨てずに右揃えで表示する。
+        float scale = width > 0f ? Mathf.Min(1f, scoreArea.rect.width / width) : 1f;
+        float right = scoreArea.rect.xMax;
+        for (int i = 0; i < scoreDigits.Count; i++)
+        {
+            RectTransform rect = scoreDigits[i].rectTransform;
+            rect.SetParent(scoreArea, false);
+            rect.anchorMin = new Vector2(1f, 0.5f);
+            rect.anchorMax = rect.anchorMin;
+            rect.pivot = new Vector2(1f, 0.5f);
+            rect.localScale = Vector3.one;
+            if (i >= count)
+            {
+                continue;
+            }
+
+            Rect spriteRect = scoreDigits[i].sprite.rect;
+            float digitWidth = height * spriteRect.width / spriteRect.height * scale;
+            rect.sizeDelta = new Vector2(digitWidth, height * scale);
+            rect.anchoredPosition = new Vector2(right - scoreArea.rect.xMax, 0f);
+            right -= digitWidth + scoreDigitSpacing * scale;
+        }
     }
 }

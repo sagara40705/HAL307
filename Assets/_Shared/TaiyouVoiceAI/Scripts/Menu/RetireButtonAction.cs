@@ -5,24 +5,32 @@ public class RetireButtonAction : MonoBehaviour
 {
     [Header("Retire Event")]
     [SerializeField] private UnityEvent onRetaire;
+    private bool isTransitionRequested;
 
     public void OnClickRetire()
     {
-        Debug.Log("リタイアボタンが押されました");
+        if (isTransitionRequested)
+        {
+            return;
+        }
 
-        // メニューを止めていた時間を戻す
-        Time.timeScale = 1f;
+        GamePhaseManager phaseManager = GamePhaseManager.Instance;
+        if (phaseManager != null && phaseManager.IsInitialized)
+        {
+            // The phase manager closes pause, restores time and cleans up scene audio.
+            isTransitionRequested = phaseManager.ChangePhase(GamePhase.Title);
+            return;
+        }
 
-
-        // デバックでゲーム終了する処理
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-
-
-        // あとでタイトルに戻る処理を追加する
-
+        // Keep the standalone Pause scene usable without the Boot managers.
+        GamePhaseSceneSettings settings = GamePhaseSceneSettings.Load();
+        string titleScene = settings != null && settings.TryGetSceneName(GamePhase.Title, out string sceneName)
+            ? sceneName
+            : "Title";
+        isTransitionRequested = SceneLoader.Load(titleScene);
+        if (isTransitionRequested)
+        {
+            Time.timeScale = 1f;
+        }
     }
 }

@@ -17,6 +17,7 @@ public static class PauseMenuInputValidation
 {
     private const string SessionKey = "PauseMenuInputValidation.Running";
     private const string BootKey = "PauseMenuInputValidation.Boot";
+    private const string ExitKey = "PauseMenuInputValidation.ExitCode";
     private const string ScenePath = "Assets/_Shared/InGameUI/Menu/Scenes/Pause.unity";
     private static IEnumerator routine;
     private static readonly List<string> results = new();
@@ -39,6 +40,7 @@ public static class PauseMenuInputValidation
 
     public static void RunBatch()
     {
+        if (!Application.isBatchMode) throw new InvalidOperationException("Run this probe in a separate batch editor.");
         SessionState.SetBool(BootKey, false);
         SessionState.SetBool(SessionKey, true);
         // Keep this isolated probe out of the normal Boot/gameplay sequence.
@@ -51,6 +53,7 @@ public static class PauseMenuInputValidation
 
     public static void RunBootBatch()
     {
+        if (!Application.isBatchMode) throw new InvalidOperationException("Run this probe in a separate batch editor.");
         SessionState.SetBool(BootKey, true);
         SessionState.SetBool(SessionKey, true);
         EditorSceneManager.OpenScene("Assets/_Shared/Prototype/Scenes/Prototype.unity");
@@ -59,6 +62,13 @@ public static class PauseMenuInputValidation
 
     private static void OnPlayMode(PlayModeStateChange state)
     {
+        if (state == PlayModeStateChange.EnteredEditMode && SessionState.GetInt(ExitKey, -1) >= 0)
+        {
+            int exitCode = SessionState.GetInt(ExitKey, 1);
+            SessionState.EraseInt(ExitKey);
+            EditorApplication.Exit(exitCode);
+            return;
+        }
         if (!SessionState.GetBool(SessionKey, false) || state != PlayModeStateChange.EnteredPlayMode) return;
         routine = CoroutineUtility.Run(Run());
         EditorApplication.update += Tick;
@@ -94,7 +104,9 @@ public static class PauseMenuInputValidation
         string suffix = SessionState.GetBool(BootKey, false) ? "boot-validation.txt" : "validation.txt";
         File.WriteAllLines("Library/UIInvestigation/" + suffix, results);
         Debug.Log("[PauseMenuInputValidation]\n" + string.Join("\n", results));
-        EditorApplication.Exit(failures == 0 ? 0 : 1);
+        // Stop Play normally so persistent managers receive OnApplicationQuit.
+        SessionState.SetInt(ExitKey, failures == 0 ? 0 : 1);
+        EditorApplication.isPlaying = false;
     }
 
     private static IEnumerator Run()
@@ -269,6 +281,34 @@ public static class PauseMenuInputValidation
             Press(Key.Enter, i % 2 == 0);
             Observe(mainPanel.activeInHierarchy && !howToPanel.activeInHierarchy && Time.timeScale == 0f && Field<int>(main, "currentIndex") == 3,
                 $"Open/page/return round trip #{i + 1}");
+        }
+
+        // Restore the real action only after input-leak checks are finished.
+        {
+            actions[1].SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.RuntimeOnly);
+            SetField(main, "currentIndex", 1);
+            main.RefreshSelection();
+            yield return NextFrame();
+            Press(Key.Enter, false);
+            scripts.OfType<RetireButtonAction>().Single().OnClickRetire();
+            if (boot)
+            {
+                yield return WaitForPhase();
+            }
+            else
+            {
+                double deadline = EditorApplication.timeSinceStartup + 30;
+                while (SceneManager.GetActiveScene().name != "Title")
+                {
+                    if (EditorApplication.timeSinceStartup > deadline) throw new TimeoutException("Standalone retire did not load Title");
+                    yield return null;
+                }
+            }
+            Observe(EditorApplication.isPlaying, "Retire keeps Play Mode running");
+            Observe(SceneManager.GetActiveScene().name == "Title" && (!boot || GamePhaseManager.Instance.CurrentPhase == GamePhase.Title),
+                "Retire returns to Title (and synchronizes phase when booted)");
+            Observe((!boot || !PauseManager.Instance.IsPaused) && Time.timeScale == 1f, "Retire clears pause and restores time");
+            if (boot) Observe(!SceneManager.GetSceneByName("Prototype").isLoaded, "Retire unloads the previous integrated game scene");
         }
     }
 

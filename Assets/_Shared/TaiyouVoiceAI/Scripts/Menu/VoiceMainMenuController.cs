@@ -8,6 +8,8 @@ public class VoiceMainMenuController : MonoBehaviour
     [Header("Menu")]
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private bool pauseGameWhenOpen = true;
+    [SerializeField] private HowToController howToController;
+    [SerializeField] private MicSettingController micSettingController;
 
     [Header("Cursor")]
     [Tooltip("動かしたいカーソル画像。例：ダンベルカーソル")]
@@ -48,6 +50,11 @@ public class VoiceMainMenuController : MonoBehaviour
 
     private int currentIndex;
     private bool isMenuOpen;
+    private int selectionRestoredFrame = -1;
+
+    private bool CanControlMainMenu =>
+        (!requireOpenBeforeControl || isMenuOpen) &&
+        (menuPanel == null || menuPanel.activeInHierarchy);
 
     private void Start()
     {
@@ -82,7 +89,9 @@ public class VoiceMainMenuController : MonoBehaviour
             CloseMenu();
         }
 
-        if (requireOpenBeforeControl && !isMenuOpen)
+        // A hidden parent menu must not read the keys owned by its child panel.
+        // Also leave the key that returned from that panel in the previous view.
+        if (!CanControlMainMenu || selectionRestoredFrame == Time.frameCount)
         {
             return;
         }
@@ -145,6 +154,11 @@ public class VoiceMainMenuController : MonoBehaviour
 
         command = command.Trim().ToLowerInvariant();
         Debug.Log($"[MenuVoiceTrace] VoiceMainMenuController.OnVoiceCommand normalized command={command}");
+
+        if (command != "time" && !CanControlMainMenu)
+        {
+            return;
+        }
 
         switch (command)
         {
@@ -223,6 +237,12 @@ public class VoiceMainMenuController : MonoBehaviour
 
     public void OpenMenu()
     {
+        // Reopening the pause menu while a child view owns it would show both panels.
+        if (isMenuOpen && menuPanel != null && !menuPanel.activeInHierarchy)
+        {
+            return;
+        }
+
         if (TryRouteOpenToPauseManager())
         {
             return;
@@ -238,7 +258,7 @@ public class VoiceMainMenuController : MonoBehaviour
         isMenuOpen = true;
 
         currentIndex = 0;
-        UpdateSelection();
+        RefreshSelection();
 
         if (pauseGameWhenOpen)
         {
@@ -254,6 +274,16 @@ public class VoiceMainMenuController : MonoBehaviour
         if (TryRouteCloseToPauseManager())
         {
             return;
+        }
+
+        // Closing pause also ends its child view, before hiding the main panel.
+        if (howToController != null && howToController.gameObject.activeInHierarchy)
+        {
+            howToController.CloseHowTo();
+        }
+        if (micSettingController != null && micSettingController.gameObject.activeInHierarchy)
+        {
+            micSettingController.CloseMicSetting();
         }
 
         if (menuPanel != null)
@@ -490,6 +520,7 @@ public class VoiceMainMenuController : MonoBehaviour
 
     public void RefreshSelection()
     {
+        selectionRestoredFrame = Time.frameCount;
         UpdateSelection();
     }
 }

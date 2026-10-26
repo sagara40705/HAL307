@@ -797,7 +797,7 @@ MonoBehaviour:
   rightKey: 62
   decideKey: 2
   decideKey2: 1
-  _voiceMainMenuController: {fileID: 0}
+  _voiceMainMenuController: {fileID: 1796446398}
 --- !u!114 &303607551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1067,7 +1067,7 @@ MonoBehaviour:
   rightKey: 62
   decideKey: 2
   decideKey2: 1
-  _voiceMainMenuController: {fileID: 0}
+  _voiceMainMenuController: {fileID: 1796446398}
 --- !u!114 &471578824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3229,6 +3229,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: asdfTest.Sandbox::VoiceMenuController
   menuPanel: {fileID: 2138444099}
   pauseGameWhenOpen: 1
+  howToController: {fileID: 303607550}
+  micSettingController: {fileID: 471578823}
   cursor: {fileID: 1285657159}
   cursorOffset: {x: -360, y: 0}
   selectLights:

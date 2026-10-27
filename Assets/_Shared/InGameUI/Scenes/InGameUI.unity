@@ -185,6 +185,7 @@ MonoBehaviour:
   - {fileID: 1764857}
   - {fileID: 2119480822}
   warningPresenter: {fileID: 0}
+  audienceRequestSystem: {fileID: 0}
 --- !u!1 &36460463
 GameObject:
   m_ObjectHideFlags: 0
@@ -3322,6 +3323,8 @@ MonoBehaviour:
   playerScoreDisplay: {fileID: 40763176}
   enemy1ScoreDisplay: {fileID: 810082269}
   enemy2ScoreDisplay: {fileID: 143103181}
+  enemy1ScorePanel: {fileID: 1041751640}
+  enemy2ScorePanel: {fileID: 68549861}
   feverGaugeController: {fileID: 551905174}
   scoreUiPresenter: {fileID: 0}
   showScoreUiOnStart: 1
@@ -3535,8 +3538,8 @@ MonoBehaviour:
   sceneUiRoots:
   - {fileID: 1718496973}
   nextSceneName: 
-  cellWidth: 130
-  cellHeight: 80
+  cellWidth: 180
+  cellHeight: 120
   extraRows: 3
   spawnInterval: 0.006
   startYOffset: 250

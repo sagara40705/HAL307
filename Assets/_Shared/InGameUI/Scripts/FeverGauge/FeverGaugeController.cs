@@ -157,6 +157,15 @@ public class FeverGaugeController : MonoBehaviour
         SetFill(0f);
     }
 
+    // Endless match boundaries must not carry an active fever or its presentation timer forward.
+    public void ResetForRound()
+    {
+        if (_isFever) { EndFever(); }
+        _feverTimer = 0f;
+        ResetFill();
+        HideFeverObjects();
+    }
+
     public void DebugIncreaseFill()
     {
         AddFill();

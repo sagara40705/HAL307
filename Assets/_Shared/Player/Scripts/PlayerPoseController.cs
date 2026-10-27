@@ -39,6 +39,7 @@ namespace Player
         private float _poseTimer = 0f;
 
         public bool IsPosing => _isPose;
+        public Animator PoseAnimator => _animator;
         public Transform MoveTargetTransform => _colorChanger != null ? _colorChanger.transform : transform;
 
         // ポーズ時のイベント
@@ -193,6 +194,26 @@ namespace Player
             }
             _currentPoseName = "None";
             Debug.Log("Player pose ended.");
+        }
+
+        // Called only at Endless round boundaries, while gameplay input is locked.
+        public void ResetForRound()
+        {
+            if (_isPose)
+            {
+                StopPose();
+                return;
+            }
+
+            _poseTimer = 0f;
+            _currentPoseName = "None";
+            _poseParryJudge?.EndPlayerPose();
+            _colorChanger?.ResetColor();
+            if (_animator != null)
+            {
+                ResetAnimationTriggers();
+                _animator.Play(IdleStateHash, 0, 0f);
+            }
         }
 
         private void ResetAnimationTriggers()

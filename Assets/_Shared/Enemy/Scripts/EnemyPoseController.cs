@@ -156,6 +156,13 @@ namespace Enemy
             _poseParryJudge?.EndEnemyPose();
         }
 
+        public void ResetForRound()
+        {
+            Unpause();
+            ClearFakePoseRequest();
+            _timer = 0f;
+        }
+
         // パリイ成功時の処理
         public void OnParrySuccess()
         {

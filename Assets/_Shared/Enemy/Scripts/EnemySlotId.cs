@@ -11,6 +11,7 @@ namespace Enemy
 
     public enum EnemyMaxCount
     {
+        One = 1,
         Two = 2,
         Four = 4
     }

@@ -17,10 +17,12 @@ public sealed class InGameFlowController : MonoBehaviour
     private WaveData _currentWaveData;
     private int _currentTargetScore;
     private float _currentEnemyAnimationSpeed = 1f;
+    private EndlessRoundFlow _endlessFlow;
 
     public int CurrentWaveIndex => _currentWaveIndex;
     public WaveData CurrentWaveData => _currentWaveData;
-    public string CurrentStateName => _currentState != null ? _currentState.StateName : "None";
+    public string CurrentStateName => _endlessFlow != null ? _endlessFlow.Phase : _currentState != null ? _currentState.StateName : "None";
+    public bool IsEndlessMode => stageData != null && stageData.IsEndlessMode;
     public bool IsFlowRunning => _isFlowRunning;
     public bool IsChangingState => _isChangingState;
     public int CurrentTargetScore => _currentTargetScore;
@@ -38,6 +40,13 @@ public sealed class InGameFlowController : MonoBehaviour
     // 進行オブジェクト停止時に演出用モデルを復元
     private void OnDisable()
     {
+        if (_endlessFlow != null)
+        {
+            _endlessFlow.Dispose();
+            StopAllCoroutines();
+            _endlessFlow = null;
+            _isFlowRunning = false;
+        }
         context?.RestoreWavePresentationStage();
     }
 
@@ -122,6 +131,18 @@ public sealed class InGameFlowController : MonoBehaviour
             _currentWaveIndex = 0;
             GameResultManager.Instance?.BeginRun();
 
+            if (stageData.IsEndlessMode)
+            {
+                _endlessFlow = new EndlessRoundFlow(stageData, context, SetEndlessWave);
+                try { yield return _endlessFlow.Run(); }
+                finally
+                {
+                    _endlessFlow?.Dispose();
+                    _endlessFlow = null;
+                }
+                yield break;
+            }
+
             var gameStartState = new GameStartFlowState(stageData);
             yield return ChangeStateCoroutine(gameStartState);
 
@@ -178,6 +199,14 @@ public sealed class InGameFlowController : MonoBehaviour
         {
             _isFlowRunning = false;
         }
+    }
+
+    private void SetEndlessWave(int index, WaveData wave)
+    {
+        _currentWaveIndex = index;
+        _currentWaveData = wave;
+        _currentTargetScore = stageData.GetTargetScore(index);
+        _currentEnemyAnimationSpeed = stageData.GetEnemyAnimationSpeed(index);
     }
 
     // 現在StateのExitと次StateのEnter/Executeを実行

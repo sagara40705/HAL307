@@ -53,13 +53,15 @@ public class MicSettingController : MonoBehaviour
     [SerializeField] private VoiceMainMenuController _voiceMainMenuController;
 
     private int currentIndex;
+    private int openedFrame = -1;
 
     private void Start()
     {
         ApplySensitivity();
         UpdateCursor();
 
-        if (micSettingPanel != null)
+        // Do not undo an explicit open if Start was deferred while preloaded.
+        if (micSettingPanel != null && openedFrame < 0)
         {
             micSettingPanel.SetActive(false);
         }
@@ -67,7 +69,7 @@ public class MicSettingController : MonoBehaviour
 
     private void Update()
     {
-        if (micSettingPanel == null || !micSettingPanel.activeSelf)
+        if (micSettingPanel == null || !micSettingPanel.activeInHierarchy || openedFrame == Time.frameCount)
         {
             return;
         }
@@ -78,6 +80,7 @@ public class MicSettingController : MonoBehaviour
 
     public void OpenMicSetting()
     {
+        openedFrame = Time.frameCount;
         if (mainMenuPanel != null)
         {
             mainMenuPanel.SetActive(false);
@@ -121,7 +124,7 @@ public class MicSettingController : MonoBehaviour
 
     public void OnVoiceCommand(string command)
     {
-        if (string.IsNullOrWhiteSpace(command))
+        if (micSettingPanel == null || !micSettingPanel.activeInHierarchy || string.IsNullOrWhiteSpace(command))
         {
             return;
         }

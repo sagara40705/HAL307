@@ -134,7 +134,9 @@ public class ForwardProgressMover : MonoBehaviour
     private bool TryRegisterEnemies()
     {
         Enemy.EnemyRegistry enemyRegistry = FindFirstObjectByType<Enemy.EnemyRegistry>();
-        if (enemyRegistry == null || enemyRegistry.Count < 2)
+        InGameFlowController flow = FindFirstObjectByType<InGameFlowController>();
+        int requiredCount = flow != null && flow.IsEndlessMode ? 1 : 2;
+        if (enemyRegistry == null || enemyRegistry.Count < requiredCount)
         {
             return false;
         }
@@ -151,7 +153,7 @@ public class ForwardProgressMover : MonoBehaviour
             registeredCount++;
         }
 
-        return registeredCount >= 2;
+        return registeredCount >= requiredCount;
     }
 
     private void MoveActors(float deltaTime)

@@ -30,7 +30,9 @@ public sealed class StageData : ScriptableObject
     public InGamePresentationAction GameEndAction => gameEndAction;
     public string ResultSceneName => resultSceneName;
     public Vector3 CameraInitialPosition => cameraInitialPosition;
-    public EnemyMaxCount InitialEnemyCount => initialEnemyCount == EnemyMaxCount.Four
+    public EnemyMaxCount InitialEnemyCount => endlessMode && initialEnemyCount == EnemyMaxCount.One
+        ? EnemyMaxCount.One
+        : initialEnemyCount == EnemyMaxCount.Four
         ? EnemyMaxCount.Four
         : EnemyMaxCount.Two;
     public EnemyMaxCount MaxEnemyCount => InitialEnemyCount == EnemyMaxCount.Four || maxEnemyCount == EnemyMaxCount.Four

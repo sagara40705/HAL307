@@ -17,6 +17,7 @@ public class StageEndJudge : MonoBehaviour
     [SerializeField] private UnityEvent _onStageEnd;
 
     public event Action OnStageEnd;
+    public bool IsRoundSuspended { get; set; }
 
     private bool _isJudged;
 
@@ -84,6 +85,7 @@ public class StageEndJudge : MonoBehaviour
 
     private void NotifyStageEnd(string sourceName)
     {
+        if (IsRoundSuspended) { return; }
         _isJudged = true;
         Debug.Log("StageEndJudge: Stage End Triggered by " + sourceName);
         OnStageEnd?.Invoke();

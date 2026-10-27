@@ -3323,6 +3323,8 @@ MonoBehaviour:
   playerScoreDisplay: {fileID: 40763176}
   enemy1ScoreDisplay: {fileID: 810082269}
   enemy2ScoreDisplay: {fileID: 143103181}
+  enemy1ScorePanel: {fileID: 1041751640}
+  enemy2ScorePanel: {fileID: 68549861}
   feverGaugeController: {fileID: 551905174}
   scoreUiPresenter: {fileID: 0}
   showScoreUiOnStart: 1

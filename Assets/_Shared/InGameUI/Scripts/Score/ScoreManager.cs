@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
+    public enum EndlessScoreGroup
+    {
+        ScreenLeft,
+        ScreenRight
+    }
     [Header("スコア初期化")]
     [SerializeField]
     private string _inGameSceneName = "InGameUI";
@@ -115,6 +120,56 @@ public class ScoreManager : MonoBehaviour
     {
         int index = (int)slot - 1;
         return index >= 0 && index < _enemyScores.Length ? _enemyScores[index] : 0;
+    }
+
+    // Returns group presence separately from its score, so an occupied group can display zero.
+    // Individual Slot scores remain the source of truth for both awards and replacement selection.
+    public bool TryGetEndlessGroupScore(EnemyLineupManager lineup, EndlessScoreGroup group, out int score)
+    {
+        score = 0;
+        GameModeManager mode = GameModeManager.Instance;
+        if (mode == null || !mode.IsInitialized || mode.CurrentGameMode != GameMode.FivePlayer || lineup == null)
+        {
+            return false;
+        }
+
+        EnemySlotId first;
+        EnemySlotId second;
+        switch (group)
+        {
+            // Camera faces Y=180: positive world X is screen left.
+            case EndlessScoreGroup.ScreenLeft:
+                first = EnemySlotId.Enemy2;
+                second = EnemySlotId.Enemy3;
+                break;
+            case EndlessScoreGroup.ScreenRight:
+                first = EnemySlotId.Enemy1;
+                second = EnemySlotId.Enemy4;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(group));
+        }
+
+        bool hasFirst = IsCommittedParticipant(lineup, first);
+        bool hasSecond = IsCommittedParticipant(lineup, second);
+        long total = (hasFirst ? (long)GetEnemyScore(first) : 0L) +
+                     (hasSecond ? (long)GetEnemyScore(second) : 0L);
+        score = (int)Math.Min(total, int.MaxValue);
+        return hasFirst || hasSecond;
+    }
+
+    private static bool IsCommittedParticipant(EnemyLineupManager lineup, EnemySlotId slot)
+    {
+        if ((int)slot > lineup.MaxEnemyCount) { return false; }
+        Enemy.Enemy enemy = lineup.GetEnemy(slot);
+        if (enemy == null || !enemy.ParticipatesInRound || !enemy.gameObject.activeInHierarchy)
+        {
+            return false;
+        }
+
+        // Exclude the selected outgoing actor even before its presentation flag changes.
+        return !lineup.HasPendingReplacement ||
+               (enemy != lineup.PendingOldEnemy && enemy != lineup.PendingNewEnemy);
     }
 
     public Enemy.EnemySlotId GetLowestEnemySlot()

@@ -18,6 +18,7 @@ public class OnStartPose : MonoBehaviour
     };
 
     private Animator _animator;
+    private bool _countdownHeld;
 
     [Header("Animation")]
     [SerializeField] private float animationSpeed = 1.0f;
@@ -101,7 +102,7 @@ public class OnStartPose : MonoBehaviour
     {
         if (_animator != null)
         {
-            _animator.speed = animationSpeed;
+            _animator.speed = _countdownHeld ? 0f : animationSpeed;
         }
     }
 
@@ -113,5 +114,20 @@ public class OnStartPose : MonoBehaviour
     public float GetAnimationSpeed()
     {
         return animationSpeed;
+    }
+
+    // The existing Idle clip contains walking. Hold its standing first frame only after
+    // the Endless entrance has completed; do not pause the entrance PlayableGraph.
+    public void SetCountdownHold(bool held)
+    {
+        _countdownHeld = held;
+        if (!TryResolveAnimator()) { return; }
+        if (held)
+        {
+            ResetAnimationTriggers();
+            _animator.Play(IdleStateHash, 0, 0f);
+            _animator.Update(0f);
+        }
+        _animator.speed = held ? 0f : animationSpeed;
     }
 }

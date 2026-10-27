@@ -432,6 +432,7 @@ public sealed class InGameFlowContext : MonoBehaviour
     {
         ResetCameraPosition(stageData);
         ForwardProgressMover?.ResetStageEndJudgePosition();
+        Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
         Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
     }
 

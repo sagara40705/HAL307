@@ -31,6 +31,8 @@ public class WaveGaugeController : MonoBehaviour
 
     private float currentValue;
     private bool isTransitionStarted;
+    // Endless owns the transition so the finish pose remains visible until completion.
+    public bool DeferStageEndTransition { get; set; }
 
     private void Start()
     {
@@ -246,7 +248,10 @@ public class WaveGaugeController : MonoBehaviour
 
         HideOtherUis();
 
-        PlayGaugeEmptyTransition().Forget();
+        if (!DeferStageEndTransition)
+        {
+            PlayGaugeEmptyTransition().Forget();
+        }
     }
 
     private void HideOtherUis()

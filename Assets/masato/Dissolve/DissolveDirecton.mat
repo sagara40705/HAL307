@@ -60,7 +60,7 @@ Material:
     - _DstBlend: 10
     - _DstBlendAlpha: 10
     - _MeskConstruct: 0
-    - _NoisePower: 0.5
+    - _NoisePower: 0.39
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1

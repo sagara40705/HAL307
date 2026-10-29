@@ -19,6 +19,7 @@ public class OnStartPose : MonoBehaviour
 
     private Animator _animator;
     private bool _countdownHeld;
+    private bool _countdownRootMotion;
 
     [Header("Animation")]
     [SerializeField] private float animationSpeed = 1.0f;
@@ -102,7 +103,7 @@ public class OnStartPose : MonoBehaviour
     {
         if (_animator != null)
         {
-            _animator.speed = _countdownHeld ? 0f : animationSpeed;
+            _animator.speed = animationSpeed;
         }
     }
 
@@ -116,18 +117,31 @@ public class OnStartPose : MonoBehaviour
         return animationSpeed;
     }
 
-    // The existing Idle clip contains walking. Hold its standing first frame only after
-    // the Endless entrance has completed; do not pause the entrance PlayableGraph.
+    // Endless keeps the existing entrance pose through the countdown. Gameplay Idle
+    // contains walking, so enter it only when the countdown completion releases us.
     public void SetCountdownHold(bool held)
     {
-        _countdownHeld = held;
         if (!TryResolveAnimator()) { return; }
+        if (_countdownHeld == held) { return; }
+        _countdownHeld = held;
         if (held)
         {
+            _countdownRootMotion = _animator.applyRootMotion;
+            _animator.applyRootMotion = false;
+            // Keep the pose selected at spawn, including the incoming NPC's blended landing.
+            int poseIndex = _animator.GetInteger("StartPoseIndex");
+            int poseState = Animator.StringToHash("Base Layer.StartPose.START" + (char)('A' + poseIndex));
             ResetAnimationTriggers();
-            _animator.Play(IdleStateHash, 0, 0f);
+            _animator.ResetTrigger("StartPose");
+            _animator.Play(poseState, 0, 0f);
             _animator.Update(0f);
         }
-        _animator.speed = held ? 0f : animationSpeed;
+        else
+        {
+            _animator.applyRootMotion = _countdownRootMotion;
+            ResetAnimationTriggers();
+            _animator.Play(IdleStateHash, 0, 0f);
+        }
+        _animator.speed = animationSpeed;
     }
 }

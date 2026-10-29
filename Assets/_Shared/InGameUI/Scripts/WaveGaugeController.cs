@@ -20,6 +20,7 @@ public class WaveGaugeController : MonoBehaviour
     // FinalPose UIが表示中か
     public bool IsFinalPoseVisible => isWarningVisible;
     private bool isWaveFinalSuppressed;
+    private bool isEndlessFinishPose;
 
     [Header("Wave演出時に非表示にするUI")]
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
@@ -125,7 +126,8 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         // 警告UIの表示状態を更新
-        bool shouldShowWarning = !isWaveFinalSuppressed && currentValue <= warningThreshold;
+        bool shouldShowWarning = !isWaveFinalSuppressed &&
+            (isEndlessFinishPose || currentValue <= warningThreshold);
 
         // 状態が変わった時だけ処理する
         if (isWarningVisible != shouldShowWarning)
@@ -161,6 +163,7 @@ public class WaveGaugeController : MonoBehaviour
         // WaveGaugeControllerの状態をリセット
         isTransitionStarted = false;
         isWaveFinalSuppressed = false;
+        isEndlessFinishPose = false;
         currentValue = maxValue;
 
         // マテリアルが設定されていない場合はImageコンポーネントから取得
@@ -195,8 +198,20 @@ public class WaveGaugeController : MonoBehaviour
         ShowOtherUis();
     }
 
+    // Endless owns its finish/transition sequence; retain the existing prompt even if
+    // gameplay progress no longer updates after the round has been suspended.
+    public void ShowEndlessFinishPose()
+    {
+        if (!DeferStageEndTransition) { return; }
+        isEndlessFinishPose = true;
+        isWaveFinalSuppressed = false;
+        if (!isWarningVisible) { SetWaveFinalVisible(true); }
+        HideOtherUis();
+    }
+
     public void HideWaveFinalForGameEnd()
     {
+        isEndlessFinishPose = false;
         isWaveFinalSuppressed = true;
         SetWaveFinalVisible(false);
         // GameEnd中だから再表示しない

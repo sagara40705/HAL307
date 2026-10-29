@@ -15,7 +15,9 @@ public sealed class EndlessRoundFlow : IDisposable
     private readonly InGameEndlessRoundPresentationAction presentation;
     private bool disposed;
     private bool ownsLock;
+    private bool ownsRoundTransition;
     private IntroCoutDown countdown;
+    private IntroSmoke introSmoke;
     private Player.PlayerPoseContoroller player;
     private Quaternion cameraRotation;
     private Quaternion playerRotation;
@@ -59,6 +61,7 @@ public sealed class EndlessRoundFlow : IDisposable
             }
             if (failure != null && !disposed)
             {
+                ClearRoundTransition();
                 EnterPresentation();
                 Phase = "EndlessFaulted";
                 Debug.LogError("[Endless] Progression stopped safely; this is not a defeat. " + failure);
@@ -92,6 +95,7 @@ public sealed class EndlessRoundFlow : IDisposable
             "Slot placement Action is missing.");
         player = Object.FindFirstObjectByType<Player.PlayerPoseContoroller>();
         countdown = Object.FindFirstObjectByType<IntroCoutDown>();
+        introSmoke = Object.FindFirstObjectByType<IntroSmoke>();
         Require(player != null && countdown != null && context.ForwardProgressMover.CameraTransform != null,
             "Player, countdown or gameplay camera is missing.");
         playerRotation = player.MoveTargetTransform.rotation;
@@ -105,8 +109,12 @@ public sealed class EndlessRoundFlow : IDisposable
         setWave(index, wave);
         Phase = "EndlessInitialEntrance";
         context.ResetCameraPosition(stage);
-        context.WaveGauge.BeginWavePresentation();
+        // Keep the HUD visible from the entrance, while presentation/input locks remain held.
+        context.WaveGauge.EndWavePresentation();
         context.WaveGauge.HideWaveFinalForGameEnd();
+        // Start with visible particles, rather than waiting for the first emission after activation.
+        introSmoke?.ClearSmoke();
+        introSmoke?.BeginEndlessEntrance();
         yield return new GameStartFlowState(stage).Execute(context);
         Require(context.EnemyLineup.CurrentEnemyCount == 1 && context.EnemyLineup.MaxEnemyCount == 4,
             "Initial NPC generation failed.");
@@ -170,9 +178,11 @@ public sealed class EndlessRoundFlow : IDisposable
             incoming.gameObject.SetActive(false);
 
             Phase = "EndlessFinishPose";
-            context.WaveGauge.HideWaveFinalForGameEnd();
+            context.WaveGauge.ShowEndlessFinishPose();
             context.AudienceRequest?.ResetRequests();
-            yield return presentation.PlayFinish(player);
+            // Render the existing instruction before starting the finish animation.
+            yield return null;
+            yield return presentation.PlayFinish(player, CoverForIncomingCutIn());
 
             Phase = "EndlessNpcEntrance";
             context.WaveGauge.BeginWavePresentation();
@@ -185,7 +195,15 @@ public sealed class EndlessRoundFlow : IDisposable
             }
             var positions = (InGameSetActorPositionsPresentationAction)context.ResetPositionAction;
             Vector3 destination = positions.GetFivePlayerEnemyPosition(lineup.PendingReplacementSlot);
-            yield return presentation.PlayIncoming(incoming, destination);
+            // Steam belongs to the first entrance only. Later NPCs climb and pose,
+            // then continue straight into the countdown without another burst.
+            ClearIntroSmoke();
+            try { yield return presentation.PlayIncomingCutIn(context, incoming, destination); }
+            finally
+            {
+                ClearIntroSmoke();
+                ClearRoundTransition();
+            }
             Require(lineup.CommitPendingReplacement() == incoming, "NPC replacement could not be committed.");
             incoming.SetRoundParticipation(true);
             Require(lineup.CurrentEnemyCount == Mathf.Min(previousCount + 1, 4), "Unexpected NPC count after commit.");
@@ -194,6 +212,22 @@ public sealed class EndlessRoundFlow : IDisposable
             wave = nextWave;
             yield return PrepareRound(index, wave);
         }
+    }
+
+    private IEnumerator CoverForIncomingCutIn()
+    {
+        Phase = "EndlessCutInFade";
+        context.WaveGauge.HideWaveFinalForGameEnd();
+        ownsRoundTransition = true;
+        // Reuse Grand Prix's falling dumbbells; wait for the actual cover completion.
+        yield return TransitionManager.PlayDumbbellFadeOut().ToCoroutine();
+    }
+
+    private void ClearRoundTransition()
+    {
+        if (!ownsRoundTransition) { return; }
+        ownsRoundTransition = false;
+        TransitionManager.ResetImmediate();
     }
 
     private IEnumerator PrepareRound(int index, WaveData wave)
@@ -308,7 +342,9 @@ public sealed class EndlessRoundFlow : IDisposable
 
     private void RestoreAfterStop()
     {
+        ClearRoundTransition();
         ReleaseCountdownActors();
+        ClearIntroSmoke();
         if (presentation != null) { presentation.CancelPlayback(); }
         if (countdown != null && countdown.IsRunning) { countdown.CancelCountDown(); }
         if (context != null)
@@ -328,10 +364,20 @@ public sealed class EndlessRoundFlow : IDisposable
                 }
                 lineup.CancelPendingReplacement();
             }
-            if (context.WaveGauge != null) { context.WaveGauge.DeferStageEndTransition = false; }
+            if (context.WaveGauge != null)
+            {
+                context.WaveGauge.HideWaveFinalForGameEnd();
+                context.WaveGauge.DeferStageEndTransition = false;
+            }
             context.RestoreWavePresentationStage();
         }
         ExitPresentation();
+    }
+
+    private void ClearIntroSmoke()
+    {
+        // StageModel may already have unloaded before the flow's OnDisable is called.
+        if (introSmoke != null && introSmoke.gameObject.scene.isLoaded) { introSmoke.ClearSmoke(); }
     }
 
     private static void Require(bool condition, string message)

@@ -3,6 +3,9 @@ using UnityEngine.InputSystem;
 
 public class SubmonitorMove : MonoBehaviour
 {
+    public enum ViewMode { Orbit = 0, LeftSidePoseZoom = 1 }
+
+    [SerializeField] private ViewMode viewMode = ViewMode.Orbit;
     [SerializeField] private float moveSpeed = 5f;
 
     //何秒かけて移動するか
@@ -10,6 +13,16 @@ public class SubmonitorMove : MonoBehaviour
     [SerializeField, Min(0.01f)] private float cameraDistance = 5f;
     [SerializeField] private float cameraHeight = 1.8f;
     [SerializeField] private float lookAtHeight = 1.2f;
+    [SerializeField, Range(0f, 75f)] private float orbitElevation = 35f;
+    [Header("Side monitors only")]
+    [SerializeField, Range(10f, 85f)] private float sideAngle = 55f;
+    [SerializeField, Min(0.1f)] private float poseDistance = 4f;
+    [SerializeField, Min(1f)] private float framingPadding = 1.15f;
+    private Camera monitorCamera;
+    private Transform framingTarget;
+    private Renderer[] framingRenderers;
+    // 検証用の手動固定は通常プレイの入力から切り離す。
+    [SerializeField] private bool enableManualCameraControls = false;
     private float moveTimer = 0f;
 
     //それぞれのTransformを格納する変数
@@ -29,6 +42,9 @@ public class SubmonitorMove : MonoBehaviour
     //現在見ているターゲット
     private Transform currentTarget;
     private Transform poseFocusTarget;
+    private Transform playerFocusBone;
+    private Transform cachedFocusTarget;
+    private Transform cachedFocusBone;
 
     //ポーズ開始を検出するための前フレーム状態
     private bool wasPlayerPosing;
@@ -42,6 +58,12 @@ public class SubmonitorMove : MonoBehaviour
     private Vector3 startPosition;
     private Quaternion startRotation;
     private float orbitAngle;
+    private Vector3 orbitFocus;
+    [Header("Central monitor: whole lineup")]
+    [SerializeField, Min(1f)] private float actorFramingRadius = 2.5f;
+    [SerializeField, Range(1f, 180f)] private float orbitArc = 90f;
+    private float orbitCenterAngle;
+    private float orbitTravel;
 
     //カメラの前方停止フラグ
     private bool isStopFront = false;
@@ -54,22 +76,27 @@ public class SubmonitorMove : MonoBehaviour
     void Start()
     {
         ResolvePlayer();
-        ResolveEnemies();
+        if (viewMode == ViewMode.LeftSidePoseZoom) { ResolveEnemies(); }
+        monitorCamera = GetComponent<Camera>();
+        if (viewMode == ViewMode.LeftSidePoseZoom) { SetupSideMonitorSurfaces(); }
         SetupCamera();
     }
 
     void Update()
     {
         ResolvePlayer();
-        ResolveEnemies();
-        HandleInput();
+        // Central monitor never accepts pose focus or manual pinning.
+        if (viewMode == ViewMode.LeftSidePoseZoom)
+        {
+            ResolveEnemies();
+            HandleInput();
+        }
     }
 
     private void LateUpdate()
     {
         ResolvePlayer();
-        ResolveEnemies();
-        UpdatePoseFocus();
+        if (viewMode == ViewMode.LeftSidePoseZoom) { ResolveEnemies(); }
 
         if (!isCameraInitialized)
         {
@@ -80,6 +107,20 @@ public class SubmonitorMove : MonoBehaviour
         {
             return;
         }
+
+        if (viewMode == ViewMode.Orbit)
+        {
+            UpdateOrbit();
+        }
+        else
+        {
+            UpdateSideCamera();
+        }
+    }
+
+    private void UpdateSideCamera()
+    {
+        UpdatePoseFocus();
 
         if (isMoving)
         {
@@ -99,12 +140,14 @@ public class SubmonitorMove : MonoBehaviour
             return;
         }
 
-        UpdateOrbit();
+        transform.position = GetSideBasePosition();
+        // The normal shot follows locomotion only, without following animated hip sway.
+        transform.rotation = Quaternion.LookRotation(GetSideBaseFocus() - transform.position, Vector3.up);
     }
 
     private void HandleInput()
     {
-        if (Keyboard.current == null)
+        if (!enableManualCameraControls || Keyboard.current == null)
         {
             return;
         }
@@ -188,6 +231,7 @@ public class SubmonitorMove : MonoBehaviour
         player = playerPoseController != null
             ? playerPoseController.MoveTargetTransform
             : null;
+        playerFocusBone = FindFocusBone(player);
 
         if (isStopFront && currentTarget == null)
         {
@@ -224,29 +268,14 @@ public class SubmonitorMove : MonoBehaviour
         Enemy.Enemy lineupEnemy3 = enemyLineupManager.Enemy3;
         Enemy.Enemy lineupEnemy4 = enemyLineupManager.Enemy4;
 
-        if (enemy1 != null)
-        {
-            enemyLController = enemy1;
-            enemyL = enemy1.transform;
-        }
-
-        if (enemy2 != null)
-        {
-            enemyRController = enemy2;
-            enemyR = enemy2.transform;
-        }
-
-        if (lineupEnemy3 != null)
-        {
-            enemy3Controller = lineupEnemy3;
-            enemy3 = lineupEnemy3.transform;
-        }
-
-        if (lineupEnemy4 != null)
-        {
-            enemy4Controller = lineupEnemy4;
-            enemy4 = lineupEnemy4.transform;
-        }
+        enemyLController = enemy1;
+        enemyL = enemy1 != null ? enemy1.transform : null;
+        enemyRController = enemy2;
+        enemyR = enemy2 != null ? enemy2.transform : null;
+        enemy3Controller = lineupEnemy3;
+        enemy3 = lineupEnemy3 != null ? lineupEnemy3.transform : null;
+        enemy4Controller = lineupEnemy4;
+        enemy4 = lineupEnemy4 != null ? lineupEnemy4.transform : null;
     }
 
     private void ResolveEnemiesFromRegistry()
@@ -263,7 +292,7 @@ public class SubmonitorMove : MonoBehaviour
 
         foreach (Enemy.Enemy enemy in enemyRegistry.Enemies)
         {
-            if (enemy == null)
+            if (enemy == null || !enemy.isActiveAndEnabled || !enemy.ParticipatesInRound)
             {
                 continue;
             }
@@ -294,10 +323,10 @@ public class SubmonitorMove : MonoBehaviour
     private void UpdatePoseFocus()
     {
         bool isPlayerPosing = playerPoseController != null && playerPoseController.IsPosing;
-        bool isEnemyLPosing = enemyLController != null && enemyLController.IsPosing;
-        bool isEnemyRPosing = enemyRController != null && enemyRController.IsPosing;
-        bool isEnemy3Posing = enemy3Controller != null && enemy3Controller.IsPosing;
-        bool isEnemy4Posing = enemy4Controller != null && enemy4Controller.IsPosing;
+        bool isEnemyLPosing = IsParticipatingPose(enemyLController);
+        bool isEnemyRPosing = IsParticipatingPose(enemyRController);
+        bool isEnemy3Posing = IsParticipatingPose(enemy3Controller);
+        bool isEnemy4Posing = IsParticipatingPose(enemy4Controller);
 
         // 同フレームではPlayerを最優先し、番号が大きいEnemyを次に優先する
         Transform startedPoseTarget = null;
@@ -372,6 +401,11 @@ public class SubmonitorMove : MonoBehaviour
         MoveToFront(target, false);
     }
 
+    private static bool IsParticipatingPose(Enemy.Enemy actor)
+    {
+        return actor != null && actor.isActiveAndEnabled && actor.ParticipatesInRound && actor.IsPosing;
+    }
+
     private Transform GetPosingTarget(
         bool isPlayerPosing,
         bool isEnemyLPosing,
@@ -431,8 +465,15 @@ public class SubmonitorMove : MonoBehaviour
         }
 
         transform.SetParent(null, true);
-        orbitAngle = player.eulerAngles.y;
-        SetCameraPose(GetFrontPosition(player), player);
+        orbitCenterAngle = player.eulerAngles.y;
+        orbitTravel = Mathf.Max(0.5f, orbitArc * 0.5f) * Mathf.PI * 0.5f;
+        orbitAngle = orbitCenterAngle;
+        if (viewMode == ViewMode.Orbit) { SetOrbitCameraPose(); }
+        else
+        {
+            transform.position = GetSideBasePosition();
+            transform.rotation = Quaternion.LookRotation(GetSideBaseFocus() - transform.position, Vector3.up);
+        }
         isCameraInitialized = true;
     }
 
@@ -450,8 +491,10 @@ public class SubmonitorMove : MonoBehaviour
         float t = Mathf.Clamp01(moveTimer / duration);
         float easedT = t * t * (3f - 2f * t);
 
-        Vector3 destination = GetFrontPosition(currentTarget);
-        Quaternion destinationRotation = GetLookRotation(currentTarget, destination);
+        Vector3 destination = restartRotationAfterMove ? GetSideBasePosition() : GetFrontPosition(currentTarget);
+        Quaternion destinationRotation = restartRotationAfterMove
+            ? Quaternion.LookRotation(GetSideBaseFocus() - destination, Vector3.up)
+            : GetLookRotation(currentTarget, destination);
         transform.position = Vector3.Lerp(startPosition, destination, easedT);
         transform.rotation = Quaternion.Slerp(startRotation, destinationRotation, easedT);
 
@@ -463,7 +506,8 @@ public class SubmonitorMove : MonoBehaviour
         isMoving = false;
         if (restartRotationAfterMove)
         {
-            ResumeOrbit();
+            restartRotationAfterMove = false;
+            isStopFront = false;
         }
     }
 
@@ -474,10 +518,45 @@ public class SubmonitorMove : MonoBehaviour
 
     private void UpdateOrbit()
     {
-        orbitAngle += moveSpeed * Time.deltaTime;
-        Vector3 orbitOffset = Quaternion.Euler(0f, orbitAngle, 0f) * Vector3.forward * cameraDistance;
-        Vector3 cameraPosition = player.position + orbitOffset + Vector3.up * cameraHeight;
-        SetCameraPose(cameraPosition, player);
+        // Move between opposite ends of the front arc, easing to a stop at each end.
+        // Position changes and the lens are independent of pose state.
+        float halfArc = Mathf.Max(0.5f, orbitArc * 0.5f);
+        orbitTravel = Mathf.Repeat(orbitTravel + moveSpeed * Time.deltaTime, halfArc * 2f * Mathf.PI);
+        orbitAngle = orbitCenterAngle - halfArc * Mathf.Cos(orbitTravel / halfArc);
+        SetOrbitCameraPose();
+    }
+
+    private Vector3 GetOrbitPosition()
+    {
+        // Frame the whole participating lineup, not a single actor or its current pose.
+        Bounds roots = new Bounds(player.position, Vector3.zero);
+        if (enemyLineupManager == null) { enemyLineupManager = Object.FindFirstObjectByType<Enemy.EnemyLineupManager>(); }
+        if (enemyLineupManager != null)
+        {
+            for (int slot = 1; slot <= enemyLineupManager.MaxEnemyCount; slot++)
+            {
+                Enemy.Enemy actor = enemyLineupManager.GetEnemy((Enemy.EnemySlotId)slot);
+                if (actor != null && actor.isActiveAndEnabled && actor.ParticipatesInRound)
+                    roots.Encapsulate(actor.transform.position);
+            }
+        }
+        orbitFocus = roots.center + Vector3.up * (lookAtHeight + 0.3f);
+        if (monitorCamera == null) { monitorCamera = GetComponent<Camera>(); }
+        float vertical = monitorCamera != null ? monitorCamera.fieldOfView * 0.5f * Mathf.Deg2Rad : 30f * Mathf.Deg2Rad;
+        float horizontal = Mathf.Atan(Mathf.Tan(vertical) * (monitorCamera != null ? monitorCamera.aspect : 1f));
+        // Fixed per-character room includes outstretched arms. Pose flags never change the lens/radius.
+        float radius = roots.extents.magnitude + actorFramingRadius;
+        float distance = radius * framingPadding / Mathf.Sin(Mathf.Min(vertical, horizontal));
+        distance = Mathf.Max(distance, cameraDistance / Mathf.Cos(orbitElevation * Mathf.Deg2Rad));
+        Vector3 direction = Quaternion.Euler(0f, orbitAngle, 0f) *
+            new Vector3(0f, Mathf.Sin(orbitElevation * Mathf.Deg2Rad), Mathf.Cos(orbitElevation * Mathf.Deg2Rad));
+        return orbitFocus + direction * distance;
+    }
+
+    private void SetOrbitCameraPose()
+    {
+        transform.position = GetOrbitPosition();
+        transform.rotation = Quaternion.LookRotation(orbitFocus - transform.position, Vector3.up);
     }
 
     private void ResumeOrbit()
@@ -492,27 +571,81 @@ public class SubmonitorMove : MonoBehaviour
             return;
         }
 
-        Vector3 offset = Vector3.ProjectOnPlane(transform.position - player.position, Vector3.up);
+        Vector3 offset = Vector3.ProjectOnPlane(transform.position - GetFocusPosition(player), Vector3.up);
         if (offset.sqrMagnitude > 0.0001f)
         {
             orbitAngle = Mathf.Atan2(offset.x, offset.z) * Mathf.Rad2Deg;
         }
+
+        // ポーズ終了後は同じ補間時間で通常の左側ショットへ戻す。
+        startPosition = transform.position;
+        startRotation = transform.rotation;
+        moveTimer = 0f;
+        restartRotationAfterMove = true;
+        isMoving = true;
     }
 
     private Vector3 GetFrontPosition(Transform target)
     {
+        if (viewMode == ViewMode.LeftSidePoseZoom)
+        {
+            Vector3 focus = GetSidePoseFocus(target, out Bounds bounds);
+            Vector3 direction = GetSideDirection(target);
+            float distance = Mathf.Max(poseDistance, RequiredDistance(bounds, focus, direction));
+            return focus + direction * distance;
+        }
         Vector3 forward = Vector3.ProjectOnPlane(target.forward, Vector3.up).normalized;
         if (forward.sqrMagnitude < 0.0001f)
         {
             forward = Vector3.forward;
         }
 
-        return target.position + forward * cameraDistance + Vector3.up * cameraHeight;
+        return GetFocusPosition(target) + forward * cameraDistance + Vector3.up * (cameraHeight - lookAtHeight);
+    }
+
+    // 原点ではなくアニメーション後の体を追う。高さの差と距離は既存設定を保つ。
+    private Vector3 GetFocusPosition(Transform target)
+    {
+        Transform focusBone;
+        if (target == player)
+        {
+            focusBone = playerFocusBone;
+        }
+        else
+        {
+            if (cachedFocusTarget != target)
+            {
+                cachedFocusTarget = target;
+                cachedFocusBone = FindFocusBone(target);
+            }
+            focusBone = cachedFocusBone;
+        }
+
+        return focusBone != null ? focusBone.position : target.position + Vector3.up * lookAtHeight;
+    }
+
+    private static Transform FindFocusBone(Transform target)
+    {
+        if (target == null)
+        {
+            return null;
+        }
+
+        Animator animator = target.GetComponentInChildren<Animator>();
+        if (animator != null && animator.isHuman)
+        {
+            return animator.GetBoneTransform(HumanBodyBones.Hips);
+        }
+
+        // 本プロジェクトのGenericリグ。Renderer.rootBoneはモデルごとに異なる。
+        return target.Find("ALL_JNT/C_Hip_JNT");
     }
 
     private Quaternion GetLookRotation(Transform target, Vector3 cameraPosition)
     {
-        Vector3 lookDirection = target.position + Vector3.up * lookAtHeight - cameraPosition;
+        Vector3 focus = viewMode == ViewMode.LeftSidePoseZoom
+            ? GetSidePoseFocus(target, out _) : GetFocusPosition(target);
+        Vector3 lookDirection = focus - cameraPosition;
         return Quaternion.LookRotation(lookDirection, Vector3.up);
     }
 
@@ -520,5 +653,79 @@ public class SubmonitorMove : MonoBehaviour
     {
         transform.position = cameraPosition;
         transform.rotation = GetLookRotation(target, cameraPosition);
+    }
+
+    private Vector3 GetSideBaseFocus() => player.position + Vector3.up * lookAtHeight;
+
+    private void SetupSideMonitorSurfaces()
+    {
+        if (monitorCamera == null || monitorCamera.targetTexture == null) { return; }
+        // The existing 3P/5P FBX side panels occupy two rotated atlas islands. Apply
+        // the full-frame layout to these renderers only; never alter shared materials.
+        foreach (MeshRenderer renderer in Object.FindObjectsByType<MeshRenderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (renderer.gameObject.scene != gameObject.scene) { continue; }
+            foreach (Material material in renderer.sharedMaterials)
+            {
+                if (material == null || !material.HasProperty("_SidePanelLayout") ||
+                    material.GetTexture("_BaseMap") != monitorCamera.targetTexture) { continue; }
+                var properties = new MaterialPropertyBlock();
+                renderer.GetPropertyBlock(properties);
+                properties.SetFloat("_SidePanelLayout", 1f);
+                renderer.SetPropertyBlock(properties);
+                break;
+            }
+        }
+    }
+
+    private Vector3 GetSideBasePosition() => GetSideBaseFocus() + GetSideDirection(player) * cameraDistance;
+
+    private Vector3 GetSideDirection(Transform target)
+    {
+        Vector3 forward = Vector3.ProjectOnPlane(target.forward, Vector3.up).normalized;
+        if (forward.sqrMagnitude < 0.0001f) { forward = Vector3.forward; }
+        Vector3 direction = Quaternion.AngleAxis(-sideAngle, Vector3.up) * forward;
+        direction.y = (cameraHeight - lookAtHeight) / Mathf.Max(0.1f, cameraDistance);
+        return direction.normalized;
+    }
+
+    private Vector3 GetSidePoseFocus(Transform target, out Bounds bounds)
+    {
+        if (framingTarget != target)
+        {
+            framingTarget = target;
+            framingRenderers = target.GetComponentsInChildren<Renderer>();
+        }
+        bounds = new Bounds(target.position + Vector3.up * lookAtHeight, Vector3.zero);
+        bool found = false;
+        foreach (Renderer renderer in framingRenderers)
+        {
+            if (renderer == null || !renderer.enabled || !renderer.gameObject.activeInHierarchy ||
+                (renderer is not SkinnedMeshRenderer && renderer is not MeshRenderer)) { continue; }
+            if (!found) { bounds = renderer.bounds; found = true; }
+            else { bounds.Encapsulate(renderer.bounds); }
+        }
+        if (!found) { bounds = new Bounds(GetFocusPosition(target), new Vector3(2f, 3f, 1f)); }
+        return bounds.center;
+    }
+
+    private float RequiredDistance(Bounds bounds, Vector3 focus, Vector3 direction)
+    {
+        if (monitorCamera == null) { monitorCamera = GetComponent<Camera>(); }
+        if (monitorCamera == null || monitorCamera.orthographic) { return poseDistance; }
+        float tanVertical = Mathf.Tan(monitorCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float tanHorizontal = tanVertical * monitorCamera.aspect;
+        Quaternion toView = Quaternion.Inverse(Quaternion.LookRotation(-direction, Vector3.up));
+        float distance = poseDistance;
+        for (int corner = 0; corner < 8; corner++)
+        {
+            Vector3 point = bounds.center + Vector3.Scale(bounds.extents, new Vector3(
+                (corner & 1) == 0 ? -1f : 1f, (corner & 2) == 0 ? -1f : 1f, (corner & 4) == 0 ? -1f : 1f));
+            Vector3 local = toView * (point - focus);
+            distance = Mathf.Max(distance, Mathf.Abs(local.x) * framingPadding / tanHorizontal - local.z,
+                Mathf.Abs(local.y) * framingPadding / tanVertical - local.z,
+                monitorCamera.nearClipPlane * framingPadding - local.z);
+        }
+        return distance;
     }
 }

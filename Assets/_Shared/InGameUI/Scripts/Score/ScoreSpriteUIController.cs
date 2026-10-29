@@ -67,7 +67,7 @@ public class ScoreSpriteUIController : MonoBehaviour
         RestoreScoreVisuals(animator, defaults);
         if (animator.isActiveAndEnabled)
         {
-            // Rebind from the authored scale, not the enlarged pose left when the UI was hidden.
+            // 非表示時に残った拡大状態ではなく、制作時のスケールを基準に再設定する。
             animator.Rebind();
             animator.ResetTrigger(scoreUpTriggerName);
             animator.Play("Idle", 0, 0f);
@@ -112,7 +112,7 @@ public class ScoreSpriteUIController : MonoBehaviour
 
     private void OnEnable()
     {
-        // The existing Wave presentation hides this UI's parent. Refresh before it is shown again.
+        // 既存のWave演出はこのUIの親を非表示にするため、再表示前に更新する。
         if (!IsEndlessMode) { return; }
         ResetScoreAnimation(playerScoreAnimator);
         ResetScoreAnimation(enemy1ScoreAnimator);
@@ -123,7 +123,7 @@ public class ScoreSpriteUIController : MonoBehaviour
     private void LateUpdate()
     {
         if (!IsEndlessMode || ScoreManager.Instance == null) { return; }
-        // Participation/commit can change without a point award (notably a newly joined zero-score NPC).
+        // 加点がなくても参加・確定状態は変化する。特に、新規参加NPCは0点の場合がある。
         ReadEnemyScores(out int rightScore, out int leftScore, out bool hasRight, out bool hasLeft);
         if (rightScore != previousEnemy1Score || leftScore != previousEnemy2Score ||
             (enemy1ScoreDisplay != null && enemy1ScoreDisplay.gameObject.activeSelf != hasRight) ||
@@ -171,7 +171,7 @@ public class ScoreSpriteUIController : MonoBehaviour
 
         if (endless)
         {
-            // Inspector bindings are reversed by name: enemy1ScoreDisplay is screen RIGHT.
+            // Inspectorの接続は変数名と左右が逆で、enemy1ScoreDisplayは画面右を指す。
             if (enemy1ScoreDisplay != null) { enemy1ScoreDisplay.gameObject.SetActive(hasRight); }
             if (enemy2ScoreDisplay != null) { enemy2ScoreDisplay.gameObject.SetActive(hasLeft); }
             if (enemy1ScorePanel != null) { enemy1ScorePanel.gameObject.SetActive(hasRight); }

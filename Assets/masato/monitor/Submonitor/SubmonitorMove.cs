@@ -85,7 +85,7 @@ public class SubmonitorMove : MonoBehaviour
     void Update()
     {
         ResolvePlayer();
-        // Central monitor never accepts pose focus or manual pinning.
+        // 中央モニターはポーズへの注目や手動固定を受け付けない。
         if (viewMode == ViewMode.LeftSidePoseZoom)
         {
             ResolveEnemies();
@@ -141,7 +141,7 @@ public class SubmonitorMove : MonoBehaviour
         }
 
         transform.position = GetSideBasePosition();
-        // The normal shot follows locomotion only, without following animated hip sway.
+        // 通常の映像は前進移動だけに追従し、アニメーションによる腰の揺れには追従しない。
         transform.rotation = Quaternion.LookRotation(GetSideBaseFocus() - transform.position, Vector3.up);
     }
 
@@ -518,8 +518,8 @@ public class SubmonitorMove : MonoBehaviour
 
     private void UpdateOrbit()
     {
-        // Move between opposite ends of the front arc, easing to a stop at each end.
-        // Position changes and the lens are independent of pose state.
+        // 正面の円弧の両端を往復し、各端で滑らかに減速・停止する。
+        // 位置の変化とレンズ設定は、ポーズ状態に依存しない。
         float halfArc = Mathf.Max(0.5f, orbitArc * 0.5f);
         orbitTravel = Mathf.Repeat(orbitTravel + moveSpeed * Time.deltaTime, halfArc * 2f * Mathf.PI);
         orbitAngle = orbitCenterAngle - halfArc * Mathf.Cos(orbitTravel / halfArc);
@@ -528,7 +528,7 @@ public class SubmonitorMove : MonoBehaviour
 
     private Vector3 GetOrbitPosition()
     {
-        // Frame the whole participating lineup, not a single actor or its current pose.
+        // 特定の1体や現在のポーズではなく、参加中のキャラクター全体を画角に収める。
         Bounds roots = new Bounds(player.position, Vector3.zero);
         if (enemyLineupManager == null) { enemyLineupManager = Object.FindFirstObjectByType<Enemy.EnemyLineupManager>(); }
         if (enemyLineupManager != null)
@@ -544,7 +544,7 @@ public class SubmonitorMove : MonoBehaviour
         if (monitorCamera == null) { monitorCamera = GetComponent<Camera>(); }
         float vertical = monitorCamera != null ? monitorCamera.fieldOfView * 0.5f * Mathf.Deg2Rad : 30f * Mathf.Deg2Rad;
         float horizontal = Mathf.Atan(Mathf.Tan(vertical) * (monitorCamera != null ? monitorCamera.aspect : 1f));
-        // Fixed per-character room includes outstretched arms. Pose flags never change the lens/radius.
+        // 腕を広げた状態も収まるよう、1体ごとに固定の余白を確保する。ポーズフラグでレンズや半径は変えない。
         float radius = roots.extents.magnitude + actorFramingRadius;
         float distance = radius * framingPadding / Mathf.Sin(Mathf.Min(vertical, horizontal));
         distance = Mathf.Max(distance, cameraDistance / Mathf.Cos(orbitElevation * Mathf.Deg2Rad));
@@ -660,8 +660,8 @@ public class SubmonitorMove : MonoBehaviour
     private void SetupSideMonitorSurfaces()
     {
         if (monitorCamera == null || monitorCamera.targetTexture == null) { return; }
-        // The existing 3P/5P FBX side panels occupy two rotated atlas islands. Apply
-        // the full-frame layout to these renderers only; never alter shared materials.
+        // 既存の3P・5P用FBXの側面パネルは、回転した2つのUV領域に配置されている。
+        // 対象のRendererだけに映像全体を表示する設定を適用し、共有マテリアルは変更しない。
         foreach (MeshRenderer renderer in Object.FindObjectsByType<MeshRenderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             if (renderer.gameObject.scene != gameObject.scene) { continue; }

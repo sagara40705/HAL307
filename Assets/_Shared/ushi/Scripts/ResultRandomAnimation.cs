@@ -7,7 +7,7 @@ public class ResultRandomAnimation : MonoBehaviour
     private int RandomAnimationCount = 3;
     [SerializeField] private Animator _animator;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
     void Start()
     {
         GameResultManager manager = GameResultManager.Instance;
@@ -21,7 +21,7 @@ public class ResultRandomAnimation : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    // 毎フレーム呼び出される
     void Update()
     {
         

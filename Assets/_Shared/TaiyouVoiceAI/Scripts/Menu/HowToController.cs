@@ -33,8 +33,8 @@ public class HowToController : MonoBehaviour
 
     private void Start()
     {
-        // Boot may preload and hide this object before its first Start.
-        // In that case OpenHowTo has already established the requested view.
+        // Bootが最初のStartより前に、このオブジェクトを先読みして非表示にする場合がある。
+        // その場合、OpenHowToで要求された表示が既に設定されている。
         if (howToPanel != null && openedFrame < 0)
         {
             howToPanel.SetActive(false);

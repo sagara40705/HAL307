@@ -17,13 +17,13 @@ namespace masato.Sandbox
 
         [SerializeField] private float spotStep = 5.0f;
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
         void Start()
         {
             
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         void Update()
         {
             //-----------------------------------
@@ -38,7 +38,7 @@ namespace masato.Sandbox
 
             //-----------------------------------
             // 左右キー
-            // Spot Angle
+            // スポットライトの角度
             //-----------------------------------
             if (Keyboard.current.aKey.wasPressedThisFrame)
             {
@@ -54,7 +54,7 @@ namespace masato.Sandbox
 
             //-----------------------------------
             // 上下キー
-            // Inner Spot Angle
+            // スポットライトの内側の角度
             //-----------------------------------
             if (Keyboard.current.wKey.wasPressedThisFrame)
             {

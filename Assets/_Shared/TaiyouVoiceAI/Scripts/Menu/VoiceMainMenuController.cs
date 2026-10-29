@@ -89,8 +89,8 @@ public class VoiceMainMenuController : MonoBehaviour
             CloseMenu();
         }
 
-        // A hidden parent menu must not read the keys owned by its child panel.
-        // Also leave the key that returned from that panel in the previous view.
+        // 非表示の親メニューは、子パネルが使用するキー入力を読み取らない。
+        // 子パネルから戻るために押されたキーも、戻った先の画面では処理しない。
         if (!CanControlMainMenu || selectionRestoredFrame == Time.frameCount)
         {
             return;
@@ -237,7 +237,7 @@ public class VoiceMainMenuController : MonoBehaviour
 
     public void OpenMenu()
     {
-        // Reopening the pause menu while a child view owns it would show both panels.
+        // 子画面の操作中にポーズメニューを開き直すと、両方のパネルが表示されてしまう。
         if (isMenuOpen && menuPanel != null && !menuPanel.activeInHierarchy)
         {
             return;
@@ -276,7 +276,7 @@ public class VoiceMainMenuController : MonoBehaviour
             return;
         }
 
-        // Closing pause also ends its child view, before hiding the main panel.
+        // ポーズメニューを閉じる際は、メインパネルを隠す前に子画面も閉じる。
         if (howToController != null && howToController.gameObject.activeInHierarchy)
         {
             howToController.CloseHowTo();

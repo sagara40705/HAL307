@@ -60,7 +60,7 @@ namespace Enemy
             RuntimeDebug.DebugMenu.DestroyWindow(DebugWindowName);
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         private void Update()
         {
             if (InGameFlowLock.IsPresentationPlaying)

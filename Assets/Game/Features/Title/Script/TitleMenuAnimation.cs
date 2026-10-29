@@ -15,8 +15,8 @@ public enum TitleMenuAnimationState
     Transition
 }
 
-// Adds presentation to the existing TitleUiManager and TitleSceneMgr.
-// Their selection and scene transition implementations remain the source of truth.
+// 既存のTitleUiManagerとTitleSceneMgrに演出を追加する。
+// 選択とシーン遷移は、引き続き既存の実装を基準とする。
 public sealed class TitleMenuAnimation : MonoBehaviour
 {
     private const float FramesPerSecond = 60f;
@@ -121,8 +121,8 @@ public sealed class TitleMenuAnimation : MonoBehaviour
             return;
         }
 
-        // Arrow keys are handled by the existing menu's Update. Observe its cursor
-        // after that Update, so this component does not maintain a second selection.
+        // 矢印キーは既存メニューのUpdateで処理する。その後にカーソルを確認し、
+        // このコンポーネント側で別の選択状態を保持しないようにする。
         SyncSelection();
         Gamepad pad = Gamepad.current;
         if (DebugShortcuts.Pressed(Key.W) || (pad != null && pad.dpad.up.wasPressedThisFrame))
@@ -209,7 +209,7 @@ public sealed class TitleMenuAnimation : MonoBehaviour
         for (int frame = first; frame < count; frame++)
         {
             if (frames[frame] != null) continue;
-            // These exact ranges in both supplied sequences are identical to frame 0.
+            // 提供された両方の連番画像で、この範囲は0フレーム目と同じ内容になっている。
             if (frame <= 5 || (frame >= 20 && frame <= 40))
             {
                 frames[frame] = frames[0];

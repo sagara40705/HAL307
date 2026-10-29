@@ -6,8 +6,8 @@ public class IntroSmoke : MonoBehaviour
     [SerializeField] GameObject _storngsmoke;
     private bool _endlessEntranceActive;
 
-    // Endless needs visible particles in the same frame that its actors are revealed.
-    // Keep the shared Grand Prix event's normal playback unchanged.
+    // エンドレスでは、キャラクターが表示されるフレームから粒子を見せる必要がある。
+    // 共通のグランプリ用イベントは、従来どおり再生する。
     public void BeginEndlessEntrance()
     {
         if (_endlessEntranceActive) { return; }
@@ -22,8 +22,8 @@ public class IntroSmoke : MonoBehaviour
         root.SetActive(true);
         foreach (ParticleSystem particles in root.GetComponentsInChildren<ParticleSystem>())
         {
-            // Restart one system at a time to avoid simulating children twice. The short
-            // pre-roll fills the emitter's initially empty frame without delaying the actors.
+            // 子の二重シミュレーションを避けるため、各システムを個別に再開する。短い事前再生で
+            // 発生直後の粒子が空のフレームを埋め、キャラクターの表示は遅らせない。
             particles.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             particles.Simulate(0.35f, false, true, true);
             particles.Play(false);
@@ -32,7 +32,7 @@ public class IntroSmoke : MonoBehaviour
 
     public void InstanceSmoke()
     {
-        // The existing intro Action is still invoked, but must not start a second burst.
+        // 既存の開始Actionも呼ばれるが、蒸気を二重に発生させない。
         if (_endlessEntranceActive) { return; }
         Debug.Log("Instance Smoke");
         _normalsmoke.SetActive(true);

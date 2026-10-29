@@ -32,8 +32,8 @@ Varyings vert(Attributes IN)
     OUT.monitorUV = OUT.uv;
     if (_SidePanelLayout > 0.5)
     {
-        // SM_FullStage 3P/5P: negative-X panel is rotated in its UV island.
-        // Keep the original UV for the LED mask so its existing density is preserved.
+        // SM_FullStageの3P・5Pモデルでは、X負側のパネルのUV領域が回転している。
+        // LEDマスクには元のUVを使い、既存の密度を維持する。
         if (IN.uv.x < 0.5)
         {
             float2 panel = (IN.uv - float2(0.0098898, 0.2499135)) / float2(0.2499802, 0.2302413);

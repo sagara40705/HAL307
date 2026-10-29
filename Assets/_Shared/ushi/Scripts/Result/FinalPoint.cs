@@ -14,14 +14,14 @@ public class FinalPoint : MonoBehaviour
     private List<Image> digitImages = new List<Image>();
     private int currentScore;
     // public Texture2D texture; // Inspectorで設定
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
     void Start()
     {
         currentScore = 0;//ここにプレイヤーの点数の変数を+として書く
         UpdateScore(currentScore); // 初期表示
     }
 
-    // Update is called once per frame
+    // 毎フレーム呼び出される
     void Update()
     {
         //if (Input.GetKeyDown(KeyCode.Space))

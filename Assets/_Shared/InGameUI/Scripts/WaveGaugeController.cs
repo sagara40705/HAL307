@@ -32,7 +32,7 @@ public class WaveGaugeController : MonoBehaviour
 
     private float currentValue;
     private bool isTransitionStarted;
-    // Endless owns the transition so the finish pose remains visible until completion.
+    // エンドレス側で遷移を管理し、フィニッシュポーズが完了するまで表示を維持する。
     public bool DeferStageEndTransition { get; set; }
 
     private void Start()
@@ -198,8 +198,8 @@ public class WaveGaugeController : MonoBehaviour
         ShowOtherUis();
     }
 
-    // Endless owns its finish/transition sequence; retain the existing prompt even if
-    // gameplay progress no longer updates after the round has been suspended.
+    // エンドレス側でフィニッシュと遷移の順序を管理するため、試合を中断して
+    // 進行状況の更新が止まった場合でも、既存の案内表示を維持する。
     public void ShowEndlessFinishPose()
     {
         if (!DeferStageEndTransition) { return; }

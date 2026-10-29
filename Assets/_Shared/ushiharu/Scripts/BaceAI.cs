@@ -15,7 +15,7 @@ namespace ushiharu.Sandbox
         int[] Poose = new int [5];
         int randomPoose;
         public Vector3 moveDirection= Vector3.forward;
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
         void Start()
         {
             StartCoroutine(AIBehaviour());
@@ -26,7 +26,7 @@ namespace ushiharu.Sandbox
 
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         IEnumerator AIBehaviour()
         {
             while (true)

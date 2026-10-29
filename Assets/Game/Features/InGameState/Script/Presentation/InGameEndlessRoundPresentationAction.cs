@@ -5,7 +5,7 @@ using UnityEngine.Animations;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-// Endless composition of existing intro Actions and animation clips. No shared Timeline is edited.
+// 既存の開始Actionとアニメーションクリップをエンドレス用に組み合わせる。共通Timelineは編集しない。
 [CreateAssetMenu(fileName = "EndlessRoundPresentation", menuName = "Game/InGame/Presentation/Endless Round")]
 public sealed class InGameEndlessRoundPresentationAction : InGamePresentationAction
 {
@@ -51,8 +51,8 @@ public sealed class InGameEndlessRoundPresentationAction : InGamePresentationAct
                     if (candidate.asset is AnimationPlayableAsset animation && animation.clip == npcClimb)
                     {
                         climb = candidate;
-                        // The next overlapping clip is the source entrance pose (yaa), before
-                        // the later walk/launch clips. Include the entire pose before countdown.
+                        // 次に重なるクリップは、後続の歩行・飛ばしより前にある元の登場ポーズ（yaa）。
+                        // カウントダウン前に、このポーズを最後まで再生する。
                         foreach (TimelineClip next in track.GetClips())
                         {
                             if (next != candidate && next.start >= candidate.start && next.start < candidate.end &&
@@ -116,9 +116,9 @@ public sealed class InGameEndlessRoundPresentationAction : InGamePresentationAct
         var sample = new GameObject("Endless entrance motion sample") { hideFlags = HideFlags.HideAndDontSave };
         try
         {
-            // Reuse the recorded climb path relative to its landing point, at the chosen Slot.
-            // The source Timeline itself is never played: its launch, camera, audio and Signals
-            // cannot run on an incoming actor.
+            // 記録済みの登り経路を着地点からの相対位置として再利用し、選択したSlotに合わせる。
+            // 元のTimeline自体は再生しないため、参加NPCに飛ばし・カメラ・音声・Signalの
+            // 処理が実行されることはない。
             float finalMotionTime = (float)(movement.clipIn + movement.duration * movement.timeScale);
             motion.SampleAnimation(sample, finalMotionTime);
             Vector3 landingPosition = sample.transform.localPosition;
@@ -160,13 +160,13 @@ public sealed class InGameEndlessRoundPresentationAction : InGamePresentationAct
         Vector3 localScale = animator.transform.localScale;
         int entrancePoseState = Animator.StringToHash("Base Layer.StartPose.START" +
             (char)('A' + animator.GetInteger("StartPoseIndex")));
-        // Suppress any clip events on the incoming-only copy; keep the source and finish clips intact.
+        // 参加NPC専用のコピーからクリップイベントを除く。元のクリップとフィニッシュ用クリップは維持する。
         AnimationClip playbackClip = blendToEntrancePose ? Instantiate(clip) : clip;
         if (blendToEntrancePose) { playbackClip.events = Array.Empty<AnimationEvent>(); }
         AnimationClip poseClip = entrancePose != null
             ? Instantiate(((AnimationPlayableAsset)entrancePose.asset).clip) : null;
         if (poseClip != null) { poseClip.events = Array.Empty<AnimationEvent>(); }
-        // The source Timeline holds the final Climb frame until its recorded path ends.
+        // 元のTimelineは、記録された経路が終わるまでClimbの最終フレームを保持する。
         double clipEnd = endTime < 0d ? clip.length : endTime;
         double poseStart = entrancePose != null
             ? startTime + (entrancePose.start - climbSection.start) * climbSection.timeScale : clipEnd;
@@ -185,7 +185,7 @@ public sealed class InGameEndlessRoundPresentationAction : InGamePresentationAct
             animator.applyRootMotion = originalRootMotion;
             animator.cullingMode = originalCulling;
             animator.speed = originalSpeed;
-            // The gameplay root moves to its Slot; model-local animation offsets must be restored.
+            // ゲーム用ルートをSlotへ移動するため、モデルのローカルなアニメーションオフセットを復元する。
             if (onProgress == null || animator.GetComponent<global::Enemy.Enemy>() == null)
             {
                 animator.transform.localPosition = localPosition;
@@ -228,9 +228,9 @@ public sealed class InGameEndlessRoundPresentationAction : InGamePresentationAct
             }
             AnimationPlayableOutput output = AnimationPlayableOutput.Create(graph, "Actor", animator);
             output.SetSourcePlayable(sequence);
-            // Clamp clip time ourselves, but let Unity evaluate the output in its animation
-            // phase. A manual graph evaluated in a coroutine gets overwritten by the actor's
-            // normal AnimatorController before the frame is rendered.
+            // クリップ時刻はこの処理で制限し、出力の評価はUnityのアニメーション処理に任せる。
+            // コルーチン内でグラフを手動評価すると、描画前にキャラクターの通常の
+            // AnimatorControllerで結果が上書きされてしまう。
             graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
             graph.Play();
 
@@ -265,13 +265,13 @@ public sealed class InGameEndlessRoundPresentationAction : InGamePresentationAct
                 yield return null;
                 time = Math.Min(sequenceEnd, time + Time.deltaTime);
             }
-            // Keep the completed finish pose bound until the next transition covers it.
-            // Release/Idle restoration still runs on cancellation through the same finally.
+            // 次の遷移で画面が覆われるまで、完了したフィニッシュポーズを接続したまま保持する。
+            // 中断時も同じfinallyを通り、解放とIdleへの復元を行う。
             if (afterPose != null) { yield return afterPose; }
             if (blendToEntrancePose)
             {
-                // An initially inactive incoming actor runs OnStartPose.Start after reveal.
-                // Read its selected pose now, rather than caching the prefab's pre-Start value.
+                // 初期状態が非アクティブの参加NPCは、表示後にOnStartPose.Startが実行される。
+                // PrefabのStart前の値を保存せず、この時点で選択されたポーズを読み取る。
                 entrancePoseState = Animator.StringToHash("Base Layer.StartPose.START" +
                     (char)('A' + animator.GetInteger("StartPoseIndex")));
                 var controller = AnimatorControllerPlayable.Create(graph, animator.runtimeAnimatorController);
@@ -283,8 +283,8 @@ public sealed class InGameEndlessRoundPresentationAction : InGamePresentationAct
                 graph.Connect(sequence, 0, mixer, 0);
                 graph.Connect(controller, 0, mixer, 1);
                 output.SetSourcePlayable(mixer);
-                // Blend the completed climb into the existing entrance pose before committing
-                // the NPC. The countdown uses the same selected pose, so it does not snap again.
+                // NPCの参加を確定する前に、登りの完了状態から既存の登場ポーズへブレンドする。
+                // カウントダウンでも同じ選択済みポーズを使い、再度の不自然な切り替わりを防ぐ。
                 float blend = 0f;
                 while (blend < 1f)
                 {

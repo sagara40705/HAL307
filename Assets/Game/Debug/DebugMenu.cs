@@ -6,7 +6,7 @@ Debugメニュー本体
 各機能パネルの呼び出し
 
 主なアタッチ先:
-DebugRoot
+デバッグ用ルート
  */
 public class DebugMenu
 {

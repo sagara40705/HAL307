@@ -70,8 +70,8 @@ namespace AudienceRequest
             setting.LabelColor = setting.Label.color;
             setting.LabelSize = setting.Label.fontSize;
             setting.Initialized = true;
-            // The old child is offset and enlarged over the permanent legend. Keep it as
-            // the existing animation's timing/color source, but render only one label.
+            // 既存の子要素は、常設の説明表示に重なる位置で拡大されている。
+            // 既存アニメーションのタイミングと色の参照元として残し、ラベルは1つだけ描画する。
             setting.AnimatedText.enabled = false;
         }
 
@@ -113,7 +113,7 @@ namespace AudienceRequest
                 setting.Label.color = Color.Lerp(setting.LabelColor, animatedColor, strength);
                 float expansion = setting.LabelSize > 0f
                     ? Mathf.Max(0f, setting.AnimatedText.fontSize / setting.LabelSize - 1f) : 0f;
-                // Retain the existing fade/pulse without growing into the adjacent legend rows.
+                // 隣の説明行に重なるほど拡大せず、既存のフェードと脈動を維持する。
                 setting.Label.fontSize = setting.LabelSize * (1f + Mathf.Min(0.12f, expansion * strength));
             }
         }
@@ -173,7 +173,7 @@ namespace AudienceRequest
             setting.Playing = true;
             setting.Started = false;
             animator.ResetTrigger(_voiceClearTriggerName);
-            // Restart the existing one-shot state instead of queuing a second trigger during a pulse.
+            // 脈動中に2つ目のトリガーを追加せず、既存の単発ステートを先頭から再生する。
             animator.Play(FeedbackState, 0, 0f);
         }
     }

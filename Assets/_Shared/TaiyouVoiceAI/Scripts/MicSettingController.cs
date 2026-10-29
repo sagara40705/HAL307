@@ -60,7 +60,7 @@ public class MicSettingController : MonoBehaviour
         ApplySensitivity();
         UpdateCursor();
 
-        // Do not undo an explicit open if Start was deferred while preloaded.
+        // 先読み中にStartが遅延していた場合、明示的に開いた画面を閉じない。
         if (micSettingPanel != null && openedFrame < 0)
         {
             micSettingPanel.SetActive(false);

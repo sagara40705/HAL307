@@ -258,7 +258,7 @@ namespace Enemy
             _currentPoseData?.PoseAction?.OnStart(this);
         }
 
-        // Pending presentation actors must not be selected by AI or request generation.
+        // 参加確定前の演出用キャラクターは、AIやリクエスト生成の選択対象から除外する。
         public void SetRoundParticipation(bool participates)
         {
             if (_participatesInRound == participates) { return; }

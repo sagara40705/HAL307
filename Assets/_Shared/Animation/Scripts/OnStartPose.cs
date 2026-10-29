@@ -57,9 +57,9 @@ public class OnStartPose : MonoBehaviour
 
         _animator.CrossFadeInFixedTime(
             IdleStateHash,
-            0.5f,  // Transition duration (seconds)
-            0,     // Layer
-            0f     // Start Idle from beginning
+            0.5f,  // 遷移時間（秒）
+            0,     // レイヤー
+            0f     // Idleを先頭から再生する
         );
     }
 
@@ -117,8 +117,8 @@ public class OnStartPose : MonoBehaviour
         return animationSpeed;
     }
 
-    // Endless keeps the existing entrance pose through the countdown. Gameplay Idle
-    // contains walking, so enter it only when the countdown completion releases us.
+    // エンドレスではカウントダウン中も既存の登場ポーズを維持する。
+    // ゲーム用Idleには歩行が含まれるため、カウントダウン完了による解除後に遷移する。
     public void SetCountdownHold(bool held)
     {
         if (!TryResolveAnimator()) { return; }
@@ -128,7 +128,7 @@ public class OnStartPose : MonoBehaviour
         {
             _countdownRootMotion = _animator.applyRootMotion;
             _animator.applyRootMotion = false;
-            // Keep the pose selected at spawn, including the incoming NPC's blended landing.
+            // 生成時に選択したポーズを維持する。参加NPCの着地からのブレンドも含む。
             int poseIndex = _animator.GetInteger("StartPoseIndex");
             int poseState = Animator.StringToHash("Base Layer.StartPose.START" + (char)('A' + poseIndex));
             ResetAnimationTriggers();

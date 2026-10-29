@@ -122,8 +122,8 @@ public class ScoreManager : MonoBehaviour
         return index >= 0 && index < _enemyScores.Length ? _enemyScores[index] : 0;
     }
 
-    // Returns group presence separately from its score, so an occupied group can display zero.
-    // Individual Slot scores remain the source of truth for both awards and replacement selection.
+    // NPCがいるグループで0点も表示できるよう、グループの有無と得点を分けて返す。
+    // 加点と交代対象の選択では、引き続きSlotごとの個別スコアを基準にする。
     public bool TryGetEndlessGroupScore(EnemyLineupManager lineup, EndlessScoreGroup group, out int score)
     {
         score = 0;
@@ -137,7 +137,7 @@ public class ScoreManager : MonoBehaviour
         EnemySlotId second;
         switch (group)
         {
-            // Camera faces Y=180: positive world X is screen left.
+            // カメラの向きはY=180度のため、ワールド座標のX正方向が画面左になる。
             case EndlessScoreGroup.ScreenLeft:
                 first = EnemySlotId.Enemy2;
                 second = EnemySlotId.Enemy3;
@@ -167,7 +167,7 @@ public class ScoreManager : MonoBehaviour
             return false;
         }
 
-        // Exclude the selected outgoing actor even before its presentation flag changes.
+        // 演出フラグが変わる前でも、退場対象に選ばれたキャラクターを除外する。
         return !lineup.HasPendingReplacement ||
                (enemy != lineup.PendingOldEnemy && enemy != lineup.PendingNewEnemy);
     }

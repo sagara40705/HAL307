@@ -45,7 +45,7 @@ namespace Player
         // ポーズ時のイベント
         public event Action<PoseID> OnPoseStart; /*あう*/
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
         private void Start()
         {
             if (_poseSettings == null)
@@ -57,7 +57,7 @@ namespace Player
             _poseParryJudge = poseContext?.GetPoseParryJudge;
             _poseStateTracker = poseContext?.GetPoseStateTracker;
             Debug.Log("PlayerPoseController Start. _poseParryJudge = " + _poseParryJudge);
-            //---animator
+            //---アニメーター
             if (_animator == null)
             { _animator = GetComponent<Animator>(); }
 
@@ -79,7 +79,7 @@ namespace Player
             RuntimeDebug.DebugMenu.DestroyWindow("Player");
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         private void Update()
         {
             if (_isPose)
@@ -196,7 +196,7 @@ namespace Player
             Debug.Log("Player pose ended.");
         }
 
-        // Called only at Endless round boundaries, while gameplay input is locked.
+        // ゲーム入力をロックした状態で、エンドレスの試合切り替え時だけ呼び出す。
         public void ResetForRound()
         {
             if (_isPose)

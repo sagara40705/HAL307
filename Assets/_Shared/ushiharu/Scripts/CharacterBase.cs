@@ -7,7 +7,7 @@ namespace ushiharu.Sandbox
 {
     public class CharacterBase : MonoBehaviour
     {
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
         public float speed = 3f;
         public float moveTimeMin = 2f;
         public float moveTimeMax = 5f;

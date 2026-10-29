@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Timeline;
 using Object = UnityEngine.Object;
 
-// A runtime-only entrance edit of the existing cutscene. Shared Scene/Timeline assets stay intact.
+// 既存カットシーンを実行時だけ登場用に編集する。共通のScene・Timelineアセットは変更しない。
 public sealed class EndlessEntranceCutIn : IDisposable
 {
     private const string SceneName = "CutScene";
@@ -123,8 +123,8 @@ public sealed class EndlessEntranceCutIn : IDisposable
             director.extrapolationMode = DirectorWrapMode.Hold;
             director.timeUpdateMode = DirectorUpdateMode.GameTime;
             controller.PlayFromStart();
-            // Prepare the first cinematic frame behind the dumbbell cover, then use the
-            // normal reveal notification before advancing the entrance animation.
+            // ダンベルのフェードで画面が覆われている間に、カットインの最初のフレームを準備する。
+            // 通常の表示完了通知を待ってから、登場アニメーションを進める。
             director.Pause();
             yield return TransitionManager.RevealIfCovered();
             director.Play();
@@ -140,14 +140,14 @@ public sealed class EndlessEntranceCutIn : IDisposable
         }
         finally { Dispose(); }
 
-        // Do not yield after hiding the cut-in: the caller commits the roster and resets the
-        // gameplay camera/countdown in this same frame. Scene removal finishes in the loader.
+        // カットインを隠した後は待機せず、呼び出し元で同じフレーム内に参加者を確定し、
+        // ゲーム用カメラとカウントダウンを初期化する。シーンの削除完了はローダー側で処理する。
     }
 
     private void PrepareCameraAnchor(Animator animator, AnimationTrack cameraTrack)
     {
-        // This recorded camera has no Avatar/root-motion binding. Put the original infinite
-        // track's offset on a parent so Unity cannot discard it when converting to clip mode.
+        // この記録済みカメラにはAvatarやルートモーションのバインドがない。無限トラックの元の
+        // オフセットを親に設定し、クリップ形式への変換時にUnityが破棄しないようにする。
         var anchor = new GameObject("Endless cut-in camera anchor");
         runtimeObjects.Add(anchor);
         anchor.transform.SetParent(animator.transform.parent, false);
@@ -204,8 +204,8 @@ public sealed class EndlessEntranceCutIn : IDisposable
         }
         foreach (TimelineClip original in sourceTrack.GetClips())
         {
-            // Incoming: climb + complete pose + landing path only. In particular, never copy
-            // the walk at 6.88s or launch path at 7.01s. Other actors stop before their launch.
+            // 参加NPCには登り・ポーズ全体・着地経路だけを使い、6.88秒からの歩行と7.01秒からの
+            // 飛ばす経路はコピーしない。他のキャラクターも飛ばされる前に止める。
             if (isIncoming ? isChild ? original != movement : original != climb && original != pose
                 : original.start >= climb.end) { continue; }
             if (original.asset is not AnimationPlayableAsset animation || animation.clip == null) { continue; }
@@ -213,8 +213,8 @@ public sealed class EndlessEntranceCutIn : IDisposable
             runtimeObjects.Add(clip.asset);
             clip.start = original.start;
             clip.clipIn = original.clipIn;
-            // Extend the landing/observer clips inside their own non-looping playable so
-            // their final frame holds without using Timeline's editor-only extrapolation setters.
+            // 着地と見守る側のクリップは、それぞれの非ループPlayable内で延長する。
+            // これにより、エディター専用のTimeline外挿設定を使わずに最終フレームを保持する。
             clip.duration = isChild || !isIncoming ? pose.end - original.start :
                 Math.Min(original.duration, pose.end - original.start);
             clip.timeScale = original.timeScale;
@@ -228,8 +228,8 @@ public sealed class EndlessEntranceCutIn : IDisposable
             CopyAnimationSettings(animation, asset);
             if (original.start > 0d && (isChild || !isIncoming))
             {
-                // Original recorded movement has Hold before its 0.1167s start. Preserve
-                // that first-frame placement with a tiny-speed lead-in clip at runtime.
+                // 元の移動記録は開始時刻0.1167秒より前を保持するため、実行時に低速の導入クリップを加え、
+                // 最初のフレームの配置を維持する。
                 TimelineClip leadIn = track.CreateClip(asset.clip);
                 runtimeObjects.Add(leadIn.asset);
                 leadIn.start = 0d;
@@ -280,7 +280,7 @@ public sealed class EndlessEntranceCutIn : IDisposable
     {
         if (!ownsScene || !scene.IsValid() || !scene.isLoaded) { return; }
         ownsScene = false;
-        // The persistent loader also completes cleanup if the calling gameplay scene is gone.
+        // 呼び出し元のゲームシーンがなくなっても、常駐ローダーが後片付けを完了する。
         if (SceneLoader.Instance != null && SceneLoader.Instance.IsInitialized) SceneLoader.Unload(SceneName);
         else SceneManager.UnloadSceneAsync(scene);
     }

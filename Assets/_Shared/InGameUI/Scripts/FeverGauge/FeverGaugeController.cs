@@ -157,7 +157,7 @@ public class FeverGaugeController : MonoBehaviour
         SetFill(0f);
     }
 
-    // Endless match boundaries must not carry an active fever or its presentation timer forward.
+    // エンドレスの試合切り替え時は、フィーバー状態や演出タイマーを次試合へ持ち越さない。
     public void ResetForRound()
     {
         if (_isFever) { EndFever(); }

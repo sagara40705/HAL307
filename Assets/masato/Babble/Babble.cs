@@ -13,7 +13,7 @@ public class Babble : MonoBehaviour
     [SerializeField]
     AnimationCurve displacementCurve = null;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
     void Start()
     {
         rendererComponent = GetComponent<Renderer>();
@@ -21,7 +21,7 @@ public class Babble : MonoBehaviour
 
     }
 
-    // Update is called once per frame
+    // 毎フレーム呼び出される
     void Update()
     {
         Camera _currentCamera = Camera.main;

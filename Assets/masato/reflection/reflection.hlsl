@@ -130,10 +130,10 @@ half4 frag(Varyings IN) : SV_Target
     // --------------------------------------------------------
     // 2. 反射テクスチャの UV を作る
     // --------------------------------------------------------
-    // clip space -> NDC
+    // クリップ空間 → 正規化デバイス座標（NDC）
     float2 reflectionUV = IN.reflectionPos.xy / max(IN.reflectionPos.w, 0.0001);
 
-    // NDC (-1..1) -> UV (0..1)
+    // NDC（-1～1）→ UV（0～1）
     reflectionUV = reflectionUV * 0.5 + 0.5;
 
     // プラットフォーム差による上下反転対応

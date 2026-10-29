@@ -6,7 +6,7 @@ using Enemy;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-// Separate round orchestration; Grand Prix continues to use the original State sequence.
+// 試合進行を独立して管理する。グランプリは従来のStateの順序を使用する。
 public sealed class EndlessRoundFlow : IDisposable
 {
     private readonly StageData stage;
@@ -36,7 +36,7 @@ public sealed class EndlessRoundFlow : IDisposable
         presentation = stage.GameStartAction as InGameEndlessRoundPresentationAction;
     }
 
-    // Catch nested Action/animation failures as configuration/runtime faults, never as a loss.
+    // 入れ子のActionやアニメーションの失敗は、敗北ではなく設定・実行時の異常として扱う。
     public IEnumerator Run()
     {
         routines.Push(RunRounds());
@@ -109,10 +109,10 @@ public sealed class EndlessRoundFlow : IDisposable
         setWave(index, wave);
         Phase = "EndlessInitialEntrance";
         context.ResetCameraPosition(stage);
-        // Keep the HUD visible from the entrance, while presentation/input locks remain held.
+        // 演出と入力のロックを維持したまま、登場時からHUDを表示する。
         context.WaveGauge.EndWavePresentation();
         context.WaveGauge.HideWaveFinalForGameEnd();
-        // Start with visible particles, rather than waiting for the first emission after activation.
+        // 有効化後の最初の粒子発生を待たず、開始時点で粒子が見えるようにする。
         introSmoke?.ClearSmoke();
         introSmoke?.BeginEndlessEntrance();
         yield return new GameStartFlowState(stage).Execute(context);
@@ -153,7 +153,7 @@ public sealed class EndlessRoundFlow : IDisposable
             }
             if (disposed) { yield break; }
 
-            // Scores are frozen by the same-frame presentation lock, before any reset or generation.
+            // リセットや生成を行う前に、同じフレームで演出ロックをかけて得点を確定する。
             int score = context.CurrentPlayerScore;
             ResetActorStates();
             if (score < stage.GetTargetScore(index))
@@ -170,7 +170,7 @@ public sealed class EndlessRoundFlow : IDisposable
             Require(nextWave != null && nextWave.HasReplacementEnemy, "Next Wave has no replacement EnemyData.");
             EnemyLineupManager lineup = context.EnemyLineup;
             int previousCount = lineup.CurrentEnemyCount;
-            // Select the empty/lowest-score Slot while the previous match's individual scores still exist.
+            // 前試合の個別スコアが残っている間に、空きSlotまたは最低得点のSlotを選ぶ。
             global::Enemy.Enemy incoming = lineup.BeginWaveEnemyChange(nextWave.ReplacementEnemyData,
                 nextWave.ReplacementEnemyPosition, nextWave.ReplacementEnemyRotation);
             Require(incoming != null && lineup.HasPendingReplacement, "NPC generation failed.");
@@ -180,7 +180,7 @@ public sealed class EndlessRoundFlow : IDisposable
             Phase = "EndlessFinishPose";
             context.WaveGauge.ShowEndlessFinishPose();
             context.AudienceRequest?.ResetRequests();
-            // Render the existing instruction before starting the finish animation.
+            // フィニッシュアニメーションの開始前に、既存の案内を描画する。
             yield return null;
             yield return presentation.PlayFinish(player, CoverForIncomingCutIn());
 
@@ -195,8 +195,8 @@ public sealed class EndlessRoundFlow : IDisposable
             }
             var positions = (InGameSetActorPositionsPresentationAction)context.ResetPositionAction;
             Vector3 destination = positions.GetFivePlayerEnemyPosition(lineup.PendingReplacementSlot);
-            // Steam belongs to the first entrance only. Later NPCs climb and pose,
-            // then continue straight into the countdown without another burst.
+            // 蒸気は初回登場時だけ使用する。以降のNPCは登りとポーズを再生し、
+            // 蒸気を再発生させずに、そのままカウントダウンへ進む。
             ClearIntroSmoke();
             try { yield return presentation.PlayIncomingCutIn(context, incoming, destination); }
             finally
@@ -219,7 +219,7 @@ public sealed class EndlessRoundFlow : IDisposable
         Phase = "EndlessCutInFade";
         context.WaveGauge.HideWaveFinalForGameEnd();
         ownsRoundTransition = true;
-        // Reuse Grand Prix's falling dumbbells; wait for the actual cover completion.
+        // グランプリの落下ダンベルを再利用し、実際に画面を覆い終わるまで待つ。
         yield return TransitionManager.PlayDumbbellFadeOut().ToCoroutine();
     }
 
@@ -236,7 +236,7 @@ public sealed class EndlessRoundFlow : IDisposable
         setWave(index, wave);
         ResetActorStates();
         context.AudienceRequest?.ResetRequests();
-        // The replacement Slot has already been selected and committed from the previous scores.
+        // 交代するSlotは、前試合の得点をもとに既に選択・確定されている。
         context.ScoreSource.ResetAllScores();
         context.EnemyLineup.SetAllEnemyAnimationSpeed(stage.GetEnemyAnimationSpeed(index));
         context.RestoreWavePresentationStage();
@@ -327,8 +327,8 @@ public sealed class EndlessRoundFlow : IDisposable
     {
         if (disposed) { return; }
         disposed = true;
-        // Unity StopCoroutine does not reliably dispose nested iterators. Unwind the Actions
-        // explicitly so GameStartFlowState/GameEndFlowState release their own nested locks too.
+        // UnityのStopCoroutineでは、入れ子のイテレーターが確実に破棄されるとは限らない。
+        // Actionを明示的に巻き戻し、GameStartFlowStateとGameEndFlowState内のロックも解放する。
         try { DisposeRoutines(); }
         finally { RestoreAfterStop(); }
     }
@@ -376,7 +376,7 @@ public sealed class EndlessRoundFlow : IDisposable
 
     private void ClearIntroSmoke()
     {
-        // StageModel may already have unloaded before the flow's OnDisable is called.
+        // この進行処理のOnDisableが呼ばれる前に、StageModelが既にアンロードされている場合がある。
         if (introSmoke != null && introSmoke.gameObject.scene.isLoaded) { introSmoke.ClearSmoke(); }
     }
 

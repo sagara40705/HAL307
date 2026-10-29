@@ -28,7 +28,7 @@ public class AnimatorTextureBaker : MonoBehaviour
         var mesh = new Mesh();
         animator.speed = 0;
 
-        // ? CREATE ONE TEXTURE
+        // テクスチャを1枚作成する
         var pRt = new RenderTexture(texWidth, totalFrames, 0, RenderTextureFormat.ARGBHalf);
         var nRt = new RenderTexture(texWidth, totalFrames, 0, RenderTextureFormat.ARGBHalf);
 
@@ -85,7 +85,7 @@ public class AnimatorTextureBaker : MonoBehaviour
             var kernel = infoTexGen.FindKernel("CSMain");
 
             infoTexGen.SetInt("VertCount", vCount);
-            infoTexGen.SetInt("FrameOffset", frameOffset); // ?? KEY
+            infoTexGen.SetInt("FrameOffset", frameOffset); // キー
             infoTexGen.SetBuffer(kernel, "meshInfo", buffer);
             infoTexGen.SetTexture(kernel, "OutPosition", pRt);
             infoTexGen.SetTexture(kernel, "OutNormal", nRt);
@@ -102,7 +102,7 @@ public class AnimatorTextureBaker : MonoBehaviour
 
             buffer.Release();
 
-            frameOffset += framesPerAnim; // ?? STACK HERE
+            frameOffset += framesPerAnim; // ここに積み重ねる
         }
 
 #if UNITY_EDITOR

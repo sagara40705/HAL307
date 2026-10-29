@@ -441,8 +441,8 @@ public class MicrophoneInput : MonoBehaviour
         int previousClipId = GetClipId(recording.CurrentClip);
         int previousGeneration = recording.Generation;
 
-        // A running device with no current clip is an invalid shared session.
-        // End it before starting again so Microphone.Start is never duplicated.
+        // デバイスが動作中でも現在のクリップがなければ、共有セッションは無効とみなす。
+        // Microphone.Startの重複実行を避けるため、既存のセッションを終了してから再開する。
         if (Microphone.IsRecording(recordingDeviceName))
         {
             if (recording.CurrentClip != null)

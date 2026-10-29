@@ -14,7 +14,7 @@ public class MatyoRannyu : MonoBehaviour
     private int currentScore;
     private int MatyoRunnyu;
     // public Texture2D texture; // Inspectorで設定
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
     void Start()
     {
         currentScore = 0;
@@ -22,7 +22,7 @@ public class MatyoRannyu : MonoBehaviour
         UpdateScore(MatyoRunnyu); // 初期表示
     }
 
-    // Update is called once per frame
+    // 毎フレーム呼び出される
     void Update()
     {
         //currentScore = Mathf.Max(1, MatyoRunnyu); // 負数防止

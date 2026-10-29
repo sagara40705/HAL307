@@ -11,7 +11,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 
-// Batch-only regression probe. Uses the real Pause scene and Input System key states.
+// バッチ実行専用の回帰確認。実際のPauseシーンとInput Systemのキー状態を使用する。
 [InitializeOnLoad]
 public static class PauseMenuInputValidation
 {
@@ -43,7 +43,7 @@ public static class PauseMenuInputValidation
         if (!Application.isBatchMode) throw new InvalidOperationException("Run this probe in a separate batch editor.");
         SessionState.SetBool(BootKey, false);
         SessionState.SetBool(SessionKey, true);
-        // Keep this isolated probe out of the normal Boot/gameplay sequence.
+        // この独立した検証処理を、通常のBootやゲーム進行に混在させない。
         MethodInfo callback = typeof(PlayFromBoot).GetMethod("OnPlayModeStateChanged", BindingFlags.Static | BindingFlags.NonPublic);
         EditorApplication.playModeStateChanged -= (Action<PlayModeStateChange>)Delegate.CreateDelegate(typeof(Action<PlayModeStateChange>), callback);
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -104,7 +104,7 @@ public static class PauseMenuInputValidation
         string suffix = SessionState.GetBool(BootKey, false) ? "boot-validation.txt" : "validation.txt";
         File.WriteAllLines("Library/UIInvestigation/" + suffix, results);
         Debug.Log("[PauseMenuInputValidation]\n" + string.Join("\n", results));
-        // Stop Play normally so persistent managers receive OnApplicationQuit.
+        // 常駐ManagerにOnApplicationQuitが届くよう、通常の手順で再生を停止する。
         SessionState.SetInt(ExitKey, failures == 0 ? 0 : 1);
         EditorApplication.isPlaying = false;
     }
@@ -169,7 +169,7 @@ public static class PauseMenuInputValidation
             mic.CloseMicSetting();
             foreach (var script in scripts) if (script != null) script.enabled = false;
         }
-        // Count a retire decision without ending the editor or quitting the application.
+        // エディターやアプリを終了せずに、リタイア決定の回数を数える。
         var actions = Field<UnityEngine.Events.UnityEvent[]>(main, "onDecideEvents");
         actions[1].SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.Off);
         actions[1].AddListener(() => actionCount++);
@@ -243,7 +243,7 @@ public static class PauseMenuInputValidation
             "Mic settings returns without moving or reopening the hidden main selection");
         Observe(Field<GameObject[]>(main, "selectLights")[2].activeSelf, "Mic settings restores selected light");
 
-        // Exercise the real voice router, bypassing only microphone recognition and its time window.
+        // マイク認識と受付時間の制限だけを省き、実際の音声コマンド振り分けを確認する。
         var router = scripts.OfType<MenuVoiceCommandAction>().Single();
         ResetView();
         yield return NextFrame();
@@ -283,7 +283,7 @@ public static class PauseMenuInputValidation
                 $"Open/page/return round trip #{i + 1}");
         }
 
-        // Restore the real action only after input-leak checks are finished.
+        // 入力の漏れ込み確認が完了してから、実際のActionを復元する。
         {
             actions[1].SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.RuntimeOnly);
             SetField(main, "currentIndex", 1);

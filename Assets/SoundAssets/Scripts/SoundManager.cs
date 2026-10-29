@@ -79,7 +79,7 @@ namespace Sound.Manager
             cueInfoList[(int)SceneSoundTag.ResultSound] = atomExAcb[(int)SceneSoundTag.ResultSound].GetCueInfoList();
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         private void OnDestroy()
         {
             atomExPlayer?.Dispose();

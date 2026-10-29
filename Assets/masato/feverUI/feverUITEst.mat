@@ -56,13 +56,13 @@ Material:
     - _OuterRadius: 0.5
     - _PulseSpeed: 4
     - _RotationSpeed: 0.05
-    - _Softness: 0.03
+    - _Softness: 0.013
     - _StartAngle: 0
     - _TipLength: 0.16
     - _TipStrength: 1.4
     - _TipWidth: 0.08
     - _WaveSpeed: 2
-    - _Width: 0.018
+    - _Width: 0.15
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _GlowColor: {r: 0.9899844, g: 1, b: 0.19999999, a: 1}

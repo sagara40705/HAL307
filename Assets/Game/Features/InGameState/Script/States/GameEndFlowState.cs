@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using static Sound.Manager.SoundManager;
 
 // ゲーム終了演出とリザルト遷移State
 public sealed class GameEndFlowState : InGameFlowStateBase
@@ -17,8 +16,6 @@ public sealed class GameEndFlowState : InGameFlowStateBase
     {
         Debug.Log("[GameEndFlowState] Game end started.");
         context?.WaveGauge?.HideWaveFinalForGameEnd();
-        Sound.Manager.SoundManager.Play((int)SceneSoundTag.ResultSound, (int)ResultSoundTag.ResultSE);
-
         InGameFlowLock.BeginPresentation();
         try
         {
@@ -31,9 +28,7 @@ public sealed class GameEndFlowState : InGameFlowStateBase
             }
 
 
-
             // 固定時間ではなくダンベルの落下完了を待ってResultへ進む
-//            Sound.Manager.SoundManager.Play((int)SceneSoundTag.ResultSound, (int)ResultSoundTag.ResultSE);
             yield return TransitionManager.WaitForTransitionCompletion();
         }
         finally

@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
+using System.Collections.Generic;
 
 public class SubmonitorMove : MonoBehaviour
 {
@@ -62,8 +64,33 @@ public class SubmonitorMove : MonoBehaviour
     [Header("Central monitor: whole lineup")]
     [SerializeField, Min(1f)] private float actorFramingRadius = 2.5f;
     [SerializeField, Range(1f, 180f)] private float orbitArc = 90f;
+    [SerializeField, Range(1f, 90f)] private float wideLineupOrbitArc = 30f;
     private float orbitCenterAngle;
     private float orbitTravel;
+    private readonly List<SkinnedMeshRenderer> orbitModelRenderers = new();
+    private readonly List<Renderer> centralScreens = new();
+    private readonly Dictionary<Renderer, bool> hiddenCentralScreens = new();
+    private readonly Dictionary<Renderer, Material[]> originalCentralMaterials = new();
+    private readonly List<Material> centralScreenMaterials = new();
+    private bool centralScreensConfigured;
+
+    private bool IsEndlessCentralCamera => viewMode == ViewMode.Orbit &&
+        GameModeManager.Instance != null && GameModeManager.Instance.IsInitialized &&
+        GameModeManager.Instance.CurrentGameMode == GameMode.FivePlayer;
+
+    private void OnEnable()
+    {
+        RenderPipelineManager.beginCameraRendering += BeginCentralRendering;
+        RenderPipelineManager.endCameraRendering += EndCentralRendering;
+    }
+
+    private void OnDisable()
+    {
+        RenderPipelineManager.beginCameraRendering -= BeginCentralRendering;
+        RenderPipelineManager.endCameraRendering -= EndCentralRendering;
+        RestoreCentralScreens();
+        ReleaseCentralScreenMaterials();
+    }
 
     //カメラの前方停止フラグ
     private bool isStopFront = false;
@@ -85,7 +112,7 @@ public class SubmonitorMove : MonoBehaviour
     void Update()
     {
         ResolvePlayer();
-        // 中央モニターはポーズへの注目や手動固定を受け付けない。
+        // ポーズへの注目と手動入力は左右モニターだけに適用する。
         if (viewMode == ViewMode.LeftSidePoseZoom)
         {
             ResolveEnemies();
@@ -110,6 +137,14 @@ public class SubmonitorMove : MonoBehaviour
 
         if (viewMode == ViewMode.Orbit)
         {
+            if (IsEndlessCentralCamera)
+            {
+                ConfigureCentralScreens();
+            }
+            else
+            {
+                if (centralScreensConfigured) { ReleaseCentralScreenMaterials(); }
+            }
             UpdateOrbit();
         }
         else
@@ -522,14 +557,114 @@ public class SubmonitorMove : MonoBehaviour
         // 位置の変化とレンズ設定は、ポーズ状態に依存しない。
         float halfArc = Mathf.Max(0.5f, orbitArc * 0.5f);
         orbitTravel = Mathf.Repeat(orbitTravel + moveSpeed * Time.deltaTime, halfArc * 2f * Mathf.PI);
-        orbitAngle = orbitCenterAngle - halfArc * Mathf.Cos(orbitTravel / halfArc);
+        float viewHalfArc = halfArc;
+        if (IsEndlessCentralCamera && enemyLineupManager != null &&
+            ((enemyLineupManager.Enemy3 != null && enemyLineupManager.Enemy3.ParticipatesInRound) ||
+             (enemyLineupManager.Enemy4 != null && enemyLineupManager.Enemy4.ParticipatesInRound)))
+        {
+            // 外側の枠まで使う編成では、側面モニターが奥のモデルを隠さない正面寄りの範囲を使う。
+            // 周回の位相は共通にして、人数が増えても回転タイミングを飛ばさない。
+            viewHalfArc = Mathf.Min(viewHalfArc, wideLineupOrbitArc * 0.5f);
+        }
+        orbitAngle = orbitCenterAngle - viewHalfArc * Mathf.Cos(orbitTravel / halfArc);
         SetOrbitCameraPose();
+    }
+
+    private void ConfigureCentralScreens()
+    {
+        if (centralScreensConfigured) { return; }
+        if (monitorCamera == null) { monitorCamera = GetComponent<Camera>(); }
+        if (monitorCamera == null || monitorCamera.targetTexture == null) { return; }
+
+        foreach (GameObject root in gameObject.scene.GetRootGameObjects())
+        foreach (MeshRenderer renderer in root.GetComponentsInChildren<MeshRenderer>(true))
+        {
+            Material[] materials = renderer.sharedMaterials;
+            Material[] adjusted = null;
+            bool usesCameraOutput = false;
+            for (int i = 0; i < materials.Length; i++)
+            {
+                Material material = materials[i];
+                if (!UsesCentralOutput(material)) { continue; }
+                usesCameraOutput = true;
+                if (!material.HasProperty("_MonitorCull")) { continue; }
+                if (adjusted == null) { adjusted = (Material[])materials.Clone(); }
+                // 5P中央画面の裏面が、ZWrite Offの前面へ重なることを防ぐ。
+                // 共通アセットとカットシーンの破壊演出は変更しない。
+                Material copy = new Material(material) { name = material.name + " (Endless central monitor)" };
+                copy.SetFloat("_MonitorCull", (float)CullMode.Back);
+                centralScreenMaterials.Add(copy);
+                adjusted[i] = copy;
+            }
+            if (usesCameraOutput) { centralScreens.Add(renderer); }
+            if (adjusted != null)
+            {
+                originalCentralMaterials.Add(renderer, materials);
+                renderer.sharedMaterials = adjusted;
+            }
+        }
+        centralScreensConfigured = true;
+    }
+
+    private bool UsesCentralOutput(Material material)
+    {
+        if (material == null) { return false; }
+        // 通常舞台は_BaseMap、5P舞台は_MainTexを使っている。
+        foreach (int property in material.GetTexturePropertyNameIDs())
+        {
+            if (material.GetTexture(property) == monitorCamera.targetTexture) { return true; }
+        }
+        return false;
+    }
+
+    private void BeginCentralRendering(ScriptableRenderContext context, Camera camera)
+    {
+        if (!IsEndlessCentralCamera || camera != GetComponent<Camera>()) { return; }
+        ConfigureCentralScreens();
+        foreach (Renderer screen in centralScreens)
+        {
+            if (screen == null) { continue; }
+            hiddenCentralScreens[screen] = screen.forceRenderingOff;
+            screen.forceRenderingOff = true;
+        }
+    }
+
+    private void EndCentralRendering(ScriptableRenderContext context, Camera camera)
+    {
+        if (camera == monitorCamera) { RestoreCentralScreens(); }
+    }
+
+    private void RestoreCentralScreens()
+    {
+        foreach (KeyValuePair<Renderer, bool> state in hiddenCentralScreens)
+        {
+            if (state.Key != null) { state.Key.forceRenderingOff = state.Value; }
+        }
+        hiddenCentralScreens.Clear();
+    }
+
+    private void ReleaseCentralScreenMaterials()
+    {
+        RestoreCentralScreens();
+        foreach (KeyValuePair<Renderer, Material[]> original in originalCentralMaterials)
+        {
+            if (original.Key != null) { original.Key.sharedMaterials = original.Value; }
+        }
+        originalCentralMaterials.Clear();
+        foreach (Material material in centralScreenMaterials) { if (material != null) { Destroy(material); } }
+        centralScreenMaterials.Clear();
+        centralScreens.Clear();
+        centralScreensConfigured = false;
     }
 
     private Vector3 GetOrbitPosition()
     {
         // 特定の1体や現在のポーズではなく、参加中のキャラクター全体を画角に収める。
         Bounds roots = new Bounds(player.position, Vector3.zero);
+        Bounds models = new Bounds();
+        bool hasModels = false;
+        bool fitModels = IsEndlessCentralCamera;
+        if (fitModels) { EncapsulateOrbitModel(player, ref models, ref hasModels); }
         if (enemyLineupManager == null) { enemyLineupManager = Object.FindFirstObjectByType<Enemy.EnemyLineupManager>(); }
         if (enemyLineupManager != null)
         {
@@ -537,7 +672,10 @@ public class SubmonitorMove : MonoBehaviour
             {
                 Enemy.Enemy actor = enemyLineupManager.GetEnemy((Enemy.EnemySlotId)slot);
                 if (actor != null && actor.isActiveAndEnabled && actor.ParticipatesInRound)
+                {
                     roots.Encapsulate(actor.transform.position);
+                    if (fitModels) { EncapsulateOrbitModel(actor.transform, ref models, ref hasModels); }
+                }
             }
         }
         orbitFocus = roots.center + Vector3.up * (lookAtHeight + 0.3f);
@@ -546,11 +684,41 @@ public class SubmonitorMove : MonoBehaviour
         float horizontal = Mathf.Atan(Mathf.Tan(vertical) * (monitorCamera != null ? monitorCamera.aspect : 1f));
         // 腕を広げた状態も収まるよう、1体ごとに固定の余白を確保する。ポーズフラグでレンズや半径は変えない。
         float radius = roots.extents.magnitude + actorFramingRadius;
+        float elevation = orbitElevation;
+        if (fitModels && hasModels)
+        {
+            // 基準姿勢のモデル全体から構図を決め、ポーズ中の骨・Renderer.boundsには追従しない。
+            orbitFocus = models.center;
+            radius = models.extents.magnitude + actorFramingRadius * 0.5f;
+            // 横に広い5人編成では見下ろしを抑え、全員の体が見える角度にする。
+            float lineupElevation = Mathf.Atan2(models.size.y, Mathf.Max(models.size.x, models.size.z, 0.01f)) * Mathf.Rad2Deg;
+            elevation = Mathf.Min(elevation, lineupElevation);
+        }
         float distance = radius * framingPadding / Mathf.Sin(Mathf.Min(vertical, horizontal));
-        distance = Mathf.Max(distance, cameraDistance / Mathf.Cos(orbitElevation * Mathf.Deg2Rad));
+        distance = Mathf.Max(distance, cameraDistance / Mathf.Cos(elevation * Mathf.Deg2Rad));
         Vector3 direction = Quaternion.Euler(0f, orbitAngle, 0f) *
-            new Vector3(0f, Mathf.Sin(orbitElevation * Mathf.Deg2Rad), Mathf.Cos(orbitElevation * Mathf.Deg2Rad));
+            new Vector3(0f, Mathf.Sin(elevation * Mathf.Deg2Rad), Mathf.Cos(elevation * Mathf.Deg2Rad));
         return orbitFocus + direction * distance;
+    }
+
+    private void EncapsulateOrbitModel(Transform actor, ref Bounds models, ref bool found)
+    {
+        orbitModelRenderers.Clear();
+        actor.GetComponentsInChildren<SkinnedMeshRenderer>(false, orbitModelRenderers);
+        foreach (SkinnedMeshRenderer renderer in orbitModelRenderers)
+        {
+            if (!renderer.enabled || renderer.sharedMesh == null) { continue; }
+            // sharedMesh.boundsは基準姿勢の寸法。腕や腰のアニメーションでは変化しない。
+            Bounds reference = renderer.sharedMesh.bounds;
+            for (int corner = 0; corner < 8; corner++)
+            {
+                Vector3 point = reference.center + Vector3.Scale(reference.extents, new Vector3(
+                    (corner & 1) == 0 ? -1f : 1f, (corner & 2) == 0 ? -1f : 1f, (corner & 4) == 0 ? -1f : 1f));
+                point = renderer.transform.TransformPoint(point);
+                if (!found) { models = new Bounds(point, Vector3.zero); found = true; }
+                else { models.Encapsulate(point); }
+            }
+        }
     }
 
     private void SetOrbitCameraPose()

@@ -17,6 +17,21 @@ public sealed class GameStartFlowState : InGameFlowStateBase
     {
         IsPresentationFinished = false;
 
+        if (_stageData != null && !_stageData.IsEndlessMode)
+        {
+            // NPCの生成と登場Actionを、ダンベルが消えた後に開始する。
+            InGameFlowLock.BeginGameStartAction();
+            context?.ForwardProgressMover?.StopMove();
+            try
+            {
+                yield return TransitionManager.RevealIfCovered(waitForCompletion: true);
+            }
+            finally
+            {
+                InGameFlowLock.EndGameStartAction();
+            }
+        }
+
         if (_stageData != null)
         {
             if (context == null || context.EnemyLineup == null)

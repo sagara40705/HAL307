@@ -18,6 +18,7 @@ public sealed class InGameFlowController : MonoBehaviour
     private int _currentTargetScore;
     private float _currentEnemyAnimationSpeed = 1f;
     private EndlessRoundFlow _endlessFlow;
+    private IEnumerator _normalFlowRoutine;
 
     public int CurrentWaveIndex => _currentWaveIndex;
     public WaveData CurrentWaveData => _currentWaveData;
@@ -45,6 +46,14 @@ public sealed class InGameFlowController : MonoBehaviour
             _endlessFlow.Dispose();
             StopAllCoroutines();
             _endlessFlow = null;
+            _isFlowRunning = false;
+        }
+        else if (_normalFlowRoutine != null)
+        {
+            // Unityによる停止だけでは、入れ子のフェード待機のfinallyが実行されない場合がある。
+            StopAllCoroutines();
+            (_normalFlowRoutine as System.IDisposable)?.Dispose();
+            _normalFlowRoutine = null;
             _isFlowRunning = false;
         }
         context?.RestoreWavePresentationStage();
@@ -79,7 +88,9 @@ public sealed class InGameFlowController : MonoBehaviour
         }
 
         _isFlowRunning = true;
-        StartCoroutine(CoroutineUtility.Run(FlowCoroutine()));
+        IEnumerator routine = CoroutineUtility.Run(FlowCoroutine());
+        if (!stageData.IsEndlessMode) { _normalFlowRoutine = routine; }
+        StartCoroutine(routine);
     }
 
     private void ResolveStageData()

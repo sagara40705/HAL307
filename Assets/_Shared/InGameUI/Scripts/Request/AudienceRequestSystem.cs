@@ -565,5 +565,18 @@ namespace AudienceRequest
                    _waveGaugeController.IsFinalPoseVisible;
         }
 
+        // FinalPose表示後に、画面上のリクエストUIだけ消す
+        // 通常リクエストの内部カウントは残す
+        public void HideAllUisForFinalPose()
+        {
+            _uiPool?.ClearAllUiPools();
+            _uiPool?.ClearAllBlackUiPools();
+
+
+            //  黒リクエストは表示を消した時点で無効にする
+            _activeBlackRequestPoseID = PoseID.None;
+
+        }
+
     }
 }

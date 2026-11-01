@@ -12,7 +12,7 @@ public class CrowdSpawner : MonoBehaviour
         public float[] timeOffsets;
         public Bounds bounds;
 
-        // One property block per chunk.
+        // チャンクごとにプロパティブロックを1つ用意する。
         public MaterialPropertyBlock propertyBlock;
     }
 
@@ -24,7 +24,7 @@ public class CrowdSpawner : MonoBehaviour
     [SerializeField] private bool castShadows = false;
     [SerializeField] private bool receiveShadows = false;
 
-    // Set this to your Crowd layer if you create one.
+    // 観客用のレイヤーを作成した場合は、ここに設定する。
     [SerializeField] private int renderLayer = 0;
 
     [Header("Scale")]
@@ -37,7 +37,7 @@ public class CrowdSpawner : MonoBehaviour
     [SerializeField] private float rowHeight = 0.3f;
 
     [Header("Chunk Settings")]
-    // 20 x 20 crowd with 10 x 10 chunks = 4 chunks.
+    // 20×20人の観客を10×10人のチャンクに分けると、チャンクは4個になる。
     [SerializeField] private int chunkRows = 10;
     [SerializeField] private int chunkCols = 10;
 
@@ -65,14 +65,14 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // CAMERA FRUSTUM CACHE
+    // カメラの視錐台キャッシュ
     // =========================================================
 
     private class CameraFrustumData
     {
         public Camera camera;
 
-        // Unity expects exactly 6 planes.
+        // Unityでは平面が正確に6枚必要になる。
         public readonly Plane[] planes = new Plane[6];
 
         public int frame = -1;
@@ -84,7 +84,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // START
+    // 開始処理
     // =========================================================
 
     private void Start()
@@ -119,7 +119,7 @@ public class CrowdSpawner : MonoBehaviour
             );
         }
 
-        // VAT animation can move vertices outside the original mesh bounds.
+        // VATアニメーションでは、頂点が元のメッシュの境界外へ移動する場合がある。
         mesh.bounds = new Bounds(
             Vector3.zero,
             vatBoundsSize
@@ -130,7 +130,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // CROWD GENERATION
+    // 観客の生成
     // =========================================================
 
     private void GenerateCrowd()
@@ -196,7 +196,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // CREATE CHUNK
+    // チャンクの作成
     // =========================================================
 
     private CrowdChunk CreateChunk(
@@ -251,7 +251,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // CREATE PEOPLE
+        // 人物の作成
         // -----------------------------------------------------
 
         for (int r = startRow; r < endRow; r++)
@@ -309,7 +309,7 @@ public class CrowdSpawner : MonoBehaviour
                 matrices.Add(matrix);
 
 
-                // Each character gets its own animation offset.
+                // 各キャラクターに個別のアニメーションオフセットを設定する。
                 timeOffsets.Add(
                     Random.Range(0f, 1f)
                 );
@@ -331,7 +331,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // CREATE CHUNK
+        // チャンクの作成
         // -----------------------------------------------------
 
         CrowdChunk chunk =
@@ -347,7 +347,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // CHUNK BOUNDS
+        // チャンクの境界
         // -----------------------------------------------------
 
         Vector3 padding =
@@ -369,19 +369,19 @@ public class CrowdSpawner : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // MATERIAL PROPERTY BLOCK
+        // マテリアルプロパティブロック
         // -----------------------------------------------------
 
         chunk.propertyBlock =
             new MaterialPropertyBlock();
 
 
-        // Animation index is now ONE value.
+        // アニメーション番号は現在、単一の値として保持する。
         //
-        // Before:
+        // 変更前：
         // _AnimIndex = [0,0,0,0,0,0,...]
         //
-        // Now:
+        // 変更後：
         // _AnimIndex = 0
         //
         chunk.propertyBlock.SetFloat(
@@ -390,7 +390,7 @@ public class CrowdSpawner : MonoBehaviour
         );
 
 
-        // Time offset remains per-instance.
+        // 時間オフセットは引き続きインスタンスごとに保持する。
         chunk.propertyBlock.SetFloatArray(
             DTID,
             chunk.timeOffsets
@@ -402,13 +402,13 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // UPDATE
+    // 更新処理
     // =========================================================
 
     private void Update()
     {
         // -----------------------------------------------------
-        // TEST ANIMATIONS
+        // アニメーションのテスト
         // -----------------------------------------------------
 
         if (Keyboard.current != null)
@@ -426,7 +426,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // NO CAMERAS
+        // カメラが存在しない場合
         // -----------------------------------------------------
 
         if (renderCameras == null ||
@@ -437,7 +437,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // WHOLE CROWD CULL
+        // 観客全体のカリング
         // -----------------------------------------------------
 
         if (!IsBoundsVisible(crowdBounds))
@@ -447,7 +447,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // CHUNK CULL + DRAW
+        // チャンクのカリングと描画
         // -----------------------------------------------------
 
         for (int i = 0; i < chunks.Count; i++)
@@ -483,7 +483,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // FRUSTUM CULLING
+    // 視錐台カリング
     // =========================================================
 
     private bool IsBoundsVisible(
@@ -533,7 +533,7 @@ public class CrowdSpawner : MonoBehaviour
             }
 
 
-            // Calculate planes only once per camera per frame.
+            // 平面の計算は、各カメラにつき1フレームに1回だけ行う。
             if (data.frame != frame ||
                 data.camera != cam)
             {
@@ -566,14 +566,14 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // CHANGE ANIMATION
+    // アニメーションの変更
     // =========================================================
 
     public void SetAnimationIndex(
         int index
     )
     {
-        // Don't do anything if the animation is already active.
+        // 同じアニメーションが既に有効なら何もしない。
         if (animationIndex == index)
         {
             return;
@@ -589,16 +589,16 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // APPLY ANIMATION
+    // アニメーションの適用
     // =========================================================
 
     private void ApplyAnimationIndex()
     {
-        // IMPORTANT:
+        // 重要：
         //
-        // We no longer loop through every character.
+        // 全キャラクターを巡回する処理は行わない。
         //
-        // _AnimIndex is a single material property.
+        // _AnimIndexは単一のマテリアルプロパティとして扱う。
         //
         for (int c = 0;
              c < chunks.Count;
@@ -613,7 +613,7 @@ public class CrowdSpawner : MonoBehaviour
 
 
     // =========================================================
-    // DEBUG GIZMOS
+    // デバッグ用ギズモ
     // =========================================================
 
     private void OnDrawGizmos()
@@ -621,7 +621,7 @@ public class CrowdSpawner : MonoBehaviour
         if (!showChunkBounds)
             return;
 
-        // Draw an approximate overall crowd area even before Play mode.
+        // 再生モードに入る前も、観客全体のおおよその範囲を描画する。
         Vector3 centerOffset = new Vector3(
             0f,
             ((rows - 1) * rowHeight) * 0.5f,
@@ -662,7 +662,7 @@ public class CrowdSpawner : MonoBehaviour
         Gizmos.matrix = oldMatrix;
 
 
-        // Draw actual generated chunk bounds during Play Mode.
+        // 再生中は、実際に生成されたチャンクの境界を描画する。
         if (chunks == null || chunks.Count == 0)
             return;
 

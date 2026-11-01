@@ -12,7 +12,7 @@ public class WaveGaugeController : MonoBehaviour
     [SerializeField] private float minValue = 0.0f;
     [SerializeField] private StageEndJudge stageEndJudge;
 
-    [Header("警告UI")]
+    [Header("FinalPoseUI")]
     [SerializeField] private GameObject warningUI;
     [SerializeField] private float warningThreshold = 0.2f;
     [SerializeField] private Animator warningAnimator;
@@ -20,14 +20,20 @@ public class WaveGaugeController : MonoBehaviour
     // FinalPose UIが表示中か
     public bool IsFinalPoseVisible => isWarningVisible;
     private bool isWaveFinalSuppressed;
+    private bool isEndlessFinishPose;
 
     [Header("Wave演出時に非表示にするUI")]
     [SerializeField] private GameObject[] hideOnWaveEffectUis;
-
     [SerializeField] private AdjustableUiPresenter warningPresenter;
+
+    [Header("リクエスト管理")]
+    [SerializeField]
+    private AudienceRequest.AudienceRequestSystem audienceRequestSystem;
 
     private float currentValue;
     private bool isTransitionStarted;
+    // エンドレス側で遷移を管理し、フィニッシュポーズが完了するまで表示を維持する。
+    public bool DeferStageEndTransition { get; set; }
 
     private void Start()
     {
@@ -55,6 +61,11 @@ public class WaveGaugeController : MonoBehaviour
             Debug.LogError("WaveMaterial was not found.");
         }
 
+        if(audienceRequestSystem == null)
+        {
+            audienceRequestSystem = FindFirstObjectByType<AudienceRequest.AudienceRequestSystem>();
+        }
+
         // 警告UIを非表示にする
         if (warningAnimator == null && warningUI != null)
         {
@@ -75,10 +86,10 @@ public class WaveGaugeController : MonoBehaviour
 
     private void OnDestroy()
     {
-        // StageEndJudgeのイベント購読を解除
+        // StageEndJudgeのイベントを解除
         if (stageEndJudge != null)
         {
-            // イベントの購読を解除
+            // イベントを解除
             stageEndJudge.OnStageEnd -= OnStageEnd;
         }
     }
@@ -115,7 +126,8 @@ public class WaveGaugeController : MonoBehaviour
         }
 
         // 警告UIの表示状態を更新
-        bool shouldShowWarning = !isWaveFinalSuppressed && currentValue <= warningThreshold;
+        bool shouldShowWarning = !isWaveFinalSuppressed &&
+            (isEndlessFinishPose || currentValue <= warningThreshold);
 
         // 状態が変わった時だけ処理する
         if (isWarningVisible != shouldShowWarning)
@@ -151,6 +163,7 @@ public class WaveGaugeController : MonoBehaviour
         // WaveGaugeControllerの状態をリセット
         isTransitionStarted = false;
         isWaveFinalSuppressed = false;
+        isEndlessFinishPose = false;
         currentValue = maxValue;
 
         // マテリアルが設定されていない場合はImageコンポーネントから取得
@@ -185,11 +198,24 @@ public class WaveGaugeController : MonoBehaviour
         ShowOtherUis();
     }
 
+    // エンドレス側でフィニッシュと遷移の順序を管理するため、試合を中断して
+    // 進行状況の更新が止まった場合でも、既存の案内表示を維持する。
+    public void ShowEndlessFinishPose()
+    {
+        if (!DeferStageEndTransition) { return; }
+        isEndlessFinishPose = true;
+        isWaveFinalSuppressed = false;
+        if (!isWarningVisible) { SetWaveFinalVisible(true); }
+        HideOtherUis();
+    }
+
     public void HideWaveFinalForGameEnd()
     {
+        isEndlessFinishPose = false;
         isWaveFinalSuppressed = true;
         SetWaveFinalVisible(false);
-        ShowOtherUis();
+        // GameEnd中だから再表示しない
+        //ShowOtherUis();
     }
 
     private void SetupStageEndJudge()
@@ -237,7 +263,10 @@ public class WaveGaugeController : MonoBehaviour
 
         HideOtherUis();
 
-        PlayGaugeEmptyTransition().Forget();
+        if (!DeferStageEndTransition)
+        {
+            PlayGaugeEmptyTransition().Forget();
+        }
     }
 
     private void HideOtherUis()
@@ -280,7 +309,15 @@ public class WaveGaugeController : MonoBehaviour
 
     private void SetWaveFinalVisible(bool isVisible, bool immediateHide = false)
     {
+        // 非表示から表示へ変わる瞬間か
+        bool hasJustBecomeVisible = isVisible && !isWarningVisible;
+
         isWarningVisible = isVisible;
+
+        if(hasJustBecomeVisible)
+        {
+            audienceRequestSystem?.HideAllUisForFinalPose();
+        }
 
         if (warningAnimator != null)
         {

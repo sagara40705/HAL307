@@ -25,7 +25,7 @@ public class AnimationTest : MonoBehaviour
     {
         while (true)
         {
-            // Pick a random pose that isn't the same as the last one
+            // 前回と異なるポーズをランダムに選ぶ
             int index;
             do
             {
@@ -40,16 +40,16 @@ public class AnimationTest : MonoBehaviour
 
             animator.SetTrigger(pose);
 
-            // Wait one frame for the Animator to change states
+            // Animatorのステートが切り替わるまで1フレーム待つ
             yield return null;
 
-            // Wait until the transition is finished
+            // ステート間の遷移が完了するまで待つ
             while (animator.IsInTransition(0))
             {
                 yield return null;
             }
 
-            // Wait until the current animation has finished
+            // 現在のアニメーションが完了するまで待つ
             while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f)
             {
                 yield return null;

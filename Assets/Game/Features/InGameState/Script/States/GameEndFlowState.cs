@@ -16,7 +16,6 @@ public sealed class GameEndFlowState : InGameFlowStateBase
     {
         Debug.Log("[GameEndFlowState] Game end started.");
         context?.WaveGauge?.HideWaveFinalForGameEnd();
-
         InGameFlowLock.BeginPresentation();
         try
         {
@@ -27,6 +26,7 @@ public sealed class GameEndFlowState : InGameFlowStateBase
                 yield return action.Play(context);
                 Debug.Log($"[GameEndFlowState] Game end action finished. Action={action.name}");
             }
+
 
             // 固定時間ではなくダンベルの落下完了を待ってResultへ進む
             yield return TransitionManager.WaitForTransitionCompletion();

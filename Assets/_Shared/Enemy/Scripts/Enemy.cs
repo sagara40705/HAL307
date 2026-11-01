@@ -41,6 +41,7 @@ namespace Enemy
         private bool _hasEnemyRequestNotified = false;
         private bool _isPoseTracked = false;
         private float _animationSpeed = 1.0f;
+        private bool _participatesInRound = true;
 
         // パリイ関連
         private bool _isParried = false;
@@ -55,6 +56,7 @@ namespace Enemy
         public EnemyPoseState PoseState => _poseState;
         public float PoseStateElapsedTime => _poseStateElapsedTime;
         public bool IsPosing => _isPaused;
+        public bool ParticipatesInRound => _participatesInRound;
         public float AnimationSpeed => _animationSpeed;
 
         private Animator animator;
@@ -88,6 +90,7 @@ namespace Enemy
 
         private void Update()
         {
+            if (!_participatesInRound) { return; }
             if (_isPaused)
             {
                 float poseDeltaTime = Time.deltaTime * _animationSpeed;
@@ -188,7 +191,7 @@ namespace Enemy
             EndPoseTrack();
 
             // EnemyRegistryから登録解除する
-            _enemyRegistry?.Unregister(this);
+            if (_participatesInRound) { _enemyRegistry?.Unregister(this); }
             RuntimeDebug.DebugMenu.DestroyWindow(name);
         }
 
@@ -210,7 +213,7 @@ namespace Enemy
             EnemyPoseType poseType = EnemyPoseType.Normal,
             PoseID committedPoseID = PoseID.None)
         {
-            if (InGameFlowLock.IsPresentationPlaying)
+            if (!_participatesInRound || InGameFlowLock.IsPresentationPlaying)
             {
                 return PoseID.None;
             }
@@ -234,7 +237,7 @@ namespace Enemy
 
         public void Pause(EnemyPoseData poseData)
         {
-            if (InGameFlowLock.IsPresentationPlaying)
+            if (!_participatesInRound || InGameFlowLock.IsPresentationPlaying)
             {
                 return;
             }
@@ -253,6 +256,24 @@ namespace Enemy
 
             //Debug.Log($"Enemy {name} paused with pose {_currentPoseID}.");
             _currentPoseData?.PoseAction?.OnStart(this);
+        }
+
+        // 参加確定前の演出用キャラクターは、AIやリクエスト生成の選択対象から除外する。
+        public void SetRoundParticipation(bool participates)
+        {
+            if (_participatesInRound == participates) { return; }
+            _participatesInRound = participates;
+            if (participates) { _enemyRegistry?.Register(this); }
+            else { _enemyRegistry?.Unregister(this); }
+        }
+
+        public void ResetForRound()
+        {
+            OnUnpause();
+            _isParried = false;
+            _parryTimer = 0f;
+            _colorChanger?.ResetColor();
+            GetComponentInChildren<OnStartPose>(true)?.SetTriggerIdle();
         }
 
         public void CommitCurrentPose()

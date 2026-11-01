@@ -76,11 +76,11 @@ float2 GetCellID(float2 coord)
 // ================================
 // 雫中心から見た現在位置を返す
 //
-// coord:
+// 座標：
 //   汗用の座標
 //   今回はUVではなくObject座標から作る
 //
-// return:
+// 戻り値：
 //   現在ピクセルが雫中心からどれだけ離れているか
 // ================================
 float2 GetDropLocal(float2 coord)
@@ -176,7 +176,7 @@ float GetDropMask(float2 coord, float textureMask, float useTexture)
 }
 
 // ================================
-// Vertex Shader
+// 頂点シェーダー
 // ================================
 Varyings vert(Attributes IN)
 {
@@ -192,7 +192,7 @@ Varyings vert(Attributes IN)
 }
 
 // ================================
-// Fragment Shader
+// フラグメントシェーダー
 // ================================
 half4 frag(Varyings IN) : SV_Target
 {

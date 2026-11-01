@@ -39,12 +39,13 @@ namespace Player
         private float _poseTimer = 0f;
 
         public bool IsPosing => _isPose;
+        public Animator PoseAnimator => _animator;
         public Transform MoveTargetTransform => _colorChanger != null ? _colorChanger.transform : transform;
 
         // ポーズ時のイベント
         public event Action<PoseID> OnPoseStart; /*あう*/
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
         private void Start()
         {
             if (_poseSettings == null)
@@ -56,7 +57,7 @@ namespace Player
             _poseParryJudge = poseContext?.GetPoseParryJudge;
             _poseStateTracker = poseContext?.GetPoseStateTracker;
             Debug.Log("PlayerPoseController Start. _poseParryJudge = " + _poseParryJudge);
-            //---animator
+            //---アニメーター
             if (_animator == null)
             { _animator = GetComponent<Animator>(); }
 
@@ -78,7 +79,7 @@ namespace Player
             RuntimeDebug.DebugMenu.DestroyWindow("Player");
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         private void Update()
         {
             if (_isPose)
@@ -193,6 +194,26 @@ namespace Player
             }
             _currentPoseName = "None";
             Debug.Log("Player pose ended.");
+        }
+
+        // ゲーム入力をロックした状態で、エンドレスの試合切り替え時だけ呼び出す。
+        public void ResetForRound()
+        {
+            if (_isPose)
+            {
+                StopPose();
+                return;
+            }
+
+            _poseTimer = 0f;
+            _currentPoseName = "None";
+            _poseParryJudge?.EndPlayerPose();
+            _colorChanger?.ResetColor();
+            if (_animator != null)
+            {
+                ResetAnimationTriggers();
+                _animator.Play(IdleStateHash, 0, 0f);
+            }
         }
 
         private void ResetAnimationTriggers()

@@ -157,6 +157,15 @@ public class FeverGaugeController : MonoBehaviour
         SetFill(0f);
     }
 
+    // エンドレスの試合切り替え時は、フィーバー状態や演出タイマーを次試合へ持ち越さない。
+    public void ResetForRound()
+    {
+        if (_isFever) { EndFever(); }
+        _feverTimer = 0f;
+        ResetFill();
+        HideFeverObjects();
+    }
+
     public void DebugIncreaseFill()
     {
         AddFill();

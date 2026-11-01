@@ -20,7 +20,7 @@ namespace masato.Sandbox
         // --------------------------------------------------------
         private Material runtimeMaterial;
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
         void Start()
         {
             // --------------------------------------------------------
@@ -44,7 +44,7 @@ namespace masato.Sandbox
             UpdateDigits();
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Return))
@@ -72,10 +72,10 @@ namespace masato.Sandbox
             // --------------------------------------------------------
             // 例: number = 1234 のとき
             //
-            // thousands = 1
-            // hundreds  = 2
-            // tens      = 3
-            // ones      = 4
+            // 千の位 = 1
+            // 百の位 = 2
+            // 十の位 = 3
+            // 一の位 = 4
             //
             // というふうに、1つの整数を4桁に分ける
             // --------------------------------------------------------

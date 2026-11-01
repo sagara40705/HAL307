@@ -6,14 +6,14 @@ namespace ushiharu.Sandbox
     {
         public GameObject enemyPrefab;
         public float Spawntime;
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
         void Start()
         {
             //指定した時間分呼び出しを遅らせる
             Invoke("Spawn", Spawntime);
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         void Update()
         {
         

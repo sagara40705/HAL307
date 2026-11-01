@@ -25,7 +25,7 @@ public class TitleUiManager : MonoBehaviour
     [SerializeField]
     private RectTransform[] mMenuItemRects = new RectTransform[(int)TitleMenuItem.Count];
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // MonoBehaviourの生成後、最初のUpdateより前に1回だけ呼び出される
     void Start()
     {
         mTitleMenuItem = TitleMenuItem.Muscle_GrandPrix;    //初期化
@@ -41,7 +41,7 @@ public class TitleUiManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    // 毎フレーム呼び出される
     void Update()
     {
         if (DebugShortcuts.Pressed(Key.UpArrow))

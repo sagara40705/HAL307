@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
+    public enum EndlessScoreGroup
+    {
+        ScreenLeft,
+        ScreenRight
+    }
     [Header("スコア初期化")]
     [SerializeField]
     private string _inGameSceneName = "InGameUI";
@@ -115,6 +120,56 @@ public class ScoreManager : MonoBehaviour
     {
         int index = (int)slot - 1;
         return index >= 0 && index < _enemyScores.Length ? _enemyScores[index] : 0;
+    }
+
+    // NPCがいるグループで0点も表示できるよう、グループの有無と得点を分けて返す。
+    // 加点と交代対象の選択では、引き続きSlotごとの個別スコアを基準にする。
+    public bool TryGetEndlessGroupScore(EnemyLineupManager lineup, EndlessScoreGroup group, out int score)
+    {
+        score = 0;
+        GameModeManager mode = GameModeManager.Instance;
+        if (mode == null || !mode.IsInitialized || mode.CurrentGameMode != GameMode.FivePlayer || lineup == null)
+        {
+            return false;
+        }
+
+        EnemySlotId first;
+        EnemySlotId second;
+        switch (group)
+        {
+            // カメラの向きはY=180度のため、ワールド座標のX正方向が画面左になる。
+            case EndlessScoreGroup.ScreenLeft:
+                first = EnemySlotId.Enemy2;
+                second = EnemySlotId.Enemy3;
+                break;
+            case EndlessScoreGroup.ScreenRight:
+                first = EnemySlotId.Enemy1;
+                second = EnemySlotId.Enemy4;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(group));
+        }
+
+        bool hasFirst = IsCommittedParticipant(lineup, first);
+        bool hasSecond = IsCommittedParticipant(lineup, second);
+        long total = (hasFirst ? (long)GetEnemyScore(first) : 0L) +
+                     (hasSecond ? (long)GetEnemyScore(second) : 0L);
+        score = (int)Math.Min(total, int.MaxValue);
+        return hasFirst || hasSecond;
+    }
+
+    private static bool IsCommittedParticipant(EnemyLineupManager lineup, EnemySlotId slot)
+    {
+        if ((int)slot > lineup.MaxEnemyCount) { return false; }
+        Enemy.Enemy enemy = lineup.GetEnemy(slot);
+        if (enemy == null || !enemy.ParticipatesInRound || !enemy.gameObject.activeInHierarchy)
+        {
+            return false;
+        }
+
+        // 演出フラグが変わる前でも、退場対象に選ばれたキャラクターを除外する。
+        return !lineup.HasPendingReplacement ||
+               (enemy != lineup.PendingOldEnemy && enemy != lineup.PendingNewEnemy);
     }
 
     public Enemy.EnemySlotId GetLowestEnemySlot()

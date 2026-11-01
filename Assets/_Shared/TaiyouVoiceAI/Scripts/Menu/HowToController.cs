@@ -29,10 +29,13 @@ public class HowToController : MonoBehaviour
 
     private int currentIndex;
     private int pageIndex;
+    private int openedFrame = -1;
 
     private void Start()
     {
-        if (howToPanel != null)
+        // Bootが最初のStartより前に、このオブジェクトを先読みして非表示にする場合がある。
+        // その場合、OpenHowToで要求された表示が既に設定されている。
+        if (howToPanel != null && openedFrame < 0)
         {
             howToPanel.SetActive(false);
         }
@@ -40,7 +43,7 @@ public class HowToController : MonoBehaviour
 
     private void Update()
     {
-        if (howToPanel == null || !howToPanel.activeSelf)
+        if (howToPanel == null || !howToPanel.activeInHierarchy || openedFrame == Time.frameCount)
         {
             return;
         }
@@ -50,6 +53,7 @@ public class HowToController : MonoBehaviour
 
     public void OpenHowTo()
     {
+        openedFrame = Time.frameCount;
         if (mainMenuPanel != null)
         {
             mainMenuPanel.SetActive(false);
@@ -91,7 +95,7 @@ public class HowToController : MonoBehaviour
 
     public void OnVoiceCommand(string command)
     {
-        if (string.IsNullOrWhiteSpace(command))
+        if (howToPanel == null || !howToPanel.activeInHierarchy || string.IsNullOrWhiteSpace(command))
         {
             return;
         }

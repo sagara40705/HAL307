@@ -185,11 +185,24 @@ public class TransitionManager : MonoBehaviour
         await Instance.FadeInInternal(duration);
     }
 
-    // 黒背景が指定割合まで薄くなったら演出本体を開始可能にする
-    public static IEnumerator RevealIfCovered(float duration = 0.5f)
+    // 通常モードは消去完了を待つ。既存の呼び出しは指定割合での再開を維持する。
+    public static IEnumerator RevealIfCovered(float duration = 0.5f, bool waitForCompletion = false)
     {
         if (Instance == null || !Instance.HasVisibleTransition())
         {
+            yield break;
+        }
+
+        if (waitForCompletion)
+        {
+            TransitionManager transition = Instance;
+            // シーン切り替えで既に消去が始まっている場合は、その完了だけを待つ。
+            yield return WaitForTransitionCompletion();
+            // 落下中の全ダンベルと背景の消去まで含む、実際の処理完了を待つ。
+            if (transition != null && transition == Instance && transition.HasVisibleTransition())
+            {
+                yield return transition.FadeInInternal(duration).ToCoroutine();
+            }
             yield break;
         }
 

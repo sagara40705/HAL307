@@ -6,7 +6,7 @@ using UnityEngine;
 public static class ProjectSetupMenu
 {
     // ==============================
-    // Project Standard
+    // プロジェクト標準
     // ==============================
 
     private static readonly InputHandlingSetup.Mode DesiredInputHandling = InputHandlingSetup.Mode.NewInputSystem;
@@ -25,7 +25,7 @@ public static class ProjectSetupMenu
     };
 
     // ==============================
-    // Menu
+    // メニュー
     // ==============================
 
     [MenuItem("Tools/Project Setup/Validate Standard Settings", priority = 0)]
@@ -51,7 +51,7 @@ public static class ProjectSetupMenu
     }
 
     // ==============================
-    // Config
+    // 設定
     // ==============================
 
     private static ProjectSetupRunner.Config CreateConfig(

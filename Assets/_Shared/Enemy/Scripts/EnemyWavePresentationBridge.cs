@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace Enemy
 {
-    // Relays wave replacement presentation calls to runtime Enemy instances.
+    // Wave交代演出の呼び出しを、実行時のEnemyインスタンスへ中継する。
     public sealed class EnemyWavePresentationBridge : MonoBehaviour
     {
         [SerializeField] private EnemyLineupManager _enemyLineupManager;
@@ -40,62 +40,62 @@ namespace Enemy
             ResolveLineupManager();
         }
 
-        // Invokes events for the Enemy that will be removed.
+        // 退場するEnemyのイベントを呼び出す。
         public void InvokeRemovingEnemy()
         {
             InvokeEnemyEvent(RemovingEnemy, _onRemovingEnemy, "RemovingEnemy");
         }
 
-        // Invokes a named event set for the Enemy that will be removed.
+        // 退場するEnemyの、指定名のイベントセットを呼び出す。
         public void InvokeRemovingEnemy(string eventSetName)
         {
             InvokeEnemyEventSet(RemovingEnemy, _removingEnemyEventSets, eventSetName, "RemovingEnemy");
         }
 
-        // Invokes events for the newly generated Enemy.
+        // 新しく生成されたEnemyのイベントを呼び出す。
         public void InvokeIncomingEnemy()
         {
             InvokeEnemyEvent(IncomingEnemy, _onIncomingEnemy, "IncomingEnemy");
         }
 
-        // Invokes a named event set for the newly generated Enemy.
+        // 新しく生成されたEnemyの、指定名のイベントセットを呼び出す。
         public void InvokeIncomingEnemy(string eventSetName)
         {
             InvokeEnemyEventSet(IncomingEnemy, _incomingEnemyEventSets, eventSetName, "IncomingEnemy");
         }
 
-        // Invokes removing and incoming Enemy events in order.
+        // 退場するEnemy、新しく参加するEnemyの順にイベントを呼び出す。
         public void InvokeReplacementEnemies()
         {
             InvokeRemovingEnemy();
             InvokeIncomingEnemy();
         }
 
-        // Invokes named event sets for removing and incoming Enemy instances in order.
+        // 退場するEnemy、新しく参加するEnemyの順に、指定名のイベントセットを呼び出す。
         public void InvokeReplacementEnemies(string eventSetName)
         {
             InvokeRemovingEnemy(eventSetName);
             InvokeIncomingEnemy(eventSetName);
         }
 
-        // Changes active state of the Enemy that will be removed.
+        // 退場するEnemyの有効状態を変更する。
         public void SetRemovingEnemyActive(bool isActive)
         {
             SetEnemyActive(RemovingEnemy, isActive, "RemovingEnemy");
         }
 
-        // Changes active state of the newly generated Enemy.
+        // 新しく生成されたEnemyの有効状態を変更する。
         public void SetIncomingEnemyActive(bool isActive)
         {
             SetEnemyActive(IncomingEnemy, isActive, "IncomingEnemy");
         }
 
-        // Empty sample for incoming Enemy presentation.
+        // 参加するEnemyの演出用の空のサンプル。
         public void SampleIncomingEnemyAction(Enemy enemy)
         {
         }
 
-        // Empty sample for removing Enemy presentation.
+        // 退場するEnemyの演出用の空のサンプル。
         public void SampleRemovingEnemyAction(Enemy enemy)
         {
         }

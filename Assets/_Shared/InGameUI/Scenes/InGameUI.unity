@@ -185,6 +185,7 @@ MonoBehaviour:
   - {fileID: 1764857}
   - {fileID: 2119480822}
   warningPresenter: {fileID: 0}
+  audienceRequestSystem: {fileID: 0}
 --- !u!1 &36460463
 GameObject:
   m_ObjectHideFlags: 0
@@ -1719,7 +1720,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be3b0a418c324ed78e9a9940d2a42093, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudienceRequest.FeverGaugeController
-  _flameMaterial: {fileID: 2100000, guid: 20381abbc77054941abb9cd752d95570, type: 2}
+  _flameMaterial: {fileID: 2100000, guid: a747bbaddb3543c5b280f8d7b3d1e9cf, type: 2}
   _fillAmountProperty: _FillAmount
   DefaultFillIncrease: 0.05
   _settings: {fileID: 11400000, guid: ea2bf89f412340769fbc91f7a7ac23f3, type: 2}
@@ -2224,23 +2225,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8859339582741728449, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1920
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 8859339582741728449, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 1080
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 8859339582741728449, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.099999994
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8859339582741728449, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.099999994
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8859339582741728449, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.099999994
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8859339582741728449, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2294,6 +2295,22 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3640764383508598081, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3640764383508598081, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3640764383508598081, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7427477425937497211, guid: a66b264a02dd18044ac1ec205c297b82, type: 3}
+      propertyPath: m_Material
+      value:
+      objectReference: {fileID: 2100000, guid: a747bbaddb3543c5b280f8d7b3d1e9cf, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2335,8 +2352,8 @@ RectTransform:
   - {fileID: 918885604}
   - {fileID: 1673124963}
   - {fileID: 328744064}
-  - {fileID: 773276577}
   - {fileID: 1088096276}
+  - {fileID: 773276577}
   - {fileID: 1491470897}
   m_Father: {fileID: 1718496974}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3320,15 +3337,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreSpriteUIController
   playerScoreDisplay: {fileID: 40763176}
-  enemy1ScoreDisplay: {fileID: 143103181}
-  enemy2ScoreDisplay: {fileID: 810082269}
+  enemy1ScoreDisplay: {fileID: 810082269}
+  enemy2ScoreDisplay: {fileID: 143103181}
+  enemy1ScorePanel: {fileID: 1041751640}
+  enemy2ScorePanel: {fileID: 68549861}
   feverGaugeController: {fileID: 551905174}
   scoreUiPresenter: {fileID: 0}
   showScoreUiOnStart: 1
   playScoreUiOnScoreChanged: 0
   playerScoreAnimator: {fileID: 40763177}
-  enemy1ScoreAnimator: {fileID: 143103182}
-  enemy2ScoreAnimator: {fileID: 810082270}
+  enemy1ScoreAnimator: {fileID: 810082270}
+  enemy2ScoreAnimator: {fileID: 143103182}
   scoreUpTriggerName: ScoreUp
 --- !u!224 &1041751640 stripped
 RectTransform:
@@ -3535,8 +3554,8 @@ MonoBehaviour:
   sceneUiRoots:
   - {fileID: 1718496973}
   nextSceneName: 
-  cellWidth: 130
-  cellHeight: 80
+  cellWidth: 180
+  cellHeight: 120
   extraRows: 3
   spawnInterval: 0.006
   startYOffset: 250

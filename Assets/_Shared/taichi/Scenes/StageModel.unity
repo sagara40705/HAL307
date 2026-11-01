@@ -2368,6 +2368,7 @@ GameObject:
   - component: {fileID: 961590832}
   - component: {fileID: 961590831}
   - component: {fileID: 961590829}
+  - component: {fileID: 961590833}
   m_Layer: 0
   m_Name: Main Monitor Camera
   m_TagString: MainCamera
@@ -2485,6 +2486,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1576856035}
   m_LocalEulerAnglesHint: {x: 1.611, y: 180, z: 0}
+--- !u!114 &961590833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961590828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb03e82d4c058f44e8575d93c67af8a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SubmonitorMove
+  viewMode: 1
+  moveSpeed: 5
+  moveDuration: 1
+  cameraDistance: 7
+  cameraHeight: 1.8
+  lookAtHeight: 1.2
+  orbitElevation: 35
+  sideAngle: 55
+  poseDistance: 4
+  framingPadding: 1.15
+  enableManualCameraControls: 0
 --- !u!1 &967299053
 GameObject:
   m_ObjectHideFlags: 0
@@ -3196,11 +3220,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb03e82d4c058f44e8575d93c67af8a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SubmonitorMove
+  viewMode: 0
   moveSpeed: 5
   moveDuration: 1
   cameraDistance: 5
   cameraHeight: 1.8
   lookAtHeight: 1.2
+  orbitElevation: 25
+  framingPadding: 1.05
 --- !u!114 &1094592044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4813,7 +4840,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3252974025101885775, guid: 3472c455d5f3da440afbe10d485d203c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2000000011}
   m_SourcePrefab: {fileID: 100100000, guid: 3472c455d5f3da440afbe10d485d203c, type: 3}
 --- !u!4 &1422180165 stripped
 Transform:
@@ -6778,6 +6808,31 @@ MonoBehaviour:
   - {fileID: 961590831}
   - {fileID: 1094592046}
   - {fileID: 1038430641}
+--- !u!1 &2000000010 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3252974025101885775, guid: 3472c455d5f3da440afbe10d485d203c, type: 3}
+  m_PrefabInstance: {fileID: 1422180164}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2000000011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000000010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f9399e4e09df8c4c8d7bea6db07eb58, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlanarReflectionRenderer
+  textureSize: 1024
+  reflectionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  clipPlaneOffset: 1.79
+  planeOffset: -4.17
+  reflectionTextureProperty: _ReflectionTex
+  reflectionVpProperty: _ReflectionVP
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -60,7 +60,7 @@ namespace Enemy
             RuntimeDebug.DebugMenu.DestroyWindow(DebugWindowName);
         }
 
-        // Update is called once per frame
+        // 毎フレーム呼び出される
         private void Update()
         {
             if (InGameFlowLock.IsPresentationPlaying)
@@ -154,6 +154,13 @@ namespace Enemy
             _isPaused = false;
             if (_poseParryJudge == null) { return; }
             _poseParryJudge?.EndEnemyPose();
+        }
+
+        public void ResetForRound()
+        {
+            Unpause();
+            ClearFakePoseRequest();
+            _timer = 0f;
         }
 
         // パリイ成功時の処理

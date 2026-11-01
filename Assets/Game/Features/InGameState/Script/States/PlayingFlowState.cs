@@ -39,7 +39,7 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         InGamePresentationAction action = _waveData?.GetWaveStartAction(currentEnemyCount, maxEnemyCount);
         if (action == null)
         {
-            yield return TransitionManager.RevealIfCovered();
+            yield return TransitionManager.RevealIfCovered(waitForCompletion: _stageData == null || !_stageData.IsEndlessMode);
             CommitPendingEnemyReplacement(context);
             yield return PlayResetPositionAction(context);
             context?.ForwardProgressMover?.ResumeMove();
@@ -52,7 +52,8 @@ public sealed class PlayingFlowState : InGameFlowStateBase
         {
             IEnumerator presentation = action.Play(context);
             yield return context != null
-                ? context.PlayWavePresentation(presentation, true)
+                ? context.PlayWavePresentation(presentation, true,
+                    waitForRevealCompletion: _stageData == null || !_stageData.IsEndlessMode)
                 : presentation;
         }
         finally

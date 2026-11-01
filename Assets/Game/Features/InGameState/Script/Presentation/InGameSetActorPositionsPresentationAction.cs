@@ -36,7 +36,7 @@ public sealed class InGameSetActorPositionsPresentationAction : InGamePresentati
         }
 
         SetEnemyPosition(lineup, EnemySlotId.Enemy1, useFivePlayerPositions ? enemy1Position : threePlayerEnemy1Position, true);
-        SetEnemyPosition(lineup, EnemySlotId.Enemy2, useFivePlayerPositions ? enemy2Position : threePlayerEnemy2Position, true);
+        SetEnemyPosition(lineup, EnemySlotId.Enemy2, useFivePlayerPositions ? enemy2Position : threePlayerEnemy2Position, !useFivePlayerPositions);
         if (useFivePlayerPositions)
         {
             SetEnemyPosition(lineup, EnemySlotId.Enemy3, enemy3Position, false);
@@ -45,6 +45,18 @@ public sealed class InGameSetActorPositionsPresentationAction : InGamePresentati
         SetPlayerPosition(player, useFivePlayerPositions ? playerPosition : threePlayerPlayerPosition);
 
         yield break;
+    }
+
+    public Vector3 GetFivePlayerEnemyPosition(EnemySlotId slot)
+    {
+        switch (slot)
+        {
+            case EnemySlotId.Enemy1: return enemy1Position;
+            case EnemySlotId.Enemy2: return enemy2Position;
+            case EnemySlotId.Enemy3: return enemy3Position;
+            case EnemySlotId.Enemy4: return enemy4Position;
+            default: throw new System.ArgumentOutOfRangeException(nameof(slot));
+        }
     }
 
     private void SetEnemyPosition(EnemyLineupManager lineup, EnemySlotId slot, Vector3 position, bool isRequired)

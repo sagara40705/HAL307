@@ -5,6 +5,7 @@ Shader "Custom/LiveMonitor"
         // モニターに表示する映像テクスチャ
         // Render Texture をここに入れる
         [MainTexture] _BaseMap("Monitor Texture", 2D) = "white" {}
+        [HideInInspector] _SidePanelLayout("Full frame on side panel atlas", Float) = 0
 
         // モニター全体の明るさ
         // 数値を上げるほどライブ会場のLED画面のように明るくなる

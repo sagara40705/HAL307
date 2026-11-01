@@ -127,7 +127,8 @@ public sealed class InGameFlowContext : MonoBehaviour
     // Wave演出中だけ3Pモデルを表示。入れ子の演出例外でも復元処理を実行
     public IEnumerator PlayWavePresentation(
         IEnumerator presentation,
-        bool revealTransitionCover = false)
+        bool revealTransitionCover = false,
+        bool waitForRevealCompletion = false)
     {
         if (presentation == null)
         {
@@ -156,8 +157,8 @@ public sealed class InGameFlowContext : MonoBehaviour
 
             if (revealTransitionCover)
             {
-                // 黒背景のフェードが指定位置まで進んだら、ダンベル落下中に演出を重ねて開始する
-                yield return TransitionManager.RevealIfCovered();
+                // 通常モードでは、ダンベルがすべて消えてから演出を開始する。
+                yield return TransitionManager.RevealIfCovered(waitForCompletion: waitForRevealCompletion);
             }
 
             var routines = new Stack<IEnumerator>();
@@ -432,6 +433,7 @@ public sealed class InGameFlowContext : MonoBehaviour
     {
         ResetCameraPosition(stageData);
         ForwardProgressMover?.ResetStageEndJudgePosition();
+        Sound.Manager.SoundManager.Stop((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
         Sound.Manager.SoundManager.Play((int)SceneSoundTag.InGameSound, (int)InGameSoundTag.InGameBGM);
     }
 

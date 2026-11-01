@@ -3,6 +3,8 @@ Shader "Custom/breakstage"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        // エンドレスの中央画面専用。既存マテリアルは両面描画のまま維持する。
+        [Enum(UnityEngine.Rendering.CullMode)] _MonitorCull ("Monitor Cull", Float) = 0
 
         // 破壊する中心位置
         // UVなので 0～1
@@ -53,7 +55,7 @@ Shader "Custom/breakstage"
 
         Blend SrcAlpha OneMinusSrcAlpha
         ZWrite Off
-        Cull Off
+        Cull [_MonitorCull]
 
         Pass
         {

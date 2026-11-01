@@ -18,6 +18,8 @@ public class OnStartPose : MonoBehaviour
     };
 
     private Animator _animator;
+    private bool _countdownHeld;
+    private bool _countdownRootMotion;
 
     [Header("Animation")]
     [SerializeField] private float animationSpeed = 1.0f;
@@ -55,9 +57,9 @@ public class OnStartPose : MonoBehaviour
 
         _animator.CrossFadeInFixedTime(
             IdleStateHash,
-            0.5f,  // Transition duration (seconds)
-            0,     // Layer
-            0f     // Start Idle from beginning
+            0.5f,  // 遷移時間（秒）
+            0,     // レイヤー
+            0f     // Idleを先頭から再生する
         );
     }
 
@@ -113,5 +115,33 @@ public class OnStartPose : MonoBehaviour
     public float GetAnimationSpeed()
     {
         return animationSpeed;
+    }
+
+    // エンドレスではカウントダウン中も既存の登場ポーズを維持する。
+    // ゲーム用Idleには歩行が含まれるため、カウントダウン完了による解除後に遷移する。
+    public void SetCountdownHold(bool held)
+    {
+        if (!TryResolveAnimator()) { return; }
+        if (_countdownHeld == held) { return; }
+        _countdownHeld = held;
+        if (held)
+        {
+            _countdownRootMotion = _animator.applyRootMotion;
+            _animator.applyRootMotion = false;
+            // 生成時に選択したポーズを維持する。参加NPCの着地からのブレンドも含む。
+            int poseIndex = _animator.GetInteger("StartPoseIndex");
+            int poseState = Animator.StringToHash("Base Layer.StartPose.START" + (char)('A' + poseIndex));
+            ResetAnimationTriggers();
+            _animator.ResetTrigger("StartPose");
+            _animator.Play(poseState, 0, 0f);
+            _animator.Update(0f);
+        }
+        else
+        {
+            _animator.applyRootMotion = _countdownRootMotion;
+            ResetAnimationTriggers();
+            _animator.Play(IdleStateHash, 0, 0f);
+        }
+        _animator.speed = animationSpeed;
     }
 }
